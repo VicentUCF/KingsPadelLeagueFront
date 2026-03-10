@@ -1,0 +1,26 @@
+<header class="match-card__header">
+  <div class="match-card__identity">
+    <p class="match-card__club">{{ match().clubName }}</p>
+    <h3 class="match-card__title">{{ match().courtName }}</h3>
+  </div>
+
+  <span class="match-card__status" [class.match-card__status--ready]="match().isReady">
+    {{ match().statusLabel }}
+  </span>
+</header>
+
+<p class="match-card__schedule">
+  {{ match().scheduledAt | date: 'EEE, d MMM · HH:mm' }}
+</p>
+
+<p class="match-card__meta">
+  {{ match().confirmedPlayersCount }}/{{ match().requiredPlayersCount }} players confirmed
+</p>
+
+@if (match().confirmedPlayers.length) {
+  <ul aria-label="Confirmed players" class="match-card__players" role="list">
+    @for (player of match().confirmedPlayers; track player) {
+      <li class="match-card__player">{{ player }}</li>
+    }
+  </ul>
+}

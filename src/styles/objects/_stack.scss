@@ -1,0 +1,8 @@
+.o-stack {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.o-stack--compact {
+  gap: var(--space-4);
+}

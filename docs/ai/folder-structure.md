@@ -343,9 +343,7 @@ export const PLAYERS_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/players-page/players-page.component').then(
-        (m) => m.PlayersPageComponent,
-      ),
+      import('./pages/players-page/players-page.component').then((m) => m.PlayersPageComponent),
   },
 ];
 ```

@@ -55,17 +55,17 @@ Prefer specific names that describe **responsibility and context**.
 Bad:
 
 ```ts
-dataService
-helper
-manager
+dataService;
+helper;
+manager;
 ```
 
 Better:
 
 ```ts
-playerRepository
-matchResultValidator
-marketValueCalculator
+playerRepository;
+matchResultValidator;
+marketValueCalculator;
 ```
 
 ## Domain Naming
@@ -409,8 +409,8 @@ it('should increase market value after a victory', () => {});
 Avoid vague names:
 
 ```ts
-it('works')
-it('test player')
+it('works');
+it('test player');
 ```
 
 ## Enum Naming

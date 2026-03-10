@@ -112,13 +112,13 @@ Example:
 Bad:
 
 ```html
-<button role="button">
+<button role="button"></button>
 ```
 
 Correct:
 
 ```html
-<button>
+<button></button>
 ```
 
 Use ARIA carefully for:
@@ -181,7 +181,7 @@ Buttons and links must have clear semantics.
 Use:
 
 ```html
-<button>
+<button></button>
 ```
 
 for actions.
@@ -189,7 +189,7 @@ for actions.
 Use:
 
 ```html
-<a>
+<a></a>
 ```
 
 for navigation.
@@ -197,13 +197,13 @@ for navigation.
 Bad:
 
 ```html
-<div class="button" (click)="save()">
+<div class="button" (click)="save()"></div>
 ```
 
 Correct:
 
 ```html
-<button (click)="save()">
+<button (click)="save()"></button>
 ```
 
 Rules:
@@ -260,8 +260,7 @@ Requirements:
 Example:
 
 ```html
-<label for="player-name">Player name</label>
-<input id="player-name" type="text" />
+<label for="player-name">Player name</label> <input id="player-name" type="text" />
 ```
 
 Error handling must be clear and accessible.
@@ -321,7 +320,7 @@ Requirements:
 Example:
 
 ```html
-<div role="dialog" aria-labelledby="dialog-title">
+<div role="dialog" aria-labelledby="dialog-title"></div>
 ```
 
 Rules:

@@ -1,0 +1,101 @@
+.app-shell {
+  &__skip-link {
+    position: absolute;
+    inset-block-start: var(--space-4);
+    inset-inline-start: var(--space-4);
+    z-index: var(--z-index-overlay);
+  }
+
+  &__header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-index-header);
+    backdrop-filter: blur(18px);
+    background:
+      linear-gradient(180deg, rgb(250 248 242 / 96%), rgb(250 248 242 / 82%)), var(--color-surface);
+    border-block-end: 1px solid var(--color-border-subtle);
+  }
+
+  &__header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+  }
+
+  &__brand-group {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__brand {
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.6rem, 2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  &__nav-link {
+    padding: var(--space-2) var(--space-4);
+    border-radius: 999px;
+    color: var(--color-text-default);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+
+    &:hover {
+      background-color: rgb(17 94 89 / 8%);
+      color: var(--color-text-strong);
+      transform: translateY(-1px);
+    }
+
+    &--active {
+      background-color: var(--color-brand);
+      color: var(--color-brand-contrast);
+    }
+  }
+
+  &__content {
+    padding-block: var(--space-8) var(--space-12);
+  }
+}
+
+@media (max-width: 48rem) {
+  .app-shell {
+    &__header-inner {
+      align-items: flex-start;
+    }
+
+    &__nav {
+      width: 100%;
+    }
+
+    &__nav-link {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}

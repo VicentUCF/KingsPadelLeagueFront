@@ -134,7 +134,7 @@ Example:
 
 ```html
 @for (player of players(); track player.id) {
-  <app-player-card [player]="player" />
+<app-player-card [player]="player" />
 }
 ```
 

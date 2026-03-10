@@ -334,13 +334,17 @@ Example:
 
 ```scss
 .c-player-card {
-  &__avatar {}
+  &__avatar {
+  }
 
-  &__name {}
+  &__name {
+  }
 
-  &__stats {}
+  &__stats {
+  }
 
-  &--highlighted {}
+  &--highlighted {
+  }
 }
 ```
 
@@ -377,7 +381,8 @@ Good example:
 
 ```scss
 .c-player-card {
-  &__avatar {}
+  &__avatar {
+  }
 }
 ```
 
@@ -400,8 +405,10 @@ Example:
 
 ```scss
 .player-card {
-  &__name {}
-  &__stats {}
+  &__name {
+  }
+  &__stats {
+  }
 }
 ```
 

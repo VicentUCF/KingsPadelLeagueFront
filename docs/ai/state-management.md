@@ -253,7 +253,7 @@ When consuming APIs, it can be useful to convert observables to signals.
 Example:
 
 ```ts
-toSignal(apiCall$)
+toSignal(apiCall$);
 ```
 
 Rules:
@@ -292,13 +292,13 @@ State updates should remain immutable.
 Bad:
 
 ```ts
-players().push(newPlayer)
+players().push(newPlayer);
 ```
 
 Good:
 
 ```ts
-players.update((players) => [...players, newPlayer])
+players.update((players) => [...players, newPlayer]);
 ```
 
 Rules:

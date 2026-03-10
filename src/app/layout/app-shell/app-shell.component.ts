@@ -1,0 +1,18 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+
+import { applicationMetadata } from '@core/config/application-metadata';
+
+@Component({
+  selector: 'app-shell',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'app-shell',
+  },
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  templateUrl: './app-shell.component.html',
+  styleUrl: './app-shell.component.scss',
+})
+export class AppShellComponent {
+  protected readonly applicationMetadata = applicationMetadata;
+}

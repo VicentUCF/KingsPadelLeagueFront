@@ -1,0 +1,29 @@
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgb(17 94 89 / 12%), transparent 35%),
+    radial-gradient(circle at top right, rgb(199 92 32 / 12%), transparent 32%),
+    var(--color-surface);
+  color: var(--color-text-default);
+  font-family: var(--font-family-body);
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgb(17 94 89 / 20%);
+}

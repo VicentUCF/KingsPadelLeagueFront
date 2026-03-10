@@ -1,0 +1,69 @@
+<section class="matches-page__hero o-stack o-stack--compact">
+  <p class="matches-page__eyebrow">Golden path feature</p>
+
+  <div class="matches-page__hero-row">
+    <div class="o-stack o-stack--compact">
+      <h1>Upcoming padel matches</h1>
+      <p>
+        Reference feature for the project foundation: pure domain model, explicit use case,
+        route-scoped providers and UI state handled with Angular signals.
+      </p>
+    </div>
+
+    <button
+      class="matches-page__refresh"
+      type="button"
+      (click)="reloadMatches()"
+      [disabled]="store.isLoading()"
+    >
+      Refresh board
+    </button>
+  </div>
+</section>
+
+<section aria-label="Schedule summary" class="o-grid o-grid--metrics">
+  <article class="c-metric">
+    <span class="c-metric__label">Upcoming slots</span>
+    <strong class="c-metric__value">{{ store.matches().length }}</strong>
+  </article>
+
+  <article class="c-metric">
+    <span class="c-metric__label">Ready to play</span>
+    <strong class="c-metric__value">{{ store.readyMatchesCount() }}</strong>
+  </article>
+
+  <article class="c-metric">
+    <span class="c-metric__label">Missing players</span>
+    <strong class="c-metric__value">{{ store.pendingMatchesCount() }}</strong>
+  </article>
+</section>
+
+@if (store.errorMessage()) {
+  <p class="matches-page__status matches-page__status--error" role="status">
+    {{ store.errorMessage() }}
+  </p>
+}
+
+@if (store.isLoading()) {
+  <p class="matches-page__status" role="status">Loading upcoming matches…</p>
+} @else if (store.hasMatches()) {
+  <section class="matches-page__list o-stack o-stack--compact">
+    <div class="matches-page__section-heading">
+      <h2>Schedule board</h2>
+      <p>The page shows how a feature can stay cohesive while keeping business rules outside UI.</p>
+    </div>
+
+    <div class="o-grid o-grid--cards" role="list">
+      @for (match of store.matches(); track match.id) {
+        <div role="listitem">
+          <app-upcoming-match-card [match]="match" />
+        </div>
+      }
+    </div>
+  </section>
+} @else {
+  <app-empty-state
+    [description]="'Create or import matches and they will appear here.'"
+    [title]="'No upcoming matches yet'"
+  />
+}

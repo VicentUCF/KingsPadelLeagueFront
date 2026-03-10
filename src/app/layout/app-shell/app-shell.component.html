@@ -1,0 +1,28 @@
+<a class="app-shell__skip-link u-visually-hidden-focusable" href="#app-content">
+  Skip to content
+</a>
+
+<header class="app-shell__header">
+  <div class="o-container app-shell__header-inner">
+    <div class="app-shell__brand-group">
+      <p class="app-shell__eyebrow">{{ applicationMetadata.technicalBaseline }}</p>
+      <a class="app-shell__brand" routerLink="/">{{ applicationMetadata.name }}</a>
+    </div>
+
+    <nav aria-label="Primary" class="app-shell__nav">
+      <a
+        class="app-shell__nav-link"
+        routerLink="/matches"
+        routerLinkActive="app-shell__nav-link--active"
+      >
+        Upcoming matches
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="app-shell__content" id="app-content">
+  <div class="o-container">
+    <router-outlet />
+  </div>
+</main>

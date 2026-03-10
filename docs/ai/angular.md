@@ -158,15 +158,15 @@ Good:
 
 ```html
 @if (players().length) {
-  <ul class="players-list">
-    @for (player of players(); track player.id) {
-      <li>
-        <app-player-card [player]="player" />
-      </li>
-    }
-  </ul>
+<ul class="players-list">
+  @for (player of players(); track player.id) {
+  <li>
+    <app-player-card [player]="player" />
+  </li>
+  }
+</ul>
 } @else {
-  <p>No players found.</p>
+<p>No players found.</p>
 }
 ```
 
@@ -267,9 +267,7 @@ export const PLAYERS_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/players-page/players-page.component').then(
-        (m) => m.PlayersPageComponent,
-      ),
+      import('./pages/players-page/players-page.component').then((m) => m.PlayersPageComponent),
   },
 ];
 ```

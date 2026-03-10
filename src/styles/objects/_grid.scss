@@ -1,0 +1,12 @@
+.o-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.o-grid--metrics {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.o-grid--cards {
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}

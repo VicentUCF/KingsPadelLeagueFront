@@ -1,59 +1,104 @@
-# FantasyFrontend
+# Padel Fantasy Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+Angular 21 frontend foundation prepared for serious feature work: hexagonal architecture, strict TypeScript, signals-first UI state, SCSS with ITCSS, Jest, Testing Library and team-oriented tooling.
 
-## Development server
-
-To start a local development server, run:
+## Quick start
 
 ```bash
-ng serve
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open `http://localhost:4200`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Scripts
 
 ```bash
-ng generate component component-name
+npm run start          # Angular dev server
+npm run build          # Production build
+npm run build:watch    # Build in watch mode
+npm run lint           # ESLint on app source
+npm run lint:fix       # ESLint autofix
+npm run format         # Prettier write
+npm run format:check   # Prettier check
+npm run typecheck      # TypeScript app + test projects
+npm run test           # Jest once
+npm run test:watch     # Jest watch mode
+npm run test:coverage  # Jest with coverage
+npm run test:ci        # CI-oriented Jest run
+npm run validate       # Lint + typecheck + tests + build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Tooling baseline
 
-```bash
-ng generate --help
+- ESLint with `angular-eslint` flat config and accessibility template rules.
+- Prettier + EditorConfig for formatting consistency.
+- Husky + lint-staged for pre-commit checks.
+- Commitlint with Conventional Commits.
+- Path aliases in `tsconfig.json` for `@core`, `@layout`, `@shared`, `@features`, `@styles` and `@testing`.
+- Jest + `jest-preset-angular` + `@testing-library/angular`.
+
+## Architecture
+
+The application uses a feature-first hexagonal structure:
+
+```txt
+src/app/
+  core/
+  layout/
+  shared/
+  features/
 ```
 
-## Building
+Inside each feature:
 
-To build the project run:
-
-```bash
-ng build
+```txt
+feature/
+  domain/
+  application/
+  infrastructure/
+  ui/
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+`ui` is the Angular presentation adapter. Domain stays framework-free, application contains use cases and ports, infrastructure implements adapters, and UI orchestrates user-facing state without embedding business rules.
 
-## Running unit tests
+The example feature lives in `src/app/features/matches` and is the reference implementation to copy from.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Styling
 
-```bash
-ng test
+Global styles live in `src/styles` and follow ITCSS:
+
+```txt
+settings -> tools -> generic -> elements -> objects -> components -> utilities
 ```
 
-## Running end-to-end tests
+- Design tokens are defined in Sass settings and exposed as CSS custom properties.
+- Layout abstractions use `o-*`.
+- Reusable global components use `c-*`.
+- Utilities use `u-*`.
+- Component-local styles use BEM naming inside each component stylesheet.
 
-For end-to-end (e2e) testing, run:
+Import order is centralized in `src/styles.scss`. Avoid importing whole global layers inside component styles.
 
-```bash
-ng e2e
-```
+## Testing
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The project is prepared for TDD:
 
-## Additional Resources
+- Domain tests for pure rules.
+- Application tests for use-case orchestration.
+- Angular component/page tests with Testing Library.
+- Jest runs in a zoneless Angular test environment to match the app baseline.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Playwright is intentionally deferred. Add it later only for critical end-to-end flows.
+
+## Conventions
+
+- Standalone components only.
+- `ChangeDetectionStrategy.OnPush` everywhere.
+- Use `input()` and `output()` APIs.
+- Prefer `inject()` over constructor injection in Angular code.
+- Keep business logic in domain/application, never in components.
+- Feature state should use signals and computed values, with effects reserved for real side effects.
+- Repositories are ports in application and adapters in infrastructure.
+
+Additional project notes live in [frontend-foundation.md](docs/architecture/frontend-foundation.md).

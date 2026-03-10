@@ -1,0 +1,6 @@
+@use '../settings' as settings;
+
+.o-container {
+  width: min(100% - (var(--space-4) * 2), #{settings.$container-width});
+  margin-inline: auto;
+}
