@@ -1,56 +1,275 @@
+# AGENTS.md
 
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+This file defines the **global development rules** for the frontend codebase.
 
-## TypeScript Best Practices
+All generated code must follow the standards described here and in the specialized documents referenced below.
 
-- Use strict type checking
-- Prefer type inference when the type is obvious
-- Avoid the `any` type; use `unknown` when type is uncertain
+This project prioritizes:
 
-## Angular Best Practices
+- maintainability
+- scalability
+- testability
+- accessibility
+- clear architecture
+- predictable styling
+- small, focused code units
 
-- Always use standalone components over NgModules
-- Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
-- Use signals for state management
-- Implement lazy loading for feature routes
-- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
-- Use `NgOptimizedImage` for all static images.
-  - `NgOptimizedImage` does not work for inline base64 images.
+If a tradeoff must be made between **speed and long-term maintainability**, prefer maintainability unless it blocks delivery.
 
-## Accessibility Requirements
+---
 
-- It MUST pass all AXE checks.
-- It MUST follow all WCAG AA minimums, including focus management, color contrast, and ARIA attributes.
+# Core Principles
 
-### Components
+All code must follow these fundamental principles:
 
-- Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
-- Use `computed()` for derived state
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
-- Prefer Reactive forms instead of Template-driven ones
-- Do NOT use `ngClass`, use `class` bindings instead
-- Do NOT use `ngStyle`, use `style` bindings instead
-- When using external templates/styles, use paths relative to the component TS file.
+- Keep files **small and focused**.
+- Avoid large components, services, or stylesheets.
+- Maintain **low coupling and high cohesion**.
+- Avoid duplication.
+- Prefer explicit and readable code over clever abstractions.
+- Favor **composition over inheritance**.
+- Keep business logic outside UI components.
+- Maintain strict separation between **domain logic and framework code**.
 
-## State Management
+Refactoring must follow principles from:
 
-- Use signals for local component state
-- Use `computed()` for derived state
-- Keep state transformations pure and predictable
-- Do NOT use `mutate` on signals, use `update` or `set` instead
+https://refactoring.guru/
 
-## Templates
+Common refactoring practices include:
 
-- Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
-- Use the async pipe to handle observables
-- Do not assume globals like (`new Date()`) are available.
-- Do not write arrow functions in templates (they are not supported).
+- Extract Method
+- Extract Class
+- Remove Duplication
+- Replace Magic Numbers with Named Constants
+- Replace Conditional Complexity with better modeling
+- Rename unclear symbols
+- Break large files into smaller cohesive units
 
-## Services
+Code should never be left worse than it was found.
 
-- Design services around a single responsibility
-- Use the `providedIn: 'root'` option for singleton services
-- Use the `inject()` function instead of constructor injection
+---
+
+# Architecture
+
+This project follows **Hexagonal Architecture (Ports and Adapters)**.
+
+The frontend must respect the following layers:
+
+- **Domain**
+- **Application**
+- **Infrastructure**
+- **Presentation**
+
+Rules:
+
+- Domain contains pure business logic.
+- Domain must not depend on Angular.
+- Application orchestrates domain behavior through use cases.
+- Infrastructure handles external integrations.
+- Presentation (Angular) handles UI concerns only.
+
+UI components must not contain domain rules.
+
+More details:  
+See `docs/ai/architecture.md`
+
+---
+
+# Development Model
+
+The project follows **TDD (Test-Driven Development)**.
+
+Process:
+
+1. Write a failing test.
+2. Implement the minimum code to pass.
+3. Refactor.
+4. Ensure tests remain green.
+
+Every business rule must have tests.
+
+See `docs/ai/testing.md`.
+
+---
+
+# Angular Development
+
+Angular code must follow modern Angular standards:
+
+- Standalone components
+- Signals for state
+- OnPush change detection
+- Lazy loaded feature routes
+
+More detailed rules are defined in:
+
+`docs/ai/angular.md`
+
+---
+
+# TypeScript Standards
+
+Type safety is mandatory.
+
+Rules include:
+
+- strict typing
+- no `any`
+- explicit domain modeling
+- small focused types
+- immutable patterns when possible
+
+See:
+
+`docs/ai/typescript.md`
+
+---
+
+# State Management
+
+State must primarily use **Angular signals**.
+
+Guidelines include:
+
+- signals for state
+- computed for derived state
+- predictable updates
+- minimal side effects
+
+See:
+
+`docs/ai/state-management.md`
+
+---
+
+# Styling System
+
+The styling architecture uses:
+
+**SCSS + ITCSS + BEM**
+
+Goals:
+
+- predictable cascade
+- low specificity
+- scalable styles
+- reusable abstractions
+
+Full rules:
+
+`docs/ai/styling.md`
+
+---
+
+# Accessibility
+
+Accessibility is **not optional**.
+
+The application must:
+
+- pass AXE checks
+- comply with WCAG AA minimum standards
+- ensure keyboard accessibility
+- ensure proper semantic HTML usage
+
+See:
+
+`docs/ai/accessibility.md`
+
+---
+
+# Folder Structure
+
+The project follows a **feature-first structure** combined with architectural boundaries.
+
+Rules are defined in:
+
+`docs/ai/folder-structure.md`
+
+---
+
+# Refactoring Standards
+
+Refactoring is mandatory during development.
+
+Files should remain:
+
+- readable
+- small
+- well separated
+- easy to navigate
+
+Guidelines:
+
+`docs/ai/refactoring.md`
+
+---
+
+# Naming Conventions
+
+Naming must reflect **business meaning and intent**.
+
+Avoid vague names such as:
+
+- data
+- helper
+- manager
+- utils
+
+See:
+
+`docs/ai/naming.md`
+
+---
+
+# Backend Contracts
+
+Frontend must not depend directly on backend response structures.
+
+Use:
+
+- DTOs
+- mappers
+- adapters
+
+Details:
+
+`docs/ai/backend-contracts.md`
+
+---
+
+# Task-Based Rule Loading
+
+When working on a specific task, load the relevant rule files.
+
+| Task Type                | Required Documents   |
+| ------------------------ | -------------------- |
+| Architecture changes     | architecture.md      |
+| Angular components       | angular.md           |
+| Type modeling            | typescript.md        |
+| State logic              | state-management.md  |
+| Styling work             | styling.md           |
+| Accessibility work       | accessibility.md     |
+| Testing work             | testing.md           |
+| Refactoring work         | refactoring.md       |
+| Folder structure changes | folder-structure.md  |
+| API integration          | backend-contracts.md |
+
+Always apply **AGENTS.md rules first**, then the specialized document.
+
+---
+
+# Code Generation Expectations
+
+When generating code:
+
+- Respect hexagonal architecture.
+- Produce production-grade code.
+- Keep files small and focused.
+- Follow ITCSS + BEM for styles.
+- Use signals for state.
+- Include tests when implementing behavior.
+- Ensure accessibility is preserved.
+- Apply refactoring when structure becomes unclear.
+
+Code should always prioritize **clarity, maintainability, and correctness**.
