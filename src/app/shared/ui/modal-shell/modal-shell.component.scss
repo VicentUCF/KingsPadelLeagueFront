@@ -21,10 +21,10 @@
   &__panel {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    gap: var(--space-5);
+    gap: var(--space-6);
     width: min(100%, 38rem);
     max-height: min(90vh, 44rem);
-    padding: var(--space-6);
+    padding: var(--space-7);
     overflow: auto;
     border: 1px solid var(--color-border-subtle);
     border-radius: 1.5rem;
@@ -42,12 +42,12 @@
     display: flex;
     align-items: start;
     justify-content: space-between;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
 
   &__header-copy {
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-3);
   }
 
   h2,
@@ -80,7 +80,21 @@
 
   &__body {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-5);
+    min-width: 0;
+  }
+
+  &__body-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    min-width: 0;
+  }
+
+  &__body-content > div {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     min-width: 0;
   }
 
@@ -88,7 +102,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: end;
-    gap: var(--space-3);
+    gap: var(--space-4);
+    padding-block-start: var(--space-2);
   }
 }
 
@@ -102,7 +117,7 @@
     &__panel {
       width: 100%;
       max-height: min(92vh, 48rem);
-      padding: var(--space-5);
+      padding: var(--space-6);
       border-radius: 1.25rem;
     }
 

@@ -1,0 +1,72 @@
+.c-select-control {
+  position: relative;
+
+  &__select {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--field-control-text-color);
+    color-scheme: dark;
+    font: inherit;
+    line-height: 1.4;
+    outline: none;
+    appearance: none;
+
+    option,
+    optgroup {
+      background: var(--color-surface-raised);
+      color: var(--color-text-strong);
+      font: inherit;
+    }
+
+    option:checked {
+      background: color-mix(in srgb, var(--color-brand) 26%, var(--color-surface-raised));
+      color: var(--color-text-strong);
+    }
+
+    option:disabled {
+      color: var(--color-text-muted);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      color: var(--color-text-muted);
+      -webkit-text-fill-color: var(--color-text-muted);
+    }
+  }
+
+  &__indicator {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 0.85rem;
+    height: 0.85rem;
+    color: var(--field-control-affix-color);
+    pointer-events: none;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset-block-start: 50%;
+      width: 0.48rem;
+      height: 1px;
+      background: currentColor;
+    }
+
+    &::before {
+      inset-inline-start: 0.04rem;
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    &::after {
+      inset-inline-end: 0.04rem;
+      transform: translateY(-50%) rotate(-45deg);
+    }
+  }
+}

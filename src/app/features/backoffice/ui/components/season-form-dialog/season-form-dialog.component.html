@@ -9,7 +9,7 @@
   size="wide"
   (closed)="close()"
 >
-  <div modalBody>
+  <div modalBody class="season-form-dialog__body">
     <div class="season-form-dialog__steps" aria-label="Progreso del formulario">
       @for (step of steps; track step.label; let index = $index) {
         <div
@@ -35,40 +35,48 @@
       @switch (currentStep()) {
         @case (0) {
           <div class="season-form-dialog__grid">
-            <label class="season-form-dialog__field">
-              <span>Nombre</span>
-              <input formControlName="name" type="text" />
-              @if (hasControlError('name')) {
-                <small>El nombre de la season es obligatorio.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="name"
+              label="Nombre"
+              [errorMessage]="
+                hasControlError('name') ? 'El nombre de la season es obligatorio.' : null
+              "
+              required
+              type="text"
+            />
 
-            <label class="season-form-dialog__field">
-              <span>Año</span>
-              <input formControlName="year" type="number" />
-              @if (hasControlError('year')) {
-                <small>Introduce un año válido entre 2000 y 2100.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="year"
+              label="Año"
+              [errorMessage]="
+                hasControlError('year') ? 'Introduce un año válido entre 2000 y 2100.' : null
+              "
+              [max]="2100"
+              [min]="2000"
+              required
+              type="number"
+            />
           </div>
         }
         @case (1) {
           <div class="season-form-dialog__grid">
-            <label class="season-form-dialog__field">
-              <span>Inicio</span>
-              <input formControlName="startDate" type="date" />
-              @if (hasControlError('startDate')) {
-                <small>La fecha de inicio es obligatoria.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="startDate"
+              label="Inicio"
+              [errorMessage]="
+                hasControlError('startDate') ? 'La fecha de inicio es obligatoria.' : null
+              "
+              required
+              type="date"
+            />
 
-            <label class="season-form-dialog__field">
-              <span>Fin</span>
-              <input formControlName="endDate" type="date" />
-              @if (hasControlError('endDate')) {
-                <small>La fecha de fin es obligatoria.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="endDate"
+              label="Fin"
+              [errorMessage]="hasControlError('endDate') ? 'La fecha de fin es obligatoria.' : null"
+              required
+              type="date"
+            />
           </div>
 
           @if (hasDateRangeError()) {
@@ -79,19 +87,17 @@
         }
         @case (2) {
           <div class="season-form-dialog__stack">
-            <label class="season-form-dialog__field">
-              <span>Estado base</span>
-              <select formControlName="status">
-                <option value="DRAFT">Borrador</option>
-                <option value="ACTIVE">Activa</option>
-              </select>
-            </label>
+            <app-base-select formControlName="status" label="Estado base">
+              <option value="DRAFT">Borrador</option>
+              <option value="ACTIVE">Activa</option>
+            </app-base-select>
 
-            <label class="season-form-dialog__field">
-              <span>Notas operativas</span>
-              <textarea formControlName="notes" rows="5"></textarea>
-              <small>Usa una línea por nota.</small>
-            </label>
+            <app-base-textarea
+              formControlName="notes"
+              helperText="Usa una línea por nota."
+              label="Notas operativas"
+              rows="5"
+            />
           </div>
         }
       }

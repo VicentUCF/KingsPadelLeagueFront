@@ -1,0 +1,92 @@
+<app-form-field
+  [controlId]="controlId()"
+  [errorMessage]="errorMessage()"
+  [helperId]="helperId()"
+  [helperText]="helperText()"
+  [label]="label()"
+  [labelHidden]="labelHidden()"
+  [messageId]="messageId()"
+  [required]="required()"
+  [size]="size()"
+  [successMessage]="successMessage()"
+  [width]="width()"
+>
+  <div
+    class="c-input-control"
+    [class.c-input-control--default]="variant() === 'default'"
+    [class.c-input-control--outlined]="variant() === 'outlined'"
+    [class.c-input-control--filled]="variant() === 'filled'"
+    [class.c-input-control--ghost]="variant() === 'ghost'"
+    [class.c-input-control--sm]="size() === 'sm'"
+    [class.c-input-control--md]="size() === 'md'"
+    [class.c-input-control--lg]="size() === 'lg'"
+    [class.c-input-control--error]="resolvedState() === 'error'"
+    [class.c-input-control--success]="resolvedState() === 'success'"
+    [class.c-input-control--readonly]="readOnly()"
+    [class.c-input-control--disabled]="isDisabled()"
+    [class.c-input-control--loading]="loading()"
+  >
+    @if (leadingIcon()) {
+      <span aria-hidden="true" class="c-input-control__icon">
+        <lucide-angular [img]="leadingIcon()!" [size]="iconSize()" />
+      </span>
+    }
+
+    @if (prefix()) {
+      <span class="c-input-control__affix c-input-control__affix--prefix">{{ prefix() }}</span>
+    }
+
+    <input
+      class="c-input-control__input"
+      [attr.aria-busy]="loading() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-invalid]="resolvedState() === 'error' ? 'true' : 'false'"
+      [attr.aria-label]="effectiveAriaLabel()"
+      [attr.autocomplete]="autocomplete()"
+      [attr.id]="controlId()"
+      [attr.inputmode]="inputMode()"
+      [attr.max]="max()"
+      [attr.maxlength]="maxLength()"
+      [attr.min]="min()"
+      [attr.minlength]="minLength()"
+      [attr.name]="name()"
+      [attr.placeholder]="placeholder()"
+      [attr.readonly]="readOnly() ? true : null"
+      [attr.required]="required() ? true : null"
+      [attr.step]="step()"
+      [attr.type]="type()"
+      [disabled]="isDisabled()"
+      [value]="value()"
+      (blur)="handleBlur()"
+      (input)="handleInput($event)"
+    />
+
+    @if (suffix()) {
+      <span class="c-input-control__affix c-input-control__affix--suffix">{{ suffix() }}</span>
+    }
+
+    @if (trailingIcon() && !loading()) {
+      <span aria-hidden="true" class="c-input-control__icon c-input-control__icon--trailing">
+        <lucide-angular [img]="trailingIcon()!" [size]="iconSize()" />
+      </span>
+    }
+
+    @if (loading()) {
+      <span aria-hidden="true" class="c-input-control__spinner"></span>
+    }
+
+    @if (hasAction() && !loading()) {
+      <button
+        class="c-input-control__action"
+        type="button"
+        [attr.aria-label]="actionLabel()"
+        [attr.aria-pressed]="actionPressed() ?? null"
+        [disabled]="isActionDisabled()"
+        (click)="triggerAction()"
+        (mousedown)="handleActionMouseDown($event)"
+      >
+        <lucide-angular [img]="actionIcon()!" [size]="iconSize()" aria-hidden="true" />
+      </button>
+    }
+  </div>
+</app-form-field>

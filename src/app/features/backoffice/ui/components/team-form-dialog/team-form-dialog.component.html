@@ -9,7 +9,7 @@
   size="wide"
   (closed)="close()"
 >
-  <div modalBody>
+  <div modalBody class="team-form-dialog__body">
     <div class="team-form-dialog__steps" aria-label="Progreso del formulario">
       <div [class.team-form-dialog__step--active]="isCurrentStep(0)" class="team-form-dialog__step">
         <span>1</span>
@@ -30,48 +30,61 @@
       @switch (currentStep()) {
         @case (0) {
           <div class="team-form-dialog__grid">
-            <label class="team-form-dialog__field">
-              <span>Nombre</span>
-              <input formControlName="name" type="text" />
-              @if (hasControlError('name')) {
-                <small>El nombre del equipo es obligatorio.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="name"
+              label="Nombre"
+              [errorMessage]="
+                hasControlError('name') ? 'El nombre del equipo es obligatorio.' : null
+              "
+              required
+              type="text"
+            />
 
-            <label class="team-form-dialog__field">
-              <span>Siglas</span>
-              <input formControlName="shortName" maxlength="5" type="text" />
-              @if (hasControlError('shortName')) {
-                <small>Usa entre 2 y 5 letras en mayúsculas.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="shortName"
+              label="Siglas"
+              [errorMessage]="
+                hasControlError('shortName') ? 'Usa entre 2 y 5 letras en mayúsculas.' : null
+              "
+              [maxLength]="5"
+              required
+              type="text"
+            />
           </div>
         }
         @case (1) {
           <div class="team-form-dialog__grid">
-            <label class="team-form-dialog__field">
-              <span>Presidente</span>
-              <input formControlName="presidentName" type="text" />
-              @if (hasControlError('presidentName')) {
-                <small>La presidencia actual es obligatoria.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="presidentName"
+              label="Presidente"
+              [errorMessage]="
+                hasControlError('presidentName') ? 'La presidencia actual es obligatoria.' : null
+              "
+              required
+              type="text"
+            />
 
-            <label class="team-form-dialog__field">
-              <span>Color principal</span>
-              <input formControlName="primaryColor" type="text" />
-              @if (hasControlError('primaryColor')) {
-                <small>Introduce un color hexadecimal válido.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="primaryColor"
+              helperText="Formato hexadecimal, por ejemplo #1B1F3B."
+              label="Color principal"
+              [errorMessage]="
+                hasControlError('primaryColor') ? 'Introduce un color hexadecimal válido.' : null
+              "
+              required
+              type="text"
+            />
 
-            <label class="team-form-dialog__field">
-              <span>Color secundario</span>
-              <input formControlName="secondaryColor" type="text" />
-              @if (hasControlError('secondaryColor')) {
-                <small>Introduce un color hexadecimal válido.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="secondaryColor"
+              helperText="Formato hexadecimal, por ejemplo #D4AF37."
+              label="Color secundario"
+              [errorMessage]="
+                hasControlError('secondaryColor') ? 'Introduce un color hexadecimal válido.' : null
+              "
+              required
+              type="text"
+            />
           </div>
         }
       }

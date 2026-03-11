@@ -12,6 +12,9 @@ import {
   type BackofficeCrudFormMode,
   type BackofficeSeasonFormValue,
 } from '../../models/backoffice-crud.model';
+import { BaseInputComponent } from '@shared/ui/base-input/base-input.component';
+import { BaseSelectComponent } from '@shared/ui/base-select/base-select.component';
+import { BaseTextareaComponent } from '@shared/ui/base-textarea/base-textarea.component';
 import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.component';
 
 type SeasonFormGroup = FormGroup<{
@@ -33,7 +36,13 @@ interface SeasonFormStep {
   host: {
     class: 'season-form-dialog',
   },
-  imports: [ModalShellComponent, ReactiveFormsModule],
+  imports: [
+    BaseInputComponent,
+    BaseSelectComponent,
+    BaseTextareaComponent,
+    ModalShellComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: './season-form-dialog.component.html',
   styleUrl: './season-form-dialog.component.scss',
 })

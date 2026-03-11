@@ -1,0 +1,52 @@
+<app-form-field
+  [controlId]="controlId()"
+  [errorMessage]="errorMessage()"
+  [helperId]="helperId()"
+  [helperText]="helperText()"
+  [label]="label()"
+  [labelHidden]="labelHidden()"
+  [messageId]="messageId()"
+  [required]="required()"
+  [size]="size()"
+  [successMessage]="successMessage()"
+  [width]="width()"
+>
+  <div
+    class="c-select-control"
+    [class.c-select-control--default]="variant() === 'default'"
+    [class.c-select-control--outlined]="variant() === 'outlined'"
+    [class.c-select-control--filled]="variant() === 'filled'"
+    [class.c-select-control--ghost]="variant() === 'ghost'"
+    [class.c-select-control--sm]="size() === 'sm'"
+    [class.c-select-control--md]="size() === 'md'"
+    [class.c-select-control--lg]="size() === 'lg'"
+    [class.c-select-control--error]="resolvedState() === 'error'"
+    [class.c-select-control--success]="resolvedState() === 'success'"
+    [class.c-select-control--disabled]="isDisabled() || loading()"
+  >
+    <select
+      class="c-select-control__select"
+      [attr.aria-busy]="loading() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-invalid]="resolvedState() === 'error' ? 'true' : 'false'"
+      [attr.aria-label]="effectiveAriaLabel()"
+      [attr.id]="controlId()"
+      [attr.name]="name()"
+      [attr.required]="required() ? true : null"
+      [disabled]="isDisabled() || loading()"
+      [value]="value()"
+      (blur)="handleBlur()"
+      (change)="handleChange($event)"
+    >
+      @if (placeholder()) {
+        <option value="">
+          {{ placeholder() }}
+        </option>
+      }
+
+      <ng-content />
+    </select>
+
+    <span aria-hidden="true" class="c-select-control__indicator"></span>
+  </div>
+</app-form-field>

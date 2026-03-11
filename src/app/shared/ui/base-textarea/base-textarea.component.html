@@ -1,0 +1,48 @@
+<app-form-field
+  [controlId]="controlId()"
+  [errorMessage]="errorMessage()"
+  [helperId]="helperId()"
+  [helperText]="helperText()"
+  [label]="label()"
+  [labelHidden]="labelHidden()"
+  [messageId]="messageId()"
+  [required]="required()"
+  [size]="size()"
+  [successMessage]="successMessage()"
+  [width]="width()"
+>
+  <div
+    class="c-textarea-control"
+    [class.c-textarea-control--default]="variant() === 'default'"
+    [class.c-textarea-control--outlined]="variant() === 'outlined'"
+    [class.c-textarea-control--filled]="variant() === 'filled'"
+    [class.c-textarea-control--ghost]="variant() === 'ghost'"
+    [class.c-textarea-control--sm]="size() === 'sm'"
+    [class.c-textarea-control--md]="size() === 'md'"
+    [class.c-textarea-control--lg]="size() === 'lg'"
+    [class.c-textarea-control--error]="resolvedState() === 'error'"
+    [class.c-textarea-control--success]="resolvedState() === 'success'"
+    [class.c-textarea-control--readonly]="readOnly()"
+    [class.c-textarea-control--disabled]="isDisabled()"
+  >
+    <textarea
+      class="c-textarea-control__textarea"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-invalid]="resolvedState() === 'error' ? 'true' : 'false'"
+      [attr.aria-label]="effectiveAriaLabel()"
+      [attr.id]="controlId()"
+      [attr.maxlength]="maxLength()"
+      [attr.minlength]="minLength()"
+      [attr.name]="name()"
+      [attr.placeholder]="placeholder()"
+      [attr.readonly]="readOnly() ? true : null"
+      [attr.required]="required() ? true : null"
+      [disabled]="isDisabled()"
+      [rows]="rows()"
+      [style.resize]="resize()"
+      [value]="value()"
+      (blur)="handleBlur()"
+      (input)="handleInput($event)"
+    ></textarea>
+  </div>
+</app-form-field>

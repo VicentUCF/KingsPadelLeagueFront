@@ -1,0 +1,130 @@
+.c-input-control,
+.c-select-control,
+.c-textarea-control {
+  --field-control-height: 3rem;
+  --field-control-gap: var(--space-3);
+  --field-control-padding-inline: var(--space-4);
+  --field-control-radius: 0.95rem;
+  --field-control-surface: rgb(255 255 255 / 0.03);
+  --field-control-surface-hover: rgb(255 255 255 / 0.05);
+  --field-control-surface-focus: rgb(255 255 255 / 0.06);
+  --field-control-border-color: var(--color-border-subtle);
+  --field-control-border-hover: color-mix(
+    in srgb,
+    var(--color-brand) 18%,
+    var(--color-border-subtle)
+  );
+  --field-control-border-focus: var(--color-brand);
+  --field-control-ring-color: rgb(201 162 39 / 18%);
+  --field-control-text-color: var(--color-text-strong);
+  --field-control-affix-color: var(--color-text-muted);
+  --field-control-placeholder-color: color-mix(in srgb, var(--color-text-muted) 94%, white 6%);
+  --field-control-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--field-control-border-color);
+  border-radius: var(--field-control-radius);
+  background: var(--field-control-surface);
+  box-shadow: var(--field-control-shadow);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+
+  &:hover:not(&--disabled):not(&--readonly) {
+    border-color: var(--field-control-border-hover);
+    background: var(--field-control-surface-hover);
+  }
+
+  &:focus-within {
+    border-color: var(--field-control-border-focus);
+    background: var(--field-control-surface-focus);
+    box-shadow:
+      var(--field-control-shadow),
+      0 0 0 3px var(--field-control-ring-color);
+  }
+
+  &--outlined {
+    --field-control-surface: transparent;
+    --field-control-surface-hover: rgb(255 255 255 / 0.02);
+    --field-control-surface-focus: rgb(255 255 255 / 0.03);
+    --field-control-shadow: none;
+  }
+
+  &--filled {
+    --field-control-surface: var(--color-surface-raised);
+    --field-control-surface-hover: color-mix(in srgb, var(--color-surface-hover) 88%, white 4%);
+    --field-control-surface-focus: color-mix(in srgb, var(--color-surface-hover) 94%, white 6%);
+    --field-control-border-color: rgb(255 255 255 / 0.08);
+    --field-control-shadow: inset 0 1px 0 rgb(255 255 255 / 0.02);
+  }
+
+  &--ghost {
+    --field-control-surface: transparent;
+    --field-control-surface-hover: rgb(255 255 255 / 0.02);
+    --field-control-surface-focus: rgb(255 255 255 / 0.03);
+    --field-control-border-color: transparent;
+    --field-control-border-hover: var(--color-border-subtle);
+    --field-control-shadow: none;
+  }
+
+  &--error {
+    --field-control-border-color: rgb(230 90 90 / 28%);
+    --field-control-border-hover: rgb(230 90 90 / 42%);
+    --field-control-border-focus: rgb(255 154 154 / 56%);
+    --field-control-ring-color: rgb(230 90 90 / 18%);
+  }
+
+  &--success {
+    --field-control-border-color: rgb(65 187 124 / 32%);
+    --field-control-border-hover: rgb(65 187 124 / 44%);
+    --field-control-border-focus: rgb(139 224 176 / 52%);
+    --field-control-ring-color: rgb(65 187 124 / 18%);
+  }
+
+  &--sm {
+    --field-control-height: 2.75rem;
+    --field-control-gap: var(--space-2);
+    --field-control-padding-inline: var(--space-3);
+    --field-control-radius: 0.85rem;
+  }
+
+  &--lg {
+    --field-control-height: 3.5rem;
+    --field-control-radius: 1rem;
+  }
+
+  &--readonly {
+    --field-control-surface-hover: var(--field-control-surface);
+    --field-control-surface-focus: var(--field-control-surface);
+  }
+
+  &--disabled {
+    background: color-mix(in srgb, var(--field-control-surface) 88%, var(--color-surface) 12%);
+    cursor: not-allowed;
+    opacity: 0.72;
+  }
+}
+
+.c-input-control,
+.c-select-control {
+  display: flex;
+  align-items: center;
+  gap: var(--field-control-gap);
+  min-height: var(--field-control-height);
+  padding-inline: var(--field-control-padding-inline);
+}
+
+.c-textarea-control {
+  display: block;
+  min-height: calc(var(--field-control-height) + var(--space-7));
+  padding: var(--space-3) var(--field-control-padding-inline);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-input-control,
+  .c-select-control,
+  .c-textarea-control {
+    transition: none;
+  }
+}

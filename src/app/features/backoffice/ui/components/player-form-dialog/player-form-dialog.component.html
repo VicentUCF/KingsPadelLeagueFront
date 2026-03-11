@@ -9,7 +9,7 @@
   size="wide"
   (closed)="close()"
 >
-  <div modalBody>
+  <div modalBody class="player-form-dialog__body">
     <div class="player-form-dialog__steps" aria-label="Progreso del formulario">
       <div
         [class.player-form-dialog__step--active]="isCurrentStep(0)"
@@ -41,67 +41,63 @@
       @switch (currentStep()) {
         @case (0) {
           <div class="player-form-dialog__grid">
-            <label class="player-form-dialog__field">
-              <span>Nombre completo</span>
-              <input formControlName="fullName" type="text" />
-              @if (hasControlError('fullName')) {
-                <small>El nombre completo es obligatorio.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="fullName"
+              label="Nombre completo"
+              [errorMessage]="
+                hasControlError('fullName') ? 'El nombre completo es obligatorio.' : null
+              "
+              required
+              type="text"
+            />
 
-            <label class="player-form-dialog__field">
-              <span>Nick</span>
-              <input formControlName="nickName" type="text" />
-              @if (hasControlError('nickName')) {
-                <small>El nick es obligatorio.</small>
-              }
-            </label>
+            <app-base-input
+              formControlName="nickName"
+              label="Nick"
+              [errorMessage]="hasControlError('nickName') ? 'El nick es obligatorio.' : null"
+              required
+              type="text"
+            />
 
-            <label class="player-form-dialog__field player-form-dialog__field--full">
-              <span>Avatar</span>
-              <input formControlName="avatarPath" type="text" />
-              <small
-                >Ruta opcional de imagen. Si se deja vacía, se mostrará un fallback textual.</small
-              >
-            </label>
+            <app-base-input
+              class="player-form-dialog__field--full"
+              formControlName="avatarPath"
+              helperText="Ruta opcional de imagen. Si se deja vacía, se mostrará un fallback textual."
+              label="Avatar"
+              type="text"
+            />
           </div>
         }
         @case (1) {
           <div class="player-form-dialog__grid">
-            <label class="player-form-dialog__field">
-              <span>Perfil de pista</span>
-              <select formControlName="preferredSideLabel">
-                <option value="Revés">Revés</option>
-                <option value="Derecha">Derecha</option>
-                <option value="Ambas">Ambas</option>
-              </select>
-            </label>
+            <app-base-select formControlName="preferredSideLabel" label="Perfil de pista">
+              <option value="Revés">Revés</option>
+              <option value="Derecha">Derecha</option>
+              <option value="Ambas">Ambas</option>
+            </app-base-select>
 
-            <label class="player-form-dialog__field">
-              <span>Equipo actual</span>
-              <select formControlName="currentTeamId">
-                <option value="">Sin equipo activo</option>
-                @for (team of teamOptions(); track team.id) {
-                  <option [value]="team.id">{{ team.label }}</option>
-                }
-              </select>
-            </label>
-
-            <label class="player-form-dialog__field">
-              <span>Email vinculado</span>
-              <input formControlName="linkedUserEmail" type="email" />
-              @if (hasControlError('linkedUserEmail')) {
-                <small>Introduce un email válido o deja el campo vacío.</small>
+            <app-base-select formControlName="currentTeamId" label="Equipo actual">
+              <option value="">Sin equipo activo</option>
+              @for (team of teamOptions(); track team.id) {
+                <option [value]="team.id">{{ team.label }}</option>
               }
-            </label>
+            </app-base-select>
 
-            <label class="player-form-dialog__field">
-              <span>Estado</span>
-              <select formControlName="status">
-                <option value="ACTIVE">Activo</option>
-                <option value="INACTIVE">Inactivo</option>
-              </select>
-            </label>
+            <app-base-input
+              formControlName="linkedUserEmail"
+              label="Email vinculado"
+              [errorMessage]="
+                hasControlError('linkedUserEmail')
+                  ? 'Introduce un email válido o deja el campo vacío.'
+                  : null
+              "
+              type="email"
+            />
+
+            <app-base-select formControlName="status" label="Estado">
+              <option value="ACTIVE">Activo</option>
+              <option value="INACTIVE">Inactivo</option>
+            </app-base-select>
           </div>
         }
       }

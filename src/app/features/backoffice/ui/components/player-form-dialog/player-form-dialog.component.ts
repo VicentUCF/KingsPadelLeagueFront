@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { BaseInputComponent } from '@shared/ui/base-input/base-input.component';
+import { BaseSelectComponent } from '@shared/ui/base-select/base-select.component';
 import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.component';
 
 import {
@@ -25,7 +27,7 @@ type PlayerFormGroup = FormGroup<{
   host: {
     class: 'player-form-dialog',
   },
-  imports: [ModalShellComponent, ReactiveFormsModule],
+  imports: [BaseInputComponent, BaseSelectComponent, ModalShellComponent, ReactiveFormsModule],
   templateUrl: './player-form-dialog.component.html',
   styleUrl: './player-form-dialog.component.scss',
 })

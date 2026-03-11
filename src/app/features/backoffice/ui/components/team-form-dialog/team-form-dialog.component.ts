@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { BaseInputComponent } from '@shared/ui/base-input/base-input.component';
 import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.component';
 
 import {
@@ -22,7 +23,7 @@ type TeamFormGroup = FormGroup<{
   host: {
     class: 'team-form-dialog',
   },
-  imports: [ModalShellComponent, ReactiveFormsModule],
+  imports: [BaseInputComponent, ModalShellComponent, ReactiveFormsModule],
   templateUrl: './team-form-dialog.component.html',
   styleUrl: './team-form-dialog.component.scss',
 })
