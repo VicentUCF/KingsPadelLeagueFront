@@ -1,0 +1,98 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  type OnInit,
+} from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
+import { CalendarDays, LucideAngularModule, Swords, Table2 } from 'lucide-angular';
+
+import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+
+import { CalendarDayGroupComponent } from '../../components/calendar-day-group/calendar-day-group.component';
+import { CalendarFiltersPanelComponent } from '../../components/calendar-filters-panel/calendar-filters-panel.component';
+import {
+  ALL_CALENDAR_STATUS_FILTER,
+  ALL_CALENDAR_TEAM_FILTER,
+  toLeagueCalendarPageViewModel,
+  type CalendarStatusFilter,
+  type CalendarTeamFilter,
+  type LeagueCalendarPageViewModel,
+} from '../../models/league-calendar.viewmodel';
+import { LeagueCalendarStore } from '../../state/league-calendar.store';
+
+@Component({
+  selector: 'app-league-calendar-page',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'league-calendar-page',
+  },
+  imports: [
+    CalendarDayGroupComponent,
+    CalendarFiltersPanelComponent,
+    EmptyStateComponent,
+    LucideAngularModule,
+    RouterLink,
+  ],
+  providers: [LeagueCalendarStore],
+  templateUrl: './league-calendar-page.component.html',
+  styleUrl: './league-calendar-page.component.scss',
+})
+export class LeagueCalendarPageComponent implements OnInit {
+  private readonly title = inject(Title);
+  private readonly meta = inject(Meta);
+
+  protected readonly store = inject(LeagueCalendarStore);
+  protected readonly selectedStatusFilter = signal<CalendarStatusFilter>(
+    ALL_CALENDAR_STATUS_FILTER,
+  );
+  protected readonly selectedTeamFilter = signal<CalendarTeamFilter>(ALL_CALENDAR_TEAM_FILTER);
+
+  protected readonly calendarIcon = CalendarDays;
+  protected readonly matchdaysIcon = Swords;
+  protected readonly standingsIcon = Table2;
+
+  protected readonly viewModel = computed<LeagueCalendarPageViewModel | null>(() => {
+    const snapshot = this.store.snapshot();
+
+    if (!snapshot || !this.store.hasMatchdays()) {
+      return null;
+    }
+
+    return toLeagueCalendarPageViewModel(snapshot, this.store.matchdays(), {
+      status: this.selectedStatusFilter(),
+      team: this.selectedTeamFilter(),
+    });
+  });
+
+  ngOnInit(): void {
+    this.title.setTitle('Calendario | KingsPadelLeague');
+    this.meta.updateTag({
+      name: 'description',
+      content:
+        'Explora la agenda completa de KingsPadelLeague, con todos los cruces ordenados por fecha y filtros por estado o equipo.',
+    });
+
+    void this.store.load();
+  }
+
+  protected selectStatusFilter(statusFilter: CalendarStatusFilter): void {
+    this.selectedStatusFilter.set(statusFilter);
+  }
+
+  protected selectTeamFilter(teamFilter: CalendarTeamFilter): void {
+    this.selectedTeamFilter.set(teamFilter);
+  }
+
+  protected clearFilters(): void {
+    this.selectedStatusFilter.set(ALL_CALENDAR_STATUS_FILTER);
+    this.selectedTeamFilter.set(ALL_CALENDAR_TEAM_FILTER);
+  }
+
+  protected reloadCalendar(): void {
+    void this.store.load();
+  }
+}

@@ -40,14 +40,10 @@ export const routes: Routes = [
   {
     path: 'calendario',
     loadComponent: () =>
-      import('@shared/ui/site-placeholder-page/site-placeholder-page.component').then(
-        (module) => module.SitePlaceholderPageComponent,
+      import('@features/league-home/ui/pages/league-calendar-page/league-calendar-page.component').then(
+        (module) => module.LeagueCalendarPageComponent,
       ),
-    data: {
-      title: 'Calendario',
-      description:
-        'El calendario completo se publicará en una página propia. La home prioriza la lectura rápida del estado actual de la liga.',
-    },
+    providers: [provideLeagueHomeFeature()],
   },
   {
     path: '**',

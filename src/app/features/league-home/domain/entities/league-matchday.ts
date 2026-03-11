@@ -27,6 +27,7 @@ export interface LeagueMatchdayEncounter {
   readonly homeScore: number;
   readonly awayScore: number;
   readonly status: LeagueMatchdayStatus;
+  readonly scheduledAtIso: string;
   readonly scheduledAtLabel: string;
   readonly pairResults: readonly LeagueMatchPairResult[];
 }

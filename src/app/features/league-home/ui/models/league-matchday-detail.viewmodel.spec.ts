@@ -29,6 +29,7 @@ describe('toLeagueMatchdayDetailPageViewModel', () => {
               homeScore: 1,
               awayScore: 0,
               status: 'current',
+              scheduledAtIso: '2026-03-15T17:00:00.000Z',
               scheduledAtLabel: 'Domingo 18:00',
               pairResults: [
                 {

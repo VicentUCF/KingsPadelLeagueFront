@@ -1,0 +1,208 @@
+.calendar-encounter-card-host {
+  display: block;
+}
+
+.calendar-encounter-card {
+  display: grid;
+  gap: var(--space-3);
+  align-items: start;
+
+  &__time-slot {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    padding-block-start: var(--space-3);
+  }
+
+  &__time {
+    color: var(--color-brand);
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+  }
+
+  &__dot {
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px solid color-mix(in srgb, var(--color-brand) 44%, white 8%);
+    border-radius: 999px;
+    background: var(--color-surface);
+  }
+
+  &__body {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  &__header,
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  &__matchday {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
+    padding-inline: var(--space-3);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+
+    &--success {
+      border-color: rgb(105 246 209 / 0.22);
+      background: rgb(105 246 209 / 0.08);
+      color: #8cf4da;
+    }
+
+    &--live {
+      border-color: rgb(243 200 75 / 0.24);
+      background: rgb(243 200 75 / 0.1);
+      color: #f5dfa0;
+    }
+
+    &--scheduled {
+      border-color: rgb(132 213 255 / 0.22);
+      background: rgb(132 213 255 / 0.08);
+      color: #cdeefe;
+    }
+  }
+
+  &__matchup {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  &__team {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  &__crest {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    overflow: hidden;
+    border: 1px solid rgb(201 162 39 / 0.22);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at top, rgb(201 162 39 / 0.12), transparent 68%),
+      rgb(255 255 255 / 0.015);
+  }
+
+  &__crest-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__crest-fallback {
+    color: var(--color-brand-strong);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__team-copy {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__team-label {
+    color: var(--color-text-muted);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__team-link {
+    color: var(--color-text-strong);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  &__versus {
+    display: grid;
+    place-items: center;
+    min-width: 3rem;
+    color: var(--color-brand);
+    font-family: var(--font-family-heading);
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  &__score-block {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  &__score-label {
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  &__score {
+    color: var(--color-text-strong);
+    font-size: 1.2rem;
+    font-weight: 800;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-strong);
+    font-weight: 700;
+    text-decoration: none;
+  }
+}
+
+@media (max-width: 47.999rem) {
+  .calendar-encounter-card {
+    &__body {
+      padding: var(--space-4);
+    }
+
+    &__header,
+    &__footer {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+@media (min-width: 48rem) {
+  .calendar-encounter-card {
+    grid-template-columns: 6.25rem minmax(0, 1fr);
+    column-gap: var(--space-4);
+
+    &__matchup {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+    }
+
+    &__time-slot {
+      justify-items: start;
+      padding-block-start: var(--space-4);
+    }
+  }
+}

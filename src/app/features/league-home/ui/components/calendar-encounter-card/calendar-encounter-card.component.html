@@ -1,0 +1,94 @@
+<article class="calendar-encounter-card">
+  <div class="calendar-encounter-card__time-slot">
+    <span class="calendar-encounter-card__time">{{ encounter().scheduledTimeLabel }}</span>
+    <span aria-hidden="true" class="calendar-encounter-card__dot"></span>
+  </div>
+
+  <div class="calendar-encounter-card__body c-surface-card">
+    <div class="calendar-encounter-card__header">
+      <span class="calendar-encounter-card__matchday">{{ encounter().matchdayLabel }}</span>
+      <span
+        [class.calendar-encounter-card__status--live]="encounter().statusTone === 'live'"
+        [class.calendar-encounter-card__status--scheduled]="encounter().statusTone === 'scheduled'"
+        [class.calendar-encounter-card__status--success]="encounter().statusTone === 'success'"
+        class="calendar-encounter-card__status"
+      >
+        {{ encounter().statusLabel }}
+      </span>
+    </div>
+
+    <div class="calendar-encounter-card__matchup">
+      <div class="calendar-encounter-card__team">
+        <span aria-hidden="true" class="calendar-encounter-card__crest">
+          @if (encounter().homeTeam.logoPath) {
+            <img
+              [ngSrc]="encounter().homeTeam.logoPath!"
+              alt=""
+              class="calendar-encounter-card__crest-image"
+              decoding="async"
+              height="40"
+              width="40"
+            />
+          } @else {
+            <span class="calendar-encounter-card__crest-fallback">
+              {{ encounter().homeTeam.monogram }}
+            </span>
+          }
+        </span>
+
+        <div class="calendar-encounter-card__team-copy">
+          <span class="calendar-encounter-card__team-label">Local</span>
+          <a
+            [routerLink]="encounter().homeTeam.teamLink"
+            class="calendar-encounter-card__team-link"
+          >
+            {{ encounter().homeTeam.teamName }}
+          </a>
+        </div>
+      </div>
+
+      <span aria-hidden="true" class="calendar-encounter-card__versus">VS</span>
+
+      <div class="calendar-encounter-card__team">
+        <span aria-hidden="true" class="calendar-encounter-card__crest">
+          @if (encounter().awayTeam.logoPath) {
+            <img
+              [ngSrc]="encounter().awayTeam.logoPath!"
+              alt=""
+              class="calendar-encounter-card__crest-image"
+              decoding="async"
+              height="40"
+              width="40"
+            />
+          } @else {
+            <span class="calendar-encounter-card__crest-fallback">
+              {{ encounter().awayTeam.monogram }}
+            </span>
+          }
+        </span>
+
+        <div class="calendar-encounter-card__team-copy">
+          <span class="calendar-encounter-card__team-label">Visitante</span>
+          <a
+            [routerLink]="encounter().awayTeam.teamLink"
+            class="calendar-encounter-card__team-link"
+          >
+            {{ encounter().awayTeam.teamName }}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-encounter-card__footer">
+      <div class="calendar-encounter-card__score-block">
+        <span class="calendar-encounter-card__score-label">Marcador global</span>
+        <strong class="calendar-encounter-card__score">{{ encounter().scoreLabel }}</strong>
+      </div>
+
+      <a [routerLink]="encounter().matchdayLink" class="calendar-encounter-card__cta">
+        <span>{{ encounter().matchdayLinkLabel }}</span>
+        <lucide-angular [img]="arrowRightIcon" [size]="15" aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+</article>

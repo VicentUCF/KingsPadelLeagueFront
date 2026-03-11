@@ -1,0 +1,95 @@
+@if (store.isLoading() && !store.hasMatchdays()) {
+  <section class="o-container league-calendar-page__status-panel">
+    <p aria-live="polite" class="league-calendar-page__status">Cargando agenda completa...</p>
+  </section>
+} @else if (viewModel(); as viewModel) {
+  <section class="o-container league-calendar-page__content">
+    <header class="league-calendar-page__hero">
+      <p class="league-calendar-page__eyebrow">
+        <lucide-angular [img]="calendarIcon" [size]="15" aria-hidden="true" />
+        <span>{{ viewModel.eyebrow }}</span>
+      </p>
+
+      <div class="league-calendar-page__hero-main">
+        <div class="league-calendar-page__hero-copy">
+          <p class="league-calendar-page__season">{{ viewModel.seasonLabel }}</p>
+          <h1>{{ viewModel.title }}</h1>
+          <p class="league-calendar-page__hero-description">{{ viewModel.description }}</p>
+
+          <p class="league-calendar-page__hero-meta">
+            <span>{{ viewModel.currentMatchdayLabel }}</span>
+            <span aria-hidden="true" class="league-calendar-page__divider"></span>
+            <span>{{ viewModel.phaseLabel }}</span>
+          </p>
+        </div>
+
+        <nav aria-label="Acciones de calendario" class="league-calendar-page__actions">
+          <a class="league-calendar-page__action" routerLink="/jornadas">
+            <lucide-angular [img]="matchdaysIcon" [size]="16" aria-hidden="true" />
+            <span>Ver jornadas</span>
+          </a>
+
+          <a class="league-calendar-page__action" routerLink="/clasificacion">
+            <lucide-angular [img]="standingsIcon" [size]="16" aria-hidden="true" />
+            <span>Ver clasificación</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <section aria-label="Resumen global del calendario" class="league-calendar-page__metrics">
+      @for (metric of viewModel.summaryMetrics; track metric.label) {
+        <article class="league-calendar-page__metric">
+          <span class="league-calendar-page__metric-label">{{ metric.label }}</span>
+          <strong class="league-calendar-page__metric-value">{{ metric.value }}</strong>
+        </article>
+      }
+    </section>
+
+    <app-calendar-filters-panel
+      [filteredResultsLabel]="viewModel.filteredResultsLabel"
+      [hasActiveFilters]="viewModel.hasActiveFilters"
+      [statusFilters]="viewModel.statusFilters"
+      [teamFilters]="viewModel.teamFilters"
+      (filtersCleared)="clearFilters()"
+      (statusFilterSelected)="selectStatusFilter($event)"
+      (teamFilterSelected)="selectTeamFilter($event)"
+    />
+
+    @if (viewModel.dayGroups.length > 0) {
+      <div class="league-calendar-page__agenda">
+        @for (dayGroup of viewModel.dayGroups; track dayGroup.id) {
+          <app-calendar-day-group [dayGroup]="dayGroup" />
+        }
+      </div>
+    } @else {
+      <section class="league-calendar-page__filtered-empty">
+        @if (viewModel.emptyState; as emptyState) {
+          <app-empty-state [description]="emptyState.description" [title]="emptyState.title" />
+        }
+      </section>
+    }
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-calendar-page__status-panel">
+    <app-empty-state
+      description="Inténtalo de nuevo en unos segundos."
+      title="No hemos podido cargar el calendario"
+    />
+
+    <p class="league-calendar-page__status league-calendar-page__status--error">
+      {{ store.errorMessage() }}
+    </p>
+
+    <button class="league-calendar-page__retry" type="button" (click)="reloadCalendar()">
+      Reintentar
+    </button>
+  </section>
+} @else {
+  <section class="o-container league-calendar-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no hay cruces publicados para construir esta agenda.'"
+      [title]="'No hay calendario disponible'"
+    />
+  </section>
+}

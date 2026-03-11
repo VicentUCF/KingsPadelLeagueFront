@@ -42,7 +42,7 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
         id: encounter.id,
         homeTeamName: encounter.homeTeamName,
         awayTeamName: encounter.awayTeamName,
-        scheduledAtIso: toScheduledAtIso(currentMatchday.id, encounter.id),
+        scheduledAtIso: encounter.scheduledAtIso,
         scheduledAtLabel: encounter.scheduledAtLabel,
       })),
       byeTeam: {
@@ -635,8 +635,13 @@ function toTeamProfileSummary(team: TeamCatalogEntry): TeamProfileSummary {
   };
 }
 
-function createEncounter(encounter: LeagueMatchdayEncounter): LeagueMatchdayEncounter {
-  return encounter;
+function createEncounter(
+  encounter: Omit<LeagueMatchdayEncounter, 'scheduledAtIso'>,
+): LeagueMatchdayEncounter {
+  return {
+    ...encounter,
+    scheduledAtIso: toScheduledAtIso(resolveMatchdayIdFromEncounterId(encounter.id), encounter.id),
+  };
 }
 
 function createPairResult(pairResult: LeagueMatchPairResult): LeagueMatchPairResult {
@@ -705,6 +710,10 @@ function resolveWinnerTeamName(encounter: LeagueMatchdayEncounter): string {
   return encounter.homeScore > encounter.awayScore
     ? encounter.homeTeamName
     : encounter.awayTeamName;
+}
+
+function resolveMatchdayIdFromEncounterId(encounterId: string): string {
+  return encounterId.split('-').slice(0, 2).join('-');
 }
 
 function toScheduledAtIso(matchdayId: string, encounterId: string): string {

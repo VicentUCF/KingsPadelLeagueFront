@@ -1,0 +1,32 @@
+<section class="calendar-day-group">
+  <div class="calendar-day-group__date-card" aria-hidden="true">
+    <span class="calendar-day-group__weekday">{{ dayGroup().weekdayLabel }}</span>
+    <strong class="calendar-day-group__day-number">{{ dayGroup().dayNumberLabel }}</strong>
+    <span class="calendar-day-group__month">{{ dayGroup().monthLabel }}</span>
+  </div>
+
+  <div class="calendar-day-group__schedule">
+    <header class="calendar-day-group__header">
+      <div class="calendar-day-group__copy">
+        <h2>{{ dayGroup().dateLabel }}</h2>
+        <p class="calendar-day-group__meta">
+          <span>{{ dayGroup().matchdaySummaryLabel }}</span>
+          <span aria-hidden="true" class="calendar-day-group__divider"></span>
+          <span>{{ dayGroup().encounterCountLabel }}</span>
+        </p>
+      </div>
+
+      @if (dayGroup().byeTeamsLabel) {
+        <p class="calendar-day-group__bye">{{ dayGroup().byeTeamsLabel }}</p>
+      }
+    </header>
+
+    <div class="calendar-day-group__list" role="list">
+      @for (encounter of dayGroup().encounters; track encounter.id) {
+        <div class="calendar-day-group__list-item" role="listitem">
+          <app-calendar-encounter-card [encounter]="encounter" />
+        </div>
+      }
+    </div>
+  </div>
+</section>

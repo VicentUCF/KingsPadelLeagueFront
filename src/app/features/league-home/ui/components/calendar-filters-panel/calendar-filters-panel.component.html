@@ -1,0 +1,57 @@
+<section aria-labelledby="calendar-filters-title" class="calendar-filters-panel">
+  <div class="calendar-filters-panel__header">
+    <div>
+      <h2 id="calendar-filters-title">Filtra la agenda</h2>
+      <p aria-live="polite" class="calendar-filters-panel__summary">{{ filteredResultsLabel() }}</p>
+    </div>
+
+    @if (hasActiveFilters()) {
+      <button class="calendar-filters-panel__clear" type="button" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
+    }
+  </div>
+
+  <div class="calendar-filters-panel__group">
+    <p class="calendar-filters-panel__label">Estado</p>
+
+    <div aria-label="Filtrar por estado" class="calendar-filters-panel__pills" role="group">
+      @for (filter of statusFilters(); track filter.value) {
+        <button
+          [attr.aria-pressed]="filter.isActive"
+          [class.calendar-filters-panel__pill--active]="filter.isActive"
+          class="calendar-filters-panel__pill"
+          type="button"
+          (click)="selectStatusFilter(filter.value)"
+        >
+          {{ filter.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="calendar-filters-panel__group">
+    <p class="calendar-filters-panel__label">Equipo</p>
+
+    <div aria-label="Filtrar por equipo" class="calendar-filters-panel__teams" role="group">
+      @for (filter of teamFilters(); track filter.value) {
+        <button
+          [attr.aria-pressed]="filter.isActive"
+          [class.calendar-filters-panel__team--active]="filter.isActive"
+          [style.--team-accent]="filter.palette.accent"
+          [style.--team-glow]="filter.palette.glow"
+          [style.--team-primary]="filter.palette.primary"
+          [style.--team-surface]="filter.palette.surface"
+          class="calendar-filters-panel__team"
+          type="button"
+          (click)="selectTeamFilter(filter.value)"
+        >
+          <span aria-hidden="true" class="calendar-filters-panel__team-mark">
+            {{ filter.monogram }}
+          </span>
+          <span>{{ filter.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+</section>
