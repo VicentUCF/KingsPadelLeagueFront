@@ -1,5 +1,7 @@
 import { type Routes } from '@angular/router';
 
+import { provideLeagueHomeFeature } from '@features/league-home/ui/providers/league-home.providers';
+
 export const routes: Routes = [
   {
     path: '',
@@ -11,14 +13,10 @@ export const routes: Routes = [
   {
     path: 'clasificacion',
     loadComponent: () =>
-      import('@shared/ui/site-placeholder-page/site-placeholder-page.component').then(
-        (module) => module.SitePlaceholderPageComponent,
+      import('@features/league-home/ui/pages/league-standings-page/league-standings-page.component').then(
+        (module) => module.LeagueStandingsPageComponent,
       ),
-    data: {
-      title: 'Clasificación',
-      description:
-        'La vista completa de clasificación llegará en la siguiente fase del producto. La home ya muestra el estado actual de la liga.',
-    },
+    providers: [provideLeagueHomeFeature()],
   },
   {
     path: 'jornadas',

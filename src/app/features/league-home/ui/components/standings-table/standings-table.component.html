@@ -1,8 +1,18 @@
 <div class="standings-table__scroll">
   <table class="standings-table__table">
     <caption class="u-visually-hidden">
-      Clasificación actual de KingsPadelLeague
+      {{
+        caption()
+      }}
     </caption>
+
+    <colgroup>
+      <col class="standings-table__column standings-table__column--rank" />
+      <col class="standings-table__column standings-table__column--team" />
+      <col class="standings-table__column standings-table__column--metric" />
+      <col class="standings-table__column standings-table__column--metric" />
+      <col class="standings-table__column standings-table__column--metric" />
+    </colgroup>
 
     <thead>
       <tr class="standings-table__header-row">
@@ -33,28 +43,24 @@
         >
           <td class="standings-table__rank" data-label="Rank">
             <span class="standings-table__cell-label">Rank</span>
-            <span
-              [class.standings-table__rank-chip--leader]="row.rankTone === 'leader'"
-              [class.standings-table__rank-chip--podium]="row.rankTone === 'podium'"
-              class="standings-table__rank-chip"
-            >
-              {{ row.rank }}
-            </span>
+            <app-rank-indicator
+              [compact]="true"
+              [isLast]="row.isLast"
+              [isLeader]="row.isLeader"
+              [rank]="row.rank"
+            />
           </td>
 
           <th class="standings-table__team" scope="row">
             <span class="standings-table__cell-label">Equipo</span>
-            <span class="standings-table__team-block">
-              <span class="standings-table__cell-value standings-table__cell-value--team">
-                {{ row.teamName }}
-              </span>
-
-              @if (row.rankTone === 'leader') {
-                <span class="standings-table__team-status">Lider actual</span>
-              } @else if (row.rankTone === 'podium') {
-                <span class="standings-table__team-status">Zona podium</span>
-              }
-            </span>
+            <app-team-badge
+              [compact]="true"
+              [interactive]="true"
+              [logoPath]="row.logoPath"
+              [monogram]="row.monogram"
+              [teamLink]="row.teamLink"
+              [teamName]="row.teamName"
+            />
           </th>
 
           <td class="standings-table__metric" data-label="Puntos">

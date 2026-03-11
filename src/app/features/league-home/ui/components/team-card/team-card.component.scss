@@ -3,11 +3,13 @@
 
   &__link {
     display: grid;
-    gap: var(--space-5);
+    grid-template-rows: auto 1fr auto;
+    gap: var(--space-4);
     height: 100%;
-    padding: var(--space-6);
+    padding: var(--space-5);
     color: inherit;
     text-decoration: none;
+    overflow: hidden;
     transition:
       transform 160ms ease,
       border-color 160ms ease,
@@ -20,31 +22,64 @@
     }
   }
 
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
+  &__media {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 12.5rem;
+    padding: 0.35rem;
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(circle at center, rgb(201 162 39 / 0.12), transparent 60%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.03), rgb(255 255 255 / 0.01));
   }
 
   &__badge {
+    position: relative;
+    z-index: 1;
     display: grid;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: 1rem;
+    width: min(100%, 12.75rem);
+    aspect-ratio: 1;
+    overflow: visible;
+    transition: transform 180ms ease;
+  }
+
+  &__badge-image {
+    display: block;
+    width: 116%;
+    height: 116%;
+    object-fit: contain;
+    filter: drop-shadow(0 1rem 1.5rem rgb(0 0 0 / 0.28));
+  }
+
+  &__badge-fallback {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgb(201 162 39 / 0.24);
+    border-radius: 1.75rem;
     background:
-      radial-gradient(circle at top, rgb(201 162 39 / 16%), transparent 52%),
+      radial-gradient(circle at center, rgb(201 162 39 / 0.18), transparent 60%),
       rgb(255 255 255 / 0.03);
     color: var(--color-brand);
     font-family: var(--font-family-heading);
+    font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: 0.08em;
   }
 
-  &__icon {
-    color: var(--color-text-muted);
+  &__glow {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 10.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(201 162 39 / 0.18), transparent 68%);
+    filter: blur(20px);
+    transform: translate(-50%, -50%);
+    transition: opacity 180ms ease;
   }
 
   &__body {
@@ -53,11 +88,23 @@
     align-content: start;
   }
 
+  &__identity {
+    display: grid;
+    gap: var(--space-2);
+  }
+
   &__title,
   &__president,
   &__players,
   &__cta {
     margin: 0;
+  }
+
+  &__title {
+    color: var(--color-text-strong);
+    font-size: 1.15rem;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
   }
 
   &__president {
@@ -76,6 +123,14 @@
   &__cta {
     color: var(--color-text-strong);
   }
+
+  &__link:hover &__badge {
+    transform: translateY(-2px) scale(1.035);
+  }
+
+  &__link:hover &__glow {
+    opacity: 0.9;
+  }
 }
 
 @media (max-width: 47.999rem) {
@@ -84,5 +139,21 @@
       gap: var(--space-4);
       padding: var(--space-5);
     }
+
+    &__media {
+      min-height: 10.5rem;
+    }
+
+    &__badge {
+      width: min(100%, 9.8rem);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-card__link,
+  .team-card__badge,
+  .team-card__glow {
+    transition: none;
   }
 }

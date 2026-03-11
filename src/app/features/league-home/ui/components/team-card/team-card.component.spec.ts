@@ -13,6 +13,7 @@ describe('TeamCardComponent', () => {
           presidentName: 'Navarro',
           playerCountLabel: 'Jugadores: 6',
           monogram: 'HN',
+          logoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
           teamLink: '/equipos',
         },
       },

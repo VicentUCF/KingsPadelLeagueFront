@@ -1,0 +1,43 @@
+@if (interactive() && teamLink()) {
+  <a [class.team-badge--compact]="compact()" class="team-badge" [routerLink]="teamLink()">
+    <span aria-hidden="true" class="team-badge__crest">
+      @if (logoPath()) {
+        <img
+          [src]="logoPath()!"
+          alt=""
+          class="team-badge__crest-image"
+          decoding="async"
+          height="44"
+          width="44"
+        />
+      } @else {
+        <span class="team-badge__crest-fallback">{{ monogram() }}</span>
+      }
+    </span>
+
+    <span class="team-badge__copy">
+      <span class="team-badge__name">{{ teamName() }}</span>
+    </span>
+  </a>
+} @else {
+  <span [class.team-badge--compact]="compact()" class="team-badge">
+    <span aria-hidden="true" class="team-badge__crest">
+      @if (logoPath()) {
+        <img
+          [src]="logoPath()!"
+          alt=""
+          class="team-badge__crest-image"
+          decoding="async"
+          height="44"
+          width="44"
+        />
+      } @else {
+        <span class="team-badge__crest-fallback">{{ monogram() }}</span>
+      }
+    </span>
+
+    <span class="team-badge__copy">
+      <span class="team-badge__name">{{ teamName() }}</span>
+    </span>
+  </span>
+}

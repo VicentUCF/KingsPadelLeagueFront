@@ -1,0 +1,17 @@
+<span
+  [class.rank-indicator--compact]="compact()"
+  [class.rank-indicator--last]="isLast()"
+  [class.rank-indicator--leader]="isLeader()"
+  class="rank-indicator"
+>
+  @if (isLeader()) {
+    <lucide-angular
+      [img]="crownIcon"
+      [size]="compact() ? 12 : 14"
+      aria-hidden="true"
+      class="rank-indicator__icon"
+    />
+  }
+
+  <span class="rank-indicator__value">{{ rank() }}</span>
+</span>

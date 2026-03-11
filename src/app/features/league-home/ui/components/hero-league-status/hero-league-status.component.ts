@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { CalendarDays, LucideAngularModule, Trophy } from 'lucide-angular';
 
+import { applicationMetadata } from '@core/config/application-metadata';
+
 @Component({
   selector: 'app-hero-league-status',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +20,7 @@ export class HeroLeagueStatusComponent {
   readonly phaseLabel = input.required<string>();
   readonly currentMatchdayLabel = input.required<string>();
 
-  protected readonly brandCrownIconPath = '/icon-crown.svg';
+  protected readonly brandLogoPath = applicationMetadata.logoPath;
   protected readonly trophyIcon = Trophy;
   protected readonly calendarDaysIcon = CalendarDays;
 }

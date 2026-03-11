@@ -1,12 +1,28 @@
 <a class="team-card__link c-surface-card" [routerLink]="team().teamLink">
-  <div class="team-card__header">
-    <span aria-hidden="true" class="team-card__badge">{{ team().monogram }}</span>
-    <lucide-angular [img]="shieldIcon" [size]="16" aria-hidden="true" class="team-card__icon" />
+  <div class="team-card__media">
+    <div aria-hidden="true" class="team-card__glow"></div>
+    <span aria-hidden="true" class="team-card__badge">
+      @if (team().logoPath) {
+        <img
+          [src]="team().logoPath!"
+          alt=""
+          class="team-card__badge-image"
+          decoding="async"
+          height="48"
+          width="48"
+        />
+      } @else {
+        <span class="team-card__badge-fallback">{{ team().monogram }}</span>
+      }
+    </span>
   </div>
 
   <div class="team-card__body">
-    <h3 class="team-card__title">{{ team().name }}</h3>
-    <p class="team-card__president">Presidente: {{ team().presidentName }}</p>
+    <div class="team-card__identity">
+      <h3 class="team-card__title">{{ team().name }}</h3>
+      <p class="team-card__president">Presidente: {{ team().presidentName }}</p>
+    </div>
+
     <p class="team-card__players">
       <lucide-angular [img]="usersIcon" [size]="15" aria-hidden="true" />
       <span>{{ team().playerCountLabel }}</span>

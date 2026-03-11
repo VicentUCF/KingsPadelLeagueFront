@@ -36,7 +36,6 @@ interface NavigationItem {
 })
 export class AppShellComponent {
   protected readonly applicationMetadata = applicationMetadata;
-  protected readonly brandCrownIconPath = '/icon-crown.svg';
   protected readonly menuIcon = Menu;
   protected readonly closeIcon = X;
   protected readonly arrowRightIcon = ArrowRight;

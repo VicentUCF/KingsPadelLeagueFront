@@ -11,18 +11,50 @@ describe('toLeagueHomeViewModel', () => {
         teamName: 'House Navarro',
         rankTone: 'leader',
         gameDifferenceTone: 'positive',
+        logoPath: null,
       }),
       expect.objectContaining({
         teamName: 'House Torres',
         rankTone: 'podium',
         gameDifferenceTone: 'neutral',
+        logoPath: null,
       }),
       expect.objectContaining({
         teamName: 'House Perez',
         rankTone: 'standard',
         gameDifferenceTone: 'negative',
+        logoPath: null,
       }),
     ]);
+  });
+
+  it('maps uploaded team logos when the team name matches the branding registry', () => {
+    const snapshot = createSnapshot();
+    snapshot.standings = [createStandingEntry('titanics', 'Titanics', 1, 11, 2, 12)];
+    snapshot.teams = [
+      {
+        id: 'magic-city',
+        slug: 'magic-city',
+        name: 'Magic City',
+        presidentName: 'Vidal',
+        playerCount: 6,
+      },
+    ];
+
+    const viewModel = toLeagueHomeViewModel(snapshot);
+
+    expect(viewModel.standings[0]).toEqual(
+      expect.objectContaining({
+        teamName: 'Titanics',
+        logoPath: '/teams_logos/titanics_no_bg.png',
+      }),
+    );
+    expect(viewModel.teams[0]).toEqual(
+      expect.objectContaining({
+        name: 'Magic City',
+        logoPath: '/teams_logos/magic_ng_bg.png',
+      }),
+    );
   });
 });
 

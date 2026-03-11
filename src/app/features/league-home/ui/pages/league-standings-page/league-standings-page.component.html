@@ -1,0 +1,75 @@
+@if (store.isLoading() && !store.hasSnapshot()) {
+  <section class="o-container league-standings-page__status-panel">
+    <p class="league-standings-page__status">Cargando clasificación actual...</p>
+  </section>
+} @else if (viewModel(); as viewModel) {
+  <section class="o-container league-standings-page__content">
+    <header class="league-standings-page__hero">
+      <p class="league-standings-page__eyebrow">
+        <lucide-angular [img]="standingsIcon" [size]="15" aria-hidden="true" />
+        <span>{{ viewModel.eyebrow }}</span>
+      </p>
+
+      <div class="league-standings-page__hero-main">
+        <div class="league-standings-page__hero-copy">
+          <h3>{{ viewModel.seasonLabel }}</h3>
+          <h1>{{ viewModel.title }}</h1>
+
+          <p class="league-standings-page__hero-meta">
+            <span>{{ viewModel.currentMatchdayLabel }}</span>
+            <span aria-hidden="true" class="league-standings-page__divider"></span>
+            <span>{{ viewModel.phaseLabel }}</span>
+          </p>
+        </div>
+
+        <nav aria-label="Acciones de clasificación" class="league-standings-page__actions">
+          <a class="league-standings-page__action" routerLink="/jornadas">
+            <lucide-angular [img]="matchdaysIcon" [size]="16" aria-hidden="true" />
+            <span>Ver jornadas</span>
+          </a>
+
+          <a class="league-standings-page__action" routerLink="/calendario">
+            <lucide-angular [img]="calendarIcon" [size]="16" aria-hidden="true" />
+            <span>Ver calendario</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <app-standings-table [caption]="viewModel.tableCaption" [rows]="viewModel.standings" />
+
+    <section aria-labelledby="standings-tiebreaks-title" class="league-standings-page__tiebreaks">
+      <p class="league-standings-page__tiebreaks-kicker" id="standings-tiebreaks-title">
+        Desempates
+      </p>
+
+      <ol class="league-standings-page__tiebreaks-list">
+        @for (rule of viewModel.tieBreakRules; track rule) {
+          <li>{{ rule }}</li>
+        }
+      </ol>
+    </section>
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-standings-page__status-panel">
+    <app-empty-state
+      description="Inténtalo de nuevo en unos segundos."
+      title="No hemos podido cargar la clasificación"
+    />
+
+    <p class="league-standings-page__status league-standings-page__status--error">
+      {{ store.errorMessage() }}
+    </p>
+
+    <button class="league-standings-page__retry" type="button" (click)="reloadSnapshot()">
+      Reintentar
+    </button>
+  </section>
+} @else {
+  <section class="o-container league-standings-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no hay datos publicados para construir la clasificación.'"
+      [title]="'No hay clasificación disponible'"
+    />
+  </section>
+}

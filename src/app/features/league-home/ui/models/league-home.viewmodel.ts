@@ -6,6 +6,9 @@ import {
   type TeamSummary,
 } from '@features/league-home/domain/entities/league-home-snapshot';
 
+import { withSignedValue } from './league-ui-formatters';
+import { resolveTeamBranding } from './league-team-branding';
+
 export interface LeagueHomeViewModel {
   readonly leagueName: string;
   readonly leagueTagline: string;
@@ -31,10 +34,14 @@ export interface StandingsRowViewModel {
   readonly teamId: string;
   readonly rank: number;
   readonly teamName: string;
+  readonly monogram: string;
+  readonly logoPath: string | null;
   readonly pointsLabel: string;
   readonly playedMatchesLabel: string;
   readonly gameDifferenceLabel: string;
+  readonly teamLink: string;
   readonly isLeader: boolean;
+  readonly isLast: boolean;
   readonly rankTone: 'leader' | 'podium' | 'standard';
   readonly gameDifferenceTone: 'positive' | 'negative' | 'neutral';
 }
@@ -59,6 +66,7 @@ export interface TeamCardViewModel {
   readonly presidentName: string;
   readonly playerCountLabel: string;
   readonly monogram: string;
+  readonly logoPath: string | null;
   readonly teamLink: string;
 }
 
@@ -77,8 +85,8 @@ export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeV
       awayTeamName: match.awayTeamName,
       scheduledAtLabel: match.scheduledAtLabel,
     })),
-    standings: snapshot.standings.map((entry, index) =>
-      toStandingsRowViewModel(entry, index === 0),
+    standings: snapshot.standings.map((entry, index, rows) =>
+      toStandingsRowViewModel(entry, index === 0, index === rows.length - 1),
     ),
     byeTeam: toByeCardViewModel(snapshot.byeTeam),
     lastResults: snapshot.lastResults.map(toResultCardViewModel),
@@ -86,16 +94,27 @@ export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeV
   };
 }
 
-function toStandingsRowViewModel(entry: StandingEntry, isLeader: boolean): StandingsRowViewModel {
+function toStandingsRowViewModel(
+  entry: StandingEntry,
+  isLeader: boolean,
+  isLast: boolean,
+): StandingsRowViewModel {
+  const rankTone = toRankTone(entry.rank);
+  const branding = resolveTeamBranding(entry.teamName);
+
   return {
     teamId: entry.teamId,
     rank: entry.rank,
     teamName: entry.teamName,
+    monogram: branding.monogram,
+    logoPath: branding.logoPath,
     pointsLabel: `${entry.points} pts`,
     playedMatchesLabel: `${entry.playedMatches}`,
     gameDifferenceLabel: withSignedValue(entry.gameDifference),
+    teamLink: '/equipos',
     isLeader,
-    rankTone: toRankTone(entry.rank),
+    isLast,
+    rankTone,
     gameDifferenceTone: toGameDifferenceTone(entry.gameDifference),
   };
 }
@@ -119,27 +138,17 @@ function toResultCardViewModel(result: EncounterResultSummary): ResultCardViewMo
 }
 
 function toTeamCardViewModel(team: TeamSummary): TeamCardViewModel {
+  const branding = resolveTeamBranding(team.name);
+
   return {
     id: team.id,
     name: team.name,
     presidentName: team.presidentName,
     playerCountLabel: `Jugadores: ${team.playerCount}`,
-    monogram: createMonogram(team.name),
+    monogram: branding.monogram,
+    logoPath: branding.logoPath,
     teamLink: '/equipos',
   };
-}
-
-function createMonogram(teamName: string): string {
-  return teamName
-    .split(' ')
-    .filter(Boolean)
-    .slice(-2)
-    .map((word) => word[0]?.toUpperCase() ?? '')
-    .join('');
-}
-
-function withSignedValue(value: number): string {
-  return value > 0 ? `+${value}` : `${value}`;
 }
 
 function toRankTone(rank: number): 'leader' | 'podium' | 'standard' {
