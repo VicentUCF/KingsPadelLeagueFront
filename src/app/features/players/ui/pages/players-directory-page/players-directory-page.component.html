@@ -1,11 +1,14 @@
-<section class="players-directory-page__hero o-stack o-stack--compact">
+<section
+  class="players-directory-page__hero players-directory-page__section players-directory-page__section--hero o-stack o-stack--compact"
+>
   <p class="players-directory-page__eyebrow">Jugadores</p>
 
   <div class="players-directory-page__hero-row">
     <div class="o-stack o-stack--compact">
       <h1>Ranking de jugadores</h1>
       <p>
-        Clasificación de todos los participantes ordenada por victorias. Busca por nombre o equipo.
+        Clasificación de todos los participantes ordenada por victorias. Filtra por nombre, equipo,
+        lado o estadísticas.
       </p>
     </div>
 
@@ -20,7 +23,10 @@
   </div>
 </section>
 
-<section aria-label="Resumen del directorio" class="o-grid o-grid--metrics">
+<section
+  aria-label="Resumen del directorio"
+  class="players-directory-page__metrics players-directory-page__section players-directory-page__section--metrics o-grid o-grid--metrics"
+>
   <article class="c-metric">
     <span class="c-metric__label">Jugadores</span>
     <strong class="c-metric__value">{{ store.totalPlayersCount() }}</strong>
@@ -37,67 +43,131 @@
   </article>
 </section>
 
-<div class="players-directory-page__search">
-  <label class="u-visually-hidden" for="player-search">Buscar jugador o equipo</label>
-  <div class="players-directory-page__search-wrap">
-    <svg
-      class="players-directory-page__search-icon"
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-    <input
-      #searchInput
-      id="player-search"
-      class="players-directory-page__search-input"
-      type="search"
-      placeholder="Buscar por nombre o equipo…"
-      autocomplete="off"
-      (input)="store.setSearchQuery(searchInput.value)"
-    />
+<section
+  aria-label="Filtros del directorio"
+  class="players-directory-page__filters players-directory-page__section players-directory-page__section--filters"
+>
+  <div class="players-directory-page__filters-grid">
+    <div class="players-directory-page__field players-directory-page__field--search">
+      <label class="players-directory-page__field-label" for="player-search">Buscar</label>
+      <div class="players-directory-page__search-wrap">
+        <svg
+          class="players-directory-page__search-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          #searchInput
+          id="player-search"
+          class="players-directory-page__search-input"
+          type="search"
+          [placeholder]="store.searchPlaceholder()"
+          [value]="store.searchQuery()"
+          autocomplete="off"
+          (input)="store.setSearchQuery(searchInput.value)"
+        />
+      </div>
+    </div>
+
+    <div class="players-directory-page__field">
+      <label class="players-directory-page__field-label" for="player-team-filter">Equipo</label>
+      <select
+        #teamFilter
+        id="player-team-filter"
+        class="players-directory-page__select"
+        [value]="store.selectedTeamName()"
+        (change)="store.setSelectedTeamName(teamFilter.value)"
+      >
+        @for (option of store.teamFilterOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="players-directory-page__field">
+      <label class="players-directory-page__field-label" for="player-side-filter">Lado</label>
+      <select
+        #sideFilter
+        id="player-side-filter"
+        class="players-directory-page__select"
+        [value]="store.selectedSide()"
+        (change)="store.setSelectedSide(sideFilter.value)"
+      >
+        @for (option of store.sideFilterOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
   </div>
-</div>
+
+  <div class="players-directory-page__filters-footer">
+    <p class="players-directory-page__filters-summary" role="status">
+      {{ store.filteredPlayers().length }} jugadores visibles
+    </p>
+
+    @if (store.hasActiveFilters()) {
+      <button
+        class="players-directory-page__clear-filters"
+        type="button"
+        (click)="store.clearFilters()"
+      >
+        Limpiar filtros
+      </button>
+    }
+  </div>
+</section>
 
 @if (store.errorMessage()) {
-  <p class="players-directory-page__status players-directory-page__status--error" role="status">
+  <p
+    class="players-directory-page__status players-directory-page__status--error players-directory-page__section"
+    role="status"
+  >
     {{ store.errorMessage() }}
   </p>
 }
 
 @if (store.isLoading()) {
-  <p class="players-directory-page__status" role="status">Cargando jugadores…</p>
+  <p class="players-directory-page__status players-directory-page__section" role="status">
+    Cargando jugadores…
+  </p>
 } @else if (store.hasPlayers()) {
   @if (store.filteredPlayers().length === 0) {
-    <p class="players-directory-page__status" role="status">
+    <p class="players-directory-page__status players-directory-page__section" role="status">
       No hay resultados para "{{ store.searchQuery() }}".
     </p>
   } @else {
-    <div class="players-directory-page__ranking-header" aria-hidden="true">
-      <span class="players-directory-page__col players-directory-page__col--pos">#</span>
-      <span class="players-directory-page__col players-directory-page__col--player">Jugador</span>
-      <span class="players-directory-page__col players-directory-page__col--stat">G</span>
-      <span class="players-directory-page__col players-directory-page__col--stat">P</span>
-      <span class="players-directory-page__col players-directory-page__col--stat">PJ</span>
-      <span class="players-directory-page__col players-directory-page__col--wr">%</span>
-    </div>
+    <section
+      aria-label="Resultados del directorio"
+      class="players-directory-page__results players-directory-page__section players-directory-page__section--results"
+    >
+      <div class="players-directory-page__ranking-header" aria-hidden="true">
+        <span class="players-directory-page__col players-directory-page__col--pos">#</span>
+        <span class="players-directory-page__col players-directory-page__col--player">Jugador</span>
+        <span class="players-directory-page__col players-directory-page__col--stat">G</span>
+        <span class="players-directory-page__col players-directory-page__col--stat">P</span>
+        <span class="players-directory-page__col players-directory-page__col--stat">PJ</span>
+        <span class="players-directory-page__col players-directory-page__col--wr">%</span>
+      </div>
 
-    <ol class="players-directory-page__ranking" aria-label="Ranking de jugadores">
-      @for (player of store.filteredPlayers(); track player.id) {
-        <li>
-          <app-player-card [player]="player" />
-        </li>
-      }
-    </ol>
+      <ol class="players-directory-page__ranking" aria-label="Ranking de jugadores">
+        @for (player of store.filteredPlayers(); track player.id) {
+          <li>
+            <app-player-card [player]="player" />
+          </li>
+        }
+      </ol>
+    </section>
   }
 } @else {
   <app-empty-state

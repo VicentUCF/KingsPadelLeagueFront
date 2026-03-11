@@ -1,16 +1,28 @@
-// Column widths — shared between header and each card row
 $col-pos-width: 3rem;
 $col-stat-width: 3.2rem;
 $col-wr-width: 4rem;
 
-// Padding applies via :host because Angular emulated encapsulation scopes
-// class selectors to children, not the host element itself.
 :host {
   padding-block: var(--space-9) 0;
 }
 
 .players-directory-page {
-  // ── Hero banner ───────────────────────────────────────────────────────────
+  &__section {
+    animation: players-directory-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    &--hero {
+      animation-delay: 40ms;
+    }
+    &--metrics {
+      animation-delay: 110ms;
+    }
+    &--filters {
+      animation-delay: 180ms;
+    }
+    &--results {
+      animation-delay: 250ms;
+    }
+  }
 
   &__hero {
     padding: var(--space-7);
@@ -38,13 +50,13 @@ $col-wr-width: 4rem;
     text-transform: uppercase;
   }
 
-  &__refresh {
-    padding: var(--space-3) var(--space-5);
+  &__refresh,
+  &__clear-filters {
     border: 1px solid var(--color-border-subtle);
-    border-radius: 999px;
     background: transparent;
     color: var(--color-text-strong);
     cursor: pointer;
+    font: inherit;
     font-weight: 700;
     transition:
       background-color 160ms ease,
@@ -56,6 +68,11 @@ $col-wr-width: 4rem;
       background: var(--color-surface-hover);
       transform: translateY(-1px);
     }
+  }
+
+  &__refresh {
+    padding: var(--space-3) var(--space-5);
+    border-radius: 999px;
 
     &:disabled {
       cursor: progress;
@@ -63,7 +80,57 @@ $col-wr-width: 4rem;
     }
   }
 
-  // ── Search bar ────────────────────────────────────────────────────────────
+  &__metrics {
+    position: relative;
+    z-index: 1;
+  }
+
+  &__filters {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1.5rem;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.02)),
+      var(--color-surface);
+  }
+
+  &__filters-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    align-items: end;
+  }
+
+  &__filters-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  &__filters-summary {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  &__field {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  &__field-label {
+    color: var(--color-text-muted);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
   &__search-wrap {
     position: relative;
@@ -78,12 +145,11 @@ $col-wr-width: 4rem;
     pointer-events: none;
   }
 
-  &__search-input {
+  &__search-input,
+  &__select {
     width: 100%;
-    padding: var(--space-4) var(--space-5) var(--space-4)
-      calc(var(--space-4) + 18px + var(--space-3));
     border: 1px solid var(--color-border-subtle);
-    border-radius: 999px;
+    border-radius: 1rem;
     background: var(--color-surface-raised);
     color: var(--color-text-strong);
     font-size: 1rem;
@@ -92,13 +158,18 @@ $col-wr-width: 4rem;
       border-color 160ms ease,
       box-shadow 160ms ease;
 
-    &::placeholder {
-      color: var(--color-text-muted);
-    }
-
     &:focus {
       border-color: var(--color-brand);
       box-shadow: 0 0 0 3px rgb(201 162 39 / 18%);
+    }
+  }
+
+  &__search-input {
+    padding: var(--space-4) var(--space-5) var(--space-4)
+      calc(var(--space-4) + 18px + var(--space-3));
+
+    &::placeholder {
+      color: var(--color-text-muted);
     }
 
     &::-webkit-search-cancel-button {
@@ -106,7 +177,28 @@ $col-wr-width: 4rem;
     }
   }
 
-  // ── Ranking table header ──────────────────────────────────────────────────
+  &__select {
+    min-height: 3.5rem;
+    padding: var(--space-4) 3rem var(--space-4) var(--space-4);
+    appearance: none;
+    background:
+      linear-gradient(45deg, transparent 50%, var(--color-text-muted) 50%) calc(100% - 1.3rem)
+        calc(50% - 0.1rem) / 0.5rem 0.5rem no-repeat,
+      linear-gradient(135deg, var(--color-text-muted) 50%, transparent 50%) calc(100% - 0.95rem)
+        calc(50% - 0.1rem) / 0.5rem 0.5rem no-repeat,
+      var(--color-surface-raised);
+  }
+
+  &__clear-filters {
+    min-height: 2.75rem;
+    padding-inline: var(--space-4);
+    border-radius: 999px;
+  }
+
+  &__results {
+    display: grid;
+    gap: var(--space-3);
+  }
 
   &__ranking-header {
     display: grid;
@@ -136,8 +228,6 @@ $col-wr-width: 4rem;
     }
   }
 
-  // ── Ranking list ──────────────────────────────────────────────────────────
-
   &__ranking {
     display: flex;
     flex-direction: column;
@@ -145,9 +235,27 @@ $col-wr-width: 4rem;
     margin: 0;
     padding: 0;
     list-style: none;
-  }
 
-  // ── Status / error ────────────────────────────────────────────────────────
+    > li {
+      animation: players-directory-item-rise 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    > li:nth-child(1) {
+      animation-delay: 60ms;
+    }
+    > li:nth-child(2) {
+      animation-delay: 90ms;
+    }
+    > li:nth-child(3) {
+      animation-delay: 120ms;
+    }
+    > li:nth-child(4) {
+      animation-delay: 150ms;
+    }
+    > li:nth-child(5) {
+      animation-delay: 180ms;
+    }
+  }
 
   &__status {
     padding: var(--space-4);
@@ -163,8 +271,6 @@ $col-wr-width: 4rem;
   }
 }
 
-// ── Responsive ──────────────────────────────────────────────────────────────
-
 @media (max-width: 48rem) {
   :host {
     padding-block-start: var(--space-7);
@@ -175,12 +281,55 @@ $col-wr-width: 4rem;
       padding: var(--space-6);
     }
 
-    &__refresh {
+    &__filters-grid {
+      grid-template-columns: 1fr;
+    }
+
+    &__filters-footer {
+      align-items: stretch;
+    }
+
+    &__refresh,
+    &__clear-filters {
       width: 100%;
     }
 
     &__ranking-header {
       display: none;
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .players-directory-page__section,
+  .players-directory-page__ranking > li,
+  .players-directory-page__refresh,
+  .players-directory-page__clear-filters {
+    animation: none;
+    transition: none;
+  }
+}
+
+@keyframes players-directory-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes players-directory-item-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

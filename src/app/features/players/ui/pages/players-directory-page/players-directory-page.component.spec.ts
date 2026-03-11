@@ -1,5 +1,5 @@
 import { provideRouter } from '@angular/router';
-import { render, screen } from '@testing-library/angular';
+import { fireEvent, render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
 import { providePlayersFeature } from '../../providers/players.providers';
@@ -26,6 +26,24 @@ describe('PlayersDirectoryPageComponent', () => {
     const list = screen.getByRole('list', { name: /Ranking de jugadores/i });
 
     expect(list).toBeVisible();
+  });
+
+  it('filters the ranking by team and side while keeping the search global', async () => {
+    await render(PlayersDirectoryPageComponent, {
+      providers: [providePlayersFeature(), provideRouter([])],
+    });
+
+    await screen.findByRole('link', { name: /Alex Soler/i });
+
+    fireEvent.input(screen.getByRole('searchbox'), {
+      target: { value: 'reves' },
+    });
+    fireEvent.change(screen.getByLabelText(/Equipo/i), {
+      target: { value: 'Titanics' },
+    });
+
+    expect(screen.getByRole('link', { name: /Sergio Torres/i })).toBeVisible();
+    expect(screen.queryByRole('link', { name: /Alex Soler/i })).toBeNull();
   });
 
   it('has no accessibility violations in the ranking view', async () => {
