@@ -30,6 +30,7 @@ interface NavigationItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'app-shell',
+    '(document:keydown.escape)': 'closeNavigation()',
   },
   imports: [LucideAngularModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app-shell.component.html',

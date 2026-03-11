@@ -19,10 +19,10 @@
           alt=""
           class="app-shell__brand-image"
           decoding="async"
-          height="120"
+          height="135"
           loading="eager"
           [src]="applicationMetadata.logoPath"
-          width="180"
+          width="318"
         />
       </span>
 
@@ -40,8 +40,10 @@
       type="button"
       (click)="toggleNavigation()"
     >
-      <lucide-angular [img]="isNavigationOpen() ? closeIcon : menuIcon" [size]="18" />
-      <span>Menú</span>
+      <span aria-hidden="true" class="app-shell__menu-trigger-icon">
+        <lucide-angular [img]="isNavigationOpen() ? closeIcon : menuIcon" [size]="18" />
+      </span>
+      <span class="app-shell__menu-trigger-label">Menú</span>
     </button>
 
     <nav

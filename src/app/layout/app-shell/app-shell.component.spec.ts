@@ -38,6 +38,27 @@ describe('AppShellComponent', () => {
     ).toBeVisible();
   });
 
+  it('closes the navigation drawer when Escape is pressed inside the menu', async () => {
+    await render(AppShellComponent, {
+      providers: [
+        provideRouter([
+          {
+            path: '',
+            component: DummyRouteComponent,
+          },
+        ]),
+      ],
+    });
+
+    const menuButton = screen.getByRole('button', { name: /Abrir o cerrar navegación/i });
+    await fireEvent.click(menuButton);
+    expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+
+    await fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('has no accessibility violations in the application shell', async () => {
     const { container } = await render(AppShellComponent, {
       providers: [
