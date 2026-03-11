@@ -10,7 +10,7 @@ export class Player {
     readonly teamId: string,
     readonly teamName: string,
     readonly teamLogoPath: string | null,
-    readonly avatarPath: string,
+    readonly avatarPath: string | null,
     readonly wonMatchesCount: number,
     readonly lostMatchesCount: number,
     readonly side: PlayerSide = 'ambas',

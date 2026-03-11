@@ -1,0 +1,252 @@
+.matchday-encounter-card-host {
+  display: block;
+}
+
+.matchday-encounter-card {
+  &__content,
+  &__header,
+  &__identity,
+  &__scoreboard,
+  &__pair-item,
+  &__pair-topline,
+  &__pair-scoreline,
+  &__pair-matchup,
+  &__pair-team,
+  &__pair-score {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  &__content {
+    padding: var(--space-6);
+  }
+
+  &__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  &__eyebrow,
+  &__title,
+  &__score,
+  &__meta,
+  &__pair-label,
+  &__pair-winner,
+  &__empty-pairs,
+  &__pair-team-label,
+  &__pair-score-divider {
+    margin: 0;
+  }
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-brand);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    line-height: 1.05;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    padding-inline: var(--space-3);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 800;
+
+    &--success {
+      border-color: rgb(105 246 209 / 0.22);
+      background: rgb(105 246 209 / 0.08);
+      color: #8cf4da;
+    }
+
+    &--live {
+      border-color: rgb(243 200 75 / 0.24);
+      background: rgb(243 200 75 / 0.1);
+      color: #f5dfa0;
+    }
+
+    &--scheduled {
+      border-color: rgb(132 213 255 / 0.22);
+      background: rgb(132 213 255 / 0.08);
+      color: #cdeefe;
+    }
+  }
+
+  &__showdown {
+    display: grid;
+    gap: var(--space-4);
+    align-items: center;
+    padding-block: var(--space-2);
+  }
+
+  &__scoreboard {
+    justify-items: center;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(circle at top, rgb(201 162 39 / 0.12), transparent 60%),
+      rgb(255 255 255 / 0.02);
+    text-align: center;
+  }
+
+  &__score {
+    color: var(--color-text-strong);
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  &__meta,
+  &__pair-winner,
+  &__empty-pairs {
+    color: var(--color-text-muted);
+  }
+
+  &__pair-list {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__pair-item {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1.25rem;
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  &__pair-topline {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  &__pair-label {
+    color: var(--color-text-strong);
+    font-weight: 800;
+  }
+
+  &__pair-matchup {
+    align-items: start;
+  }
+
+  &__pair-scoreline {
+    align-items: center;
+    padding: var(--space-3);
+    border: 1px solid rgb(255 255 255 / 0.06);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  &__pair-score {
+    gap: 0.2rem;
+    justify-items: center;
+    text-align: center;
+
+    span {
+      color: var(--color-text-muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    strong {
+      color: var(--color-text-strong);
+      font-size: 0.98rem;
+      line-height: 1.3;
+    }
+  }
+
+  &__pair-score-divider {
+    display: grid;
+    place-items: center;
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    font-weight: 900;
+  }
+
+  &__pair-score--winner strong {
+    color: var(--color-brand);
+  }
+
+  &__pair-team {
+    padding: var(--space-3);
+    border: 1px solid rgb(255 255 255 / 0.06);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  &__pair-team-label {
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  &__pair-players {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__pair-player {
+    display: grid;
+    gap: 0.2rem;
+
+    strong {
+      color: var(--color-text-strong);
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    span {
+      color: var(--color-text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+  }
+
+  &__pair-versus {
+    display: grid;
+    place-items: center;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    align-self: center;
+  }
+
+  &__pair-team--winner {
+    border-color: color-mix(in srgb, var(--color-brand) 26%, white 8%);
+    background: rgb(201 162 39 / 0.08);
+  }
+}
+
+@media (min-width: 64rem) {
+  .matchday-encounter-card {
+    &__showdown {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+
+    &__pair-scoreline,
+    &__pair-matchup {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+  }
+}

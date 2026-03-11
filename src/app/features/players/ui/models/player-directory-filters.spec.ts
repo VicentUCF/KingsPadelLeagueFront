@@ -74,7 +74,7 @@ function createPlayerCard(
     displayName: overrides.displayName,
     teamName: overrides.teamName,
     teamLogoPath: null,
-    avatarPath: '/player-stock/avatar-01.svg',
+    avatarPath: null,
     wonMatchesCount: overrides.wonMatchesCount ?? 4,
     lostMatchesCount: overrides.lostMatchesCount ?? 1,
     playedMatchesCount: overrides.playedMatchesCount ?? 5,

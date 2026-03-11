@@ -55,7 +55,7 @@ function createPlayer(
     teamId,
     teamName,
     null,
-    '/player-stock/avatar-01.svg',
+    null,
     wonMatchesCount,
     lostMatchesCount,
   );

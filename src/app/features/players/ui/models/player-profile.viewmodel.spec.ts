@@ -12,7 +12,7 @@ describe('toPlayerProfileViewModel', () => {
         'kings-of-favar',
         'Kings of Favar',
         '/teams_logos/Kings_of_Favar_no_bg.png',
-        '/player-stock/avatar-01.svg',
+        null,
         4,
         1,
       ),

@@ -215,18 +215,31 @@
     background: rgb(255 255 255 / 0.04);
   }
 
-  &__roster-photo {
+  &__roster-preview > :first-child {
+    margin-inline-start: 0;
+  }
+
+  &__roster-photo,
+  &__roster-fallback {
     display: block;
     width: 4.25rem;
     height: 4.25rem;
     margin-inline-start: -0.55rem;
     border: 2px solid rgb(17 17 17 / 0.75);
     border-radius: 50%;
-    object-fit: cover;
+  }
 
-    &:first-child {
-      margin-inline-start: 0;
-    }
+  &__roster-photo {
+    object-fit: cover;
+  }
+
+  &__roster-fallback {
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at top, rgb(255 255 255 / 0.14), transparent 62%),
+      color-mix(in srgb, var(--team-primary) 16%, rgb(17 17 17 / 0.92));
+    color: var(--team-accent);
   }
 
   &--page &__panel {

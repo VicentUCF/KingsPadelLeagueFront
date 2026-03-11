@@ -9,7 +9,7 @@ describe('Player', () => {
       'kings-of-favar',
       'Kings of Favar',
       '/teams_logos/Kings_of_Favar_no_bg.png',
-      '/player-stock/avatar-01.svg',
+      null,
       4,
       2,
     );
@@ -28,7 +28,7 @@ describe('Player', () => {
         'barbaridad',
         'Barbaridad',
         null,
-        '/player-stock/avatar-02.svg',
+        null,
         -1,
         2,
       );

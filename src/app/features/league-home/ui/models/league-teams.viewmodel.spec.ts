@@ -71,7 +71,7 @@ function createSnapshot(): LeagueHomeSnapshot {
             id: 'kof-1',
             displayName: 'Alejandro Mena',
             roleLabel: 'Drive',
-            photoPath: '/stock_players/player-01.svg',
+            photoPath: null,
           },
         ],
       },

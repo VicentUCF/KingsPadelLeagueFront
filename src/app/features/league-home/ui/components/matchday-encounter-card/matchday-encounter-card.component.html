@@ -1,0 +1,138 @@
+<article class="matchday-encounter-card c-surface-card">
+  <div class="matchday-encounter-card__content">
+    <header class="matchday-encounter-card__header">
+      <div class="matchday-encounter-card__identity">
+        <p class="matchday-encounter-card__eyebrow">
+          <lucide-angular [img]="swordsIcon" [size]="15" aria-hidden="true" />
+          <span>Cruce</span>
+        </p>
+
+        <h3 class="matchday-encounter-card__title">
+          {{ encounter().homeTeam.teamName }} vs {{ encounter().awayTeam.teamName }}
+        </h3>
+      </div>
+
+      <span
+        [class.matchday-encounter-card__status--live]="encounter().statusTone === 'live'"
+        [class.matchday-encounter-card__status--scheduled]="encounter().statusTone === 'scheduled'"
+        [class.matchday-encounter-card__status--success]="encounter().statusTone === 'success'"
+        class="matchday-encounter-card__status"
+      >
+        {{ encounter().statusLabel }}
+      </span>
+    </header>
+
+    <div class="matchday-encounter-card__showdown">
+      <app-team-badge
+        [compact]="true"
+        [interactive]="true"
+        [logoPath]="encounter().homeTeam.logoPath"
+        [monogram]="encounter().homeTeam.monogram"
+        [teamLink]="encounter().homeTeam.teamLink"
+        [teamName]="encounter().homeTeam.teamName"
+      />
+
+      <div class="matchday-encounter-card__scoreboard">
+        <p class="matchday-encounter-card__score">{{ encounter().scoreLabel }}</p>
+        <p class="matchday-encounter-card__meta">{{ encounter().metaLabel }}</p>
+      </div>
+
+      <app-team-badge
+        [compact]="true"
+        [interactive]="true"
+        [logoPath]="encounter().awayTeam.logoPath"
+        [monogram]="encounter().awayTeam.monogram"
+        [teamLink]="encounter().awayTeam.teamLink"
+        [teamName]="encounter().awayTeam.teamName"
+      />
+    </div>
+
+    @if (encounter().pairResults.length) {
+      <ul class="matchday-encounter-card__pair-list">
+        @for (pairResult of encounter().pairResults; track pairResult.id) {
+          <li class="matchday-encounter-card__pair-item">
+            <div class="matchday-encounter-card__pair-topline">
+              <p class="matchday-encounter-card__pair-label">{{ pairResult.label }}</p>
+
+              @if (pairResult.winnerTeamName) {
+                <p class="matchday-encounter-card__pair-winner">
+                  {{ pairResult.winnerTeamName }} se lleva el punto
+                </p>
+              }
+            </div>
+
+            <div class="matchday-encounter-card__pair-scoreline">
+              <div
+                [class.matchday-encounter-card__pair-score--winner]="
+                  pairResult.winnerSide === 'home'
+                "
+                class="matchday-encounter-card__pair-score"
+              >
+                <span>{{ encounter().homeTeam.teamName }}</span>
+                <strong>{{ pairResult.homeScoreLabel }}</strong>
+              </div>
+
+              <span aria-hidden="true" class="matchday-encounter-card__pair-score-divider">-</span>
+
+              <div
+                [class.matchday-encounter-card__pair-score--winner]="
+                  pairResult.winnerSide === 'away'
+                "
+                class="matchday-encounter-card__pair-score"
+              >
+                <span>{{ encounter().awayTeam.teamName }}</span>
+                <strong>{{ pairResult.awayScoreLabel }}</strong>
+              </div>
+            </div>
+
+            <div class="matchday-encounter-card__pair-matchup">
+              <div
+                [class.matchday-encounter-card__pair-team--winner]="
+                  pairResult.winnerSide === 'home'
+                "
+                class="matchday-encounter-card__pair-team"
+              >
+                <p class="matchday-encounter-card__pair-team-label">
+                  {{ encounter().homeTeam.teamName }} · {{ pairResult.homePair.label }}
+                </p>
+
+                <ul class="matchday-encounter-card__pair-players">
+                  @for (player of pairResult.homePair.players; track player.id) {
+                    <li class="matchday-encounter-card__pair-player">
+                      <strong>{{ player.displayName }}</strong>
+                      <span>{{ player.roleLabel }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+
+              <span aria-hidden="true" class="matchday-encounter-card__pair-versus">VS</span>
+
+              <div
+                [class.matchday-encounter-card__pair-team--winner]="
+                  pairResult.winnerSide === 'away'
+                "
+                class="matchday-encounter-card__pair-team"
+              >
+                <p class="matchday-encounter-card__pair-team-label">
+                  {{ encounter().awayTeam.teamName }} · {{ pairResult.awayPair.label }}
+                </p>
+
+                <ul class="matchday-encounter-card__pair-players">
+                  @for (player of pairResult.awayPair.players; track player.id) {
+                    <li class="matchday-encounter-card__pair-player">
+                      <strong>{{ player.displayName }}</strong>
+                      <span>{{ player.roleLabel }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="matchday-encounter-card__empty-pairs">{{ encounter().emptyPairResultsMessage }}</p>
+    }
+  </div>
+</article>

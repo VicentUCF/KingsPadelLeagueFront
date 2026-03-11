@@ -19,7 +19,7 @@ export interface TeamRosterPlayerViewModel {
   readonly id: string;
   readonly displayName: string;
   readonly roleLabel: string;
-  readonly photoPath: string;
+  readonly photoPath: string | null;
   readonly photoAlt: string;
 }
 
@@ -174,7 +174,7 @@ function toTeamRosterPlayerViewModel(player: TeamPlayerSummary): TeamRosterPlaye
     displayName: player.displayName,
     roleLabel: player.roleLabel,
     photoPath: player.photoPath,
-    photoAlt: `Retrato temporal de stock de ${player.displayName}`,
+    photoAlt: player.photoPath ? player.displayName : '',
   };
 }
 

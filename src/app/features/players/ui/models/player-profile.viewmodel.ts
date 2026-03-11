@@ -14,7 +14,7 @@ export interface PlayerProfileViewModel {
   readonly teamLogoPath: string | null;
   readonly teamMonogram: string;
   readonly teamPalette: TeamBrandingPalette;
-  readonly avatarPath: string;
+  readonly avatarPath: string | null;
   readonly wonMatchesCount: number;
   readonly lostMatchesCount: number;
   readonly wonMatchesLabel: string;

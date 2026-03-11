@@ -5,7 +5,7 @@ export interface PlayerCardViewModel {
   readonly displayName: string;
   readonly teamName: string;
   readonly teamLogoPath: string | null;
-  readonly avatarPath: string;
+  readonly avatarPath: string | null;
   readonly wonMatchesCount: number;
   readonly lostMatchesCount: number;
   readonly playedMatchesCount: number;

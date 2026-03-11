@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ArrowUpRight, LucideAngularModule, Sparkles } from 'lucide-angular';
+import { ArrowUpRight, LucideAngularModule, Sparkles, User } from 'lucide-angular';
 
 import { type TeamShowcaseViewModel } from '@features/league-home/ui/models/league-team-showcase.viewmodel';
 
@@ -23,5 +23,6 @@ export class TeamShowcaseHeroComponent {
 
   protected readonly sparklesIcon = Sparkles;
   protected readonly arrowUpRightIcon = ArrowUpRight;
+  protected readonly userIcon = User;
   protected readonly compactRoster = computed(() => this.team().roster.slice(0, 3));
 }

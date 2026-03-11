@@ -10,14 +10,20 @@
   }
 
   <div class="player-card__avatar">
-    <img
-      [ngSrc]="player().avatarPath"
-      [alt]="player().displayName"
-      class="player-card__image"
-      decoding="async"
-      height="48"
-      width="48"
-    />
+    @if (player().avatarPath) {
+      <img
+        [ngSrc]="player().avatarPath!"
+        [alt]="player().displayName"
+        class="player-card__image"
+        decoding="async"
+        height="48"
+        width="48"
+      />
+    } @else {
+      <span aria-hidden="true" class="player-card__avatar-fallback">
+        <lucide-angular [img]="userIcon" [size]="20" aria-hidden="true" />
+      </span>
+    }
   </div>
 
   <div class="player-card__identity">

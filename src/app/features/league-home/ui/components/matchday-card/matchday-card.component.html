@@ -1,0 +1,63 @@
+<article [class.matchday-card--current]="matchday().isCurrent" class="matchday-card c-surface-card">
+  <div class="matchday-card__content">
+    <header class="matchday-card__header">
+      <div class="matchday-card__identity">
+        <p class="matchday-card__eyebrow">{{ matchday().statusLabel }}</p>
+        <h2 class="matchday-card__title">{{ matchday().label }}</h2>
+        <p class="matchday-card__date">{{ matchday().dateLabel }}</p>
+      </div>
+
+      <span
+        [class.matchday-card__status--live]="matchday().statusTone === 'live'"
+        [class.matchday-card__status--scheduled]="matchday().statusTone === 'scheduled'"
+        [class.matchday-card__status--success]="matchday().statusTone === 'success'"
+        class="matchday-card__status"
+      >
+        {{ matchday().statusLabel }}
+      </span>
+    </header>
+
+    <p class="matchday-card__meta">
+      <span>{{ matchday().encounterCountLabel }}</span>
+
+      @if (matchday().byeDescription) {
+        <span aria-hidden="true" class="matchday-card__divider"></span>
+        <span>{{ matchday().byeDescription }}</span>
+      }
+    </p>
+
+    <div class="matchday-card__encounters" role="list">
+      @for (encounter of matchday().encounters; track encounter.id) {
+        <div class="matchday-card__encounter" role="listitem">
+          <div class="matchday-card__teams">
+            <app-team-badge
+              [compact]="true"
+              [logoPath]="encounter.homeTeam.logoPath"
+              [monogram]="encounter.homeTeam.monogram"
+              [teamName]="encounter.homeTeam.teamName"
+            />
+
+            <span aria-hidden="true" class="matchday-card__versus">VS</span>
+
+            <app-team-badge
+              [compact]="true"
+              [logoPath]="encounter.awayTeam.logoPath"
+              [monogram]="encounter.awayTeam.monogram"
+              [teamName]="encounter.awayTeam.teamName"
+            />
+          </div>
+
+          <div class="matchday-card__encounter-copy">
+            <p class="matchday-card__encounter-meta">{{ encounter.metaLabel }}</p>
+            <p class="matchday-card__encounter-score">{{ encounter.scoreLabel }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <a [routerLink]="matchday().detailLink" class="matchday-card__cta">
+      <span>{{ matchday().detailLinkLabel }}</span>
+      <lucide-angular [img]="arrowRightIcon" [size]="15" aria-hidden="true" />
+    </a>
+  </div>
+</article>

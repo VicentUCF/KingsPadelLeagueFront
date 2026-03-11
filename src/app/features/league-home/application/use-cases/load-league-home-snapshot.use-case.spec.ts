@@ -1,3 +1,4 @@
+import { type LeagueMatchday } from '@features/league-home/domain/entities/league-matchday';
 import {
   type LeagueHomeSnapshot,
   type StandingEntry,
@@ -68,6 +69,10 @@ class LeagueHomeRepositoryStub extends LeagueHomeRepository {
       ],
       teamProfiles: [],
     };
+  }
+
+  override async loadMatchdays(): Promise<readonly LeagueMatchday[]> {
+    return [];
   }
 }
 

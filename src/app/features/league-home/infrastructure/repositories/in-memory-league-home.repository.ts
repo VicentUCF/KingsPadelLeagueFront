@@ -2,6 +2,14 @@ import { Injectable } from '@angular/core';
 
 import { LeagueHomeRepository } from '@features/league-home/application/ports/league-home.repository';
 import {
+  type LeagueMatchPairLineup,
+  type LeagueMatchPairPlayer,
+  type LeagueMatchPairResult,
+  type LeagueMatchday,
+  type LeagueMatchdayEncounter,
+} from '@features/league-home/domain/entities/league-matchday';
+import {
+  type EncounterResultSummary,
   type LeagueHomeSnapshot,
   type TeamPlayerSummary,
   type TeamProfileSummary,
@@ -13,6 +21,8 @@ type TeamCatalogEntry = TeamProfileSummary;
 @Injectable()
 export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
   override async loadSnapshot(): Promise<LeagueHomeSnapshot> {
+    const currentMatchday = resolveCurrentMatchday();
+
     return {
       league: {
         name: 'KingsPadelLeague',
@@ -24,30 +34,21 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
         label: 'Fase regular',
       },
       currentMatchday: {
-        current: 3,
-        total: 5,
-        label: 'Jornada 3 de 5',
+        current: currentMatchday.number,
+        total: MATCHDAY_CATALOG.length,
+        label: `${currentMatchday.label} de ${MATCHDAY_CATALOG.length}`,
       },
-      nextMatches: [
-        {
-          id: 'matchday-3-kings-of-favar-barbaridad',
-          homeTeamName: 'Kings of Favar',
-          awayTeamName: 'Barbaridad',
-          scheduledAtIso: '2026-03-15T17:00:00.000Z',
-          scheduledAtLabel: 'Domingo 18:00',
-        },
-        {
-          id: 'matchday-3-titanics-house-perez',
-          homeTeamName: 'Titanics',
-          awayTeamName: 'House Perez',
-          scheduledAtIso: '2026-03-15T15:00:00.000Z',
-          scheduledAtLabel: 'Domingo 16:00',
-        },
-      ],
+      nextMatches: currentMatchday.encounters.map((encounter) => ({
+        id: encounter.id,
+        homeTeamName: encounter.homeTeamName,
+        awayTeamName: encounter.awayTeamName,
+        scheduledAtIso: toScheduledAtIso(currentMatchday.id, encounter.id),
+        scheduledAtLabel: encounter.scheduledAtLabel,
+      })),
       byeTeam: {
-        teamId: 'magic-city',
-        teamName: 'Magic City',
-        matchdayLabel: 'Jornada 3',
+        teamId: currentMatchday.byeTeam?.teamId ?? 'magic-city',
+        teamName: currentMatchday.byeTeam?.teamName ?? 'Magic City',
+        matchdayLabel: currentMatchday.label,
       },
       standings: [
         {
@@ -91,51 +92,14 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
           gameDifference: 8,
         },
       ],
-      lastResults: [
-        {
-          id: 'result-kings-of-favar-titanics',
-          homeTeamName: 'Kings of Favar',
-          awayTeamName: 'Titanics',
-          pairOneScore: '6-4 6-2',
-          pairTwoScore: '4-6 6-3',
-          homePoints: 4,
-          awayPoints: 1,
-          winnerTeamName: 'Kings of Favar',
-        },
-        {
-          id: 'result-barbaridad-magic-city',
-          homeTeamName: 'Barbaridad',
-          awayTeamName: 'Magic City',
-          pairOneScore: '7-5 6-4',
-          pairTwoScore: '3-6 6-4',
-          homePoints: 5,
-          awayPoints: 0,
-          winnerTeamName: 'Barbaridad',
-        },
-        {
-          id: 'result-house-perez-kings-of-favar',
-          homeTeamName: 'House Perez',
-          awayTeamName: 'Kings of Favar',
-          pairOneScore: '6-7 4-6',
-          pairTwoScore: '6-4 6-2',
-          homePoints: 2,
-          awayPoints: 3,
-          winnerTeamName: 'Kings of Favar',
-        },
-        {
-          id: 'result-titanics-barbaridad',
-          homeTeamName: 'Titanics',
-          awayTeamName: 'Barbaridad',
-          pairOneScore: '6-1 6-2',
-          pairTwoScore: '6-3 6-4',
-          homePoints: 5,
-          awayPoints: 0,
-          winnerTeamName: 'Titanics',
-        },
-      ],
+      lastResults: resolveLatestResults(),
       teams: TEAM_CATALOG.map(toTeamSummary),
       teamProfiles: TEAM_CATALOG.map(toTeamProfileSummary),
     };
+  }
+
+  override async loadMatchdays(): Promise<readonly LeagueMatchday[]> {
+    return MATCHDAY_CATALOG;
   }
 }
 
@@ -232,6 +196,409 @@ const TEAM_CATALOG: readonly TeamCatalogEntry[] = [
   },
 ];
 
+const MATCHDAY_CATALOG: readonly LeagueMatchday[] = [
+  {
+    id: 'matchday-1',
+    number: 1,
+    label: 'Jornada 1',
+    status: 'completed',
+    dateLabel: 'Domingo 1 de marzo',
+    encounters: [
+      createEncounter({
+        id: 'matchday-1-kings-of-favar-titanics',
+        homeTeamId: 'kings-of-favar',
+        homeTeamSlug: 'kings-of-favar',
+        homeTeamName: 'Kings of Favar',
+        awayTeamId: 'titanics',
+        awayTeamSlug: 'titanics',
+        awayTeamName: 'Titanics',
+        homeScore: 4,
+        awayScore: 1,
+        status: 'completed',
+        scheduledAtLabel: 'Domingo 12:00',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-1-kings-of-favar-titanics-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'kings-of-favar', ['kof-1', 'kof-2']),
+            awayPair: createPairLineup('Pareja 1', 'titanics', ['tit-1', 'tit-2']),
+            homeScoreLabel: '6-4 6-2',
+            awayScoreLabel: '4-6 2-6',
+            winnerTeamId: 'kings-of-favar',
+          }),
+          createPairResult({
+            id: 'matchday-1-kings-of-favar-titanics-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'kings-of-favar', ['kof-3', 'kof-4']),
+            awayPair: createPairLineup('Pareja 2', 'titanics', ['tit-3', 'tit-4']),
+            homeScoreLabel: '4-6 6-3 7-6',
+            awayScoreLabel: '6-4 3-6 6-7',
+            winnerTeamId: 'kings-of-favar',
+          }),
+        ],
+      }),
+      createEncounter({
+        id: 'matchday-1-barbaridad-magic-city',
+        homeTeamId: 'barbaridad',
+        homeTeamSlug: 'barbaridad',
+        homeTeamName: 'Barbaridad',
+        awayTeamId: 'magic-city',
+        awayTeamSlug: 'magic-city',
+        awayTeamName: 'Magic City',
+        homeScore: 5,
+        awayScore: 0,
+        status: 'completed',
+        scheduledAtLabel: 'Domingo 16:00',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-1-barbaridad-magic-city-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'barbaridad', ['bar-1', 'bar-2']),
+            awayPair: createPairLineup('Pareja 1', 'magic-city', ['mc-1', 'mc-2']),
+            homeScoreLabel: '7-5 6-4',
+            awayScoreLabel: '5-7 4-6',
+            winnerTeamId: 'barbaridad',
+          }),
+          createPairResult({
+            id: 'matchday-1-barbaridad-magic-city-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'barbaridad', ['bar-3', 'bar-4']),
+            awayPair: createPairLineup('Pareja 2', 'magic-city', ['mc-3', 'mc-4']),
+            homeScoreLabel: '3-6 6-4 6-2',
+            awayScoreLabel: '6-3 4-6 2-6',
+            winnerTeamId: 'barbaridad',
+          }),
+        ],
+      }),
+    ],
+    byeTeam: {
+      teamId: 'house-perez',
+      teamSlug: 'house-perez',
+      teamName: 'House Perez',
+    },
+  },
+  {
+    id: 'matchday-2',
+    number: 2,
+    label: 'Jornada 2',
+    status: 'completed',
+    dateLabel: 'Domingo 8 de marzo',
+    encounters: [
+      createEncounter({
+        id: 'matchday-2-house-perez-kings-of-favar',
+        homeTeamId: 'house-perez',
+        homeTeamSlug: 'house-perez',
+        homeTeamName: 'House Perez',
+        awayTeamId: 'kings-of-favar',
+        awayTeamSlug: 'kings-of-favar',
+        awayTeamName: 'Kings of Favar',
+        homeScore: 2,
+        awayScore: 3,
+        status: 'completed',
+        scheduledAtLabel: 'Domingo 11:30',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-2-house-perez-kings-of-favar-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'house-perez', ['hp-1', 'hp-2']),
+            awayPair: createPairLineup('Pareja 1', 'kings-of-favar', ['kof-1', 'kof-2']),
+            homeScoreLabel: '6-7 4-6',
+            awayScoreLabel: '7-6 6-4',
+            winnerTeamId: 'kings-of-favar',
+          }),
+          createPairResult({
+            id: 'matchday-2-house-perez-kings-of-favar-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'house-perez', ['hp-3', 'hp-4']),
+            awayPair: createPairLineup('Pareja 2', 'kings-of-favar', ['kof-3', 'kof-4']),
+            homeScoreLabel: '6-4 6-2',
+            awayScoreLabel: '4-6 2-6',
+            winnerTeamId: 'house-perez',
+          }),
+        ],
+      }),
+      createEncounter({
+        id: 'matchday-2-titanics-barbaridad',
+        homeTeamId: 'titanics',
+        homeTeamSlug: 'titanics',
+        homeTeamName: 'Titanics',
+        awayTeamId: 'barbaridad',
+        awayTeamSlug: 'barbaridad',
+        awayTeamName: 'Barbaridad',
+        homeScore: 5,
+        awayScore: 0,
+        status: 'completed',
+        scheduledAtLabel: 'Domingo 15:30',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-2-titanics-barbaridad-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'titanics', ['tit-1', 'tit-2']),
+            awayPair: createPairLineup('Pareja 1', 'barbaridad', ['bar-1', 'bar-2']),
+            homeScoreLabel: '6-1 6-2',
+            awayScoreLabel: '1-6 2-6',
+            winnerTeamId: 'titanics',
+          }),
+          createPairResult({
+            id: 'matchday-2-titanics-barbaridad-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'titanics', ['tit-3', 'tit-4']),
+            awayPair: createPairLineup('Pareja 2', 'barbaridad', ['bar-3', 'bar-4']),
+            homeScoreLabel: '6-3 6-4',
+            awayScoreLabel: '3-6 4-6',
+            winnerTeamId: 'titanics',
+          }),
+        ],
+      }),
+    ],
+    byeTeam: {
+      teamId: 'magic-city',
+      teamSlug: 'magic-city',
+      teamName: 'Magic City',
+    },
+  },
+  {
+    id: 'matchday-3',
+    number: 3,
+    label: 'Jornada 3',
+    status: 'current',
+    dateLabel: 'Domingo 15 de marzo',
+    encounters: [
+      createEncounter({
+        id: 'matchday-3-kings-of-favar-barbaridad',
+        homeTeamId: 'kings-of-favar',
+        homeTeamSlug: 'kings-of-favar',
+        homeTeamName: 'Kings of Favar',
+        awayTeamId: 'barbaridad',
+        awayTeamSlug: 'barbaridad',
+        awayTeamName: 'Barbaridad',
+        homeScore: 1,
+        awayScore: 0,
+        status: 'current',
+        scheduledAtLabel: 'Domingo 18:00',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-3-kings-of-favar-barbaridad-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'kings-of-favar', ['kof-1', 'kof-2']),
+            awayPair: createPairLineup('Pareja 1', 'barbaridad', ['bar-1', 'bar-2']),
+            homeScoreLabel: '6-4 6-3',
+            awayScoreLabel: '4-6 3-6',
+            winnerTeamId: 'kings-of-favar',
+          }),
+          createPairResult({
+            id: 'matchday-3-kings-of-favar-barbaridad-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'kings-of-favar', ['kof-3', 'kof-4']),
+            awayPair: createPairLineup('Pareja 2', 'barbaridad', ['bar-3', 'bar-4']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+        ],
+      }),
+      createEncounter({
+        id: 'matchday-3-titanics-house-perez',
+        homeTeamId: 'titanics',
+        homeTeamSlug: 'titanics',
+        homeTeamName: 'Titanics',
+        awayTeamId: 'house-perez',
+        awayTeamSlug: 'house-perez',
+        awayTeamName: 'House Perez',
+        homeScore: 0,
+        awayScore: 0,
+        status: 'upcoming',
+        scheduledAtLabel: 'Domingo 16:00',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-3-titanics-house-perez-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'titanics', ['tit-1', 'tit-2']),
+            awayPair: createPairLineup('Pareja 1', 'house-perez', ['hp-1', 'hp-2']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+          createPairResult({
+            id: 'matchday-3-titanics-house-perez-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'titanics', ['tit-3', 'tit-4']),
+            awayPair: createPairLineup('Pareja 2', 'house-perez', ['hp-3', 'hp-4']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+        ],
+      }),
+    ],
+    byeTeam: {
+      teamId: 'magic-city',
+      teamSlug: 'magic-city',
+      teamName: 'Magic City',
+    },
+  },
+  {
+    id: 'matchday-4',
+    number: 4,
+    label: 'Jornada 4',
+    status: 'upcoming',
+    dateLabel: 'Domingo 22 de marzo',
+    encounters: [
+      createEncounter({
+        id: 'matchday-4-magic-city-house-perez',
+        homeTeamId: 'magic-city',
+        homeTeamSlug: 'magic-city',
+        homeTeamName: 'Magic City',
+        awayTeamId: 'house-perez',
+        awayTeamSlug: 'house-perez',
+        awayTeamName: 'House Perez',
+        homeScore: 0,
+        awayScore: 0,
+        status: 'upcoming',
+        scheduledAtLabel: 'Domingo 12:00',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-4-magic-city-house-perez-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'magic-city', ['mc-1', 'mc-2']),
+            awayPair: createPairLineup('Pareja 1', 'house-perez', ['hp-1', 'hp-2']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+          createPairResult({
+            id: 'matchday-4-magic-city-house-perez-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'magic-city', ['mc-3', 'mc-4']),
+            awayPair: createPairLineup('Pareja 2', 'house-perez', ['hp-3', 'hp-4']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+        ],
+      }),
+      createEncounter({
+        id: 'matchday-4-titanics-kings-of-favar',
+        homeTeamId: 'titanics',
+        homeTeamSlug: 'titanics',
+        homeTeamName: 'Titanics',
+        awayTeamId: 'kings-of-favar',
+        awayTeamSlug: 'kings-of-favar',
+        awayTeamName: 'Kings of Favar',
+        homeScore: 0,
+        awayScore: 0,
+        status: 'upcoming',
+        scheduledAtLabel: 'Domingo 17:30',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-4-titanics-kings-of-favar-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'titanics', ['tit-1', 'tit-2']),
+            awayPair: createPairLineup('Pareja 1', 'kings-of-favar', ['kof-1', 'kof-2']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+          createPairResult({
+            id: 'matchday-4-titanics-kings-of-favar-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'titanics', ['tit-3', 'tit-4']),
+            awayPair: createPairLineup('Pareja 2', 'kings-of-favar', ['kof-3', 'kof-4']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+        ],
+      }),
+    ],
+    byeTeam: {
+      teamId: 'barbaridad',
+      teamSlug: 'barbaridad',
+      teamName: 'Barbaridad',
+    },
+  },
+  {
+    id: 'matchday-5',
+    number: 5,
+    label: 'Jornada 5',
+    status: 'upcoming',
+    dateLabel: 'Domingo 29 de marzo',
+    encounters: [
+      createEncounter({
+        id: 'matchday-5-magic-city-barbaridad',
+        homeTeamId: 'magic-city',
+        homeTeamSlug: 'magic-city',
+        homeTeamName: 'Magic City',
+        awayTeamId: 'barbaridad',
+        awayTeamSlug: 'barbaridad',
+        awayTeamName: 'Barbaridad',
+        homeScore: 0,
+        awayScore: 0,
+        status: 'upcoming',
+        scheduledAtLabel: 'Domingo 11:00',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-5-magic-city-barbaridad-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'magic-city', ['mc-1', 'mc-2']),
+            awayPair: createPairLineup('Pareja 1', 'barbaridad', ['bar-1', 'bar-2']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+          createPairResult({
+            id: 'matchday-5-magic-city-barbaridad-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'magic-city', ['mc-3', 'mc-4']),
+            awayPair: createPairLineup('Pareja 2', 'barbaridad', ['bar-3', 'bar-4']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+        ],
+      }),
+      createEncounter({
+        id: 'matchday-5-house-perez-titanics',
+        homeTeamId: 'house-perez',
+        homeTeamSlug: 'house-perez',
+        homeTeamName: 'House Perez',
+        awayTeamId: 'titanics',
+        awayTeamSlug: 'titanics',
+        awayTeamName: 'Titanics',
+        homeScore: 0,
+        awayScore: 0,
+        status: 'upcoming',
+        scheduledAtLabel: 'Domingo 16:30',
+        pairResults: [
+          createPairResult({
+            id: 'matchday-5-house-perez-titanics-pair-1',
+            label: 'Partido 1',
+            homePair: createPairLineup('Pareja 1', 'house-perez', ['hp-1', 'hp-2']),
+            awayPair: createPairLineup('Pareja 1', 'titanics', ['tit-1', 'tit-2']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+          createPairResult({
+            id: 'matchday-5-house-perez-titanics-pair-2',
+            label: 'Partido 2',
+            homePair: createPairLineup('Pareja 2', 'house-perez', ['hp-3', 'hp-4']),
+            awayPair: createPairLineup('Pareja 2', 'titanics', ['tit-3', 'tit-4']),
+            homeScoreLabel: 'Pendiente',
+            awayScoreLabel: 'Pendiente',
+            winnerTeamId: null,
+          }),
+        ],
+      }),
+    ],
+    byeTeam: {
+      teamId: 'kings-of-favar',
+      teamSlug: 'kings-of-favar',
+      teamName: 'Kings of Favar',
+    },
+  },
+];
+
 function createPlayer(
   id: string,
   displayName: string,
@@ -266,4 +633,102 @@ function toTeamProfileSummary(team: TeamCatalogEntry): TeamProfileSummary {
     identityDescription: team.identityDescription,
     players: team.players,
   };
+}
+
+function createEncounter(encounter: LeagueMatchdayEncounter): LeagueMatchdayEncounter {
+  return encounter;
+}
+
+function createPairResult(pairResult: LeagueMatchPairResult): LeagueMatchPairResult {
+  return pairResult;
+}
+
+function createPairLineup(
+  label: string,
+  teamId: string,
+  playerIds: readonly string[],
+): LeagueMatchPairLineup {
+  return {
+    label,
+    players: playerIds.map((playerId) => createPairPlayer(teamId, playerId)),
+  };
+}
+
+function createPairPlayer(teamId: string, playerId: string): LeagueMatchPairPlayer {
+  const team = TEAM_CATALOG.find((teamEntry) => teamEntry.id === teamId);
+  const player = team?.players.find((teamPlayer) => teamPlayer.id === playerId);
+
+  if (!player) {
+    throw new Error(`Unknown team player "${playerId}" for team "${teamId}".`);
+  }
+
+  return {
+    id: player.id,
+    displayName: player.displayName,
+    roleLabel: player.roleLabel,
+  };
+}
+
+function resolveCurrentMatchday(): LeagueMatchday {
+  return MATCHDAY_CATALOG.find((matchday) => matchday.status === 'current') ?? MATCHDAY_CATALOG[0]!;
+}
+
+function resolveLatestResults(): readonly EncounterResultSummary[] {
+  return [...MATCHDAY_CATALOG]
+    .reverse()
+    .flatMap((matchday) =>
+      matchday.encounters
+        .filter((encounter) => encounter.status === 'completed')
+        .map(toEncounterResultSummary),
+    )
+    .slice(0, 4);
+}
+
+function toEncounterResultSummary(encounter: LeagueMatchdayEncounter): EncounterResultSummary {
+  return {
+    id: `result-${encounter.id}`,
+    homeTeamName: encounter.homeTeamName,
+    awayTeamName: encounter.awayTeamName,
+    pairOneScore: encounter.pairResults[0]?.homeScoreLabel ?? 'Pendiente',
+    pairTwoScore: encounter.pairResults[1]?.homeScoreLabel ?? 'Pendiente',
+    homePoints: encounter.homeScore,
+    awayPoints: encounter.awayScore,
+    winnerTeamName: resolveWinnerTeamName(encounter),
+  };
+}
+
+function resolveWinnerTeamName(encounter: LeagueMatchdayEncounter): string {
+  if (encounter.homeScore === encounter.awayScore) {
+    return 'Sin ganador';
+  }
+
+  return encounter.homeScore > encounter.awayScore
+    ? encounter.homeTeamName
+    : encounter.awayTeamName;
+}
+
+function toScheduledAtIso(matchdayId: string, encounterId: string): string {
+  const matchdayDateRegistry: Record<string, string> = {
+    'matchday-1': '2026-03-01',
+    'matchday-2': '2026-03-08',
+    'matchday-3': '2026-03-15',
+    'matchday-4': '2026-03-22',
+    'matchday-5': '2026-03-29',
+  };
+  const encounterTimeRegistry: Record<string, string> = {
+    'matchday-1-kings-of-favar-titanics': '11:00:00.000Z',
+    'matchday-1-barbaridad-magic-city': '15:00:00.000Z',
+    'matchday-2-house-perez-kings-of-favar': '10:30:00.000Z',
+    'matchday-2-titanics-barbaridad': '14:30:00.000Z',
+    'matchday-3-kings-of-favar-barbaridad': '17:00:00.000Z',
+    'matchday-3-titanics-house-perez': '15:00:00.000Z',
+    'matchday-4-magic-city-house-perez': '11:00:00.000Z',
+    'matchday-4-titanics-kings-of-favar': '16:30:00.000Z',
+    'matchday-5-magic-city-barbaridad': '10:00:00.000Z',
+    'matchday-5-house-perez-titanics': '15:30:00.000Z',
+  };
+
+  return `${matchdayDateRegistry[matchdayId] ?? '2026-03-15'}T${
+    encounterTimeRegistry[encounterId] ?? '15:00:00.000Z'
+  }`;
 }

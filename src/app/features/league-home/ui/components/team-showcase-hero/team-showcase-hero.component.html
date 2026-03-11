@@ -65,14 +65,20 @@
 
     <div class="team-showcase-hero__roster-preview" aria-hidden="true">
       @for (player of compactRoster(); track player.id) {
-        <img
-          [ngSrc]="player.photoPath"
-          alt=""
-          class="team-showcase-hero__roster-photo"
-          decoding="async"
-          height="68"
-          width="68"
-        />
+        @if (player.photoPath) {
+          <img
+            [ngSrc]="player.photoPath!"
+            alt=""
+            class="team-showcase-hero__roster-photo"
+            decoding="async"
+            height="68"
+            width="68"
+          />
+        } @else {
+          <span class="team-showcase-hero__roster-fallback">
+            <lucide-angular [img]="userIcon" [size]="26" aria-hidden="true" />
+          </span>
+        }
       }
     </div>
   </div>

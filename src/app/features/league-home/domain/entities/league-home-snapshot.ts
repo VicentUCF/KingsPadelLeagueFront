@@ -73,7 +73,7 @@ export interface TeamPlayerSummary {
   readonly id: string;
   readonly displayName: string;
   readonly roleLabel: string;
-  readonly photoPath: string;
+  readonly photoPath: string | null;
 }
 
 export interface TeamProfileSummary {

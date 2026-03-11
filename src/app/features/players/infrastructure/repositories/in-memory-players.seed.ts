@@ -21,20 +21,11 @@ export interface PlayerSeed {
   readonly teamId: string;
   readonly teamName: string;
   readonly teamLogoPath: string | null;
-  readonly avatarPath: string;
+  readonly avatarPath: string | null;
   readonly wonMatchesCount: number;
   readonly lostMatchesCount: number;
   readonly side: PlayerSide;
 }
-
-const PLAYER_AVATAR_PATHS = [
-  '/player-stock/avatar-01.svg',
-  '/player-stock/avatar-02.svg',
-  '/player-stock/avatar-03.svg',
-  '/player-stock/avatar-04.svg',
-  '/player-stock/avatar-05.svg',
-  '/player-stock/avatar-06.svg',
-] as const;
 
 const TEAM_SEED: readonly TeamSeed[] = [
   {
@@ -112,7 +103,7 @@ export const PLAYER_SEED: readonly PlayerSeed[] = TEAM_SEED.flatMap((team) => {
     teamId: team.teamId,
     teamName: team.teamName,
     teamLogoPath: team.teamLogoPath,
-    avatarPath: PLAYER_AVATAR_PATHS[index % PLAYER_AVATAR_PATHS.length]!,
+    avatarPath: null,
     wonMatchesCount: player.wonMatchesCount,
     lostMatchesCount: player.lostMatchesCount,
     side: player.side,

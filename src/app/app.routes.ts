@@ -25,15 +25,10 @@ export const routes: Routes = [
   },
   {
     path: 'jornadas',
-    loadComponent: () =>
-      import('@shared/ui/site-placeholder-page/site-placeholder-page.component').then(
-        (module) => module.SitePlaceholderPageComponent,
+    loadChildren: () =>
+      import('@features/league-home/ui/league-matchdays.routes').then(
+        (module) => module.LEAGUE_MATCHDAYS_ROUTES,
       ),
-    data: {
-      title: 'Jornadas',
-      description:
-        'La vista detallada de jornadas llegará en la siguiente fase. En la home ya tienes la próxima jornada y los últimos resultados.',
-    },
   },
   {
     path: 'equipos',

@@ -1,0 +1,103 @@
+@if (store.isLoading() && !store.hasMatchdays()) {
+  <section class="o-container league-matchday-detail-page__status-panel">
+    <p aria-live="polite" class="league-matchday-detail-page__status">
+      Cargando el detalle de la jornada...
+    </p>
+  </section>
+} @else if (viewModel(); as viewModel) {
+  <section class="o-container league-matchday-detail-page__content">
+    <header class="league-matchday-detail-page__hero">
+      <a class="league-matchday-detail-page__back" routerLink="/jornadas">
+        <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
+        <span>Volver a jornadas</span>
+      </a>
+
+      <p class="league-matchday-detail-page__eyebrow">
+        <lucide-angular [img]="swordsIcon" [size]="15" aria-hidden="true" />
+        <span>{{ viewModel.eyebrow }}</span>
+      </p>
+
+      <div class="league-matchday-detail-page__hero-main">
+        <div class="league-matchday-detail-page__hero-copy">
+          <h1>{{ viewModel.title }}</h1>
+          <p class="league-matchday-detail-page__hero-description">{{ viewModel.description }}</p>
+          <p class="league-matchday-detail-page__hero-meta">
+            <span>{{ viewModel.dateLabel }}</span>
+            <span aria-hidden="true" class="league-matchday-detail-page__divider"></span>
+            <span>{{ viewModel.statusLabel }}</span>
+          </p>
+        </div>
+
+        <div class="league-matchday-detail-page__summary" role="list">
+          @for (summaryItem of viewModel.summaryItems; track summaryItem.label) {
+            <div class="league-matchday-detail-page__summary-item" role="listitem">
+              <span>{{ summaryItem.label }}</span>
+              <strong>{{ summaryItem.value }}</strong>
+            </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (viewModel.byeTeam; as byeTeam) {
+      <section class="league-matchday-detail-page__section">
+        <h2 class="league-matchday-detail-page__section-title">Descanso de la jornada</h2>
+        <app-bye-card [description]="byeTeam.description" [teamName]="byeTeam.teamName" />
+      </section>
+    }
+
+    <section
+      aria-labelledby="matchday-encounters-title"
+      class="league-matchday-detail-page__section"
+    >
+      <h2 class="league-matchday-detail-page__section-title" id="matchday-encounters-title">
+        Cruces de la jornada
+      </h2>
+
+      <div class="league-matchday-detail-page__encounters" role="list">
+        @for (encounter of viewModel.encounters; track encounter.id) {
+          <div role="listitem">
+            <app-matchday-encounter-card [encounter]="encounter" />
+          </div>
+        }
+      </div>
+    </section>
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-matchday-detail-page__status-panel">
+    <app-empty-state
+      description="Inténtalo de nuevo en unos segundos."
+      title="No hemos podido cargar la jornada"
+    />
+
+    <p class="league-matchday-detail-page__status league-matchday-detail-page__status--error">
+      {{ store.errorMessage() }}
+    </p>
+
+    <button class="league-matchday-detail-page__retry" type="button" (click)="reloadMatchdays()">
+      Reintentar
+    </button>
+  </section>
+} @else if (isMatchdayMissing()) {
+  <section class="o-container league-matchday-detail-page__status-panel">
+    <app-empty-state
+      [description]="'Vuelve al listado de jornadas para abrir una jornada publicada.'"
+      [title]="'Jornada no encontrada'"
+    />
+
+    <a
+      class="league-matchday-detail-page__back league-matchday-detail-page__back--standalone"
+      routerLink="/jornadas"
+    >
+      <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
+      <span>Volver a jornadas</span>
+    </a>
+  </section>
+} @else {
+  <section class="o-container league-matchday-detail-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no hay jornadas publicadas para construir este detalle.'"
+      [title]="'No hay jornadas disponibles'"
+    />
+  </section>
+}

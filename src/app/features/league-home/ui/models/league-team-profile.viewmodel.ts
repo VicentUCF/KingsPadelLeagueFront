@@ -27,6 +27,6 @@ export function toLeagueTeamProfilePageViewModel(
     eyebrow: 'Team spotlight',
     rosterTitle: 'Plantilla del equipo',
     rosterDescription:
-      'Retratos temporales de stock para validar la experiencia visual hasta cargar fotografía editorial real.',
+      'La plantilla usa un icono temporal hasta disponer de fotografía editorial real.',
   };
 }

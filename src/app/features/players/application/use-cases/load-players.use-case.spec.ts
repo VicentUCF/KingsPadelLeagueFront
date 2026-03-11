@@ -42,7 +42,7 @@ function createPlayer(slug: string, displayName: string): Player {
     teamId: 'kings-of-favar',
     teamName: 'Kings of Favar',
     teamLogoPath: null,
-    avatarPath: '/player-stock/avatar-01.svg',
+    avatarPath: null,
     wonMatchesCount: 3,
     lostMatchesCount: 1,
     playedMatchesCount: 4,

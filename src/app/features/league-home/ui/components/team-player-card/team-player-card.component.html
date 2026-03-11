@@ -1,12 +1,18 @@
 <article class="team-player-card__panel c-surface-card">
-  <img
-    [ngSrc]="player().photoPath"
-    [alt]="player().photoAlt"
-    class="team-player-card__photo"
-    decoding="async"
-    height="440"
-    width="360"
-  />
+  @if (player().photoPath) {
+    <img
+      [ngSrc]="player().photoPath!"
+      [alt]="player().photoAlt"
+      class="team-player-card__photo"
+      decoding="async"
+      height="440"
+      width="360"
+    />
+  } @else {
+    <div aria-hidden="true" class="team-player-card__photo-fallback">
+      <lucide-angular [img]="userIcon" [size]="72" aria-hidden="true" />
+    </div>
+  }
 
   <div class="team-player-card__body">
     <p class="team-player-card__role">{{ player().roleLabel }}</p>

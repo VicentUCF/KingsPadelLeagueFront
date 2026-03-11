@@ -17,7 +17,7 @@ describe('toLeagueTeamProfilePageViewModel', () => {
           roster: [
             expect.objectContaining({
               displayName: 'Marco Vidal',
-              photoAlt: 'Retrato temporal de stock de Marco Vidal',
+              photoAlt: '',
             }),
           ],
         }),
@@ -133,7 +133,7 @@ function createSnapshot(): LeagueHomeSnapshot {
             id: 'tit-1',
             displayName: 'Marco Vidal',
             roleLabel: 'Drive',
-            photoPath: '/stock_players/player-02.svg',
+            photoPath: null,
           },
         ],
       },
@@ -149,7 +149,7 @@ function createSnapshot(): LeagueHomeSnapshot {
             id: 'hp-1',
             displayName: 'Samuel Costa',
             roleLabel: 'Drive',
-            photoPath: '/stock_players/player-05.svg',
+            photoPath: null,
           },
         ],
       },

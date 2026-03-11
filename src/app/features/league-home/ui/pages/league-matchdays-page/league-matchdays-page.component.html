@@ -1,0 +1,62 @@
+@if (store.isLoading() && !store.hasMatchdays()) {
+  <section class="o-container league-matchdays-page__status-panel">
+    <p aria-live="polite" class="league-matchdays-page__status">Cargando jornadas publicadas...</p>
+  </section>
+} @else if (viewModel(); as viewModel) {
+  <section class="o-container league-matchdays-page__content">
+    <header class="league-matchdays-page__hero">
+      <p class="league-matchdays-page__eyebrow">
+        <lucide-angular [img]="swordsIcon" [size]="15" aria-hidden="true" />
+        <span>{{ viewModel.eyebrow }}</span>
+      </p>
+
+      <div class="league-matchdays-page__hero-main">
+        <div class="league-matchdays-page__hero-copy">
+          <h1>{{ viewModel.title }}</h1>
+          <p class="league-matchdays-page__hero-description">{{ viewModel.description }}</p>
+          <p class="league-matchdays-page__hero-meta">
+            <span>{{ viewModel.publishedMatchdaysLabel }}</span>
+            <span aria-hidden="true" class="league-matchdays-page__divider"></span>
+            <span>{{ viewModel.currentMatchdayLabel }}</span>
+          </p>
+        </div>
+
+        <a class="league-matchdays-page__action" routerLink="/clasificacion">
+          <lucide-angular [img]="standingsIcon" [size]="16" aria-hidden="true" />
+          <span>Ver clasificación</span>
+          <lucide-angular [img]="arrowUpRightIcon" [size]="15" aria-hidden="true" />
+        </a>
+      </div>
+    </header>
+
+    <div class="league-matchdays-page__grid" role="list">
+      @for (matchday of viewModel.matchdays; track matchday.id) {
+        <div role="listitem">
+          <app-matchday-card [matchday]="matchday" />
+        </div>
+      }
+    </div>
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-matchdays-page__status-panel">
+    <app-empty-state
+      description="Inténtalo de nuevo en unos segundos."
+      title="No hemos podido cargar las jornadas"
+    />
+
+    <p class="league-matchdays-page__status league-matchdays-page__status--error">
+      {{ store.errorMessage() }}
+    </p>
+
+    <button class="league-matchdays-page__retry" type="button" (click)="reloadMatchdays()">
+      Reintentar
+    </button>
+  </section>
+} @else {
+  <section class="o-container league-matchdays-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no hay jornadas publicadas para construir esta vista.'"
+      [title]="'No hay jornadas disponibles'"
+    />
+  </section>
+}
