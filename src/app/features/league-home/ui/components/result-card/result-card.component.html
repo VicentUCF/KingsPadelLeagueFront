@@ -1,0 +1,25 @@
+<article class="result-card__content">
+  <h3 class="result-card__title">{{ result().matchupLabel }}</h3>
+
+  <dl class="result-card__scores">
+    <div class="result-card__score-group">
+      <dt>Pareja 1</dt>
+      <dd>{{ result().pairOneScoreLabel }}</dd>
+    </div>
+
+    <div class="result-card__score-group">
+      <dt>Pareja 2</dt>
+      <dd>{{ result().pairTwoScoreLabel }}</dd>
+    </div>
+  </dl>
+
+  <div class="result-card__encounter">
+    <p class="result-card__encounter-label">Resultado enfrentamiento</p>
+    <p class="result-card__encounter-score">{{ result().encounterScoreLabel }}</p>
+  </div>
+
+  <p class="result-card__winner">
+    <lucide-angular [img]="trophyIcon" [size]="15" aria-hidden="true" />
+    <span>{{ result().winnerTeamName }} gana el cruce</span>
+  </p>
+</article>

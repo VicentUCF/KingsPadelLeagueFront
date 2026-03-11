@@ -1,0 +1,13 @@
+<article class="match-card__content">
+  <p class="match-card__eyebrow">
+    <lucide-angular [img]="swordsIcon" [size]="15" aria-hidden="true" />
+    <span>Enfrentamiento</span>
+  </p>
+
+  <h3 class="match-card__title">{{ homeTeamName() }} vs {{ awayTeamName() }}</h3>
+
+  <p class="match-card__time">
+    <lucide-angular [img]="clockIcon" [size]="15" aria-hidden="true" />
+    <span>{{ scheduledAtLabel() }}</span>
+  </p>
+</article>

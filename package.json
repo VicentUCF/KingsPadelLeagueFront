@@ -28,6 +28,8 @@
     "@angular/forms": "^21.1.0",
     "@angular/platform-browser": "^21.1.0",
     "@angular/router": "^21.1.0",
+    "jest-axe": "^10.0.0",
+    "lucide-angular": "^0.577.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -43,6 +45,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@types/jest": "^30.0.0",
+    "@types/jest-axe": "^3.5.9",
     "angular-eslint": "21.3.0",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",

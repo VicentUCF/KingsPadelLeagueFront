@@ -1,4 +1,6 @@
 export const applicationMetadata = {
-  name: 'Padel Fantasy',
-  technicalBaseline: 'Angular 21 · Hexagonal frontend · Signals first',
+  name: 'KingsPadelLeague',
+  tagline: 'La liga de pádel competitiva',
+  description:
+    'KingsPadelLeague es una liga de pádel competitiva con equipos, clasificación, jornadas y resultados actualizados.',
 } as const;

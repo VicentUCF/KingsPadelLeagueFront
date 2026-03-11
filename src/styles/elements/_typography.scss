@@ -5,7 +5,7 @@ h4 {
   color: var(--color-text-strong);
   font-family: var(--font-family-heading);
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1;
   text-wrap: balance;
 }
 
@@ -22,5 +22,6 @@ h3 {
 }
 
 p {
+  color: var(--color-text-default);
   max-width: 68ch;
 }

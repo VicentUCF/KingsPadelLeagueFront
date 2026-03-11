@@ -1,0 +1,33 @@
+<section class="hero-league-status__surface">
+  <div class="o-container hero-league-status__layout">
+    <div class="hero-league-status__content">
+      <p class="hero-league-status__eyebrow">{{ seasonLabel() }}</p>
+      <h1>{{ leagueName() }}</h1>
+      <p class="hero-league-status__tagline">{{ leagueTagline() }}</p>
+
+      <div class="hero-league-status__meta" role="list">
+        <p class="hero-league-status__meta-item" role="listitem">
+          <lucide-angular [img]="calendarDaysIcon" [size]="16" aria-hidden="true" />
+          <span>{{ currentMatchdayLabel() }}</span>
+        </p>
+        <p class="hero-league-status__meta-item" role="listitem">
+          <lucide-angular [img]="trophyIcon" [size]="16" aria-hidden="true" />
+          <span>{{ phaseLabel() }}</span>
+        </p>
+      </div>
+
+      <div class="hero-league-status__actions">
+        <a class="hero-league-status__primary-action" href="#clasificacion">Ver clasificación</a>
+        <a class="hero-league-status__secondary-action" href="#proxima-jornada">Ver jornadas</a>
+      </div>
+    </div>
+
+    <div aria-hidden="true" class="hero-league-status__art">
+      <div class="hero-league-status__crest">
+        <lucide-angular [img]="crownIcon" [size]="56" />
+      </div>
+      <div class="hero-league-status__orb"></div>
+      <div class="hero-league-status__halo"></div>
+    </div>
+  </div>
+</section>

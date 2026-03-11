@@ -3,11 +3,15 @@ body {
   min-height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background:
-    radial-gradient(circle at top left, rgb(17 94 89 / 12%), transparent 35%),
-    radial-gradient(circle at top right, rgb(199 92 32 / 12%), transparent 32%),
-    var(--color-surface);
+    radial-gradient(circle at top left, rgb(201 162 39 / 12%), transparent 28%),
+    radial-gradient(circle at top right, rgb(255 255 255 / 4%), transparent 24%),
+    linear-gradient(180deg, rgb(255 255 255 / 2%), transparent 12%), var(--color-background);
   color: var(--color-text-default);
   font-family: var(--font-family-body);
   line-height: 1.5;
@@ -25,5 +29,6 @@ app-root {
 }
 
 ::selection {
-  background: rgb(17 94 89 / 20%);
+  background: rgb(201 162 39 / 28%);
+  color: var(--color-brand-contrast);
 }

@@ -1,0 +1,33 @@
+.site-placeholder-page {
+  padding-block: var(--space-10) var(--space-12);
+
+  &__content {
+    display: grid;
+    gap: var(--space-5);
+    align-content: start;
+    min-height: calc(100vh - 16rem);
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: var(--color-brand);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: fit-content;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.03);
+    color: var(--color-text-strong);
+    font-weight: 700;
+    text-decoration: none;
+  }
+}

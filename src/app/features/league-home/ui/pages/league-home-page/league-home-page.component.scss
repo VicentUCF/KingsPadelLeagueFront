@@ -1,0 +1,116 @@
+.league-home-page {
+  &__sections {
+    display: grid;
+    gap: var(--space-10);
+    padding-block: var(--space-9) var(--space-12);
+  }
+
+  &__section {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  &__section-heading {
+    display: grid;
+    gap: var(--space-3);
+
+    h2 {
+      margin: 0;
+    }
+
+    &--split {
+      align-items: end;
+    }
+  }
+
+  &__section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-brand);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__section-link {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    color: var(--color-text-strong);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  &__match-grid,
+  &__results-grid,
+  &__teams-grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  &__status-panel {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+    min-height: calc(100vh - 16rem);
+    padding-block: var(--space-10);
+  }
+
+  &__status {
+    width: min(100%, 32rem);
+    margin: 0;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1.25rem;
+    background: var(--color-surface);
+    color: var(--color-text-default);
+    text-align: center;
+
+    &--error {
+      border-color: color-mix(in srgb, var(--color-brand) 28%, white 8%);
+      color: var(--color-text-strong);
+    }
+  }
+
+  &__retry {
+    min-height: 3rem;
+    padding-inline: var(--space-5);
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: var(--color-brand-contrast);
+    font: inherit;
+    font-weight: 700;
+  }
+}
+
+@media (min-width: 48rem) {
+  .league-home-page {
+    &__section-heading--split {
+      grid-template-columns: 1fr auto;
+    }
+
+    &__match-grid,
+    &__results-grid,
+    &__teams-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+@media (min-width: 80rem) {
+  .league-home-page {
+    &__match-grid,
+    &__results-grid,
+    &__teams-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    &__teams-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+}

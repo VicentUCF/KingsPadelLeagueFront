@@ -1,0 +1,114 @@
+@if (store.isLoading()) {
+  <section class="o-container league-home-page__status-panel">
+    <p aria-live="polite" class="league-home-page__status">Cargando el estado actual de la liga…</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-home-page__status-panel">
+    <p class="league-home-page__status league-home-page__status--error" role="status">
+      {{ store.errorMessage() }}
+    </p>
+    <button class="league-home-page__retry" type="button" (click)="reloadSnapshot()">
+      Reintentar
+    </button>
+  </section>
+} @else if (store.viewModel(); as viewModel) {
+  <app-hero-league-status
+    [currentMatchdayLabel]="viewModel.currentMatchdayLabel"
+    [leagueName]="viewModel.leagueName"
+    [leagueTagline]="viewModel.leagueTagline"
+    [phaseLabel]="viewModel.phaseLabel"
+    [seasonLabel]="viewModel.seasonLabel"
+  />
+
+  <div class="o-container league-home-page__sections">
+    <section class="league-home-page__section" id="proxima-jornada">
+      <div class="league-home-page__section-heading">
+        <p class="league-home-page__section-kicker">
+          <lucide-angular [img]="nextMatchdayIcon" [size]="16" aria-hidden="true" />
+          <span>Matchday</span>
+        </p>
+        <h2>{{ viewModel.nextSectionTitle }}</h2>
+      </div>
+
+      <div class="league-home-page__match-grid" role="list">
+        @for (match of viewModel.nextMatches; track match.id) {
+          <div role="listitem">
+            <app-match-card
+              [awayTeamName]="match.awayTeamName"
+              [homeTeamName]="match.homeTeamName"
+              [scheduledAtLabel]="match.scheduledAtLabel"
+            />
+          </div>
+        }
+
+        <div role="listitem">
+          <app-bye-card
+            [description]="viewModel.byeTeam.description"
+            [teamName]="viewModel.byeTeam.teamName"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="league-home-page__section" id="clasificacion">
+      <div class="league-home-page__section-heading league-home-page__section-heading--split">
+        <div>
+          <p class="league-home-page__section-kicker">
+            <lucide-angular [img]="standingsIcon" [size]="16" aria-hidden="true" />
+            <span>Tabla</span>
+          </p>
+          <h2>Clasificación actual</h2>
+        </div>
+
+        <a class="league-home-page__section-link" routerLink="/clasificacion">
+          Ver clasificación completa
+        </a>
+      </div>
+
+      <app-standings-table [rows]="viewModel.standings" />
+    </section>
+
+    <section class="league-home-page__section">
+      <div class="league-home-page__section-heading">
+        <p class="league-home-page__section-kicker">
+          <lucide-angular [img]="resultsIcon" [size]="16" aria-hidden="true" />
+          <span>Resultados</span>
+        </p>
+        <h2>Últimos resultados</h2>
+      </div>
+
+      <div class="league-home-page__results-grid" role="list">
+        @for (result of viewModel.lastResults; track result.id) {
+          <div role="listitem">
+            <app-result-card [result]="result" />
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="league-home-page__section">
+      <div class="league-home-page__section-heading">
+        <p class="league-home-page__section-kicker">
+          <lucide-angular [img]="teamsIcon" [size]="16" aria-hidden="true" />
+          <span>Equipos</span>
+        </p>
+        <h2>Equipos de la liga</h2>
+      </div>
+
+      <div class="league-home-page__teams-grid" role="list">
+        @for (team of viewModel.teams; track team.id) {
+          <div role="listitem">
+            <app-team-card [team]="team" />
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+} @else {
+  <section class="o-container league-home-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no hay información publicada para mostrar en la home.'"
+      [title]="'No hay datos de liga disponibles'"
+    />
+  </section>
+}

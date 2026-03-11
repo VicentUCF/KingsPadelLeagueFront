@@ -1,0 +1,29 @@
+<div class="standings-table__scroll">
+  <table class="standings-table__table">
+    <caption class="u-visually-hidden">
+      Clasificación actual de KingsPadelLeague
+    </caption>
+
+    <thead>
+      <tr>
+        <th scope="col">Rank</th>
+        <th scope="col">Equipo</th>
+        <th scope="col">Puntos</th>
+        <th scope="col">Partidos</th>
+        <th scope="col">Dif Juegos</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of rows(); track row.teamId) {
+        <tr [class.standings-table__row--leader]="row.isLeader" class="standings-table__row">
+          <td>{{ row.rank }}</td>
+          <th scope="row">{{ row.teamName }}</th>
+          <td>{{ row.pointsLabel }}</td>
+          <td>{{ row.playedMatchesLabel }}</td>
+          <td>{{ row.gameDifferenceLabel }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,11 +1,13 @@
 @use '../settings' as settings;
 
 :root {
+  --color-background: #{settings.$color-background};
   --color-brand: #{settings.$color-brand};
   --color-brand-strong: #{settings.$color-brand-strong};
   --color-brand-contrast: #{settings.$color-brand-contrast};
   --color-accent: #{settings.$color-accent};
   --color-surface: #{settings.$color-surface};
+  --color-surface-hover: #{settings.$color-surface-hover};
   --color-surface-raised: #{settings.$color-surface-raised};
   --color-surface-emphasis: #{settings.$color-surface-emphasis};
   --color-border-subtle: #{settings.$color-border-subtle};
@@ -35,5 +37,5 @@
   --z-index-header: #{settings.$z-index-header};
   --z-index-overlay: #{settings.$z-index-overlay};
 
-  color-scheme: light;
+  color-scheme: dark;
 }

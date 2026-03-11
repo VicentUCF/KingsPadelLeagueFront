@@ -9,6 +9,6 @@ describe('AppComponent', () => {
       providers: [provideRouter([])],
     });
 
-    expect(screen.getByRole('link', { name: /padel fantasy/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /KingsPadelLeague/i })).toBeVisible();
   });
 });

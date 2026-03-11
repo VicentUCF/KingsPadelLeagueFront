@@ -1,0 +1,66 @@
+.result-card {
+  &__content {
+    display: grid;
+    gap: var(--space-5);
+    height: 100%;
+    padding: var(--space-6);
+  }
+
+  &__title,
+  &__encounter-label,
+  &__encounter-score,
+  &__winner {
+    margin: 0;
+  }
+
+  &__scores {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  &__score-group {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.02);
+
+    dt {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    dd {
+      margin: 0;
+      color: var(--color-text-strong);
+      font-weight: 700;
+    }
+  }
+
+  &__encounter {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  &__encounter-label {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  &__encounter-score {
+    color: var(--color-text-strong);
+    font-weight: 700;
+  }
+
+  &__winner {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-brand);
+    font-weight: 700;
+  }
+}
