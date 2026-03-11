@@ -1,0 +1,33 @@
+<article
+  [attr.aria-labelledby]="'roster-card-title-' + roster().id"
+  [attr.aria-label]="roster().title"
+  class="roster-list-card__content"
+>
+  <div class="roster-list-card__header">
+    <div class="roster-list-card__identity">
+      <span
+        aria-hidden="true"
+        class="roster-list-card__swatch"
+        [style.--roster-primary]="roster().primaryColor"
+        [style.--roster-secondary]="roster().secondaryColor"
+      ></span>
+
+      <div class="roster-list-card__copy">
+        <h2 [id]="'roster-card-title-' + roster().id">{{ roster().title }}</h2>
+        <p class="roster-list-card__subtitle">{{ roster().subtitle }}</p>
+      </div>
+    </div>
+
+    <app-status-badge [label]="roster().statusLabel" [tone]="roster().statusTone" />
+  </div>
+
+  <div class="roster-list-card__metrics">
+    <p>{{ roster().regularSlotsLabel }}</p>
+    <p>{{ roster().guestLabel }}</p>
+    <p>{{ roster().pendingLabel }}</p>
+  </div>
+
+  <p class="roster-list-card__validity">{{ roster().validityLabel }}</p>
+
+  <a class="roster-list-card__link" [routerLink]="roster().detailPath">Ver detalle</a>
+</article>

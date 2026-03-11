@@ -1,0 +1,44 @@
+.backoffice-rosters-page {
+  display: grid;
+  gap: var(--space-5);
+
+  &__intro {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__intro-copy {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 48rem;
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    color: var(--color-text-strong);
+  }
+
+  p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  &__helper {
+    color: var(--color-text-default);
+    font-weight: 600;
+  }
+
+  &__state {
+    padding: var(--space-6);
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+}

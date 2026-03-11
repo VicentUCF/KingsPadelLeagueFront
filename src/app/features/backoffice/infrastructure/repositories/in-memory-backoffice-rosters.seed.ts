@@ -1,0 +1,366 @@
+import { type BackofficeRosterDetail } from '@features/backoffice/domain/entities/backoffice-roster.entity';
+
+export const IN_MEMORY_BACKOFFICE_ROSTERS: readonly BackofficeRosterDetail[] = [
+  {
+    id: 'roster-barbaridad-2026',
+    teamId: 'barbaridad',
+    teamName: 'Barbaridad',
+    teamShortName: 'BAR',
+    seasonLabel: 'Temporada 2026',
+    primaryColor: '#B53A1D',
+    secondaryColor: '#F2A65A',
+    status: 'REVIEW',
+    regularSlotsUsed: 5,
+    regularSlotsLimit: 6,
+    activeGuestCount: 1,
+    pendingRequestsCount: 2,
+    validityLabel: '3 marzo · 28 junio',
+    members: [
+      createMember(
+        'player-ivan-soto',
+        'Ivan Soto',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Alta base de temporada',
+      ),
+      createMember(
+        'player-nico-prieto',
+        'Nico Prieto',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-carlos-mora',
+        'Carlos Mora',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-gael-rubio',
+        'Gael Rubio',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-jon-arias',
+        'Jon Arias',
+        'REGULAR',
+        'ACTIVE',
+        '10 marzo',
+        null,
+        'Alta aprobada tras baja médica',
+      ),
+      createMember(
+        null,
+        'Pablo Costa',
+        'GUEST',
+        'ACTIVE',
+        '22 marzo',
+        null,
+        'Invitado pendiente de validación definitiva',
+      ),
+      createMember(
+        'player-dani-pujol',
+        'Dani Pujol',
+        'REGULAR',
+        'ENDED',
+        '3 marzo',
+        '9 marzo',
+        'Baja por lesión de larga duración',
+      ),
+    ],
+    pendingRequests: [
+      createPendingRequest(
+        'Alta de sexto regular',
+        'Romero',
+        'Jornada 4',
+        'Pendiente revisión admin',
+      ),
+      createPendingRequest(
+        'Convalidar invitado para domingo',
+        'Romero',
+        'Jornada 4',
+        'Pendiente respuesta admin',
+      ),
+    ],
+    history: [
+      createHistoryEntry('Alta de Jon Arias en sustitución de Dani Pujol', 'Hace 2 días'),
+      createHistoryEntry('Baja médica de Dani Pujol', 'Hace 5 días'),
+      createHistoryEntry('Aprobación inicial de roster base', '3 marzo'),
+    ],
+    restrictions: [
+      createRestriction(
+        'Límite de regulares',
+        'La plantilla activa no puede superar 6 regulares simultáneos.',
+      ),
+      createRestriction(
+        'Invitado separado',
+        'El invitado debe mostrarse fuera del bloque de regulares y nunca computa como fijo.',
+      ),
+      createRestriction(
+        'Cierre de membership',
+        'Las bajas deben conservar histórico con fecha efectiva y motivo visible.',
+      ),
+    ],
+  },
+  {
+    id: 'roster-kings-of-favar-2026',
+    teamId: 'kings-of-favar',
+    teamName: 'Kings of Favar',
+    teamShortName: 'KOF',
+    seasonLabel: 'Temporada 2026',
+    primaryColor: '#1B1F3B',
+    secondaryColor: '#D4AF37',
+    status: 'HEALTHY',
+    regularSlotsUsed: 6,
+    regularSlotsLimit: 6,
+    activeGuestCount: 0,
+    pendingRequestsCount: 0,
+    validityLabel: '3 marzo · 28 junio',
+    members: [
+      createMember(
+        'player-alex-soler',
+        'Alex Soler',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-alejandro-mena',
+        'Alejandro Mena',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-raul-pizarro',
+        'Raul Pizarro',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-sergio-vela',
+        'Sergio Vela',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-eric-cano',
+        'Eric Cano',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-luis-marquez',
+        'Luis Marquez',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+    ],
+    pendingRequests: [],
+    history: [
+      createHistoryEntry('Rosters validados sin incidencias para la season activa', '8 marzo'),
+      createHistoryEntry('Alta de roster base aprobada', '3 marzo'),
+    ],
+    restrictions: [
+      createRestriction(
+        'Capacidad completa',
+        'La plantilla está en 6 de 6 regulares y cualquier alta requiere una baja previa.',
+      ),
+      createRestriction(
+        'Sin invitados activos',
+        'No hay invitados activos ni solicitudes abiertas en este momento.',
+      ),
+    ],
+  },
+  {
+    id: 'roster-titanics-2026',
+    teamId: 'titanics',
+    teamName: 'Titanics',
+    teamShortName: 'TIT',
+    seasonLabel: 'Temporada 2026',
+    primaryColor: '#1C355E',
+    secondaryColor: '#8FD3FF',
+    status: 'REVIEW',
+    regularSlotsUsed: 6,
+    regularSlotsLimit: 6,
+    activeGuestCount: 1,
+    pendingRequestsCount: 1,
+    validityLabel: '3 marzo · 28 junio',
+    members: [
+      createMember(
+        'player-marco-vidal',
+        'Marco Vidal',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-diego-llorens',
+        'Diego Llorens',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-hugo-ferrer',
+        'Hugo Ferrer',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-adrian-pico',
+        'Adrian Pico',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-joel-carrasco',
+        'Joel Carrasco',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        'player-bruno-parra',
+        'Bruno Parra',
+        'REGULAR',
+        'ACTIVE',
+        '3 marzo',
+        null,
+        'Regular confirmado para la season activa',
+      ),
+      createMember(
+        null,
+        'Miguel Cobo',
+        'GUEST',
+        'ACTIVE',
+        '22 marzo',
+        null,
+        'Sustitución puntual pendiente de aprobación definitiva',
+      ),
+      createMember(
+        'player-roi-sanchez',
+        'Roi Sanchez',
+        'REGULAR',
+        'REMOVED',
+        '3 marzo',
+        '17 marzo',
+        'Salida administrativa por expediente disciplinario',
+      ),
+    ],
+    pendingRequests: [
+      createPendingRequest(
+        'Revisión de invitado por ausencia justificada',
+        'Torres',
+        'Jornada 4',
+        'Pendiente documentación',
+      ),
+    ],
+    history: [
+      createHistoryEntry('Se fuerza salida de Roi Sanchez con bloqueo manual', 'Hace 1 día'),
+      createHistoryEntry(
+        'Solicitud de invitado registrada por lesión de última hora',
+        'Hace 7 horas',
+      ),
+      createHistoryEntry('Roster base aprobado', '3 marzo'),
+    ],
+    restrictions: [
+      createRestriction(
+        'Invitado visible',
+        'El invitado activo debe quedar claramente diferenciado de los regulares.',
+      ),
+      createRestriction(
+        'Membership removida',
+        'Las expulsiones administrativas no se eliminan del histórico y deben conservar trazabilidad.',
+      ),
+    ],
+  },
+] as const;
+
+function createMember(
+  playerId: string | null,
+  playerName: string,
+  membershipType: BackofficeRosterDetail['members'][number]['membershipType'],
+  status: BackofficeRosterDetail['members'][number]['status'],
+  effectiveFromLabel: string,
+  effectiveToLabel: string | null,
+  note: string,
+) {
+  return {
+    playerId,
+    playerName,
+    membershipType,
+    status,
+    effectiveFromLabel,
+    effectiveToLabel,
+    note,
+  };
+}
+
+function createPendingRequest(
+  label: string,
+  requestedBy: string,
+  effectiveFromLabel: string,
+  statusLabel: string,
+) {
+  return {
+    label,
+    requestedBy,
+    effectiveFromLabel,
+    statusLabel,
+  };
+}
+
+function createHistoryEntry(label: string, happenedAtLabel: string) {
+  return {
+    label,
+    happenedAtLabel,
+  };
+}
+
+function createRestriction(label: string, description: string) {
+  return {
+    label,
+    description,
+  };
+}

@@ -1,0 +1,133 @@
+@if (store.isLoading()) {
+  <section class="backoffice-roster-detail-page__state c-surface-card">
+    <p>Cargando detalle de plantilla...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state
+    [description]="store.errorMessage()!"
+    title="No hemos podido abrir la plantilla"
+  />
+} @else if (store.isNotFound()) {
+  <section class="backoffice-roster-detail-page__state">
+    <app-empty-state
+      description="Comprueba el identificador de la plantilla o vuelve al listado general."
+      title="No hemos encontrado esta plantilla"
+    />
+
+    <a class="backoffice-roster-detail-page__back-link" routerLink="/backoffice/plantillas">
+      Volver a plantillas
+    </a>
+  </section>
+} @else if (store.viewModel(); as roster) {
+  <div class="backoffice-roster-detail-page__layout">
+    <section class="backoffice-roster-detail-page__hero c-surface-card">
+      <div class="backoffice-roster-detail-page__hero-copy">
+        <div class="backoffice-roster-detail-page__identity">
+          <span
+            aria-hidden="true"
+            class="backoffice-roster-detail-page__swatch"
+            [style.--roster-primary]="roster.primaryColor"
+            [style.--roster-secondary]="roster.secondaryColor"
+          ></span>
+
+          <div>
+            <h2>{{ roster.title }}</h2>
+            <p>{{ roster.subtitle }}</p>
+          </div>
+        </div>
+
+        <app-status-badge [label]="roster.statusLabel" [tone]="roster.statusTone" />
+      </div>
+
+      <div class="backoffice-roster-detail-page__metrics">
+        <section class="backoffice-roster-detail-page__metric">
+          <p class="backoffice-roster-detail-page__metric-label">Regulares activos</p>
+          <p class="backoffice-roster-detail-page__metric-value">{{ roster.regularSlotsLabel }}</p>
+        </section>
+
+        <section class="backoffice-roster-detail-page__metric">
+          <p class="backoffice-roster-detail-page__metric-label">Invitados</p>
+          <p class="backoffice-roster-detail-page__metric-value">{{ roster.guestLabel }}</p>
+        </section>
+
+        <section class="backoffice-roster-detail-page__metric">
+          <p class="backoffice-roster-detail-page__metric-label">Solicitudes</p>
+          <p class="backoffice-roster-detail-page__metric-value">{{ roster.pendingLabel }}</p>
+        </section>
+
+        <section class="backoffice-roster-detail-page__metric">
+          <p class="backoffice-roster-detail-page__metric-label">Vigencia</p>
+          <p class="backoffice-roster-detail-page__metric-value">{{ roster.validityLabel }}</p>
+        </section>
+      </div>
+    </section>
+
+    <section class="backoffice-roster-detail-page__tabs c-surface-card">
+      <div
+        class="backoffice-roster-detail-page__tab-list"
+        role="tablist"
+        aria-label="Detalle plantilla"
+      >
+        @for (tab of tabs; track tab.id) {
+          <button
+            [attr.aria-selected]="isSelectedTab(tab.id)"
+            [class.backoffice-roster-detail-page__tab-button--selected]="isSelectedTab(tab.id)"
+            class="backoffice-roster-detail-page__tab-button"
+            role="tab"
+            type="button"
+            (click)="selectTab(tab.id)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      @switch (store.selectedTab()) {
+        @case ('memberships') {
+          <section role="tabpanel">
+            <h3>Memberships activas</h3>
+            <ul>
+              @for (membership of roster.memberships; track membership) {
+                <li>{{ membership }}</li>
+              }
+            </ul>
+          </section>
+        }
+        @case ('pending') {
+          <section role="tabpanel">
+            <h3>Solicitudes pendientes</h3>
+            @if (roster.pendingRequests.length) {
+              <ul>
+                @for (request of roster.pendingRequests; track request) {
+                  <li>{{ request }}</li>
+                }
+              </ul>
+            } @else {
+              <p>No hay solicitudes pendientes para esta plantilla.</p>
+            }
+          </section>
+        }
+        @case ('history') {
+          <section role="tabpanel">
+            <h3>Histórico de altas y bajas</h3>
+            <ul>
+              @for (entry of roster.history; track entry) {
+                <li>{{ entry }}</li>
+              }
+            </ul>
+          </section>
+        }
+        @case ('rules') {
+          <section role="tabpanel">
+            <h3>Restricciones visibles</h3>
+            <ul>
+              @for (restriction of roster.restrictions; track restriction) {
+                <li>{{ restriction }}</li>
+              }
+            </ul>
+          </section>
+        }
+      }
+    </section>
+  </div>
+}

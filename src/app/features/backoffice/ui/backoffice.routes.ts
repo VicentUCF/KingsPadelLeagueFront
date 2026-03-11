@@ -59,12 +59,8 @@ export const BACKOFFICE_ROUTES: Routes = [
       },
       {
         path: BACKOFFICE_ROUTE_SEGMENTS.roster,
-        component: BackofficePlaceholderPageComponent,
-        data: createRouteData(
-          'Plantillas',
-          'Este módulo concentrará altas, bajas, invitados y memberships activos.',
-          ADMIN_AND_PRESIDENT,
-        ),
+        loadChildren: () =>
+          import('./backoffice-rosters.routes').then((module) => module.BACKOFFICE_ROSTERS_ROUTES),
       },
       {
         path: BACKOFFICE_ROUTE_SEGMENTS.matchdays,

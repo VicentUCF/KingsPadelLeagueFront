@@ -80,7 +80,7 @@ export const BACKOFFICE_NAVIGATION: readonly BackofficeNavigationItem[] = [
     path: `${BACKOFFICE_ROOT_PATH}/${BACKOFFICE_ROUTE_SEGMENTS.roster}`,
     icon: ClipboardList,
     allowedRoles: ADMIN_AND_PRESIDENT,
-    isImplemented: false,
+    isImplemented: true,
   },
   {
     label: 'Jornadas',

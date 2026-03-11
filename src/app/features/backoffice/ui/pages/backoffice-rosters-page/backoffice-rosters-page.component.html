@@ -1,0 +1,39 @@
+<section class="backoffice-rosters-page__intro">
+  <div class="backoffice-rosters-page__intro-copy">
+    <h2>Plantillas activas de la season</h2>
+    <p>
+      Vista operativa de memberships por equipo, invitados activos y solicitudes que todavía
+      requieren decisión interna.
+    </p>
+
+    <p class="backoffice-rosters-page__helper">
+      @if (store.summaryLabel()) {
+        {{ store.summaryLabel() }}
+      } @else {
+        Necesitas plantillas cargadas para revisar la season activa.
+      }
+    </p>
+  </div>
+</section>
+
+@if (store.isLoading()) {
+  <section class="backoffice-rosters-page__state c-surface-card">
+    <p>Cargando plantillas...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state
+    [description]="store.errorMessage()!"
+    title="No hemos podido cargar las plantillas"
+  />
+} @else if (store.viewModel().length === 0) {
+  <app-empty-state
+    description="No hay plantillas activas para la season seleccionada."
+    title="Todavía no hay plantillas disponibles"
+  />
+} @else {
+  <div class="backoffice-rosters-page__grid">
+    @for (roster of store.viewModel(); track roster.id) {
+      <app-roster-list-card [roster]="roster" />
+    }
+  </div>
+}
