@@ -1,0 +1,151 @@
+<app-modal-shell
+  [description]="
+    mode() === 'create'
+      ? 'La ficha define el perfil base del jugador y su equipo actual derivado.'
+      : 'Actualiza la ficha del jugador sin tocar participaciones ni nominaciones históricas.'
+  "
+  [isOpen]="isOpen()"
+  [title]="mode() === 'create' ? 'Crear ficha' : 'Editar ficha'"
+  size="wide"
+  (closed)="close()"
+>
+  <div modalBody>
+    <div class="player-form-dialog__steps" aria-label="Progreso del formulario">
+      <div
+        [class.player-form-dialog__step--active]="isCurrentStep(0)"
+        class="player-form-dialog__step"
+      >
+        <span>1</span>
+        <strong>Identidad</strong>
+      </div>
+
+      <div
+        [class.player-form-dialog__step--active]="isCurrentStep(1)"
+        class="player-form-dialog__step"
+      >
+        <span>2</span>
+        <strong>Perfil</strong>
+      </div>
+    </div>
+
+    @if (submissionError()) {
+      <p class="player-form-dialog__error" role="alert">{{ submissionError() }}</p>
+    }
+
+    <form
+      [formGroup]="form"
+      class="player-form-dialog__form"
+      id="player-form"
+      (ngSubmit)="submit()"
+    >
+      @switch (currentStep()) {
+        @case (0) {
+          <div class="player-form-dialog__grid">
+            <label class="player-form-dialog__field">
+              <span>Nombre completo</span>
+              <input formControlName="fullName" type="text" />
+              @if (hasControlError('fullName')) {
+                <small>El nombre completo es obligatorio.</small>
+              }
+            </label>
+
+            <label class="player-form-dialog__field">
+              <span>Nick</span>
+              <input formControlName="nickName" type="text" />
+              @if (hasControlError('nickName')) {
+                <small>El nick es obligatorio.</small>
+              }
+            </label>
+
+            <label class="player-form-dialog__field player-form-dialog__field--full">
+              <span>Avatar</span>
+              <input formControlName="avatarPath" type="text" />
+              <small
+                >Ruta opcional de imagen. Si se deja vacía, se mostrará un fallback textual.</small
+              >
+            </label>
+          </div>
+        }
+        @case (1) {
+          <div class="player-form-dialog__grid">
+            <label class="player-form-dialog__field">
+              <span>Perfil de pista</span>
+              <select formControlName="preferredSideLabel">
+                <option value="Revés">Revés</option>
+                <option value="Derecha">Derecha</option>
+                <option value="Ambas">Ambas</option>
+              </select>
+            </label>
+
+            <label class="player-form-dialog__field">
+              <span>Equipo actual</span>
+              <select formControlName="currentTeamId">
+                <option value="">Sin equipo activo</option>
+                @for (team of teamOptions(); track team.id) {
+                  <option [value]="team.id">{{ team.label }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="player-form-dialog__field">
+              <span>Email vinculado</span>
+              <input formControlName="linkedUserEmail" type="email" />
+              @if (hasControlError('linkedUserEmail')) {
+                <small>Introduce un email válido o deja el campo vacío.</small>
+              }
+            </label>
+
+            <label class="player-form-dialog__field">
+              <span>Estado</span>
+              <select formControlName="status">
+                <option value="ACTIVE">Activo</option>
+                <option value="INACTIVE">Inactivo</option>
+              </select>
+            </label>
+          </div>
+        }
+      }
+    </form>
+  </div>
+
+  <div class="player-form-dialog__actions" modalFooter>
+    <button
+      class="player-form-dialog__button player-form-dialog__button--secondary"
+      type="button"
+      (click)="close()"
+    >
+      Cancelar
+    </button>
+
+    @if (!isFirstStep()) {
+      <button
+        class="player-form-dialog__button player-form-dialog__button--secondary"
+        type="button"
+        (click)="previousStep()"
+      >
+        Anterior
+      </button>
+    }
+
+    @if (isFirstStep()) {
+      <button
+        class="player-form-dialog__button player-form-dialog__button--primary"
+        type="button"
+        (click)="nextStep()"
+      >
+        Siguiente
+      </button>
+    } @else {
+      <button
+        class="player-form-dialog__button player-form-dialog__button--primary"
+        form="player-form"
+        [disabled]="isSubmitting()"
+        type="submit"
+      >
+        {{
+          isSubmitting() ? 'Guardando...' : mode() === 'create' ? 'Crear ficha' : 'Guardar cambios'
+        }}
+      </button>
+    }
+  </div>
+</app-modal-shell>

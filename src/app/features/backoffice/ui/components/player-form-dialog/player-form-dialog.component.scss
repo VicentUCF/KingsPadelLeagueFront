@@ -1,0 +1,138 @@
+.player-form-dialog {
+  &__steps {
+    display: grid;
+    gap: var(--space-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &__step {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1rem;
+    color: var(--color-text-muted);
+    background: rgb(255 255 255 / 0.02);
+
+    span {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: var(--color-text-default);
+      font-size: 0.95rem;
+    }
+
+    &--active {
+      border-color: rgb(201 162 39 / 36%);
+      background:
+        linear-gradient(180deg, rgb(201 162 39 / 16%), transparent), rgb(255 255 255 / 0.03);
+
+      strong {
+        color: var(--color-text-strong);
+      }
+    }
+  }
+
+  &__form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &__field {
+    display: grid;
+    gap: var(--space-2);
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+
+    span {
+      color: var(--color-text-strong);
+      font-weight: 600;
+    }
+
+    small {
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 0.95rem;
+    background: rgb(255 255 255 / 0.03);
+    color: var(--color-text-strong);
+    font: inherit;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  &__button {
+    min-height: 2.9rem;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px;
+    font: inherit;
+    font-weight: 700;
+
+    &:disabled {
+      opacity: 0.7;
+    }
+
+    &--secondary {
+      background: rgb(255 255 255 / 0.04);
+      color: var(--color-text-default);
+    }
+
+    &--primary {
+      background: var(--color-brand);
+      color: var(--color-brand-contrast);
+    }
+  }
+
+  &__error {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid rgb(214 88 88 / 36%);
+    border-radius: 0.95rem;
+    color: var(--color-text-strong);
+    background: rgb(182 52 52 / 14%);
+  }
+}
+
+@media (max-width: 40rem) {
+  .player-form-dialog {
+    &__steps,
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+
+    &__actions {
+      justify-content: stretch;
+    }
+
+    &__button {
+      width: 100%;
+    }
+  }
+}

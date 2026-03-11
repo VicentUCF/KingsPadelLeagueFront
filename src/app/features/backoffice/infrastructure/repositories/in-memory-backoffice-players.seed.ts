@@ -12,6 +12,7 @@ export const IN_MEMORY_BACKOFFICE_PLAYERS: readonly BackofficePlayerDetail[] = [
     isUserLinked: true,
     preferredSideLabel: 'Revés',
     linkedUserEmail: 'alex.soler@kings.test',
+    currentTeamId: 'kings-of-favar',
     historicalMemberships: [
       createMembership('Kings of Favar', 'Temporada 2026', 'Regular activo'),
       createMembership('Titanics', 'Temporada 2025', 'Regular finalizado'),
@@ -33,6 +34,7 @@ export const IN_MEMORY_BACKOFFICE_PLAYERS: readonly BackofficePlayerDetail[] = [
     isUserLinked: true,
     preferredSideLabel: 'Derecha',
     linkedUserEmail: 'marco.vidal@titanics.test',
+    currentTeamId: 'titanics',
     historicalMemberships: [createMembership('Titanics', 'Temporada 2026', 'Regular activo')],
     participations: [
       createParticipation('Jornada 3 · Titanics', 'Participó como pareja uno'),
@@ -51,6 +53,7 @@ export const IN_MEMORY_BACKOFFICE_PLAYERS: readonly BackofficePlayerDetail[] = [
     isUserLinked: false,
     preferredSideLabel: 'Ambas',
     linkedUserEmail: null,
+    currentTeamId: null,
     historicalMemberships: [createMembership('Magic City', 'Temporada 2025', 'Regular finalizado')],
     participations: [createParticipation('Jornada 6 · Magic City', 'Participación registrada')],
     mvpNominations: [],

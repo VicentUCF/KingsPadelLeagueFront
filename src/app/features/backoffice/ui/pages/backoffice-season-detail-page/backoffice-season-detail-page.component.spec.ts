@@ -1,5 +1,5 @@
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { render, screen, within } from '@testing-library/angular';
+import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 import { of } from 'rxjs';
 
@@ -28,7 +28,53 @@ describe('BackofficeSeasonDetailPageComponent', () => {
     const standingsTable = screen.getByRole('table', { name: /Clasificación snapshot/i });
 
     expect(within(standingsTable).getByText('Titanics')).toBeVisible();
-    expect(screen.getByRole('button', { name: /Finalizar season/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Editar season/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Finalizar season/i })).toBeEnabled();
+  });
+
+  it('opens the edit dialog with the season data prefilled', async () => {
+    const { fixture } = await render(BackofficeSeasonDetailPageComponent, {
+      providers: [
+        provideBackofficeSeasonsFeature(),
+        provideRouter([]),
+        createActivatedRouteProvider('season-2026'),
+      ],
+    });
+
+    await screen.findByRole('heading', { name: /Temporada 2026/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Editar season/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Editar season/i })).toBeVisible();
+    expect(screen.getByDisplayValue('Temporada 2026')).toBeVisible();
+    expect(screen.getByDisplayValue('2026')).toBeVisible();
+  });
+
+  it('confirms season status transitions from the detail header', async () => {
+    const { fixture } = await render(BackofficeSeasonDetailPageComponent, {
+      providers: [
+        provideBackofficeSeasonsFeature(),
+        provideRouter([]),
+        createActivatedRouteProvider('season-2026'),
+      ],
+    });
+
+    await screen.findByRole('heading', { name: /Temporada 2026/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Finalizar season/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Finalizar season/i })).toBeVisible();
+
+    const confirmButtons = screen.getAllByRole('button', { name: /Finalizar season/i });
+
+    expect(confirmButtons).toHaveLength(2);
+
+    await fireEvent.click(confirmButtons[1]!);
+    fixture.detectChanges();
+
+    expect(await screen.findByText('Operativa cerrada')).toBeVisible();
   });
 
   it('shows the not found state for an unknown season id', async () => {

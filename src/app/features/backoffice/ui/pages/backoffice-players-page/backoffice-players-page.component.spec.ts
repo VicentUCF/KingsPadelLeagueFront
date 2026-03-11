@@ -1,5 +1,5 @@
 import { provideRouter } from '@angular/router';
-import { render, screen, within } from '@testing-library/angular';
+import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
 import { provideBackofficePlayersFeature } from '../../providers/backoffice-players.providers';
@@ -14,7 +14,7 @@ describe('BackofficePlayersPageComponent', () => {
     expect(
       await screen.findByRole('heading', { name: /Directorio global de jugadores/i }),
     ).toBeVisible();
-    expect(screen.getByRole('button', { name: /Crear ficha/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Crear ficha/i })).toBeEnabled();
 
     const playerCard = await screen.findByRole('article', { name: /Alex Soler/i });
 
@@ -24,6 +24,20 @@ describe('BackofficePlayersPageComponent', () => {
       'href',
       '/backoffice/jugadores/player-alex-soler',
     );
+  });
+
+  it('opens the player creation wizard from the list page', async () => {
+    const { fixture } = await render(BackofficePlayersPageComponent, {
+      providers: [provideBackofficePlayersFeature(), provideRouter([])],
+    });
+
+    await screen.findByRole('heading', { name: /Directorio global de jugadores/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Crear ficha/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Crear ficha/i })).toBeVisible();
+    expect(screen.getByText(/La ficha define el perfil base del jugador/i)).toBeVisible();
   });
 
   it('has no accessibility violations in the players list', async () => {

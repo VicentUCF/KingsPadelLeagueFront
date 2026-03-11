@@ -1,0 +1,25 @@
+<app-modal-shell [isOpen]="isOpen()" [title]="title()" (closed)="cancel()">
+  <div modalBody>
+    <p class="confirm-action-dialog__description">{{ description() }}</p>
+  </div>
+
+  <div class="confirm-action-dialog__actions" modalFooter>
+    <button
+      class="confirm-action-dialog__button confirm-action-dialog__button--secondary"
+      type="button"
+      (click)="cancel()"
+    >
+      {{ cancelLabel() }}
+    </button>
+
+    <button
+      [class.confirm-action-dialog__button--danger]="confirmTone() === 'danger'"
+      [class.confirm-action-dialog__button--neutral]="confirmTone() === 'neutral'"
+      class="confirm-action-dialog__button"
+      type="button"
+      (click)="confirm()"
+    >
+      {{ confirmLabel() }}
+    </button>
+  </div>
+</app-modal-shell>

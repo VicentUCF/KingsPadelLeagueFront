@@ -30,6 +30,7 @@ export interface BackofficePlayerMvpNominationSummary {
 export interface BackofficePlayerDetail extends BackofficePlayerSummary {
   readonly preferredSideLabel: string;
   readonly linkedUserEmail: string | null;
+  readonly currentTeamId: string | null;
   readonly historicalMemberships: readonly BackofficePlayerMembershipSummary[];
   readonly participations: readonly BackofficePlayerParticipationSummary[];
   readonly mvpNominations: readonly BackofficePlayerMvpNominationSummary[];

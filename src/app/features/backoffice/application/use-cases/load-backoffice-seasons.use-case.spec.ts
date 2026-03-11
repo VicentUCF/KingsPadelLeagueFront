@@ -48,6 +48,8 @@ function createSeasonSummary(
     name,
     year,
     status,
+    startDate: `${year}-03-01`,
+    endDate: `${year}-06-01`,
     scheduleLabel: `${year}-01-01 / ${year}-06-01`,
     teamCount: 5,
     matchdayCount: 7,

@@ -7,7 +7,9 @@
     </p>
   </div>
 
-  <button class="backoffice-players-page__create-button" disabled type="button">Crear ficha</button>
+  <button class="backoffice-players-page__create-button" type="button" (click)="openCreateDialog()">
+    Crear ficha
+  </button>
 </section>
 
 @if (store.isLoading()) {
@@ -26,3 +28,14 @@
     }
   </div>
 }
+
+<app-player-form-dialog
+  [initialValue]="store.createFormValue()"
+  [isOpen]="store.isCreateDialogOpen()"
+  [isSubmitting]="store.isSubmittingCreate()"
+  [submissionError]="store.createErrorMessage()"
+  [teamOptions]="store.teamOptions()"
+  mode="create"
+  (cancelled)="closeCreateDialog()"
+  (submitted)="submitCreate($event)"
+/>

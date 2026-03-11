@@ -4,10 +4,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "ES2016",
-    "verbatimModuleSyntax": false,
     "types": ["jest", "node"]
   },
   "include": ["src/**/*.d.ts", "src/**/*.spec.ts", "src/testing/**/*.ts"]

@@ -5,6 +5,8 @@ export interface BackofficeSeasonSummary {
   readonly name: string;
   readonly year: number;
   readonly status: BackofficeSeasonStatus;
+  readonly startDate: string;
+  readonly endDate: string;
   readonly scheduleLabel: string;
   readonly teamCount: number;
   readonly matchdayCount: number;

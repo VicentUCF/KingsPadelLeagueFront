@@ -1,5 +1,5 @@
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { render, screen } from '@testing-library/angular';
+import { fireEvent, render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 import { of } from 'rxjs';
 
@@ -21,8 +21,50 @@ describe('BackofficePlayerDetailPageComponent', () => {
     expect(screen.getByRole('heading', { name: /Memberships históricas/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Participaciones/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Nominaciones MVP/i })).toBeVisible();
-    expect(screen.getByText(/Jornada 3 · Kings of Favar/i)).toBeVisible();
+    expect(
+      screen.getByText(/Jornada 3 · Kings of Favar · Participó como pareja uno/i),
+    ).toBeVisible();
+    expect(screen.getByText(/Jornada 3 · Kings of Favar · Nominado por su equipo/i)).toBeVisible();
     expect(screen.getByText(/Cuenta vinculada: alex.soler@kings.test/i)).toBeVisible();
+  });
+
+  it('opens the edit dialog and confirms the inactive transition from the detail header', async () => {
+    const { fixture } = await render(BackofficePlayerDetailPageComponent, {
+      providers: [
+        provideBackofficePlayersFeature(),
+        provideRouter([]),
+        createActivatedRouteProvider('player-alex-soler'),
+      ],
+    });
+
+    await screen.findByRole('heading', { name: /Alex Soler/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Editar ficha/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Editar ficha/i })).toBeVisible();
+    expect(screen.getByDisplayValue('Alex Soler')).toBeVisible();
+
+    const closeButtons = screen.getAllByRole('button', { name: /Cerrar diálogo/i });
+
+    expect(closeButtons).toHaveLength(2);
+
+    await fireEvent.click(closeButtons[1]!);
+    fixture.detectChanges();
+
+    await fireEvent.click(screen.getByRole('button', { name: /Inactivar ficha/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Inactivar ficha/i })).toBeVisible();
+
+    const confirmButtons = screen.getAllByRole('button', { name: /Inactivar ficha/i });
+
+    expect(confirmButtons).toHaveLength(2);
+
+    await fireEvent.click(confirmButtons[1]!);
+    fixture.detectChanges();
+
+    expect(await screen.findByText('Inactivo')).toBeVisible();
   });
 
   it('shows a not found state for an invalid player id', async () => {

@@ -1,5 +1,5 @@
 import { provideRouter } from '@angular/router';
-import { render, screen, within } from '@testing-library/angular';
+import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
 import { provideBackofficeSeasonsFeature } from '../../providers/backoffice-seasons.providers';
@@ -12,7 +12,7 @@ describe('BackofficeSeasonsPageComponent', () => {
     });
 
     expect(await screen.findByRole('heading', { name: /Listado de seasons/i })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Crear season/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Crear season/i })).toBeEnabled();
 
     const activeSeasonCard = await screen.findByRole('article', { name: /Temporada 2026/i });
 
@@ -25,6 +25,20 @@ describe('BackofficeSeasonsPageComponent', () => {
 
     expect(screen.getByRole('article', { name: /Temporada 2027/i })).toBeVisible();
     expect(screen.getByRole('article', { name: /Temporada 2025/i })).toBeVisible();
+  });
+
+  it('opens the creation wizard from the seasons list', async () => {
+    const { fixture } = await render(BackofficeSeasonsPageComponent, {
+      providers: [provideBackofficeSeasonsFeature(), provideRouter([])],
+    });
+
+    await screen.findByRole('heading', { name: /Listado de seasons/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Crear season/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Crear season/i })).toBeVisible();
+    expect(screen.getByText(/Completa la configuración base de la season/i)).toBeVisible();
   });
 
   it('has no accessibility violations in the seasons list', async () => {

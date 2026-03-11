@@ -17,7 +17,9 @@ describe('BackofficeTeamDetailPageComponent', () => {
     });
 
     expect(await screen.findByRole('heading', { name: /Barbaridad/i })).toBeVisible();
-    expect(screen.getAllByText(/Color principal naranja quemado/i)).toHaveLength(2);
+    expect(screen.getAllByText(/Color principal #B53A1D/i)).toHaveLength(2);
+    expect(screen.getByRole('button', { name: /Editar equipo/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Inactivar equipo/i })).toBeEnabled();
 
     await fireEvent.click(screen.getByRole('tab', { name: /Roster/i }));
 
@@ -28,6 +30,36 @@ describe('BackofficeTeamDetailPageComponent', () => {
 
     expect(screen.getByRole('heading', { name: /President \/ Roles/i })).toBeVisible();
     expect(screen.getByText(/Presidente: Romero/i)).toBeVisible();
+  });
+
+  it('opens the edit dialog and status confirmation from the team detail', async () => {
+    const { fixture } = await render(BackofficeTeamDetailPageComponent, {
+      providers: [
+        provideBackofficeTeamsFeature(),
+        provideRouter([]),
+        createActivatedRouteProvider('barbaridad'),
+      ],
+    });
+
+    await screen.findByRole('heading', { name: /Barbaridad/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Editar equipo/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Editar equipo/i })).toBeVisible();
+    expect(screen.getByDisplayValue('Barbaridad')).toBeVisible();
+
+    const closeButtons = screen.getAllByRole('button', { name: /Cerrar diálogo/i });
+
+    expect(closeButtons).toHaveLength(2);
+
+    await fireEvent.click(closeButtons[1]!);
+    fixture.detectChanges();
+
+    await fireEvent.click(screen.getByRole('button', { name: /Inactivar equipo/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Inactivar equipo/i })).toBeVisible();
   });
 
   it('shows the not found state for an invalid team id', async () => {

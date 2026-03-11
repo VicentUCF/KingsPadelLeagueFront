@@ -7,7 +7,7 @@
     </p>
   </div>
 
-  <button class="backoffice-seasons-page__create-button" disabled type="button">
+  <button class="backoffice-seasons-page__create-button" type="button" (click)="openCreateDialog()">
     Crear season
   </button>
 </section>
@@ -28,3 +28,13 @@
     }
   </div>
 }
+
+<app-season-form-dialog
+  [initialValue]="store.createFormValue()"
+  [isOpen]="store.isCreateDialogOpen()"
+  [isSubmitting]="store.isSubmittingCreate()"
+  [submissionError]="store.createErrorMessage()"
+  mode="create"
+  (cancelled)="closeCreateDialog()"
+  (submitted)="submitCreate($event)"
+/>

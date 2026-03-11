@@ -1,0 +1,51 @@
+@if (isOpen()) {
+  <button
+    [attr.aria-label]="closeLabel()"
+    class="modal-shell__backdrop"
+    type="button"
+    (click)="requestClose()"
+  ></button>
+
+  <div class="modal-shell__viewport">
+    <section
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
+      [attr.aria-describedby]="description() ? descriptionId : null"
+      [attr.aria-labelledby]="titleId"
+      [class.modal-shell__panel--wide]="size() === 'wide'"
+      aria-modal="true"
+      class="modal-shell__panel"
+      role="dialog"
+      tabindex="-1"
+    >
+      <header class="modal-shell__header">
+        <div class="modal-shell__header-copy">
+          <h2 [id]="titleId">{{ title() }}</h2>
+
+          @if (description()) {
+            <p [id]="descriptionId">{{ description() }}</p>
+          }
+        </div>
+
+        @if (isDismissible()) {
+          <button
+            [attr.aria-label]="closeLabel()"
+            class="modal-shell__close"
+            type="button"
+            (click)="requestClose()"
+          >
+            <lucide-angular [img]="closeIcon" [size]="18" aria-hidden="true" />
+          </button>
+        }
+      </header>
+
+      <div class="modal-shell__body">
+        <ng-content select="[modalBody]" />
+      </div>
+
+      <footer class="modal-shell__footer">
+        <ng-content select="[modalFooter]" />
+      </footer>
+    </section>
+  </div>
+}

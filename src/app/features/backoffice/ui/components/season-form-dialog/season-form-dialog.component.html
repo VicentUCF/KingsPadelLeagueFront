@@ -1,0 +1,141 @@
+<app-modal-shell
+  [description]="
+    mode() === 'create'
+      ? 'Completa la configuración base de la season antes de pasar a módulos operativos.'
+      : 'Actualiza la identidad y el calendario sin tocar jornadas, clasificación ni histórico.'
+  "
+  [isOpen]="isOpen()"
+  [title]="mode() === 'create' ? 'Crear season' : 'Editar season'"
+  size="wide"
+  (closed)="close()"
+>
+  <div modalBody>
+    <div class="season-form-dialog__steps" aria-label="Progreso del formulario">
+      @for (step of steps; track step.label; let index = $index) {
+        <div
+          [class.season-form-dialog__step--active]="isCurrentStep(index)"
+          class="season-form-dialog__step"
+        >
+          <span>{{ index + 1 }}</span>
+          <strong>{{ step.label }}</strong>
+        </div>
+      }
+    </div>
+
+    @if (submissionError()) {
+      <p class="season-form-dialog__error" role="alert">{{ submissionError() }}</p>
+    }
+
+    <form
+      [formGroup]="form"
+      class="season-form-dialog__form"
+      id="season-form"
+      (ngSubmit)="submit()"
+    >
+      @switch (currentStep()) {
+        @case (0) {
+          <div class="season-form-dialog__grid">
+            <label class="season-form-dialog__field">
+              <span>Nombre</span>
+              <input formControlName="name" type="text" />
+              @if (hasControlError('name')) {
+                <small>El nombre de la season es obligatorio.</small>
+              }
+            </label>
+
+            <label class="season-form-dialog__field">
+              <span>Año</span>
+              <input formControlName="year" type="number" />
+              @if (hasControlError('year')) {
+                <small>Introduce un año válido entre 2000 y 2100.</small>
+              }
+            </label>
+          </div>
+        }
+        @case (1) {
+          <div class="season-form-dialog__grid">
+            <label class="season-form-dialog__field">
+              <span>Inicio</span>
+              <input formControlName="startDate" type="date" />
+              @if (hasControlError('startDate')) {
+                <small>La fecha de inicio es obligatoria.</small>
+              }
+            </label>
+
+            <label class="season-form-dialog__field">
+              <span>Fin</span>
+              <input formControlName="endDate" type="date" />
+              @if (hasControlError('endDate')) {
+                <small>La fecha de fin es obligatoria.</small>
+              }
+            </label>
+          </div>
+
+          @if (hasDateRangeError()) {
+            <p class="season-form-dialog__error" role="alert">
+              La fecha de fin debe ser posterior a la fecha de inicio.
+            </p>
+          }
+        }
+        @case (2) {
+          <div class="season-form-dialog__stack">
+            <label class="season-form-dialog__field">
+              <span>Estado base</span>
+              <select formControlName="status">
+                <option value="DRAFT">Borrador</option>
+                <option value="ACTIVE">Activa</option>
+              </select>
+            </label>
+
+            <label class="season-form-dialog__field">
+              <span>Notas operativas</span>
+              <textarea formControlName="notes" rows="5"></textarea>
+              <small>Usa una línea por nota.</small>
+            </label>
+          </div>
+        }
+      }
+    </form>
+  </div>
+
+  <div class="season-form-dialog__actions" modalFooter>
+    <button
+      class="season-form-dialog__button season-form-dialog__button--secondary"
+      type="button"
+      (click)="close()"
+    >
+      Cancelar
+    </button>
+
+    @if (!isFirstStep()) {
+      <button
+        class="season-form-dialog__button season-form-dialog__button--secondary"
+        type="button"
+        (click)="previousStep()"
+      >
+        Anterior
+      </button>
+    }
+
+    @if (!isLastStep()) {
+      <button
+        class="season-form-dialog__button season-form-dialog__button--primary"
+        type="button"
+        (click)="nextStep()"
+      >
+        Siguiente
+      </button>
+    } @else {
+      <button
+        class="season-form-dialog__button season-form-dialog__button--primary"
+        form="season-form"
+        [disabled]="isSubmitting()"
+        type="submit"
+      >
+        {{
+          isSubmitting() ? 'Guardando...' : mode() === 'create' ? 'Crear season' : 'Guardar cambios'
+        }}
+      </button>
+    }
+  </div>
+</app-modal-shell>

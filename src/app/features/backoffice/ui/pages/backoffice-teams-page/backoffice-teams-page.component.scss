@@ -30,15 +30,24 @@
     line-height: 1.6;
   }
 
+  &__helper {
+    font-size: 0.94rem;
+  }
+
   &__create-button {
     min-height: 2.9rem;
     padding: 0 var(--space-4);
     border: 1px solid var(--color-border-subtle);
     border-radius: 999px;
-    background: rgb(255 255 255 / 0.03);
-    color: var(--color-text-muted);
+    background: var(--color-brand);
+    color: var(--color-brand-contrast);
     font: inherit;
     font-weight: 700;
+
+    &:disabled {
+      background: rgb(255 255 255 / 0.03);
+      color: var(--color-text-muted);
+    }
   }
 
   &__state {

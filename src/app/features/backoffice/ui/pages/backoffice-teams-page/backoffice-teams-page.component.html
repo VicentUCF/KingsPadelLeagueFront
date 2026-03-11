@@ -5,9 +5,24 @@
       Vista rápida del estado de cada equipo, su presidencia actual y la carga operativa del roster
       activo.
     </p>
+
+    <p class="backoffice-teams-page__helper">
+      @if (store.activeSeasonLabel()) {
+        Los nuevos equipos se asociarán a {{ store.activeSeasonLabel() }}.
+      } @else {
+        Necesitas una season activa para dar de alta nuevos equipos.
+      }
+    </p>
   </div>
 
-  <button class="backoffice-teams-page__create-button" disabled type="button">Crear equipo</button>
+  <button
+    class="backoffice-teams-page__create-button"
+    [disabled]="!store.canCreate()"
+    type="button"
+    (click)="openCreateDialog()"
+  >
+    Crear equipo
+  </button>
 </section>
 
 @if (store.isLoading()) {
@@ -26,3 +41,13 @@
     }
   </div>
 }
+
+<app-team-form-dialog
+  [initialValue]="store.createFormValue()"
+  [isOpen]="store.isCreateDialogOpen()"
+  [isSubmitting]="store.isSubmittingCreate()"
+  [submissionError]="store.createErrorMessage()"
+  mode="create"
+  (cancelled)="closeCreateDialog()"
+  (submitted)="submitCreate($event)"
+/>

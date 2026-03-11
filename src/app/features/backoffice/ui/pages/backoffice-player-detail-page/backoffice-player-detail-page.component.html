@@ -30,6 +30,26 @@
       <p>{{ player.derivedTeamLabel }}</p>
       <p>{{ player.preferredSideLabel }}</p>
       <p class="backoffice-player-detail-page__linked-user">{{ player.userLinkageLabel }}</p>
+
+      <div class="backoffice-player-detail-page__actions">
+        <button
+          class="backoffice-player-detail-page__action-button"
+          type="button"
+          (click)="openEditDialog()"
+        >
+          Editar ficha
+        </button>
+
+        @for (action of store.statusActions(); track action.label) {
+          <button
+            class="backoffice-player-detail-page__action-button backoffice-player-detail-page__action-button--danger"
+            type="button"
+            (click)="openStatusDialog(action)"
+          >
+            {{ action.label }}
+          </button>
+        }
+      </div>
     </section>
 
     <section class="backoffice-player-detail-page__panel c-surface-card">
@@ -63,4 +83,29 @@
       }
     </section>
   </div>
+}
+
+@if (store.editFormValue(); as editFormValue) {
+  <app-player-form-dialog
+    [initialValue]="editFormValue"
+    [isOpen]="store.isEditDialogOpen()"
+    [isSubmitting]="store.isSubmittingEdit()"
+    [submissionError]="store.editErrorMessage()"
+    [teamOptions]="store.teamOptions()"
+    mode="edit"
+    (cancelled)="closeEditDialog()"
+    (submitted)="submitEdit($event)"
+  />
+}
+
+@if (store.confirmDialog(); as confirmDialog) {
+  <app-confirm-action-dialog
+    [confirmLabel]="confirmDialog.confirmLabel"
+    [confirmTone]="confirmDialog.confirmTone"
+    [description]="confirmDialog.description"
+    [isOpen]="true"
+    [title]="confirmDialog.title"
+    (cancelled)="closeStatusDialog()"
+    (confirmed)="confirmStatusChange()"
+  />
 }

@@ -1,0 +1,113 @@
+.modal-shell {
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-index-overlay) + 10);
+    width: 100%;
+    border: 0;
+    padding: 0;
+    background: rgb(4 4 4 / 76%);
+  }
+
+  &__viewport {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-index-overlay) + 11);
+    display: grid;
+    place-items: center;
+    padding: var(--space-4);
+  }
+
+  &__panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: var(--space-5);
+    width: min(100%, 38rem);
+    max-height: min(90vh, 44rem);
+    padding: var(--space-6);
+    overflow: auto;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1.5rem;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.02)),
+      var(--color-surface-raised);
+    box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 36%);
+
+    &--wide {
+      width: min(100%, 48rem);
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  &__header-copy {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.45rem, 3vw, 1.9rem);
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  &__close {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.04);
+    color: var(--color-text-default);
+  }
+
+  &__body {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 40rem) {
+  .modal-shell {
+    &__viewport {
+      padding: var(--space-3);
+      align-items: end;
+    }
+
+    &__panel {
+      width: 100%;
+      max-height: min(92vh, 48rem);
+      padding: var(--space-5);
+      border-radius: 1.25rem;
+    }
+
+    &__footer {
+      justify-content: stretch;
+    }
+  }
+}

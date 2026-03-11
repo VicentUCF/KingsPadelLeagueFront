@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, type OnInit } from '@angula
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
+import { type BackofficeTeamFormValue } from '../../models/backoffice-crud.model';
+import { TeamFormDialogComponent } from '../../components/team-form-dialog/team-form-dialog.component';
 import { TeamListCardComponent } from '../../components/team-list-card/team-list-card.component';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 
@@ -11,7 +13,7 @@ import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
   host: {
     class: 'backoffice-teams-page',
   },
-  imports: [EmptyStateComponent, TeamListCardComponent],
+  imports: [EmptyStateComponent, TeamFormDialogComponent, TeamListCardComponent],
   providers: [BackofficeTeamsStore],
   templateUrl: './backoffice-teams-page.component.html',
   styleUrl: './backoffice-teams-page.component.scss',
@@ -21,5 +23,17 @@ export class BackofficeTeamsPageComponent implements OnInit {
 
   ngOnInit(): void {
     void this.store.load();
+  }
+
+  protected openCreateDialog(): void {
+    this.store.openCreateDialog();
+  }
+
+  protected closeCreateDialog(): void {
+    this.store.closeCreateDialog();
+  }
+
+  protected submitCreate(formValue: BackofficeTeamFormValue): void {
+    void this.store.createTeam(formValue);
   }
 }

@@ -1,5 +1,5 @@
 import { provideRouter } from '@angular/router';
-import { render, screen, within } from '@testing-library/angular';
+import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
 import { provideBackofficeTeamsFeature } from '../../providers/backoffice-teams.providers';
@@ -14,9 +14,11 @@ describe('BackofficeTeamsPageComponent', () => {
     expect(
       await screen.findByRole('heading', { name: /Equipos de la season activa/i }),
     ).toBeVisible();
-    expect(screen.getByRole('button', { name: /Crear equipo/i })).toBeDisabled();
+    await screen.findByRole('article', { name: /Barbaridad/i });
 
-    const teamCard = await screen.findByRole('article', { name: /Barbaridad/i });
+    expect(screen.getByRole('button', { name: /Crear equipo/i })).toBeEnabled();
+    expect(screen.getByText(/Los nuevos equipos se asociarán a Temporada 2026/i)).toBeVisible();
+    const teamCard = screen.getByRole('article', { name: /Barbaridad/i });
 
     expect(within(teamCard).getByText(/Presidente actual: Romero/i)).toBeVisible();
     expect(within(teamCard).getByText(/6 jugadores regulares activos/i)).toBeVisible();
@@ -24,6 +26,20 @@ describe('BackofficeTeamsPageComponent', () => {
       'href',
       '/backoffice/equipos/barbaridad',
     );
+  });
+
+  it('opens the team creation wizard from the list page', async () => {
+    const { fixture } = await render(BackofficeTeamsPageComponent, {
+      providers: [provideBackofficeTeamsFeature(), provideRouter([])],
+    });
+
+    await screen.findByRole('heading', { name: /Equipos de la season activa/i });
+
+    await fireEvent.click(screen.getByRole('button', { name: /Crear equipo/i }));
+    fixture.detectChanges();
+
+    expect(await screen.findByRole('dialog', { name: /Crear equipo/i })).toBeVisible();
+    expect(screen.getByText(/se asociará automáticamente a la season activa/i)).toBeVisible();
   });
 
   it('has no accessibility violations in the teams list', async () => {

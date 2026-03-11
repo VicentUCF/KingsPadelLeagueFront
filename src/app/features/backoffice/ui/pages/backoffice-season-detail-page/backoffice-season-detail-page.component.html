@@ -30,8 +30,25 @@
       <p class="backoffice-season-detail-page__state-label">{{ season.operationalStateLabel }}</p>
 
       <div class="backoffice-season-detail-page__actions">
-        @for (action of season.actions; track action) {
-          <button disabled type="button">{{ action }}</button>
+        @if (store.canEdit()) {
+          <button
+            class="backoffice-season-detail-page__button"
+            type="button"
+            (click)="openEditDialog()"
+          >
+            Editar season
+          </button>
+        }
+
+        @for (action of store.statusActions(); track action.label) {
+          <button
+            [class.backoffice-season-detail-page__button--danger]="action.tone === 'danger'"
+            class="backoffice-season-detail-page__button"
+            type="button"
+            (click)="openStatusDialog(action)"
+          >
+            {{ action.label }}
+          </button>
         }
       </div>
     </section>
@@ -98,4 +115,28 @@
       }
     </section>
   </div>
+}
+
+@if (store.editFormValue(); as editFormValue) {
+  <app-season-form-dialog
+    [initialValue]="editFormValue"
+    [isOpen]="store.isEditDialogOpen()"
+    [isSubmitting]="store.isSubmittingEdit()"
+    [submissionError]="store.editErrorMessage()"
+    mode="edit"
+    (cancelled)="closeEditDialog()"
+    (submitted)="submitEdit($event)"
+  />
+}
+
+@if (store.confirmDialog(); as confirmDialog) {
+  <app-confirm-action-dialog
+    [confirmLabel]="confirmDialog.confirmLabel"
+    [confirmTone]="confirmDialog.confirmTone"
+    [description]="confirmDialog.description"
+    [isOpen]="true"
+    [title]="confirmDialog.title"
+    (cancelled)="closeStatusDialog()"
+    (confirmed)="confirmStatusChange()"
+  />
 }

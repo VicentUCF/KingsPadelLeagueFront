@@ -28,6 +28,28 @@
       </div>
 
       <p class="backoffice-team-detail-page__identity">{{ team.visualIdentityLabel }}</p>
+
+      <div class="backoffice-team-detail-page__actions">
+        @if (store.canEdit()) {
+          <button
+            class="backoffice-team-detail-page__action-button"
+            type="button"
+            (click)="openEditDialog()"
+          >
+            Editar equipo
+          </button>
+        }
+
+        @for (action of store.statusActions(); track action.label) {
+          <button
+            class="backoffice-team-detail-page__action-button backoffice-team-detail-page__action-button--danger"
+            type="button"
+            (click)="openStatusDialog(action)"
+          >
+            {{ action.label }}
+          </button>
+        }
+      </div>
     </section>
 
     <section class="backoffice-team-detail-page__tabs c-surface-card">
@@ -114,4 +136,28 @@
       }
     </section>
   </div>
+}
+
+@if (store.editFormValue(); as editFormValue) {
+  <app-team-form-dialog
+    [initialValue]="editFormValue"
+    [isOpen]="store.isEditDialogOpen()"
+    [isSubmitting]="store.isSubmittingEdit()"
+    [submissionError]="store.editErrorMessage()"
+    mode="edit"
+    (cancelled)="closeEditDialog()"
+    (submitted)="submitEdit($event)"
+  />
+}
+
+@if (store.confirmDialog(); as confirmDialog) {
+  <app-confirm-action-dialog
+    [confirmLabel]="confirmDialog.confirmLabel"
+    [confirmTone]="confirmDialog.confirmTone"
+    [description]="confirmDialog.description"
+    [isOpen]="true"
+    [title]="confirmDialog.title"
+    (cancelled)="closeStatusDialog()"
+    (confirmed)="confirmStatusChange()"
+  />
 }

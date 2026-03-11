@@ -1,0 +1,28 @@
+@if (store.toasts().length) {
+  <section aria-label="Notificaciones de acciones" class="action-toast-outlet__stack">
+    @for (toast of store.toasts(); track toast.id) {
+      <div
+        [attr.aria-live]="toast.politeness"
+        [attr.role]="toast.politeness === 'assertive' ? 'alert' : 'status'"
+        [class.action-toast-outlet__toast--error]="toast.tone === 'error'"
+        [class.action-toast-outlet__toast--info]="toast.tone === 'info'"
+        [class.action-toast-outlet__toast--success]="toast.tone === 'success'"
+        class="action-toast-outlet__toast c-surface-card"
+      >
+        <div class="action-toast-outlet__copy">
+          <p class="action-toast-outlet__title">{{ toast.title }}</p>
+          <p class="action-toast-outlet__message">{{ toast.message }}</p>
+        </div>
+
+        <button
+          [attr.aria-label]="'Cerrar notificación: ' + toast.title"
+          class="action-toast-outlet__dismiss"
+          type="button"
+          (click)="dismiss(toast.id)"
+        >
+          Cerrar
+        </button>
+      </div>
+    }
+  </section>
+}
