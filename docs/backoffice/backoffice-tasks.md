@@ -64,7 +64,7 @@ The backoffice supports the first operational read flows and admin CRUD scaffold
 
 ### Phase 2. Priority 2
 
-- [ ] Roster module: active memberships view.
+- [x] Roster module: active memberships view.
 - [ ] Roster change requests list and decision flow.
 - [ ] Guest approval requests list and decision flow.
 - [ ] Matchdays module: list and detail.
