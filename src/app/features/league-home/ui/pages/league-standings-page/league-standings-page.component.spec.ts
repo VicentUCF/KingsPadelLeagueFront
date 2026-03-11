@@ -12,7 +12,7 @@ describe('LeagueStandingsPageComponent', () => {
     });
 
     expect(await screen.findByRole('heading', { name: /KingsPadelLeague/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /Temporada 1/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /Temporada 2026/i })).toBeVisible();
     expect(screen.getByRole('table', { name: /Clasificación de KingsPadelLeague/i })).toBeVisible();
     expect(screen.getByText(/Desempates/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver jornadas/i })).toBeVisible();

@@ -88,8 +88,17 @@
 } @else {
   <section class="o-container league-calendar-page__status-panel">
     <app-empty-state
-      [description]="'Todavía no hay cruces publicados para construir esta agenda.'"
-      [title]="'No hay calendario disponible'"
+      [actions]="emptyActions"
+      [description]="'Aquí aparecerán las fechas, horas y enfrentamientos oficiales de KingsPadelLeague para que puedas seguir el calendario completo de la competición.'"
+      [eyebrow]="'Agenda oficial'"
+      [highlights]="[
+        'Fechas y horas oficiales',
+        'Partidos por equipo',
+        'Acceso al detalle de jornada',
+      ]"
+      [icon]="calendarIcon"
+      [layout]="'feature'"
+      [title]="'Calendario de partidos de pádel aún no publicado'"
     />
   </section>
 }

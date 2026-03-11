@@ -5,10 +5,10 @@
 
   <div class="players-directory-page__hero-row">
     <div class="o-stack o-stack--compact">
-      <h1>Ranking de jugadores</h1>
+      <h1>Directorio de jugadores</h1>
       <p>
-        Clasificación de todos los participantes ordenada por victorias. Filtra por nombre, equipo,
-        lado o estadísticas.
+        Consulta los nombres ya publicados por equipo y posición. Las estadísticas competitivas se
+        activarán cuando arranque la competición.
       </p>
     </div>
 
@@ -160,7 +160,7 @@
         <span class="players-directory-page__col players-directory-page__col--wr">%</span>
       </div>
 
-      <ol class="players-directory-page__ranking" aria-label="Ranking de jugadores">
+      <ol class="players-directory-page__ranking" aria-label="Directorio de jugadores">
         @for (player of store.filteredPlayers(); track player.id) {
           <li>
             <app-player-card [player]="player" />

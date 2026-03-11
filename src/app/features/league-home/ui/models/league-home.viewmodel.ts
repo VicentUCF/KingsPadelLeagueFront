@@ -18,7 +18,7 @@ export interface LeagueHomeViewModel {
   readonly nextSectionTitle: string;
   readonly nextMatches: readonly NextMatchCardViewModel[];
   readonly standings: readonly StandingsRowViewModel[];
-  readonly byeTeam: ByeCardViewModel;
+  readonly byeTeam: ByeCardViewModel | null;
   readonly lastResults: readonly ResultCardViewModel[];
   readonly teams: readonly TeamCardViewModel[];
 }
@@ -75,6 +75,9 @@ export interface TeamCardViewModel {
 
 export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeViewModel {
   const teamSlugById = createTeamSlugById(snapshot.teams);
+  const hasCompetitiveStandings = snapshot.standings.some((entry) => {
+    return entry.points > 0 || entry.playedMatches > 0 || entry.gameDifference !== 0;
+  });
 
   return {
     leagueName: snapshot.league.name,
@@ -82,8 +85,7 @@ export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeV
     seasonLabel: snapshot.league.seasonLabel,
     phaseLabel: snapshot.currentPhase.label,
     currentMatchdayLabel: snapshot.currentMatchday.label,
-    nextSectionTitle:
-      snapshot.currentPhase.code === 'playoff' ? 'Próximos cruces' : 'Próxima jornada',
+    nextSectionTitle: toNextSectionTitle(snapshot.currentPhase.code),
     nextMatches: snapshot.nextMatches.map((match) => ({
       id: match.id,
       homeTeamName: match.homeTeamName,
@@ -91,7 +93,13 @@ export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeV
       scheduledAtLabel: match.scheduledAtLabel,
     })),
     standings: snapshot.standings.map((entry, index, rows) =>
-      toStandingsRowViewModel(entry, teamSlugById, index === 0, index === rows.length - 1),
+      toStandingsRowViewModel(
+        entry,
+        teamSlugById,
+        hasCompetitiveStandings && index === 0,
+        hasCompetitiveStandings && index === rows.length - 1,
+        hasCompetitiveStandings,
+      ),
     ),
     byeTeam: toByeCardViewModel(snapshot.byeTeam),
     lastResults: snapshot.lastResults.map(toResultCardViewModel),
@@ -104,6 +112,7 @@ function toStandingsRowViewModel(
   teamSlugById: ReadonlyMap<string, string>,
   isLeader: boolean,
   isLast: boolean,
+  hasCompetitiveStandings: boolean,
 ): StandingsRowViewModel {
   const rankTone = toRankTone(entry.rank);
   const teamSlug = teamSlugById.get(entry.teamId) ?? null;
@@ -125,12 +134,16 @@ function toStandingsRowViewModel(
     teamLink: toTeamLink(teamSlug),
     isLeader,
     isLast,
-    rankTone,
+    rankTone: hasCompetitiveStandings ? rankTone : 'standard',
     gameDifferenceTone: toGameDifferenceTone(entry.gameDifference),
   };
 }
 
-function toByeCardViewModel(byeTeam: ByeTeamSummary): ByeCardViewModel {
+function toByeCardViewModel(byeTeam: ByeTeamSummary | null): ByeCardViewModel | null {
+  if (!byeTeam) {
+    return null;
+  }
+
   return {
     teamName: byeTeam.teamName,
     description: `${byeTeam.matchdayLabel} · Descansa`,
@@ -173,6 +186,18 @@ function createTeamSlugById(teams: readonly TeamSummary[]): ReadonlyMap<string, 
 
 function toTeamLink(teamSlug: string | null): string {
   return teamSlug ? `/equipos/${teamSlug}` : '/equipos';
+}
+
+function toNextSectionTitle(phaseCode: LeagueHomeSnapshot['currentPhase']['code']): string {
+  if (phaseCode === 'playoff') {
+    return 'Próximos cruces';
+  }
+
+  if (phaseCode === 'preseason') {
+    return 'Calendario pendiente';
+  }
+
+  return 'Próxima jornada';
 }
 
 function toRankTone(rank: number): 'leader' | 'podium' | 'standard' {

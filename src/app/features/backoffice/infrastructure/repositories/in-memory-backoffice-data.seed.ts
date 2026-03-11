@@ -170,7 +170,7 @@ export const INITIAL_IN_MEMORY_BACKOFFICE_STATE: InMemoryBackofficeState = {
       id: 'player-alex-soler',
       fullName: 'Alex Soler',
       nickName: 'Alex',
-      avatarPath: '/stock_players/player-01.svg',
+      avatarPath: '',
       status: 'ACTIVE',
       preferredSideLabel: 'Revés',
       linkedUserEmail: 'alex.soler@kings.test',

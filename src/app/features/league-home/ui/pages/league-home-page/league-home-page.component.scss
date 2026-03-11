@@ -60,7 +60,9 @@
 
   &__status-panel {
     display: grid;
-    justify-items: center;
+    align-items: start;
+    align-content: start;
+    justify-items: stretch;
     gap: var(--space-4);
     min-height: calc(100vh - 16rem);
     padding-block: var(--space-10);
@@ -96,6 +98,10 @@
 
 @media (max-width: 47.999rem) {
   .league-home-page {
+    .empty-state--feature {
+      min-height: 0;
+    }
+
     &__sections {
       gap: var(--space-8);
       padding-block: var(--space-7) var(--space-10);

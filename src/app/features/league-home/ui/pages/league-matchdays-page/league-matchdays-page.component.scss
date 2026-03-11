@@ -86,7 +86,9 @@
 
   &__status-panel {
     display: grid;
-    justify-items: center;
+    align-items: start;
+    align-content: start;
+    justify-items: stretch;
     gap: var(--space-4);
     min-height: calc(100vh - 16rem);
     padding-block: var(--space-10);

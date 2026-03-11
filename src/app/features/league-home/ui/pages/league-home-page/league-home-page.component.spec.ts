@@ -12,9 +12,19 @@ describe('LeagueHomePageComponent', () => {
     });
 
     expect(await screen.findByRole('heading', { name: /KingsPadelLeague/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /Próxima jornada/i })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: /Calendario de jornadas de pádel en preparación/i }),
+    ).toBeVisible();
     expect(screen.getByRole('heading', { name: /Clasificación actual/i })).toBeVisible();
-    expect(screen.getByText('Jornada 3 · Descansa')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Ver equipos/i })).toHaveAttribute('href', '/equipos');
+    expect(
+      screen.getByRole('heading', { name: /Resultados, marcadores y resúmenes de la liga/i }),
+    ).toBeVisible();
+    expect(screen.getByRole('link', { name: /clasificación actual/i })).toHaveAttribute(
+      'href',
+      '/clasificacion',
+    );
+    expect(screen.queryByText(/Descansa/i)).toBeNull();
     expect(screen.getByRole('table', { name: /Clasificación actual/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Equipos de la liga/i })).toBeVisible();
   });

@@ -6,18 +6,24 @@ import { provideLeagueHomeFeature } from '../../providers/league-home.providers'
 import { LeagueMatchdaysPageComponent } from './league-matchdays-page.component';
 
 describe('LeagueMatchdaysPageComponent', () => {
-  it('renders the matchday listing with cards and detail links', async () => {
+  it('shows an empty state when there are no published matchdays', async () => {
     await render(LeagueMatchdaysPageComponent, {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    expect(await screen.findByRole('heading', { name: /Calendario por jornadas/i })).toBeVisible();
-    expect(screen.getByText('Jornada 3')).toBeVisible();
-    expect(screen.getByRole('link', { name: /Ver jornada 3/i })).toHaveAttribute(
+    expect(
+      await screen.findByRole('heading', {
+        name: /Calendario de jornadas de pádel en preparación/i,
+      }),
+    ).toBeVisible();
+    expect(screen.getByRole('link', { name: /Abrir calendario general/i })).toHaveAttribute(
       'href',
-      '/jornadas/matchday-3',
+      '/calendario',
     );
-    expect(screen.getAllByText('En juego')).toHaveLength(2);
+    expect(screen.getByRole('link', { name: /Consultar clasificación/i })).toHaveAttribute(
+      'href',
+      '/clasificacion',
+    );
   });
 
   it('has no accessibility violations in the matchday listing snapshot', async () => {
@@ -25,7 +31,7 @@ describe('LeagueMatchdaysPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    await screen.findByRole('heading', { name: /Calendario por jornadas/i });
+    await screen.findByRole('heading', { name: /Calendario de jornadas de pádel en preparación/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

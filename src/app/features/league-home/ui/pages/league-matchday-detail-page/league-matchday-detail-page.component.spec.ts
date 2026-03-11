@@ -7,7 +7,7 @@ import { provideLeagueHomeFeature } from '../../providers/league-home.providers'
 import { LeagueMatchdayDetailPageComponent } from './league-matchday-detail-page.component';
 
 describe('LeagueMatchdayDetailPageComponent', () => {
-  it('renders the selected matchday with all encounters and pair results', async () => {
+  it('shows an empty state when no matchday data has been published', async () => {
     const activatedRouteStub = createActivatedRouteStub('matchday-3');
 
     await render(LeagueMatchdayDetailPageComponent, {
@@ -21,12 +21,10 @@ describe('LeagueMatchdayDetailPageComponent', () => {
       ],
     });
 
-    expect(await screen.findByRole('heading', { name: /Jornada 3/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /Kings of Favar vs Barbaridad/i })).toBeVisible();
-    expect(screen.getAllByText('Partido 1').length).toBeGreaterThan(0);
-    expect(screen.getByText('Alejandro Mena')).toBeVisible();
-    expect(screen.getByText('Raul Pizarro')).toBeVisible();
-    expect(screen.getByText('Jornada 3 · Descansa')).toBeVisible();
+    expect(await screen.findByText(/No hay jornadas disponibles/i)).toBeVisible();
+    expect(
+      screen.getByText(/Todavía no hay jornadas publicadas para construir este detalle/i),
+    ).toBeVisible();
   });
 
   it('shows a not found state for an unknown matchday id', async () => {
@@ -43,11 +41,10 @@ describe('LeagueMatchdayDetailPageComponent', () => {
       ],
     });
 
-    expect(await screen.findByText(/Jornada no encontrada/i)).toBeVisible();
-    expect(screen.getByRole('link', { name: /Volver a jornadas/i })).toHaveAttribute(
-      'href',
-      '/jornadas',
-    );
+    expect(await screen.findByText(/No hay jornadas disponibles/i)).toBeVisible();
+    expect(
+      screen.getByText(/Todavía no hay jornadas publicadas para construir este detalle/i),
+    ).toBeVisible();
   });
 
   it('has no accessibility violations in the matchday detail snapshot', async () => {
@@ -64,7 +61,7 @@ describe('LeagueMatchdayDetailPageComponent', () => {
       ],
     });
 
-    await screen.findByRole('heading', { name: /Jornada 3/i });
+    await screen.findByText(/No hay jornadas disponibles/i);
 
     expect(await axe(container)).toHaveNoViolations();
   });

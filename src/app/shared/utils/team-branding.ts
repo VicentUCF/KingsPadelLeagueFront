@@ -85,6 +85,16 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
       contrast: '#12070d',
     },
   },
+  thormentadores: {
+    logoPath: '/teams_logos/Thormentadores.png',
+    palette: {
+      primary: '#8da5ff',
+      accent: '#dfe5ff',
+      surface: '#171b32',
+      glow: 'rgb(141 165 255 / 0.38)',
+      contrast: '#090b16',
+    },
+  },
 };
 
 export function resolveTeamBranding({

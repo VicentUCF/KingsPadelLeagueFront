@@ -30,24 +30,35 @@
         <h2>{{ viewModel.nextSectionTitle }}</h2>
       </div>
 
-      <div class="league-home-page__match-grid" role="list">
-        @for (match of viewModel.nextMatches; track match.id) {
-          <div role="listitem">
-            <app-match-card
-              [awayTeamName]="match.awayTeamName"
-              [homeTeamName]="match.homeTeamName"
-              [scheduledAtLabel]="match.scheduledAtLabel"
-            />
-          </div>
-        }
+      @if (viewModel.nextMatches.length || viewModel.byeTeam) {
+        <div class="league-home-page__match-grid" role="list">
+          @for (match of viewModel.nextMatches; track match.id) {
+            <div role="listitem">
+              <app-match-card
+                [awayTeamName]="match.awayTeamName"
+                [homeTeamName]="match.homeTeamName"
+                [scheduledAtLabel]="match.scheduledAtLabel"
+              />
+            </div>
+          }
 
-        <div role="listitem">
-          <app-bye-card
-            [description]="viewModel.byeTeam.description"
-            [teamName]="viewModel.byeTeam.teamName"
-          />
+          @if (viewModel.byeTeam; as byeTeam) {
+            <div role="listitem">
+              <app-bye-card [description]="byeTeam.description" [teamName]="byeTeam.teamName" />
+            </div>
+          }
         </div>
-      </div>
+      } @else {
+        <app-empty-state
+          [actions]="nextMatchdayEmptyActions"
+          [description]="'Publicaremos aquí el calendario oficial de KingsPadelLeague con jornadas, horarios, cruces y pistas de cada enfrentamiento.'"
+          [eyebrow]="'Calendario oficial'"
+          [highlights]="['Jornadas y horarios', 'Cruces por equipo', 'Pistas y sedes']"
+          [icon]="nextMatchdayIcon"
+          [layout]="'feature'"
+          [title]="'Calendario de jornadas de pádel en preparación'"
+        />
+      }
     </section>
 
     <section
@@ -80,13 +91,29 @@
         <h2>Últimos resultados</h2>
       </div>
 
-      <div class="league-home-page__results-grid" role="list">
-        @for (result of viewModel.lastResults; track result.id) {
-          <div role="listitem">
-            <app-result-card [result]="result" />
-          </div>
-        }
-      </div>
+      @if (viewModel.lastResults.length) {
+        <div class="league-home-page__results-grid" role="list">
+          @for (result of viewModel.lastResults; track result.id) {
+            <div role="listitem">
+              <app-result-card [result]="result" />
+            </div>
+          }
+        </div>
+      } @else {
+        <app-empty-state
+          [actions]="resultsEmptyActions"
+          [description]="'Cuando empiece la competición mostraremos aquí los resultados de pádel, los marcadores de cada jornada y su impacto en la clasificación.'"
+          [eyebrow]="'Resultados oficiales'"
+          [highlights]="[
+            'Marcadores por jornada',
+            'Resumen de enfrentamientos',
+            'Clasificación actualizada',
+          ]"
+          [icon]="resultsIcon"
+          [layout]="'feature'"
+          [title]="'Resultados, marcadores y resúmenes de la liga'"
+        />
+      }
     </section>
 
     <section class="league-home-page__section">
@@ -110,8 +137,13 @@
 } @else {
   <section class="o-container league-home-page__status-panel">
     <app-empty-state
-      [description]="'Todavía no hay información publicada para mostrar en la home.'"
-      [title]="'No hay datos de liga disponibles'"
+      [actions]="nextMatchdayEmptyActions"
+      [description]="'La home pública se activará con más contenido en cuanto publiquemos calendario, resultados y seguimiento oficial de la competición.'"
+      [eyebrow]="'Publicación en preparación'"
+      [highlights]="['Equipos confirmados', 'Jugadores publicados', 'Calendario pendiente']"
+      [icon]="nextMatchdayIcon"
+      [layout]="'feature'"
+      [title]="'KingsPadelLeague está preparando su escaparate público'"
     />
   </section>
 }

@@ -42,6 +42,50 @@ describe('toLeagueTeamProfilePageViewModel', () => {
   it('returns null when the slug does not match any team profile', () => {
     expect(toLeagueTeamProfilePageViewModel(createSnapshot(), 'unknown-team')).toBeNull();
   });
+
+  it('shows a publication-pending next match label when the calendar is still empty', () => {
+    const viewModel = toLeagueTeamProfilePageViewModel(
+      {
+        ...createSnapshot(),
+        currentMatchday: {
+          current: 0,
+          total: 0,
+          label: 'Calendario pendiente de publicación',
+        },
+        standings: [
+          {
+            teamId: 'titanics',
+            teamName: 'Titanics',
+            rank: 1,
+            points: 0,
+            playedMatches: 0,
+            gameDifference: 0,
+          },
+        ],
+        nextMatches: [],
+        byeTeam: null,
+        lastResults: [],
+      } as unknown as LeagueHomeSnapshot,
+      'titanics',
+    );
+
+    expect(viewModel?.team).toEqual(
+      expect.objectContaining({
+        nextMatchLabel: 'Calendario pendiente de publicación',
+        latestResultLabel: 'Todavía no hay resultado reciente publicado.',
+        facts: expect.arrayContaining([
+          expect.objectContaining({
+            label: 'Clasificación',
+            value: '#1 · 0 pts · 0',
+          }),
+          expect.objectContaining({
+            label: 'Próxima cita',
+            value: 'Calendario pendiente de publicación',
+          }),
+        ]),
+      }),
+    );
+  });
 });
 
 function createSnapshot(): LeagueHomeSnapshot {

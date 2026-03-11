@@ -1,8 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, type OnInit } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ArrowUpRight, LucideAngularModule, Swords, Table2 } from 'lucide-angular';
+import { CalendarDays } from 'lucide-angular';
 
-import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import {
+  EmptyStateComponent,
+  type EmptyStateAction,
+} from '@shared/ui/empty-state/empty-state.component';
 
 import { MatchdayCardComponent } from '../../components/matchday-card/matchday-card.component';
 import {
@@ -31,6 +35,21 @@ export class LeagueMatchdaysPageComponent implements OnInit {
   protected readonly swordsIcon = Swords;
   protected readonly standingsIcon = Table2;
   protected readonly arrowUpRightIcon = ArrowUpRight;
+  protected readonly calendarIcon = CalendarDays;
+  protected readonly emptyActions: readonly EmptyStateAction[] = [
+    {
+      label: 'Abrir calendario general',
+      href: '/calendario',
+      tone: 'primary',
+      icon: this.calendarIcon,
+    },
+    {
+      label: 'Consultar clasificación',
+      href: '/clasificacion',
+      tone: 'secondary',
+      icon: this.standingsIcon,
+    },
+  ];
 
   protected readonly viewModel = computed<LeagueMatchdaysPageViewModel | null>(() => {
     const matchdays = this.store.matchdays();
@@ -43,7 +62,7 @@ export class LeagueMatchdaysPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content:
-        'Consulta todas las jornadas de KingsPadelLeague y abre cada una para revisar cruces y resultados por pareja.',
+        'Descubre próximamente las jornadas oficiales de KingsPadelLeague con cruces, horarios y acceso al detalle de cada enfrentamiento.',
     });
 
     void this.store.load();

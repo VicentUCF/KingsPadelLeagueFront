@@ -1,6 +1,9 @@
 import { Player } from '@features/players/domain/entities/player.entity';
 
-import { toPlayerDirectorySectionsViewModel } from './player-directory.viewmodel';
+import {
+  toPlayerDirectorySectionsViewModel,
+  toRankedPlayersViewModel,
+} from './player-directory.viewmodel';
 
 describe('toPlayerDirectorySectionsViewModel', () => {
   it('groups players by team while preserving the roster order', () => {
@@ -37,6 +40,20 @@ describe('toPlayerDirectorySectionsViewModel', () => {
       lostMatchesLabel: '3',
       playedMatchesCount: 5,
     });
+  });
+
+  it('sorts tied players alphabetically when no competitive stats exist yet', () => {
+    const result = toRankedPlayersViewModel([
+      createPlayer('zeta-player', 'Zeta Player', 'kings-of-favar', 'Kings of Favar', 0, 0),
+      createPlayer('alfa-player', 'Alfa Player', 'kings-of-favar', 'Kings of Favar', 0, 0),
+      createPlayer('beta-player', 'Beta Player', 'titanics', 'Titanics', 0, 0),
+    ]);
+
+    expect(result.map((player) => player.displayName)).toEqual([
+      'Alfa Player',
+      'Beta Player',
+      'Zeta Player',
+    ]);
   });
 });
 

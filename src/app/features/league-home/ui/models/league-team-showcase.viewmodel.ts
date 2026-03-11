@@ -72,7 +72,7 @@ function toTeamShowcaseViewModel(
     snapshot.nextMatches.find((match) => includesTeam(match, teamProfile.name)) ?? null;
   const latestResult =
     snapshot.lastResults.find((result) => includesTeam(result, teamProfile.name)) ?? null;
-  const isByeTeam = snapshot.byeTeam.teamId === teamProfile.id;
+  const isByeTeam = snapshot.byeTeam?.teamId === teamProfile.id;
 
   return {
     id: teamProfile.id,
@@ -90,11 +90,17 @@ function toTeamShowcaseViewModel(
     nextMatchLabel: createNextMatchLabel(
       nextMatch,
       teamProfile.name,
-      snapshot.byeTeam.matchdayLabel,
+      snapshot.byeTeam?.matchdayLabel ?? null,
       isByeTeam,
     ),
     latestResultLabel: createLatestResultLabel(latestResult, teamProfile.name),
-    facts: createFacts(teamProfile, standing, nextMatch, snapshot.byeTeam.matchdayLabel, isByeTeam),
+    facts: createFacts(
+      teamProfile,
+      standing,
+      nextMatch,
+      snapshot.byeTeam?.matchdayLabel ?? null,
+      isByeTeam,
+    ),
     roster: teamProfile.players.map(toTeamRosterPlayerViewModel),
   };
 }
@@ -103,7 +109,7 @@ function createFacts(
   teamProfile: TeamProfileSummary,
   standing: StandingEntry | null,
   nextMatch: NextMatchSummary | null,
-  byeMatchdayLabel: string,
+  byeMatchdayLabel: string | null,
   isByeTeam: boolean,
 ): readonly TeamFactViewModel[] {
   return [
@@ -131,15 +137,15 @@ function createFacts(
 function createNextMatchLabel(
   nextMatch: NextMatchSummary | null,
   teamName: string,
-  byeMatchdayLabel: string,
+  byeMatchdayLabel: string | null,
   isByeTeam: boolean,
 ): string {
-  if (isByeTeam) {
+  if (isByeTeam && byeMatchdayLabel) {
     return `${byeMatchdayLabel} · Descansa`;
   }
 
   if (!nextMatch) {
-    return 'Sin partido anunciado';
+    return byeMatchdayLabel ? 'Sin partido anunciado' : 'Calendario pendiente de publicación';
   }
 
   const opponentName =

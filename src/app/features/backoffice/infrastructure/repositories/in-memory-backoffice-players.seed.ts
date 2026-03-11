@@ -5,7 +5,7 @@ export const IN_MEMORY_BACKOFFICE_PLAYERS: readonly BackofficePlayerDetail[] = [
     id: 'player-alex-soler',
     fullName: 'Alex Soler',
     nickName: 'Alex',
-    avatarPath: '/stock_players/player-01.svg',
+    avatarPath: '',
     status: 'ACTIVE',
     derivedCurrentTeamName: 'Kings of Favar',
     historicalTeamNames: ['Kings of Favar', 'Titanics'],

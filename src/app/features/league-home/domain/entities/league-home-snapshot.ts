@@ -4,7 +4,7 @@ export interface LeagueHomeSnapshot {
   readonly currentMatchday: CurrentMatchdaySummary;
   readonly standings: readonly StandingEntry[];
   readonly nextMatches: readonly NextMatchSummary[];
-  readonly byeTeam: ByeTeamSummary;
+  readonly byeTeam: ByeTeamSummary | null;
   readonly lastResults: readonly EncounterResultSummary[];
   readonly teams: readonly TeamSummary[];
   readonly teamProfiles: readonly TeamProfileSummary[];
@@ -17,7 +17,7 @@ export interface LeagueSummary {
 }
 
 export interface LeaguePhaseSummary {
-  readonly code: 'regular-season' | 'playoff';
+  readonly code: 'preseason' | 'regular-season' | 'playoff';
   readonly label: string;
 }
 

@@ -12,15 +12,15 @@ describe('PlayerProfilePageComponent', () => {
       providers: [
         providePlayersFeature(),
         provideRouter([]),
-        createActivatedRouteProvider('alex-soler'),
+        createActivatedRouteProvider('vicent-ciscar'),
       ],
     });
 
-    expect(await screen.findByRole('heading', { name: /Alex Soler/i })).toBeVisible();
-    expect(screen.getAllByText('Kings of Favar').length).toBeGreaterThan(0);
+    expect(await screen.findByRole('heading', { name: /Vicent Ciscar/i })).toBeVisible();
+    expect(screen.getAllByText('Kings Of Favar').length).toBeGreaterThan(0);
     expect(screen.getByText('Partidos ganados')).toBeVisible();
     expect(screen.getByText('Partidos perdidos')).toBeVisible();
-    const teamShowcase = screen.getByRole('region', { name: /Equipo Kings of Favar/i });
+    const teamShowcase = screen.getByRole('region', { name: /Equipo Kings Of Favar/i });
     const brandedLayout = teamShowcase.closest('.player-profile-page__layout');
 
     expect(brandedLayout).not.toBeNull();
@@ -56,11 +56,11 @@ describe('PlayerProfilePageComponent', () => {
       providers: [
         providePlayersFeature(),
         provideRouter([]),
-        createActivatedRouteProvider('alex-soler'),
+        createActivatedRouteProvider('vicent-ciscar'),
       ],
     });
 
-    await screen.findByRole('heading', { name: /Alex Soler/i });
+    await screen.findByRole('heading', { name: /Vicent Ciscar/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

@@ -1,3 +1,44 @@
-<div class="empty-state__icon" aria-hidden="true">•</div>
-<h2 class="empty-state__title">{{ title() }}</h2>
-<p class="empty-state__description">{{ description() }}</p>
+<div class="empty-state">
+  <div class="empty-state__header">
+    <div class="empty-state__icon" aria-hidden="true">
+      <lucide-angular [img]="resolvedIcon()" [size]="layout() === 'feature' ? 22 : 20" />
+    </div>
+
+    <div class="empty-state__heading">
+      @if (eyebrow(); as eyebrow) {
+        <p class="empty-state__eyebrow">{{ eyebrow }}</p>
+      }
+
+      <h2 class="empty-state__title">{{ title() }}</h2>
+    </div>
+  </div>
+
+  <div class="empty-state__content">
+    <p class="empty-state__description">{{ description() }}</p>
+
+    @if (highlights().length) {
+      <ul class="empty-state__highlights" aria-label="Puntos clave">
+        @for (highlight of highlights(); track highlight) {
+          <li>{{ highlight }}</li>
+        }
+      </ul>
+    }
+  </div>
+  @if (actions().length) {
+    <div aria-label="Acciones relacionadas" class="empty-state__actions" role="group">
+      @for (action of actions(); track action.href) {
+        <a
+          [class.empty-state__action--primary]="action.tone === 'primary'"
+          [class.empty-state__action--secondary]="action.tone === 'secondary'"
+          [routerLink]="action.href"
+          class="empty-state__action"
+        >
+          @if (action.icon; as actionIcon) {
+            <lucide-angular [img]="actionIcon" [size]="16" aria-hidden="true" />
+          }
+          <span>{{ action.label }}</span>
+        </a>
+      }
+    </div>
+  }
+</div>

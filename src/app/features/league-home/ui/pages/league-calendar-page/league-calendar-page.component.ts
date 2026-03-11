@@ -8,9 +8,12 @@ import {
 } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
-import { CalendarDays, LucideAngularModule, Swords, Table2 } from 'lucide-angular';
+import { CalendarDays, LucideAngularModule, Shield, Swords, Table2 } from 'lucide-angular';
 
-import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import {
+  EmptyStateComponent,
+  type EmptyStateAction,
+} from '@shared/ui/empty-state/empty-state.component';
 
 import { CalendarDayGroupComponent } from '../../components/calendar-day-group/calendar-day-group.component';
 import { CalendarFiltersPanelComponent } from '../../components/calendar-filters-panel/calendar-filters-panel.component';
@@ -54,6 +57,21 @@ export class LeagueCalendarPageComponent implements OnInit {
   protected readonly calendarIcon = CalendarDays;
   protected readonly matchdaysIcon = Swords;
   protected readonly standingsIcon = Table2;
+  protected readonly teamsIcon = Shield;
+  protected readonly emptyActions: readonly EmptyStateAction[] = [
+    {
+      label: 'Ver jornadas previstas',
+      href: '/jornadas',
+      tone: 'primary',
+      icon: this.matchdaysIcon,
+    },
+    {
+      label: 'Explorar equipos inscritos',
+      href: '/equipos',
+      tone: 'secondary',
+      icon: this.teamsIcon,
+    },
+  ];
 
   protected readonly viewModel = computed<LeagueCalendarPageViewModel | null>(() => {
     const snapshot = this.store.snapshot();
@@ -73,7 +91,7 @@ export class LeagueCalendarPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content:
-        'Explora la agenda completa de KingsPadelLeague, con todos los cruces ordenados por fecha y filtros por estado o equipo.',
+        'Consulta próximamente el calendario oficial de partidos de KingsPadelLeague con fechas, horarios y enfrentamientos confirmados.',
     });
 
     void this.store.load();

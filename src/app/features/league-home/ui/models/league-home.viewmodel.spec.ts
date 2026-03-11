@@ -52,6 +52,52 @@ describe('toLeagueHomeViewModel', () => {
       }),
     );
   });
+
+  it('keeps the standings neutral and omits the bye card when no calendar is published yet', () => {
+    const viewModel = toLeagueHomeViewModel({
+      ...createSnapshot(),
+      currentMatchday: {
+        current: 0,
+        total: 0,
+        label: 'Calendario pendiente de publicación',
+      },
+      standings: [
+        createStandingEntry('titanics', 'Titanics', 1, 0, 0, 0),
+        createStandingEntry('magic-city', 'Magic City', 2, 0, 0, 0),
+      ],
+      nextMatches: [],
+      byeTeam: null,
+      lastResults: [],
+      teams: [
+        createTeamSummary('titanics', 'titanics', 'Titanics', 'Torres'),
+        createTeamSummary('magic-city', 'magic-city', 'Magic City', 'Vidal'),
+      ],
+      teamProfiles: [
+        createTeamProfile('titanics', 'titanics', 'Titanics', 'Torres'),
+        createTeamProfile('magic-city', 'magic-city', 'Magic City', 'Vidal'),
+      ],
+    } as unknown as LeagueHomeSnapshot);
+
+    expect(viewModel.byeTeam).toBeNull();
+    expect(viewModel.nextMatches).toEqual([]);
+    expect(viewModel.lastResults).toEqual([]);
+    expect(viewModel.standings).toEqual([
+      expect.objectContaining({
+        teamName: 'Titanics',
+        rankTone: 'standard',
+        gameDifferenceTone: 'neutral',
+        isLeader: false,
+        isLast: false,
+      }),
+      expect.objectContaining({
+        teamName: 'Magic City',
+        rankTone: 'standard',
+        gameDifferenceTone: 'neutral',
+        isLeader: false,
+        isLast: false,
+      }),
+    ]);
+  });
 });
 
 function createSnapshot(overrides: Partial<LeagueHomeSnapshot> = {}): LeagueHomeSnapshot {

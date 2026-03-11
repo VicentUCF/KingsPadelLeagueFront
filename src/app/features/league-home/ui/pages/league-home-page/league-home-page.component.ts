@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, type OnInit } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
-import { CalendarDays, LucideAngularModule, Shield, Table2, Trophy } from 'lucide-angular';
+import { CalendarDays, LucideAngularModule, Shield, Table2, Trophy, Users } from 'lucide-angular';
 
-import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 import { applicationMetadata } from '@core/config/application-metadata';
+import {
+  EmptyStateComponent,
+  type EmptyStateAction,
+} from '@shared/ui/empty-state/empty-state.component';
 
 import { ByeCardComponent } from '../../components/bye-card/bye-card.component';
 import { HeroLeagueStatusComponent } from '../../components/hero-league-status/hero-league-status.component';
@@ -45,6 +48,35 @@ export class LeagueHomePageComponent implements OnInit {
   protected readonly standingsIcon = Table2;
   protected readonly resultsIcon = Trophy;
   protected readonly teamsIcon = Shield;
+  protected readonly playersIcon = Users;
+  protected readonly nextMatchdayEmptyActions: readonly EmptyStateAction[] = [
+    {
+      label: 'Explorar equipos inscritos',
+      href: '/equipos',
+      tone: 'primary',
+      icon: this.teamsIcon,
+    },
+    {
+      label: 'Consultar jugadores publicados',
+      href: '/jugadores',
+      tone: 'secondary',
+      icon: this.playersIcon,
+    },
+  ];
+  protected readonly resultsEmptyActions: readonly EmptyStateAction[] = [
+    {
+      label: 'Ir a la clasificación actual',
+      href: '/clasificacion',
+      tone: 'primary',
+      icon: this.standingsIcon,
+    },
+    {
+      label: 'Ver equipos y plantillas',
+      href: '/equipos',
+      tone: 'secondary',
+      icon: this.teamsIcon,
+    },
+  ];
 
   ngOnInit(): void {
     this.title.setTitle('KingsPadelLeague | Liga de Pádel Competitiva');

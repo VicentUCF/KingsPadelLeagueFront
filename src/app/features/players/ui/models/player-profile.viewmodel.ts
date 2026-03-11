@@ -35,6 +35,7 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
       ? Math.round((player.wonMatchesCount / player.playedMatchesCount) * 100)
       : 0;
   const overallRating = Math.round(60 + (winRate / 100) * 35);
+  const hasCompetitiveStats = player.playedMatchesCount > 0;
   const teamBranding = resolveTeamBranding({
     teamName: player.teamName,
     teamSlug: player.teamId,
@@ -60,6 +61,8 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
     side: player.side,
     sideLabel: SIDE_LABELS[player.side] ?? player.side,
     pageTitle: `${player.displayName} | Jugadores | KingsPadelLeague`,
-    metaDescription: `Perfil de ${player.displayName}, jugador de ${player.teamName}, con ${player.wonMatchesCount} partidos ganados y ${player.lostMatchesCount} perdidos.`,
+    metaDescription: hasCompetitiveStats
+      ? `Perfil de ${player.displayName}, jugador de ${player.teamName}, con ${player.wonMatchesCount} partidos ganados y ${player.lostMatchesCount} perdidos.`
+      : `Perfil de ${player.displayName}, jugador de ${player.teamName}, pendiente de estadísticas oficiales.`,
   };
 }

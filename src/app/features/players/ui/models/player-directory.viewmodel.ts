@@ -30,8 +30,15 @@ export function toRankedPlayersViewModel(
   players: readonly Player[],
 ): readonly PlayerCardViewModel[] {
   const sorted = [...players].sort((a, b) => {
-    if (b.wonMatchesCount !== a.wonMatchesCount) return b.wonMatchesCount - a.wonMatchesCount;
-    return a.lostMatchesCount - b.lostMatchesCount;
+    if (b.wonMatchesCount !== a.wonMatchesCount) {
+      return b.wonMatchesCount - a.wonMatchesCount;
+    }
+
+    if (a.lostMatchesCount !== b.lostMatchesCount) {
+      return a.lostMatchesCount - b.lostMatchesCount;
+    }
+
+    return a.displayName.localeCompare(b.displayName);
   });
 
   return sorted.map((player, index) => toPlayerCardViewModel(player, index + 1));
