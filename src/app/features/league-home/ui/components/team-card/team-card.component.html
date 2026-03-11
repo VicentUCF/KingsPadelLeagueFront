@@ -1,10 +1,17 @@
-<a class="team-card__link c-surface-card" [routerLink]="team().teamLink">
+<a
+  [routerLink]="team().teamLink"
+  [style.--team-accent]="team().palette.accent"
+  [style.--team-glow]="team().palette.glow"
+  [style.--team-primary]="team().palette.primary"
+  [style.--team-surface]="team().palette.surface"
+  class="team-card__link c-surface-card"
+>
   <div class="team-card__media">
     <div aria-hidden="true" class="team-card__glow"></div>
     <span aria-hidden="true" class="team-card__badge">
       @if (team().logoPath) {
         <img
-          [src]="team().logoPath!"
+          [ngSrc]="team().logoPath!"
           alt=""
           class="team-card__badge-image"
           decoding="async"

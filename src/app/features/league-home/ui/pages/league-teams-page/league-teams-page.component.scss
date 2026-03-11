@@ -1,0 +1,131 @@
+.league-teams-page {
+  &__content {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-9) var(--space-12);
+  }
+
+  &__hero,
+  &__selector-panel {
+    padding: var(--space-5);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: 1.75rem;
+    background:
+      radial-gradient(circle at top right, rgb(201 162 39 / 0.12), transparent 28%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.015)),
+      var(--color-surface);
+  }
+
+  &__hero-copy {
+    display: grid;
+    gap: var(--space-3);
+
+    h1,
+    p {
+      margin: 0;
+    }
+
+    p {
+      max-width: 42rem;
+      color: var(--color-text-default);
+      line-height: 1.6;
+    }
+  }
+
+  &__eyebrow,
+  &__selector-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-brand);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__layout {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  &__selector-panel,
+  &__selector-heading {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  &__selector-copy {
+    margin: 0;
+    color: var(--color-text-default);
+    line-height: 1.5;
+  }
+
+  &__status-panel {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+    min-height: calc(100vh - 16rem);
+    padding-block: var(--space-10);
+  }
+
+  &__status {
+    width: min(100%, 32rem);
+    margin: 0;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 1.25rem;
+    background: var(--color-surface);
+    color: var(--color-text-default);
+    text-align: center;
+
+    &--error {
+      border-color: color-mix(in srgb, var(--color-brand) 28%, white 8%);
+      color: var(--color-text-strong);
+    }
+  }
+
+  &__retry {
+    min-height: 3rem;
+    padding-inline: var(--space-5);
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: var(--color-brand-contrast);
+    font: inherit;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 47.999rem) {
+  .league-teams-page {
+    &__content {
+      gap: var(--space-6);
+      padding-block: var(--space-7) var(--space-10);
+    }
+
+    &__hero,
+    &__selector-panel {
+      padding: var(--space-4);
+    }
+
+    &__retry {
+      width: 100%;
+    }
+  }
+}
+
+@media (min-width: 64rem) {
+  .league-teams-page {
+    &__layout {
+      grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    &__selector-panel {
+      position: sticky;
+      top: calc(var(--space-6) + 5rem);
+    }
+  }
+}

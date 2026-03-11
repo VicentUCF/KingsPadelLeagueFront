@@ -1,0 +1,79 @@
+<section
+  [class.team-showcase-hero--page]="mode() === 'page'"
+  [style.--team-accent]="team().palette.accent"
+  [style.--team-contrast]="team().palette.contrast"
+  [style.--team-glow]="team().palette.glow"
+  [style.--team-primary]="team().palette.primary"
+  [style.--team-surface]="team().palette.surface"
+  class="team-showcase-hero__panel"
+>
+  <div aria-hidden="true" class="team-showcase-hero__background"></div>
+
+  <div class="team-showcase-hero__copy">
+    <p class="team-showcase-hero__eyebrow">
+      <lucide-angular [img]="sparklesIcon" [size]="15" aria-hidden="true" />
+      <span>{{ team().pulseLabel }}</span>
+    </p>
+
+    <div class="team-showcase-hero__heading">
+      <p class="team-showcase-hero__kicker">{{ team().playerCountLabel }}</p>
+      @if (mode() === 'page') {
+        <h1>{{ team().name }}</h1>
+      } @else {
+        <h2>{{ team().name }}</h2>
+      }
+      <p class="team-showcase-hero__tagline">{{ team().tagline }}</p>
+    </div>
+
+    <p class="team-showcase-hero__description">{{ team().identityDescription }}</p>
+
+    <dl class="team-showcase-hero__facts">
+      @for (fact of team().facts; track fact.label) {
+        <div class="team-showcase-hero__fact">
+          <dt>{{ fact.label }}</dt>
+          <dd>{{ fact.value }}</dd>
+        </div>
+      }
+    </dl>
+
+    <p class="team-showcase-hero__result">{{ team().latestResultLabel }}</p>
+
+    @if (actionLink() && actionLabel()) {
+      <a [routerLink]="actionLink()!" class="team-showcase-hero__action">
+        <span>{{ actionLabel() }}</span>
+        <lucide-angular [img]="arrowUpRightIcon" [size]="16" aria-hidden="true" />
+      </a>
+    }
+  </div>
+
+  <div class="team-showcase-hero__visual">
+    <div class="team-showcase-hero__logo-shell">
+      @if (team().logoPath) {
+        <img
+          [ngSrc]="team().logoPath!"
+          alt=""
+          class="team-showcase-hero__logo"
+          decoding="async"
+          height="320"
+          priority
+          width="320"
+        />
+      } @else {
+        <span class="team-showcase-hero__monogram">{{ team().monogram }}</span>
+      }
+    </div>
+
+    <div class="team-showcase-hero__roster-preview" aria-hidden="true">
+      @for (player of compactRoster(); track player.id) {
+        <img
+          [ngSrc]="player.photoPath"
+          alt=""
+          class="team-showcase-hero__roster-photo"
+          decoding="async"
+          height="68"
+          width="68"
+        />
+      }
+    </div>
+  </div>
+</section>

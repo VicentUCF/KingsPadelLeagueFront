@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArrowUpRight, LucideAngularModule, Users } from 'lucide-angular';
@@ -10,7 +11,7 @@ import { type TeamCardViewModel } from '@features/league-home/ui/models/league-h
   host: {
     class: 'team-card',
   },
-  imports: [LucideAngularModule, RouterLink],
+  imports: [LucideAngularModule, NgOptimizedImage, RouterLink],
   templateUrl: './team-card.component.html',
   styleUrl: './team-card.component.scss',
 })

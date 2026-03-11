@@ -1,0 +1,66 @@
+<a
+  class="player-card__link c-surface-card"
+  [routerLink]="player().profileLink"
+  [attr.aria-label]="player().displayName + ', ' + player().teamName"
+>
+  @if (player().ranking > 0) {
+    <span class="player-card__rank" aria-hidden="true">{{ player().ranking }}</span>
+  } @else {
+    <span class="player-card__rank player-card__rank--empty" aria-hidden="true">—</span>
+  }
+
+  <div class="player-card__avatar">
+    <img
+      [ngSrc]="player().avatarPath"
+      [alt]="player().displayName"
+      class="player-card__image"
+      decoding="async"
+      height="48"
+      width="48"
+    />
+  </div>
+
+  <div class="player-card__identity">
+    <span class="player-card__name">{{ player().displayName }}</span>
+    <span class="player-card__meta">
+      @if (player().teamLogoPath) {
+        <img
+          [ngSrc]="player().teamLogoPath!"
+          [alt]="player().teamName"
+          class="player-card__team-logo"
+          decoding="async"
+          height="16"
+          width="16"
+        />
+      }
+      <span class="player-card__team">{{ player().teamName }}</span>
+      <span class="player-card__side-badge" [attr.data-side]="player().side">
+        {{ player().sideLabel }}
+      </span>
+    </span>
+  </div>
+
+  <dl class="player-card__stats">
+    <div class="player-card__stat">
+      <dt class="u-visually-hidden">Ganados</dt>
+      <dd class="player-card__stat-value">{{ player().wonMatchesLabel }}</dd>
+    </div>
+
+    <div class="player-card__stat">
+      <dt class="u-visually-hidden">Perdidos</dt>
+      <dd class="player-card__stat-value">{{ player().lostMatchesLabel }}</dd>
+    </div>
+
+    <div class="player-card__stat">
+      <dt class="u-visually-hidden">Partidos jugados</dt>
+      <dd class="player-card__stat-value">{{ player().playedMatchesCount }}</dd>
+    </div>
+
+    <div class="player-card__stat player-card__stat--rate">
+      <dt class="u-visually-hidden">Efectividad</dt>
+      <dd class="player-card__stat-value player-card__stat-value--rate">
+        {{ player().winRateLabel }}
+      </dd>
+    </div>
+  </dl>
+</a>

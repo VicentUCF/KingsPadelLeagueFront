@@ -50,7 +50,23 @@ function createSnapshot(): LeagueHomeSnapshot {
       createStandingEntry('house-perez', 'House Perez', 5, 3, 3, -7),
     ],
     lastResults: [],
-    teams: [],
+    teams: [
+      {
+        id: 'house-navarro',
+        slug: 'house-navarro',
+        name: 'House Navarro',
+        presidentName: 'Navarro',
+        playerCount: 6,
+      },
+      {
+        id: 'house-perez',
+        slug: 'house-perez',
+        name: 'House Perez',
+        presidentName: 'Perez',
+        playerCount: 6,
+      },
+    ],
+    teamProfiles: [],
   };
 }
 

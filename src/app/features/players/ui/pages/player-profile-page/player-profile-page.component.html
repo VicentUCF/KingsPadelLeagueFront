@@ -1,0 +1,122 @@
+<a class="player-profile-page__back-link" routerLink="/jugadores">
+  <lucide-angular [img]="arrowLeftIcon" [size]="18" aria-hidden="true" />
+  <span>Volver a jugadores</span>
+</a>
+
+@if (store.errorMessage()) {
+  <p class="player-profile-page__status player-profile-page__status--error" role="status">
+    {{ store.errorMessage() }}
+  </p>
+}
+
+@if (store.isLoading()) {
+  <p class="player-profile-page__status" role="status">Cargando perfil del jugador…</p>
+} @else if (store.player(); as player) {
+  <div
+    class="player-profile-page__layout"
+    [style.--player-team-accent]="player.teamPalette.accent"
+    [style.--player-team-glow]="player.teamPalette.glow"
+    [style.--player-team-primary]="player.teamPalette.primary"
+    [style.--player-team-surface]="player.teamPalette.surface"
+  >
+    <div class="player-profile-page__brand-watermark" aria-hidden="true">
+      @if (player.teamLogoPath) {
+        <img
+          [ngSrc]="player.teamLogoPath"
+          [alt]="'Escudo de ' + player.teamName"
+          class="player-profile-page__brand-watermark-image"
+          decoding="async"
+          height="720"
+          width="720"
+        />
+      } @else {
+        <span class="player-profile-page__brand-watermark-monogram">{{ player.teamMonogram }}</span>
+      }
+    </div>
+
+    <app-player-profile-card [player]="player" />
+
+    <div class="player-profile-page__detail o-stack">
+      <section aria-label="Equipo {{ player.teamName }}" class="player-profile-page__team-showcase">
+        <div class="player-profile-page__team-showcase-copy">
+          <p class="player-profile-page__eyebrow">Perfil del jugador</p>
+          <h1>{{ player.displayName }}</h1>
+          <p class="player-profile-page__team-kicker">Equipo actual</p>
+          <p class="player-profile-page__team-name">{{ player.teamName }}</p>
+
+          <div class="player-profile-page__team-pills" aria-label="Resumen del jugador">
+            <span class="player-profile-page__team-pill">OVR {{ player.overallRating }}</span>
+            <span
+              class="player-profile-page__team-pill player-profile-page__team-pill--side"
+              [attr.data-side]="player.side"
+            >
+              {{ player.sideLabel }}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Estadísticas del jugador" class="player-profile-page__stats-grid">
+        <article class="player-profile-page__stat-block">
+          <span class="player-profile-page__stat-label">Partidos ganados</span>
+          <strong class="player-profile-page__stat-value player-profile-page__stat-value--win">
+            {{ player.wonMatchesLabel }}
+          </strong>
+        </article>
+
+        <article class="player-profile-page__stat-block">
+          <span class="player-profile-page__stat-label">Partidos perdidos</span>
+          <strong class="player-profile-page__stat-value player-profile-page__stat-value--loss">
+            {{ player.lostMatchesLabel }}
+          </strong>
+        </article>
+
+        <article class="player-profile-page__stat-block">
+          <span class="player-profile-page__stat-label">Partidos jugados</span>
+          <strong class="player-profile-page__stat-value">{{ player.playedMatchesLabel }}</strong>
+        </article>
+
+        <article class="player-profile-page__stat-block">
+          <span class="player-profile-page__stat-label">Efectividad</span>
+          <strong class="player-profile-page__stat-value player-profile-page__stat-value--rate">
+            {{ player.winRateLabel }}
+          </strong>
+        </article>
+
+        <article class="player-profile-page__stat-block player-profile-page__stat-block--side">
+          <span class="player-profile-page__stat-label">Posición en pista</span>
+          <strong
+            class="player-profile-page__stat-value player-profile-page__stat-value--side"
+            [attr.data-side]="player.side"
+          >
+            {{ player.sideLabel }}
+          </strong>
+        </article>
+      </section>
+
+      <div class="player-profile-page__win-bar-wrap">
+        <div class="player-profile-page__win-bar-label">
+          <span>Rendimiento</span>
+          <span>{{ player.winRateLabel }}</span>
+        </div>
+        <div
+          class="player-profile-page__win-bar"
+          role="progressbar"
+          [attr.aria-valuenow]="player.winRate"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-label]="'Efectividad ' + player.winRateLabel"
+        >
+          <div class="player-profile-page__win-bar-fill" [style.width.%]="player.winRate"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (store.isNotFound()) {
+  <section class="player-profile-page__empty o-stack o-stack--compact">
+    <app-empty-state
+      [description]="'Revisa el listado general para acceder a otro jugador disponible.'"
+      [title]="'No hemos encontrado este jugador'"
+    />
+  </section>
+}

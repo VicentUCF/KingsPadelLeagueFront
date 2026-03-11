@@ -7,7 +7,7 @@ import {
 } from '@features/league-home/domain/entities/league-home-snapshot';
 
 import { withSignedValue } from './league-ui-formatters';
-import { resolveTeamBranding } from './league-team-branding';
+import { resolveTeamBranding, type TeamBrandingPalette } from './league-team-branding';
 
 export interface LeagueHomeViewModel {
   readonly leagueName: string;
@@ -36,6 +36,7 @@ export interface StandingsRowViewModel {
   readonly teamName: string;
   readonly monogram: string;
   readonly logoPath: string | null;
+  readonly palette: TeamBrandingPalette;
   readonly pointsLabel: string;
   readonly playedMatchesLabel: string;
   readonly gameDifferenceLabel: string;
@@ -62,15 +63,19 @@ export interface ResultCardViewModel {
 
 export interface TeamCardViewModel {
   readonly id: string;
+  readonly slug: string;
   readonly name: string;
   readonly presidentName: string;
   readonly playerCountLabel: string;
   readonly monogram: string;
   readonly logoPath: string | null;
+  readonly palette: TeamBrandingPalette;
   readonly teamLink: string;
 }
 
 export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeViewModel {
+  const teamSlugById = createTeamSlugById(snapshot.teams);
+
   return {
     leagueName: snapshot.league.name,
     leagueTagline: snapshot.league.tagline,
@@ -86,7 +91,7 @@ export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeV
       scheduledAtLabel: match.scheduledAtLabel,
     })),
     standings: snapshot.standings.map((entry, index, rows) =>
-      toStandingsRowViewModel(entry, index === 0, index === rows.length - 1),
+      toStandingsRowViewModel(entry, teamSlugById, index === 0, index === rows.length - 1),
     ),
     byeTeam: toByeCardViewModel(snapshot.byeTeam),
     lastResults: snapshot.lastResults.map(toResultCardViewModel),
@@ -96,11 +101,16 @@ export function toLeagueHomeViewModel(snapshot: LeagueHomeSnapshot): LeagueHomeV
 
 function toStandingsRowViewModel(
   entry: StandingEntry,
+  teamSlugById: ReadonlyMap<string, string>,
   isLeader: boolean,
   isLast: boolean,
 ): StandingsRowViewModel {
   const rankTone = toRankTone(entry.rank);
-  const branding = resolveTeamBranding(entry.teamName);
+  const teamSlug = teamSlugById.get(entry.teamId) ?? null;
+  const branding = resolveTeamBranding({
+    teamName: entry.teamName,
+    teamSlug,
+  });
 
   return {
     teamId: entry.teamId,
@@ -108,10 +118,11 @@ function toStandingsRowViewModel(
     teamName: entry.teamName,
     monogram: branding.monogram,
     logoPath: branding.logoPath,
+    palette: branding.palette,
     pointsLabel: `${entry.points} pts`,
     playedMatchesLabel: `${entry.playedMatches}`,
     gameDifferenceLabel: withSignedValue(entry.gameDifference),
-    teamLink: '/equipos',
+    teamLink: toTeamLink(teamSlug),
     isLeader,
     isLast,
     rankTone,
@@ -138,17 +149,30 @@ function toResultCardViewModel(result: EncounterResultSummary): ResultCardViewMo
 }
 
 function toTeamCardViewModel(team: TeamSummary): TeamCardViewModel {
-  const branding = resolveTeamBranding(team.name);
+  const branding = resolveTeamBranding({
+    teamName: team.name,
+    teamSlug: team.slug,
+  });
 
   return {
     id: team.id,
+    slug: team.slug,
     name: team.name,
     presidentName: team.presidentName,
     playerCountLabel: `Jugadores: ${team.playerCount}`,
     monogram: branding.monogram,
     logoPath: branding.logoPath,
-    teamLink: '/equipos',
+    palette: branding.palette,
+    teamLink: toTeamLink(team.slug),
   };
+}
+
+function createTeamSlugById(teams: readonly TeamSummary[]): ReadonlyMap<string, string> {
+  return new Map(teams.map((team) => [team.id, team.slug]));
+}
+
+function toTeamLink(teamSlug: string | null): string {
+  return teamSlug ? `/equipos/${teamSlug}` : '/equipos';
 }
 
 function toRankTone(rank: number): 'leader' | 'podium' | 'standard' {

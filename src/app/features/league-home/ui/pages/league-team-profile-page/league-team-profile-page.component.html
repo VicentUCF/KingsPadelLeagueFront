@@ -1,0 +1,71 @@
+@if (store.isLoading() && !store.hasSnapshot()) {
+  <section class="o-container league-team-profile-page__status-panel">
+    <p class="league-team-profile-page__status">Cargando el perfil del equipo...</p>
+  </section>
+} @else if (viewModel(); as viewModel) {
+  <section class="league-team-profile-page__hero-shell">
+    <div class="o-container league-team-profile-page__hero-content">
+      <a class="league-team-profile-page__back-link" routerLink="/equipos">
+        <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
+        <span>Volver al selector</span>
+      </a>
+
+      <app-team-showcase-hero [mode]="'page'" [team]="viewModel.team" />
+    </div>
+  </section>
+
+  <section class="o-container league-team-profile-page__content">
+    <header class="league-team-profile-page__section-heading">
+      <p class="league-team-profile-page__section-kicker">
+        <lucide-angular [img]="rosterIcon" [size]="16" aria-hidden="true" />
+        <span>{{ viewModel.eyebrow }}</span>
+      </p>
+      <h2>{{ viewModel.rosterTitle }}</h2>
+      <p>{{ viewModel.rosterDescription }}</p>
+    </header>
+
+    <div class="league-team-profile-page__roster-grid" role="list">
+      @for (player of viewModel.team.roster; track player.id) {
+        <div role="listitem">
+          <app-team-player-card [player]="player" />
+        </div>
+      }
+    </div>
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-team-profile-page__status-panel">
+    <app-empty-state
+      description="Vuelve a intentarlo en unos segundos."
+      title="No hemos podido cargar el perfil del equipo"
+    />
+
+    <p class="league-team-profile-page__status league-team-profile-page__status--error">
+      {{ store.errorMessage() }}
+    </p>
+
+    <button class="league-team-profile-page__retry" type="button" (click)="reloadSnapshot()">
+      Reintentar
+    </button>
+  </section>
+} @else if (isTeamMissing()) {
+  <section class="o-container league-team-profile-page__status-panel">
+    <app-empty-state
+      [description]="'El slug solicitado no coincide con ningún equipo del catálogo actual.'"
+      [title]="'Equipo no encontrado'"
+    />
+
+    <a
+      class="league-team-profile-page__retry league-team-profile-page__retry--link"
+      routerLink="/equipos"
+    >
+      Volver a equipos
+    </a>
+  </section>
+} @else {
+  <section class="o-container league-team-profile-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no hay información publicada para este equipo.'"
+      [title]="'Perfil no disponible'"
+    />
+  </section>
+}

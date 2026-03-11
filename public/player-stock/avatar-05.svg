@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+  <title id="title">Stock player portrait 05</title>
+  <desc id="desc">Abstract portrait illustration with sand background and burgundy sportswear.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f2e7d7" />
+      <stop offset="100%" stop-color="#ccb089" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="320" rx="42" fill="url(#bg)" />
+  <circle cx="160" cy="118" r="58" fill="#e8bf9c" />
+  <path d="M104 252c13-43 49-74 88-74 41 0 79 31 92 74v26H104z" fill="#5d2034" />
+  <path d="M110 110c5-33 28-55 58-55 33 0 56 20 60 55-14-11-31-17-58-17s-44 6-60 17z" fill="#2d1b17" />
+  <path d="M137 134c9 10 17 15 24 15 10 0 20-5 29-15" fill="none" stroke="#8b5135" stroke-linecap="round" stroke-width="8" />
+</svg>

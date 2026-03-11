@@ -1,0 +1,60 @@
+.team-player-card {
+  height: 100%;
+
+  &__panel {
+    display: grid;
+    gap: var(--space-4);
+    height: 100%;
+    padding: var(--space-4);
+    overflow: hidden;
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-border-strong);
+      box-shadow: 0 1.6rem 3rem -2rem var(--color-shadow);
+    }
+  }
+
+  &__photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: 1.25rem;
+    object-fit: cover;
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  &__body {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  &__role,
+  &__name {
+    margin: 0;
+  }
+
+  &__role {
+    color: var(--color-brand);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    color: var(--color-text-strong);
+    font-size: 1.15rem;
+    line-height: 1.1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-player-card__panel {
+    transition: none;
+  }
+}

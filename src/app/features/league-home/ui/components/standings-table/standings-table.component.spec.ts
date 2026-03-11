@@ -12,10 +12,11 @@ describe('StandingsTableComponent', () => {
       teamName: 'House Navarro',
       monogram: 'HN',
       logoPath: '/teams_logos/titanics_no_bg.png',
+      palette: createPalette(),
       pointsLabel: '11 pts',
       playedMatchesLabel: '2',
       gameDifferenceLabel: '+12',
-      teamLink: '/equipos',
+      teamLink: '/equipos/house-navarro',
       isLeader: true,
       isLast: false,
       rankTone: 'leader' as const,
@@ -27,10 +28,11 @@ describe('StandingsTableComponent', () => {
       teamName: 'House Torres',
       monogram: 'HT',
       logoPath: null,
+      palette: createPalette(),
       pointsLabel: '9 pts',
       playedMatchesLabel: '2',
       gameDifferenceLabel: '+8',
-      teamLink: '/equipos',
+      teamLink: '/equipos/house-torres',
       isLeader: false,
       isLast: false,
       rankTone: 'podium' as const,
@@ -42,10 +44,11 @@ describe('StandingsTableComponent', () => {
       teamName: 'House Perez',
       monogram: 'HP',
       logoPath: null,
+      palette: createPalette(),
       pointsLabel: '3 pts',
       playedMatchesLabel: '2',
       gameDifferenceLabel: '-7',
-      teamLink: '/equipos',
+      teamLink: '/equipos/house-perez',
       isLeader: false,
       isLast: true,
       rankTone: 'standard' as const,
@@ -72,6 +75,10 @@ describe('StandingsTableComponent', () => {
       'src',
       '/teams_logos/titanics_no_bg.png',
     );
+    expect(screen.getByRole('link', { name: /House Navarro/i })).toHaveAttribute(
+      'href',
+      '/equipos/house-navarro',
+    );
     expect(screen.getByText('-7')).toBeVisible();
   });
 
@@ -86,3 +93,13 @@ describe('StandingsTableComponent', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+function createPalette() {
+  return {
+    primary: '#f3c84b',
+    accent: '#f9e9a7',
+    surface: '#24150b',
+    glow: 'rgb(243 200 75 / 0.46)',
+    contrast: '#0d0904',
+  };
+}

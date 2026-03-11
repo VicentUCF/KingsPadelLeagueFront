@@ -1,0 +1,37 @@
+<ul class="team-selector__list">
+  @for (team of teams(); track team.slug) {
+    <li class="team-selector__item">
+      <button
+        [attr.aria-pressed]="isSelected(team.slug)"
+        [class.team-selector__option--selected]="isSelected(team.slug)"
+        [style.--team-accent]="team.palette.accent"
+        [style.--team-glow]="team.palette.glow"
+        [style.--team-primary]="team.palette.primary"
+        [style.--team-surface]="team.palette.surface"
+        class="team-selector__option"
+        type="button"
+        (click)="selectTeam(team.slug)"
+      >
+        <span aria-hidden="true" class="team-selector__crest">
+          @if (team.logoPath) {
+            <img
+              [ngSrc]="team.logoPath!"
+              alt=""
+              class="team-selector__crest-image"
+              decoding="async"
+              height="64"
+              width="64"
+            />
+          } @else {
+            <span class="team-selector__crest-fallback">{{ team.monogram }}</span>
+          }
+        </span>
+
+        <span class="team-selector__copy">
+          <span class="team-selector__name">{{ team.name }}</span>
+          <span class="team-selector__tagline">{{ team.tagline }}</span>
+        </span>
+      </button>
+    </li>
+  }
+</ul>

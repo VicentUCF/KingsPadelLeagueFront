@@ -19,6 +19,11 @@ export const routes: Routes = [
     providers: [provideLeagueHomeFeature()],
   },
   {
+    path: 'jugadores',
+    loadChildren: () =>
+      import('@features/players/ui/players.routes').then((module) => module.PLAYERS_ROUTES),
+  },
+  {
     path: 'jornadas',
     loadComponent: () =>
       import('@shared/ui/site-placeholder-page/site-placeholder-page.component').then(
@@ -32,15 +37,10 @@ export const routes: Routes = [
   },
   {
     path: 'equipos',
-    loadComponent: () =>
-      import('@shared/ui/site-placeholder-page/site-placeholder-page.component').then(
-        (module) => module.SitePlaceholderPageComponent,
+    loadChildren: () =>
+      import('@features/league-home/ui/league-teams.routes').then(
+        (module) => module.LEAGUE_TEAMS_ROUTES,
       ),
-    data: {
-      title: 'Equipos',
-      description:
-        'La vista completa de equipos se implementará después. Desde la home puedes ver los cinco equipos participantes.',
-    },
   },
   {
     path: 'calendario',

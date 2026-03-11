@@ -7,6 +7,7 @@ export interface LeagueHomeSnapshot {
   readonly byeTeam: ByeTeamSummary;
   readonly lastResults: readonly EncounterResultSummary[];
   readonly teams: readonly TeamSummary[];
+  readonly teamProfiles: readonly TeamProfileSummary[];
 }
 
 export interface LeagueSummary {
@@ -66,4 +67,21 @@ export interface TeamSummary {
   readonly name: string;
   readonly presidentName: string;
   readonly playerCount: number;
+}
+
+export interface TeamPlayerSummary {
+  readonly id: string;
+  readonly displayName: string;
+  readonly roleLabel: string;
+  readonly photoPath: string;
+}
+
+export interface TeamProfileSummary {
+  readonly id: string;
+  readonly slug: string;
+  readonly name: string;
+  readonly presidentName: string;
+  readonly tagline: string;
+  readonly identityDescription: string;
+  readonly players: readonly TeamPlayerSummary[];
 }

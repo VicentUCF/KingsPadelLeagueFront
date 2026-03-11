@@ -1,0 +1,193 @@
+// Column widths — must match the ranking header in players-directory-page.component.scss
+$col-pos-width: 3rem;
+$col-avatar-width: 3rem;
+$col-stat-width: 3.2rem;
+$col-wr-width: 4rem;
+
+.player-card {
+  display: block;
+
+  &__link {
+    display: grid;
+    grid-template-columns:
+      $col-pos-width
+      $col-avatar-width
+      minmax(0, 1fr)
+      repeat(3, $col-stat-width)
+      $col-wr-width;
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3) var(--space-5);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+
+    &:hover {
+      border-color: var(--color-border-strong);
+      background-color: var(--color-surface-hover);
+      transform: translateX(2px);
+    }
+  }
+
+  // ── Rank badge ────────────────────────────────────────────────────────────
+
+  &__rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-family: var(--font-family-heading);
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-align: center;
+
+    &--empty {
+      opacity: 0.35;
+    }
+  }
+
+  // ── Avatar ────────────────────────────────────────────────────────────────
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: $col-avatar-width;
+    height: $col-avatar-width;
+    overflow: hidden;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at top, rgb(201 162 39 / 16%), transparent 64%),
+      var(--color-surface-raised);
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // ── Identity ──────────────────────────────────────────────────────────────
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  &__name {
+    overflow: hidden;
+    color: var(--color-text-strong);
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &__team-logo {
+    display: block;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
+  }
+
+  &__team {
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__side-badge {
+    flex-shrink: 0;
+    padding: 0.1rem var(--space-2);
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    &[data-side='derecha'] {
+      background: rgb(74 222 128 / 0.14);
+      color: #4ade80;
+    }
+
+    &[data-side='reves'] {
+      background: rgb(129 140 248 / 0.14);
+      color: #818cf8;
+    }
+
+    &[data-side='ambas'] {
+      background: rgb(201 162 39 / 0.14);
+      color: var(--color-brand-strong);
+    }
+  }
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+
+  &__stats {
+    display: contents;
+    margin: 0;
+  }
+
+  &__stat {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0;
+  }
+
+  &__stat-value {
+    margin: 0;
+    color: var(--color-text-default);
+    font-family: var(--font-family-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+
+    &--rate {
+      color: var(--color-brand-strong);
+    }
+  }
+}
+
+// ── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: 48rem) {
+  .player-card {
+    &__link {
+      grid-template-columns: $col-pos-width $col-avatar-width minmax(0, 1fr) $col-wr-width;
+      padding: var(--space-3) var(--space-4);
+    }
+
+    // Hide G, P, PJ columns on mobile — only keep win rate
+    &__stat:not(.player-card__stat--rate) {
+      display: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-card__link {
+    transition: none;
+  }
+}

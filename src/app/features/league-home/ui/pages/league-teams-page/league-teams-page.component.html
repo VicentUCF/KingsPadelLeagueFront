@@ -1,0 +1,73 @@
+@if (store.isLoading() && !store.hasSnapshot()) {
+  <section class="o-container league-teams-page__status-panel">
+    <p class="league-teams-page__status">Cargando el universo de equipos...</p>
+  </section>
+} @else if (viewModel(); as viewModel) {
+  <section class="o-container league-teams-page__content">
+    <header class="league-teams-page__hero">
+      <p class="league-teams-page__eyebrow">
+        <lucide-angular [img]="teamsIcon" [size]="16" aria-hidden="true" />
+        <span>{{ viewModel.eyebrow }}</span>
+      </p>
+
+      <div class="league-teams-page__hero-copy">
+        <h1>{{ viewModel.title }}</h1>
+        <p>{{ viewModel.description }}</p>
+      </div>
+    </header>
+
+    @if (selectedTeam(); as selectedTeam) {
+      <div class="league-teams-page__layout">
+        <section aria-labelledby="team-selector-title" class="league-teams-page__selector-panel">
+          <div class="league-teams-page__selector-heading">
+            <p class="league-teams-page__selector-kicker" id="team-selector-title">
+              Selector de escudos
+            </p>
+            <p class="league-teams-page__selector-copy">
+              Cambia de equipo para actualizar el preview y entrar directamente a su perfil.
+            </p>
+          </div>
+
+          <app-team-selector
+            [selectedTeamSlug]="selectedTeam.slug"
+            [teams]="viewModel.teams"
+            (teamSelected)="selectTeam($event)"
+          />
+        </section>
+
+        <app-team-showcase-hero
+          [actionLabel]="'Ver equipo completo'"
+          [actionLink]="selectedTeam.teamLink"
+          [team]="selectedTeam"
+        />
+      </div>
+    } @else {
+      <app-empty-state
+        [description]="'Todavía no hay equipos cargados para mostrar esta experiencia.'"
+        [title]="'No hay equipos disponibles'"
+      />
+    }
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-teams-page__status-panel">
+    <app-empty-state
+      description="Vuelve a intentarlo en unos segundos."
+      title="No hemos podido cargar los equipos"
+    />
+
+    <p class="league-teams-page__status league-teams-page__status--error">
+      {{ store.errorMessage() }}
+    </p>
+
+    <button class="league-teams-page__retry" type="button" (click)="reloadSnapshot()">
+      Reintentar
+    </button>
+  </section>
+} @else {
+  <section class="o-container league-teams-page__status-panel">
+    <app-empty-state
+      [description]="'Todavía no se ha publicado el catálogo de equipos de la liga.'"
+      [title]="'No hay equipos disponibles'"
+    />
+  </section>
+}

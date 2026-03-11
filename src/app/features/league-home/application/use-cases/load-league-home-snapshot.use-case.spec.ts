@@ -66,6 +66,7 @@ class LeagueHomeRepositoryStub extends LeagueHomeRepository {
           playerCount: 6,
         },
       ],
+      teamProfiles: [],
     };
   }
 }

@@ -1,0 +1,15 @@
+<article class="team-player-card__panel c-surface-card">
+  <img
+    [ngSrc]="player().photoPath"
+    [alt]="player().photoAlt"
+    class="team-player-card__photo"
+    decoding="async"
+    height="440"
+    width="360"
+  />
+
+  <div class="team-player-card__body">
+    <p class="team-player-card__role">{{ player().roleLabel }}</p>
+    <h3 class="team-player-card__name">{{ player().displayName }}</h3>
+  </div>
+</article>

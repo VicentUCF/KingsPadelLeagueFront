@@ -11,9 +11,8 @@ describe('LeagueStandingsPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    expect(
-      await screen.findByRole('heading', { name: /KingsPadelLeague — Temporada 1/i }),
-    ).toBeVisible();
+    expect(await screen.findByRole('heading', { name: /KingsPadelLeague/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /Temporada 1/i })).toBeVisible();
     expect(screen.getByRole('table', { name: /Clasificación de KingsPadelLeague/i })).toBeVisible();
     expect(screen.getByText(/Desempates/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver jornadas/i })).toBeVisible();
@@ -25,7 +24,7 @@ describe('LeagueStandingsPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    await screen.findByRole('heading', { name: /KingsPadelLeague — Temporada 1/i });
+    await screen.findByRole('heading', { name: /KingsPadelLeague/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

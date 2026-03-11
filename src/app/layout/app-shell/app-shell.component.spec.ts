@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { fireEvent, render, screen, within } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
@@ -51,5 +51,33 @@ describe('AppShellComponent', () => {
     });
 
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('keeps Equipos navigation active for nested team routes', async () => {
+    const { fixture } = await render(AppShellComponent, {
+      providers: [
+        provideRouter([
+          {
+            path: '',
+            component: DummyRouteComponent,
+          },
+          {
+            path: 'equipos/:slug',
+            component: DummyRouteComponent,
+          },
+        ]),
+      ],
+    });
+
+    const router = fixture.componentRef.injector.get(Router);
+
+    await router.navigateByUrl('/equipos/titanics');
+    fixture.detectChanges();
+
+    expect(
+      within(screen.getByRole('navigation', { name: /Principal/i })).getByRole('link', {
+        name: /^Equipos$/i,
+      }),
+    ).toHaveClass('app-shell__nav-link--active');
   });
 });

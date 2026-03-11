@@ -9,6 +9,7 @@ import {
   Shield,
   Swords,
   Trophy,
+  Users,
   type LucideIconData,
   X,
 } from 'lucide-angular';
@@ -59,6 +60,14 @@ export class AppShellComponent {
       },
     },
     {
+      label: 'Jugadores',
+      path: '/jugadores',
+      icon: Users,
+      matchOptions: {
+        exact: false,
+      },
+    },
+    {
       label: 'Jornadas',
       path: '/jornadas',
       icon: Swords,
@@ -71,7 +80,7 @@ export class AppShellComponent {
       path: '/equipos',
       icon: Shield,
       matchOptions: {
-        exact: true,
+        exact: false,
       },
     },
     {

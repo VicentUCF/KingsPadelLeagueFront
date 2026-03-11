@@ -3,7 +3,7 @@ import { type LeagueHomeSnapshot } from '@features/league-home/domain/entities/l
 import { toLeagueHomeViewModel } from './league-home.viewmodel';
 
 describe('toLeagueHomeViewModel', () => {
-  it('maps standings entries to premium leaderboard tones', () => {
+  it('maps standings entries to premium leaderboard tones and team detail links', () => {
     const viewModel = toLeagueHomeViewModel(createSnapshot());
 
     expect(viewModel.standings).toEqual([
@@ -12,6 +12,7 @@ describe('toLeagueHomeViewModel', () => {
         rankTone: 'leader',
         gameDifferenceTone: 'positive',
         logoPath: null,
+        teamLink: '/equipos/house-navarro',
       }),
       expect.objectContaining({
         teamName: 'House Torres',
@@ -29,17 +30,11 @@ describe('toLeagueHomeViewModel', () => {
   });
 
   it('maps uploaded team logos when the team name matches the branding registry', () => {
-    const snapshot = createSnapshot();
-    snapshot.standings = [createStandingEntry('titanics', 'Titanics', 1, 11, 2, 12)];
-    snapshot.teams = [
-      {
-        id: 'magic-city',
-        slug: 'magic-city',
-        name: 'Magic City',
-        presidentName: 'Vidal',
-        playerCount: 6,
-      },
-    ];
+    const snapshot = createSnapshot({
+      standings: [createStandingEntry('titanics', 'Titanics', 1, 11, 2, 12)],
+      teams: [createTeamSummary('magic-city', 'magic-city', 'Magic City', 'Vidal')],
+      teamProfiles: [createTeamProfile('magic-city', 'magic-city', 'Magic City', 'Vidal')],
+    });
 
     const viewModel = toLeagueHomeViewModel(snapshot);
 
@@ -53,12 +48,13 @@ describe('toLeagueHomeViewModel', () => {
       expect.objectContaining({
         name: 'Magic City',
         logoPath: '/teams_logos/magic_ng_bg.png',
+        teamLink: '/equipos/magic-city',
       }),
     );
   });
 });
 
-function createSnapshot(): LeagueHomeSnapshot {
+function createSnapshot(overrides: Partial<LeagueHomeSnapshot> = {}): LeagueHomeSnapshot {
   return {
     league: {
       name: 'KingsPadelLeague',
@@ -86,7 +82,17 @@ function createSnapshot(): LeagueHomeSnapshot {
       createStandingEntry('house-perez', 'House Perez', 5, 3, 2, -7),
     ],
     lastResults: [],
-    teams: [],
+    teams: [
+      createTeamSummary('house-navarro', 'house-navarro', 'House Navarro', 'Navarro'),
+      createTeamSummary('house-torres', 'house-torres', 'House Torres', 'Torres'),
+      createTeamSummary('house-perez', 'house-perez', 'House Perez', 'Perez'),
+    ],
+    teamProfiles: [
+      createTeamProfile('house-navarro', 'house-navarro', 'House Navarro', 'Navarro'),
+      createTeamProfile('house-torres', 'house-torres', 'House Torres', 'Torres'),
+      createTeamProfile('house-perez', 'house-perez', 'House Perez', 'Perez'),
+    ],
+    ...overrides,
   };
 }
 
@@ -105,5 +111,27 @@ function createStandingEntry(
     points,
     playedMatches,
     gameDifference,
+  };
+}
+
+function createTeamSummary(id: string, slug: string, name: string, presidentName: string) {
+  return {
+    id,
+    slug,
+    name,
+    presidentName,
+    playerCount: 6,
+  };
+}
+
+function createTeamProfile(id: string, slug: string, name: string, presidentName: string) {
+  return {
+    id,
+    slug,
+    name,
+    presidentName,
+    tagline: `${name} tagline`,
+    identityDescription: `${name} identity`,
+    players: [],
   };
 }

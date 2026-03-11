@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -7,7 +8,7 @@ import { RouterLink } from '@angular/router';
   host: {
     class: 'team-badge-host',
   },
-  imports: [RouterLink],
+  imports: [NgOptimizedImage, RouterLink],
   templateUrl: './team-badge.component.html',
   styleUrl: './team-badge.component.scss',
 })

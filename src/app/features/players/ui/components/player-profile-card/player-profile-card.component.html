@@ -1,0 +1,56 @@
+<article class="player-profile-card__panel" aria-label="Carta del jugador">
+  <div class="player-profile-card__top">
+    <div class="player-profile-card__ovr">
+      <span class="player-profile-card__ovr-number">{{ player().overallRating }}</span>
+      <span class="player-profile-card__ovr-label">OVR</span>
+    </div>
+
+    <div class="player-profile-card__top-right">
+      <div class="player-profile-card__badge">PAD</div>
+      <div
+        class="player-profile-card__badge player-profile-card__badge--side"
+        [attr.data-side]="player().side"
+      >
+        {{ player().sideLabel }}
+      </div>
+    </div>
+  </div>
+
+  <div class="player-profile-card__avatar">
+    <img
+      [ngSrc]="player().avatarPath"
+      [alt]="player().displayName"
+      class="player-profile-card__image"
+      decoding="async"
+      height="220"
+      width="220"
+      priority
+    />
+  </div>
+
+  <div class="player-profile-card__bottom">
+    <p class="player-profile-card__name">{{ player().displayName }}</p>
+    <p class="player-profile-card__team">{{ player().teamName }}</p>
+
+    <dl class="player-profile-card__stats">
+      <div class="player-profile-card__stat">
+        <dd class="player-profile-card__stat-value">{{ player().wonMatchesLabel }}</dd>
+        <dt class="player-profile-card__stat-key">VIC</dt>
+      </div>
+      <div class="player-profile-card__stat">
+        <dd class="player-profile-card__stat-value">{{ player().lostMatchesLabel }}</dd>
+        <dt class="player-profile-card__stat-key">DER</dt>
+      </div>
+      <div class="player-profile-card__stat">
+        <dd class="player-profile-card__stat-value">{{ player().playedMatchesLabel }}</dd>
+        <dt class="player-profile-card__stat-key">PJ</dt>
+      </div>
+      <div class="player-profile-card__stat">
+        <dd class="player-profile-card__stat-value player-profile-card__stat-value--rate">
+          {{ player().winRateLabel }}
+        </dd>
+        <dt class="player-profile-card__stat-key">EFI</dt>
+      </div>
+    </dl>
+  </div>
+</article>
