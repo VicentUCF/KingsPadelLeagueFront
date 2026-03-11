@@ -5,23 +5,92 @@
     </caption>
 
     <thead>
-      <tr>
-        <th scope="col">Rank</th>
-        <th scope="col">Equipo</th>
-        <th scope="col">Puntos</th>
-        <th scope="col">Partidos</th>
-        <th scope="col">Dif Juegos</th>
+      <tr class="standings-table__header-row">
+        <th class="standings-table__header-cell standings-table__header-cell--rank" scope="col">
+          Rank
+        </th>
+        <th class="standings-table__header-cell standings-table__header-cell--team" scope="col">
+          Equipo
+        </th>
+        <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
+          Puntos
+        </th>
+        <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
+          Partidos
+        </th>
+        <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
+          Dif Juegos
+        </th>
       </tr>
     </thead>
 
     <tbody>
       @for (row of rows(); track row.teamId) {
-        <tr [class.standings-table__row--leader]="row.isLeader" class="standings-table__row">
-          <td>{{ row.rank }}</td>
-          <th scope="row">{{ row.teamName }}</th>
-          <td>{{ row.pointsLabel }}</td>
-          <td>{{ row.playedMatchesLabel }}</td>
-          <td>{{ row.gameDifferenceLabel }}</td>
+        <tr
+          [class.standings-table__row--leader]="row.isLeader"
+          [class.standings-table__row--podium]="row.rankTone === 'podium'"
+          class="standings-table__row"
+        >
+          <td class="standings-table__rank" data-label="Rank">
+            <span class="standings-table__cell-label">Rank</span>
+            <span
+              [class.standings-table__rank-chip--leader]="row.rankTone === 'leader'"
+              [class.standings-table__rank-chip--podium]="row.rankTone === 'podium'"
+              class="standings-table__rank-chip"
+            >
+              {{ row.rank }}
+            </span>
+          </td>
+
+          <th class="standings-table__team" scope="row">
+            <span class="standings-table__cell-label">Equipo</span>
+            <span class="standings-table__team-block">
+              <span class="standings-table__cell-value standings-table__cell-value--team">
+                {{ row.teamName }}
+              </span>
+
+              @if (row.rankTone === 'leader') {
+                <span class="standings-table__team-status">Lider actual</span>
+              } @else if (row.rankTone === 'podium') {
+                <span class="standings-table__team-status">Zona podium</span>
+              }
+            </span>
+          </th>
+
+          <td class="standings-table__metric" data-label="Puntos">
+            <span class="standings-table__cell-label">Puntos</span>
+            <span class="standings-table__metric-block">
+              <span class="standings-table__cell-value standings-table__cell-value--metric">
+                {{ row.pointsLabel }}
+              </span>
+            </span>
+          </td>
+
+          <td class="standings-table__metric" data-label="Partidos">
+            <span class="standings-table__cell-label">Partidos</span>
+            <span class="standings-table__metric-block">
+              <span class="standings-table__cell-value standings-table__cell-value--metric">
+                {{ row.playedMatchesLabel }}
+              </span>
+            </span>
+          </td>
+
+          <td
+            [class.standings-table__metric--negative]="row.gameDifferenceTone === 'negative'"
+            [class.standings-table__metric--neutral]="row.gameDifferenceTone === 'neutral'"
+            [class.standings-table__metric--positive]="row.gameDifferenceTone === 'positive'"
+            class="standings-table__metric standings-table__metric--difference"
+            data-label="Dif Juegos"
+          >
+            <span class="standings-table__cell-label">Dif Juegos</span>
+            <span class="standings-table__metric-block">
+              <span
+                class="standings-table__cell-value standings-table__cell-value--difference standings-table__cell-value--metric"
+              >
+                {{ row.gameDifferenceLabel }}
+              </span>
+            </span>
+          </td>
         </tr>
       }
     </tbody>

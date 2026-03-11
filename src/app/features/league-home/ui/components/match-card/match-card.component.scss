@@ -22,3 +22,12 @@
     font-size: clamp(1.25rem, 2vw, 1.7rem);
   }
 }
+
+@media (max-width: 47.999rem) {
+  .match-card {
+    &__content {
+      gap: var(--space-3);
+      padding: var(--space-5);
+    }
+  }
+}

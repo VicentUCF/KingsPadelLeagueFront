@@ -64,3 +64,16 @@
     font-weight: 700;
   }
 }
+
+@media (max-width: 47.999rem) {
+  .result-card {
+    &__content {
+      gap: var(--space-4);
+      padding: var(--space-5);
+    }
+
+    &__encounter-score {
+      line-height: 1.35;
+    }
+  }
+}

@@ -35,6 +35,8 @@ export interface StandingsRowViewModel {
   readonly playedMatchesLabel: string;
   readonly gameDifferenceLabel: string;
   readonly isLeader: boolean;
+  readonly rankTone: 'leader' | 'podium' | 'standard';
+  readonly gameDifferenceTone: 'positive' | 'negative' | 'neutral';
 }
 
 export interface ByeCardViewModel {
@@ -93,6 +95,8 @@ function toStandingsRowViewModel(entry: StandingEntry, isLeader: boolean): Stand
     playedMatchesLabel: `${entry.playedMatches}`,
     gameDifferenceLabel: withSignedValue(entry.gameDifference),
     isLeader,
+    rankTone: toRankTone(entry.rank),
+    gameDifferenceTone: toGameDifferenceTone(entry.gameDifference),
   };
 }
 
@@ -136,4 +140,28 @@ function createMonogram(teamName: string): string {
 
 function withSignedValue(value: number): string {
   return value > 0 ? `+${value}` : `${value}`;
+}
+
+function toRankTone(rank: number): 'leader' | 'podium' | 'standard' {
+  if (rank === 1) {
+    return 'leader';
+  }
+
+  if (rank === 2 || rank === 3) {
+    return 'podium';
+  }
+
+  return 'standard';
+}
+
+function toGameDifferenceTone(value: number): 'positive' | 'negative' | 'neutral' {
+  if (value > 0) {
+    return 'positive';
+  }
+
+  if (value < 0) {
+    return 'negative';
+  }
+
+  return 'neutral';
 }

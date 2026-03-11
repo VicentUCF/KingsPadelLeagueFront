@@ -3,7 +3,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   ArrowRight,
   CalendarDays,
-  Crown,
   House,
   LucideAngularModule,
   Menu,
@@ -37,7 +36,7 @@ interface NavigationItem {
 })
 export class AppShellComponent {
   protected readonly applicationMetadata = applicationMetadata;
-  protected readonly crownIcon = Crown;
+  protected readonly brandCrownIconPath = '/icon-crown.svg';
   protected readonly menuIcon = Menu;
   protected readonly closeIcon = X;
   protected readonly arrowRightIcon = ArrowRight;

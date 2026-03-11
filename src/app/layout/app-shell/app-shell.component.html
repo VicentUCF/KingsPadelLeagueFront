@@ -15,7 +15,15 @@
   <div class="o-container app-shell__header-inner">
     <a class="app-shell__brand" routerLink="/" (click)="closeNavigation()">
       <span aria-hidden="true" class="app-shell__brand-mark">
-        <lucide-angular [img]="crownIcon" [size]="20" />
+        <img
+          alt=""
+          class="app-shell__brand-image"
+          decoding="async"
+          height="220"
+          loading="eager"
+          [src]="brandCrownIconPath"
+          width="220"
+        />
       </span>
 
       <span class="app-shell__brand-copy">

@@ -20,6 +20,7 @@
 
     &--split {
       align-items: end;
+      margin-block-end: var(--space-2);
     }
   }
 
@@ -38,7 +39,13 @@
   &__section-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     width: fit-content;
+    min-height: 3rem;
+    padding-inline: var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.02);
     color: var(--color-text-strong);
     font-weight: 700;
     text-decoration: none;
@@ -84,6 +91,30 @@
     color: var(--color-brand-contrast);
     font: inherit;
     font-weight: 700;
+  }
+}
+
+@media (max-width: 47.999rem) {
+  .league-home-page {
+    &__sections {
+      gap: var(--space-8);
+      padding-block: var(--space-7) var(--space-10);
+    }
+
+    &__section {
+      gap: var(--space-4);
+    }
+
+    &__section-link,
+    &__retry {
+      width: 100%;
+    }
+
+    &__match-grid,
+    &__results-grid,
+    &__teams-grid {
+      gap: var(--space-4);
+    }
   }
 }
 

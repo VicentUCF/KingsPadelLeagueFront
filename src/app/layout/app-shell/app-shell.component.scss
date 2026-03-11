@@ -28,41 +28,49 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-5);
-    min-height: 5.5rem;
+    min-height: 6.25rem;
     padding-block: var(--space-4);
   }
 
   &__brand {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-4);
     text-decoration: none;
   }
 
   &__brand-mark {
     display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: clamp(3.9rem, 7vw, 5rem);
+    height: clamp(3.9rem, 7vw, 5rem);
     border: 1px solid var(--color-border-strong);
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     background:
       radial-gradient(circle at top, rgb(201 162 39 / 22%), transparent 58%),
       linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.01));
-    color: var(--color-brand);
+    overflow: hidden;
+  }
+
+  &__brand-image {
+    display: block;
+    width: 74%;
+    object-fit: contain;
   }
 
   &__brand-copy {
     display: grid;
     gap: 0.15rem;
+    min-width: 0;
   }
 
   &__brand-title {
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.2rem, 1.4vw, 1.5rem);
+    font-size: clamp(1.45rem, 2vw, 2rem);
     font-weight: 700;
     letter-spacing: -0.05em;
+    line-height: 0.95;
   }
 
   &__brand-tagline {
@@ -124,7 +132,6 @@
 
   &__footer {
     border-block-start: 1px solid var(--color-border-subtle);
-    background: var(--color-background);
   }
 
   &__footer-inner {
