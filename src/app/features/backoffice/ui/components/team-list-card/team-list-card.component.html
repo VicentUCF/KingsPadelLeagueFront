@@ -1,0 +1,28 @@
+<article
+  [attr.aria-labelledby]="'team-card-title-' + team().id"
+  [attr.aria-label]="team().title"
+  class="team-list-card__content"
+>
+  <div class="team-list-card__header">
+    <div class="team-list-card__identity">
+      <span
+        aria-hidden="true"
+        class="team-list-card__swatch"
+        [style.--team-primary]="team().primaryColor"
+        [style.--team-secondary]="team().secondaryColor"
+      ></span>
+
+      <div class="team-list-card__copy">
+        <h2 [id]="'team-card-title-' + team().id">{{ team().title }}</h2>
+        <p class="team-list-card__subtitle">{{ team().subtitle }}</p>
+      </div>
+    </div>
+
+    <app-status-badge [label]="team().statusLabel" [tone]="team().statusTone" />
+  </div>
+
+  <p class="team-list-card__meta">{{ team().presidentLabel }}</p>
+  <p class="team-list-card__meta">{{ team().activePlayersLabel }}</p>
+
+  <a class="team-list-card__link" [routerLink]="team().detailPath">Ver detalle</a>
+</article>

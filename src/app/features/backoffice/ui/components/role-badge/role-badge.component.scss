@@ -1,0 +1,24 @@
+.role-badge {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.02)), var(--color-surface);
+
+  &__eyebrow {
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__value {
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+  }
+}

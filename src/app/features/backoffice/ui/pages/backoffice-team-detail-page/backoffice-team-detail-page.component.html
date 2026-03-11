@@ -1,0 +1,117 @@
+@if (store.isLoading()) {
+  <section class="backoffice-team-detail-page__state c-surface-card">
+    <p>Cargando detalle del equipo...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state [description]="store.errorMessage()!" title="No hemos podido abrir el equipo" />
+} @else if (store.isNotFound()) {
+  <section class="backoffice-team-detail-page__state">
+    <app-empty-state
+      description="Comprueba el identificador del equipo o vuelve al listado general."
+      title="No hemos encontrado este equipo"
+    />
+
+    <a class="backoffice-team-detail-page__back-link" routerLink="/backoffice/equipos">
+      Volver a equipos
+    </a>
+  </section>
+} @else if (store.viewModel(); as team) {
+  <div class="backoffice-team-detail-page__layout">
+    <section class="backoffice-team-detail-page__hero c-surface-card">
+      <div class="backoffice-team-detail-page__hero-copy">
+        <div>
+          <h2>{{ team.title }}</h2>
+          <p>{{ team.subtitle }}</p>
+        </div>
+
+        <app-status-badge [label]="team.statusLabel" [tone]="team.statusTone" />
+      </div>
+
+      <p class="backoffice-team-detail-page__identity">{{ team.visualIdentityLabel }}</p>
+    </section>
+
+    <section class="backoffice-team-detail-page__tabs c-surface-card">
+      <div class="backoffice-team-detail-page__tab-list" role="tablist" aria-label="Detalle equipo">
+        @for (tab of tabs; track tab.id) {
+          <button
+            [attr.aria-selected]="isSelectedTab(tab.id)"
+            [class.backoffice-team-detail-page__tab-button--selected]="isSelectedTab(tab.id)"
+            class="backoffice-team-detail-page__tab-button"
+            role="tab"
+            type="button"
+            (click)="selectTab(tab.id)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      @switch (store.selectedTab()) {
+        @case ('info') {
+          <section role="tabpanel">
+            <h3>Info</h3>
+            <p>{{ team.visualIdentityLabel }}</p>
+          </section>
+        }
+        @case ('roles') {
+          <section role="tabpanel">
+            <h3>President / Roles</h3>
+            <ul>
+              @for (role of team.roleAssignments; track role) {
+                <li>{{ role }}</li>
+              }
+            </ul>
+          </section>
+        }
+        @case ('roster') {
+          <section role="tabpanel">
+            <h3>Roster</h3>
+            <ul>
+              @for (member of team.rosterMembers; track member) {
+                <li>{{ member }}</li>
+              }
+            </ul>
+          </section>
+        }
+        @case ('fixtures') {
+          <section role="tabpanel">
+            <h3>Fixtures</h3>
+            <ul>
+              @for (fixture of team.fixtures; track fixture) {
+                <li>{{ fixture }}</li>
+              }
+            </ul>
+          </section>
+        }
+        @case ('sanctions') {
+          <section role="tabpanel">
+            <h3>Sanctions</h3>
+            @if (team.sanctions.length) {
+              <ul>
+                @for (sanction of team.sanctions; track sanction) {
+                  <li>{{ sanction }}</li>
+                }
+              </ul>
+            } @else {
+              <p>Este equipo no tiene sanciones visibles en la season activa.</p>
+            }
+          </section>
+        }
+        @case ('mvp') {
+          <section role="tabpanel">
+            <h3>MVP history</h3>
+            @if (team.mvpHistory.length) {
+              <ul>
+                @for (entry of team.mvpHistory; track entry) {
+                  <li>{{ entry }}</li>
+                }
+              </ul>
+            } @else {
+              <p>No hay histórico MVP registrado todavía.</p>
+            }
+          </section>
+        }
+      }
+    </section>
+  </div>
+}

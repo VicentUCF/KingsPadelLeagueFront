@@ -1,0 +1,43 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.9rem;
+  padding-inline: var(--space-3);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+
+  &--brand {
+    background: rgb(201 162 39 / 14%);
+    border-color: rgb(201 162 39 / 24%);
+    color: var(--color-brand-strong);
+  }
+
+  &--success {
+    background: rgb(65 187 124 / 14%);
+    border-color: rgb(65 187 124 / 30%);
+    color: #8be0b0;
+  }
+
+  &--warning {
+    background: rgb(240 202 90 / 12%);
+    border-color: rgb(240 202 90 / 24%);
+    color: #f0ca5a;
+  }
+
+  &--danger {
+    background: rgb(230 90 90 / 12%);
+    border-color: rgb(230 90 90 / 24%);
+    color: #ff9a9a;
+  }
+
+  &--neutral {
+    background: rgb(255 255 255 / 4%);
+    border-color: var(--color-border-subtle);
+    color: var(--color-text-muted);
+  }
+}

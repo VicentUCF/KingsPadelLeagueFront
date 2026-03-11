@@ -1,0 +1,58 @@
+.backoffice-player-detail-page {
+  &__layout,
+  &__hero,
+  &__panel,
+  &__state {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__hero,
+  &__panel,
+  &__state {
+    padding: var(--space-5);
+  }
+
+  &__hero-copy {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  h2,
+  h3,
+  p,
+  ul {
+    margin: 0;
+  }
+
+  h2,
+  h3 {
+    color: var(--color-text-strong);
+  }
+
+  p,
+  li {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  ul {
+    display: grid;
+    gap: var(--space-2);
+    padding-inline-start: 1.2rem;
+  }
+
+  &__linked-user {
+    color: var(--color-text-strong);
+    font-weight: 600;
+  }
+
+  &__back-link {
+    width: fit-content;
+    color: var(--color-text-strong);
+    font-weight: 600;
+    text-decoration: none;
+  }
+}

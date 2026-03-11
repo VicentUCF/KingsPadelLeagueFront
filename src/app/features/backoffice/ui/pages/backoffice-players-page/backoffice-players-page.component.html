@@ -1,0 +1,28 @@
+<section class="backoffice-players-page__intro">
+  <div class="backoffice-players-page__intro-copy">
+    <h2>Directorio global de jugadores</h2>
+    <p>
+      La vista no trata al player como propiedad de un equipo. El equipo actual aparece como dato
+      derivado desde memberships.
+    </p>
+  </div>
+
+  <button class="backoffice-players-page__create-button" disabled type="button">Crear ficha</button>
+</section>
+
+@if (store.isLoading()) {
+  <section class="backoffice-players-page__state c-surface-card">
+    <p>Cargando directorio de jugadores...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state
+    [description]="store.errorMessage()!"
+    title="No hemos podido cargar los jugadores"
+  />
+} @else {
+  <div class="backoffice-players-page__grid">
+    @for (player of store.viewModel(); track player.id) {
+      <app-player-directory-card [player]="player" />
+    }
+  </div>
+}

@@ -1,0 +1,66 @@
+@if (store.isLoading()) {
+  <section class="backoffice-player-detail-page__state c-surface-card">
+    <p>Cargando detalle del jugador...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state [description]="store.errorMessage()!" title="No hemos podido abrir el jugador" />
+} @else if (store.isNotFound()) {
+  <section class="backoffice-player-detail-page__state">
+    <app-empty-state
+      description="Comprueba el identificador del player o vuelve al directorio global."
+      title="No hemos encontrado este jugador"
+    />
+
+    <a class="backoffice-player-detail-page__back-link" routerLink="/backoffice/jugadores">
+      Volver a jugadores
+    </a>
+  </section>
+} @else if (store.viewModel(); as player) {
+  <div class="backoffice-player-detail-page__layout">
+    <section class="backoffice-player-detail-page__hero c-surface-card">
+      <div class="backoffice-player-detail-page__hero-copy">
+        <div>
+          <h2>{{ player.title }}</h2>
+          <p>{{ player.nickLabel }}</p>
+        </div>
+
+        <app-status-badge [label]="player.statusLabel" [tone]="player.statusTone" />
+      </div>
+
+      <p>{{ player.derivedTeamLabel }}</p>
+      <p>{{ player.preferredSideLabel }}</p>
+      <p class="backoffice-player-detail-page__linked-user">{{ player.userLinkageLabel }}</p>
+    </section>
+
+    <section class="backoffice-player-detail-page__panel c-surface-card">
+      <h3>Memberships históricas</h3>
+      <ul>
+        @for (membership of player.memberships; track membership) {
+          <li>{{ membership }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="backoffice-player-detail-page__panel c-surface-card">
+      <h3>Participaciones</h3>
+      <ul>
+        @for (participation of player.participations; track participation) {
+          <li>{{ participation }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="backoffice-player-detail-page__panel c-surface-card">
+      <h3>Nominaciones MVP</h3>
+      @if (player.mvpNominations.length) {
+        <ul>
+          @for (nomination of player.mvpNominations; track nomination) {
+            <li>{{ nomination }}</li>
+          }
+        </ul>
+      } @else {
+        <p>Este player no tiene nominaciones MVP registradas.</p>
+      }
+    </section>
+  </div>
+}

@@ -1,0 +1,30 @@
+<article
+  [attr.aria-labelledby]="'player-card-title-' + player().id"
+  [attr.aria-label]="player().title"
+  class="player-directory-card__content"
+>
+  <div class="player-directory-card__header">
+    <div class="player-directory-card__identity">
+      <span aria-hidden="true" class="player-directory-card__avatar">
+        @if (player().avatarPath) {
+          <img [src]="player().avatarPath!" alt="" />
+        } @else {
+          <span>{{ player().title.slice(0, 2).toUpperCase() }}</span>
+        }
+      </span>
+
+      <div class="player-directory-card__copy">
+        <h2 [id]="'player-card-title-' + player().id">{{ player().title }}</h2>
+        <p>{{ player().nickLabel }}</p>
+      </div>
+    </div>
+
+    <app-status-badge [label]="player().statusLabel" [tone]="player().statusTone" />
+  </div>
+
+  <p>{{ player().derivedTeamLabel }}</p>
+  <p>{{ player().historyLabel }}</p>
+  <p class="player-directory-card__linkage">{{ player().userLinkageLabel }}</p>
+
+  <a class="player-directory-card__link" [routerLink]="player().detailPath">Ver detalle</a>
+</article>

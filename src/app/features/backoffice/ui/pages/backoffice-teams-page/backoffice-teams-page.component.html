@@ -1,0 +1,28 @@
+<section class="backoffice-teams-page__intro">
+  <div class="backoffice-teams-page__intro-copy">
+    <h2>Equipos de la season activa</h2>
+    <p>
+      Vista rápida del estado de cada equipo, su presidencia actual y la carga operativa del roster
+      activo.
+    </p>
+  </div>
+
+  <button class="backoffice-teams-page__create-button" disabled type="button">Crear equipo</button>
+</section>
+
+@if (store.isLoading()) {
+  <section class="backoffice-teams-page__state c-surface-card">
+    <p>Cargando equipos...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state
+    [description]="store.errorMessage()!"
+    title="No hemos podido cargar los equipos"
+  />
+} @else {
+  <div class="backoffice-teams-page__grid">
+    @for (team of store.viewModel(); track team.id) {
+      <app-team-list-card [team]="team" />
+    }
+  </div>
+}

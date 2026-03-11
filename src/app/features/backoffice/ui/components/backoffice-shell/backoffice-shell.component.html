@@ -1,0 +1,98 @@
+<a class="backoffice-shell__skip-link u-visually-hidden-focusable" href="#backoffice-content">
+  Ir al contenido del backoffice
+</a>
+
+<aside class="backoffice-shell__sidebar">
+  <a aria-label="Backoffice" class="backoffice-shell__brand" routerLink="/backoffice">
+    <span aria-hidden="true" class="backoffice-shell__brand-eyebrow">KingsPadelLeague</span>
+    <span class="backoffice-shell__brand-title">Backoffice</span>
+    <span class="backoffice-shell__brand-copy">
+      Operación interna de jornadas, equipos y decisiones de liga.
+    </span>
+  </a>
+
+  <nav aria-label="Backoffice" class="backoffice-shell__nav">
+    @for (navigationItem of navigation(); track navigationItem.path) {
+      @if (navigationItem.isAccessible) {
+        <a
+          class="backoffice-shell__nav-link"
+          [routerLink]="navigationItem.path"
+          [routerLinkActiveOptions]="{ exact: isDashboardLink(navigationItem.path) }"
+          routerLinkActive="backoffice-shell__nav-link--active"
+        >
+          <div class="backoffice-shell__nav-main">
+            <lucide-angular
+              [img]="navigationItem.icon"
+              [size]="16"
+              aria-hidden="true"
+              class="backoffice-shell__nav-icon"
+            />
+            <span>{{ navigationItem.label }}</span>
+          </div>
+
+          <app-status-badge
+            [label]="navigationItem.isImplemented ? 'Activo' : 'Roadmap'"
+            [tone]="navigationItem.isImplemented ? 'success' : 'neutral'"
+          />
+        </a>
+      } @else {
+        <span
+          aria-disabled="true"
+          class="backoffice-shell__nav-link backoffice-shell__nav-link--disabled"
+        >
+          <span class="backoffice-shell__nav-main">
+            <lucide-angular
+              [img]="navigationItem.icon"
+              [size]="16"
+              aria-hidden="true"
+              class="backoffice-shell__nav-icon"
+            />
+            <span>{{ navigationItem.label }}</span>
+          </span>
+
+          <app-status-badge label="Bloqueado" tone="warning" />
+        </span>
+      }
+    }
+  </nav>
+</aside>
+
+<div class="backoffice-shell__main">
+  <header class="backoffice-shell__topbar">
+    <nav aria-label="Breadcrumb" class="backoffice-shell__breadcrumb">
+      <a routerLink="/backoffice">Backoffice</a>
+      <lucide-angular [img]="chevronRightIcon" [size]="14" aria-hidden="true" />
+      <span aria-current="page">{{ pageContext().breadcrumb }}</span>
+    </nav>
+
+    <div class="backoffice-shell__topbar-grid">
+      <div class="backoffice-shell__page-copy">
+        <p class="backoffice-shell__eyebrow">Panel operativo interno</p>
+        <h1>{{ pageContext().title }}</h1>
+        <p class="backoffice-shell__description">{{ pageContext().description }}</p>
+      </div>
+
+      <div class="backoffice-shell__role-panel">
+        <app-role-badge [role]="sessionStore.currentRole()" />
+
+        <label class="backoffice-shell__role-label" for="backoffice-role-switch">
+          Rol simulado
+        </label>
+        <select
+          class="backoffice-shell__role-select"
+          id="backoffice-role-switch"
+          [value]="sessionStore.currentRole()"
+          (change)="onRoleChange($event)"
+        >
+          @for (role of sessionStore.availableRoles; track role) {
+            <option [value]="role">{{ toRoleOptionLabel(role) }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="backoffice-shell__content" id="backoffice-content">
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,30 @@
+<section class="backoffice-seasons-page__intro">
+  <div class="backoffice-seasons-page__intro-copy">
+    <h2>Listado de seasons</h2>
+    <p>
+      La season activa debe verse con claridad y las seasons cerradas deben quedar en solo lectura
+      operativa.
+    </p>
+  </div>
+
+  <button class="backoffice-seasons-page__create-button" disabled type="button">
+    Crear season
+  </button>
+</section>
+
+@if (store.isLoading()) {
+  <section class="backoffice-seasons-page__state c-surface-card">
+    <p>Cargando seasons...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state
+    [description]="store.errorMessage()!"
+    title="No hemos podido cargar las seasons"
+  />
+} @else {
+  <div class="backoffice-seasons-page__grid">
+    @for (season of store.viewModel(); track season.id) {
+      <app-season-card [season]="season" />
+    }
+  </div>
+}

@@ -1,0 +1,101 @@
+@if (store.isLoading()) {
+  <section class="backoffice-season-detail-page__state c-surface-card">
+    <p>Cargando detalle de season...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <app-empty-state [description]="store.errorMessage()!" title="No hemos podido abrir la season" />
+} @else if (store.isNotFound()) {
+  <section class="backoffice-season-detail-page__state">
+    <app-empty-state
+      description="Comprueba el identificador o vuelve al listado para abrir otra season."
+      title="No hemos encontrado esta season"
+    />
+
+    <a class="backoffice-season-detail-page__back-link" routerLink="/backoffice/temporadas">
+      Volver a temporadas
+    </a>
+  </section>
+} @else if (store.viewModel(); as season) {
+  <div class="backoffice-season-detail-page__layout">
+    <section class="backoffice-season-detail-page__hero c-surface-card">
+      <div class="backoffice-season-detail-page__hero-header">
+        <div class="backoffice-season-detail-page__hero-copy">
+          <h2>{{ season.title }}</h2>
+          <p>{{ season.subtitle }}</p>
+        </div>
+
+        <app-status-badge [label]="season.statusLabel" [tone]="season.statusTone" />
+      </div>
+
+      <p class="backoffice-season-detail-page__state-label">{{ season.operationalStateLabel }}</p>
+
+      <div class="backoffice-season-detail-page__actions">
+        @for (action of season.actions; track action) {
+          <button disabled type="button">{{ action }}</button>
+        }
+      </div>
+    </section>
+
+    <section class="backoffice-season-detail-page__panel c-surface-card">
+      <h3>Datos básicos</h3>
+      <ul class="backoffice-season-detail-page__notes">
+        @for (note of season.notes; track note) {
+          <li>{{ note }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="backoffice-season-detail-page__panel c-surface-card">
+      <h3>Equipos asociados</h3>
+      <ul class="backoffice-season-detail-page__list">
+        @for (team of season.teams; track team) {
+          <li>{{ team }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="backoffice-season-detail-page__panel c-surface-card">
+      <h3>Jornadas</h3>
+      <ul class="backoffice-season-detail-page__list">
+        @for (matchday of season.matchdays; track matchday) {
+          <li>{{ matchday }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="backoffice-season-detail-page__panel c-surface-card">
+      <h3>Clasificación snapshot</h3>
+
+      @if (season.standings.length) {
+        <div class="backoffice-season-detail-page__table-wrapper">
+          <table aria-label="Clasificación snapshot">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Equipo</th>
+                <th scope="col">Puntos</th>
+                <th scope="col">PJ</th>
+                <th scope="col">DG</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of season.standings; track entry.rank + '-' + entry.teamName) {
+                <tr>
+                  <td>{{ entry.rank }}</td>
+                  <td>{{ entry.teamName }}</td>
+                  <td>{{ entry.points }}</td>
+                  <td>{{ entry.playedMatches }}</td>
+                  <td>{{ entry.gameDifference }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="backoffice-season-detail-page__empty-copy">
+          Esta season todavía no tiene snapshot de clasificación.
+        </p>
+      }
+    </section>
+  </div>
+}

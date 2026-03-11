@@ -1,0 +1,13 @@
+<section class="backoffice-placeholder-page__content">
+  <app-empty-state
+    description="La navegación, los permisos mock y el layout ya están listos. El siguiente paso será implementar el flujo real de este módulo."
+    title="Módulo en construcción"
+  />
+
+  <p class="backoffice-placeholder-page__description">{{ description }}</p>
+
+  <a class="backoffice-placeholder-page__link" [routerLink]="dashboardPath">
+    <span>Volver al dashboard operativo</span>
+    <lucide-angular [img]="arrowRightIcon" [size]="16" aria-hidden="true" />
+  </a>
+</section>

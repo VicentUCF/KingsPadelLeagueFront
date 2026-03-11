@@ -1,0 +1,146 @@
+@if (store.isLoading()) {
+  <section class="backoffice-dashboard-page__state c-surface-card">
+    <p>Cargando panel operativo...</p>
+  </section>
+} @else if (store.errorMessage()) {
+  <section class="backoffice-dashboard-page__state">
+    <app-empty-state
+      [description]="store.errorMessage()!"
+      title="No hemos podido abrir el dashboard"
+    />
+  </section>
+} @else if (store.viewModel(); as viewModel) {
+  <div class="backoffice-dashboard-page__layout">
+    <section
+      aria-labelledby="backoffice-dashboard-active-season"
+      class="backoffice-dashboard-page__card c-surface-card"
+    >
+      <div class="backoffice-dashboard-page__card-header">
+        <h2 id="backoffice-dashboard-active-season">Temporada activa</h2>
+        <app-status-badge
+          [label]="viewModel.activeSeason.statusLabel"
+          [tone]="viewModel.activeSeason.statusTone"
+        />
+      </div>
+
+      <p class="backoffice-dashboard-page__value">{{ viewModel.activeSeason.title }}</p>
+      <p class="backoffice-dashboard-page__meta">{{ viewModel.activeSeason.meta }}</p>
+      <p class="backoffice-dashboard-page__detail">{{ viewModel.activeSeason.detail }}</p>
+    </section>
+
+    <section
+      aria-labelledby="backoffice-dashboard-next-matchday"
+      class="backoffice-dashboard-page__card c-surface-card"
+    >
+      <div class="backoffice-dashboard-page__card-header">
+        <h2 id="backoffice-dashboard-next-matchday">Próxima jornada</h2>
+        <app-status-badge
+          [label]="viewModel.nextMatchday.statusLabel"
+          [tone]="viewModel.nextMatchday.statusTone"
+        />
+      </div>
+
+      <p class="backoffice-dashboard-page__value">{{ viewModel.nextMatchday.title }}</p>
+      <p class="backoffice-dashboard-page__meta">{{ viewModel.nextMatchday.meta }}</p>
+      <p class="backoffice-dashboard-page__detail">{{ viewModel.nextMatchday.detail }}</p>
+
+      <div class="backoffice-dashboard-page__metrics">
+        <article class="c-metric">
+          <span class="c-metric__label">Convocatorias</span>
+          <span class="c-metric__value">{{ viewModel.pendingLineupsLabel }}</span>
+        </article>
+        <article class="c-metric">
+          <span class="c-metric__label">Resultados</span>
+          <span class="c-metric__value">{{ viewModel.pendingResultsLabel }}</span>
+        </article>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="backoffice-dashboard-requests"
+      class="backoffice-dashboard-page__card c-surface-card"
+    >
+      <div class="backoffice-dashboard-page__card-header">
+        <h2 id="backoffice-dashboard-requests">Solicitudes pendientes</h2>
+      </div>
+
+      <div class="backoffice-dashboard-page__request-list">
+        @for (requestItem of viewModel.requestItems; track requestItem.label) {
+          <article class="backoffice-dashboard-page__request-item">
+            <p class="backoffice-dashboard-page__request-value">{{ requestItem.valueLabel }}</p>
+            <p class="backoffice-dashboard-page__request-title">{{ requestItem.label }}</p>
+            <p class="backoffice-dashboard-page__request-description">
+              {{ requestItem.description }}
+            </p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="backoffice-dashboard-actions"
+      class="backoffice-dashboard-page__card c-surface-card"
+    >
+      <div class="backoffice-dashboard-page__card-header">
+        <h2 id="backoffice-dashboard-actions">Acciones rápidas</h2>
+      </div>
+
+      <div class="backoffice-dashboard-page__actions">
+        @for (quickAction of viewModel.quickActions; track quickAction.label) {
+          <a class="backoffice-dashboard-page__action" [routerLink]="quickAction.path">
+            <span class="backoffice-dashboard-page__action-title">{{ quickAction.label }}</span>
+            <span class="backoffice-dashboard-page__action-description">
+              {{ quickAction.description }}
+            </span>
+          </a>
+        }
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="backoffice-dashboard-sanctions"
+      class="backoffice-dashboard-page__card c-surface-card"
+    >
+      <div class="backoffice-dashboard-page__card-header">
+        <h2 id="backoffice-dashboard-sanctions">Sanciones recientes</h2>
+      </div>
+
+      <div class="backoffice-dashboard-page__sanctions">
+        @for (sanction of viewModel.recentSanctions; track sanction.teamName + sanction.reason) {
+          <article class="backoffice-dashboard-page__sanction">
+            <div class="backoffice-dashboard-page__sanction-copy">
+              <p class="backoffice-dashboard-page__sanction-team">{{ sanction.teamName }}</p>
+              <p class="backoffice-dashboard-page__sanction-reason">{{ sanction.reason }}</p>
+              <p class="backoffice-dashboard-page__sanction-meta">
+                {{ sanction.pointsLabel }} · {{ sanction.appliedAtLabel }}
+              </p>
+            </div>
+
+            <app-status-badge [label]="sanction.statusLabel" [tone]="sanction.statusTone" />
+          </article>
+        }
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="backoffice-dashboard-mvp"
+      class="backoffice-dashboard-page__card c-surface-card"
+    >
+      <div class="backoffice-dashboard-page__card-header">
+        <h2 id="backoffice-dashboard-mvp">Estado MVP</h2>
+        <app-status-badge
+          [label]="viewModel.mvpSummary.statusLabel"
+          [tone]="viewModel.mvpSummary.statusTone"
+        />
+      </div>
+
+      <p class="backoffice-dashboard-page__value">{{ viewModel.mvpSummary.detail }}</p>
+
+      <ul class="backoffice-dashboard-page__mvp-metrics">
+        @for (metric of viewModel.mvpSummary.metrics; track metric) {
+          <li>{{ metric }}</li>
+        }
+      </ul>
+    </section>
+  </div>
+}

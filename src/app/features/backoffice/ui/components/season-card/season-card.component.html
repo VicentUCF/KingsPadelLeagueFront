@@ -1,0 +1,19 @@
+<article
+  [attr.aria-labelledby]="'season-card-title-' + season().id"
+  [attr.aria-label]="season().title"
+  class="season-card__content"
+>
+  <div class="season-card__header">
+    <div class="season-card__copy">
+      <h2 [id]="'season-card-title-' + season().id">{{ season().title }}</h2>
+      <p class="season-card__subtitle">{{ season().subtitle }}</p>
+    </div>
+
+    <app-status-badge [label]="season().statusLabel" [tone]="season().statusTone" />
+  </div>
+
+  <p class="season-card__restriction">{{ season().restrictionLabel }}</p>
+  <p class="season-card__actions">{{ season().actionsLabel }}</p>
+
+  <a class="season-card__link" [routerLink]="season().detailPath">Ver detalle</a>
+</article>

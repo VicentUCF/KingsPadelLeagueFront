@@ -1,0 +1,81 @@
+.backoffice-team-detail-page {
+  &__layout,
+  &__hero,
+  &__tabs,
+  &__state {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__hero,
+  &__tabs,
+  &__state {
+    padding: var(--space-5);
+  }
+
+  &__hero-copy {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  h2,
+  h3,
+  p,
+  ul {
+    margin: 0;
+  }
+
+  h2,
+  h3 {
+    color: var(--color-text-strong);
+  }
+
+  p,
+  li {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  ul {
+    display: grid;
+    gap: var(--space-2);
+    padding-inline-start: 1.2rem;
+  }
+
+  &__identity {
+    color: var(--color-text-default);
+    font-weight: 600;
+  }
+
+  &__tab-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  &__tab-button {
+    min-height: 2.6rem;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.03);
+    color: var(--color-text-muted);
+    font: inherit;
+    font-weight: 700;
+
+    &--selected {
+      border-color: rgb(201 162 39 / 24%);
+      color: var(--color-text-strong);
+      background: rgb(201 162 39 / 10%);
+    }
+  }
+
+  &__back-link {
+    width: fit-content;
+    color: var(--color-text-strong);
+    font-weight: 600;
+    text-decoration: none;
+  }
+}

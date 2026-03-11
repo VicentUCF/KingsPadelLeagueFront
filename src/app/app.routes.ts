@@ -1,8 +1,9 @@
 import { type Routes } from '@angular/router';
 
 import { provideLeagueHomeFeature } from '@features/league-home/ui/providers/league-home.providers';
+import { AppShellComponent } from '@layout/app-shell/app-shell.component';
 
-export const routes: Routes = [
+const publicSiteRoutes: Routes = [
   {
     path: '',
     loadChildren: () =>
@@ -48,5 +49,20 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: '',
+  },
+];
+
+export const routes: Routes = [
+  {
+    path: 'backoffice',
+    loadChildren: () =>
+      import('@features/backoffice/ui/backoffice.routes').then(
+        (module) => module.BACKOFFICE_ROUTES,
+      ),
+  },
+  {
+    path: '',
+    component: AppShellComponent,
+    children: publicSiteRoutes,
   },
 ];

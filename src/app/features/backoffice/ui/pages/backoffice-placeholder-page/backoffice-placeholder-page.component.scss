@@ -1,0 +1,23 @@
+.backoffice-placeholder-page {
+  &__content {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 42rem;
+  }
+
+  &__description {
+    margin: 0;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: fit-content;
+    color: var(--color-text-strong);
+    font-weight: 600;
+    text-decoration: none;
+  }
+}
