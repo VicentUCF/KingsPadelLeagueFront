@@ -122,6 +122,8 @@ export const PUBLIC_LEAGUE_PLAYER_CATALOG: readonly PublicLeaguePlayerCatalogEnt
     'derecha',
     '/stock_players/player-05.svg',
   ),
+  createPlayer('sin-equipo', 1, 'Artur Peris', 'Ambas', 'ambas', null),
+  createPlayer('sin-equipo', 2, 'Damian Crespo', 'Ambas', 'ambas', null),
 ] as const;
 
 // Temporary public catalog used until the backend is available.

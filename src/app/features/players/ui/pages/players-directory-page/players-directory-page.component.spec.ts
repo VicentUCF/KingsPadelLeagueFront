@@ -25,7 +25,7 @@ describe('PlayersDirectoryPageComponent', () => {
 
     await screen.findByRole('link', { name: /Vicent Ciscar/i });
 
-    expect(screen.getByText(/26 jugadores inscritos/i)).toBeVisible();
+    expect(screen.getByText(/28 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Enric Bixquert/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Vicent Ciscar/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Adri Alvarez/i })).toBeVisible();
@@ -35,6 +35,8 @@ describe('PlayersDirectoryPageComponent', () => {
     expect(screen.getByRole('link', { name: /Ruben Marzal/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Samu/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Borja Vercher/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /Artur Peris/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /Damian Crespo/i })).toBeVisible();
     expect(screen.getByRole('option', { name: /Titanics/i })).toBeVisible();
     expect(screen.getByRole('option', { name: /Sin equipo todavía/i })).toBeVisible();
   });
