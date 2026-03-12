@@ -13,14 +13,14 @@ describe('LeagueCalendarPageComponent', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: /Calendario de partidos de pádel aún no publicado/i,
+        name: /Calendario oficial de partidos/i,
       }),
     ).toBeVisible();
-    expect(screen.getByRole('link', { name: /Ver jornadas previstas/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ver jornadas/i })).toHaveAttribute(
       'href',
       '/jornadas',
     );
-    expect(screen.getByRole('link', { name: /Explorar equipos inscritos/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ver equipos inscritos/i })).toHaveAttribute(
       'href',
       '/equipos',
     );
@@ -32,7 +32,7 @@ describe('LeagueCalendarPageComponent', () => {
     });
 
     await screen.findByRole('heading', {
-      name: /Calendario de partidos de pádel aún no publicado/i,
+      name: /Calendario oficial de partidos/i,
     });
 
     expect(await axe(container)).toHaveNoViolations();

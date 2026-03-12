@@ -13,14 +13,14 @@ describe('LeagueMatchdaysPageComponent', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: /Calendario de jornadas de pádel en preparación/i,
+        name: /Jornadas de la temporada/i,
       }),
     ).toBeVisible();
-    expect(screen.getByRole('link', { name: /Abrir calendario general/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ver calendario general/i })).toHaveAttribute(
       'href',
       '/calendario',
     );
-    expect(screen.getByRole('link', { name: /Consultar clasificación/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ver clasificación/i })).toHaveAttribute(
       'href',
       '/clasificacion',
     );
@@ -31,7 +31,7 @@ describe('LeagueMatchdaysPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    await screen.findByRole('heading', { name: /Calendario de jornadas de pádel en preparación/i });
+    await screen.findByRole('heading', { name: /Jornadas de la temporada/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

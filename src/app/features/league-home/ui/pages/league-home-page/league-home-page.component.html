@@ -56,7 +56,7 @@
           [highlights]="['Jornadas y horarios', 'Cruces por equipo', 'Pistas y sedes']"
           [icon]="nextMatchdayIcon"
           [layout]="'feature'"
-          [title]="'Calendario de jornadas de pádel en preparación'"
+          [title]="'Calendario oficial de jornadas'"
         />
       }
     </section>
@@ -71,7 +71,7 @@
             <lucide-angular [img]="standingsIcon" [size]="16" aria-hidden="true" />
             <span>Tabla</span>
           </p>
-          <h2>Clasificación actual</h2>
+          <h2>Clasificación de la liga</h2>
         </div>
 
         <a class="league-home-page__section-link" routerLink="/clasificacion">
@@ -102,7 +102,7 @@
       } @else {
         <app-empty-state
           [actions]="resultsEmptyActions"
-          [description]="'Cuando empiece la competición mostraremos aquí los resultados de pádel, los marcadores de cada jornada y su impacto en la clasificación.'"
+          [description]="'Aquí se publicarán los resultados de cada jornada, los marcadores oficiales y su impacto en la clasificación general.'"
           [eyebrow]="'Resultados oficiales'"
           [highlights]="[
             'Marcadores por jornada',
@@ -111,7 +111,7 @@
           ]"
           [icon]="resultsIcon"
           [layout]="'feature'"
-          [title]="'Resultados, marcadores y resúmenes de la liga'"
+          [title]="'Resultados oficiales de la jornada'"
         />
       }
     </section>
@@ -122,7 +122,7 @@
           <lucide-angular [img]="teamsIcon" [size]="16" aria-hidden="true" />
           <span>Equipos</span>
         </p>
-        <h2>Equipos de la liga</h2>
+        <h2>Equipos participantes</h2>
       </div>
 
       <div class="league-home-page__teams-grid" role="list">
@@ -138,12 +138,12 @@
   <section class="o-container league-home-page__status-panel">
     <app-empty-state
       [actions]="nextMatchdayEmptyActions"
-      [description]="'La home pública se activará con más contenido en cuanto publiquemos calendario, resultados y seguimiento oficial de la competición.'"
-      [eyebrow]="'Publicación en preparación'"
-      [highlights]="['Equipos confirmados', 'Jugadores publicados', 'Calendario pendiente']"
+      [description]="'La KingsPadelLeague publicará aquí el seguimiento oficial de la temporada con calendario, resultados y clasificación.'"
+      [eyebrow]="'Temporada 2026'"
+      [highlights]="['Equipos participantes', 'Jugadores inscritos', 'Calendario oficial']"
       [icon]="nextMatchdayIcon"
       [layout]="'feature'"
-      [title]="'KingsPadelLeague está preparando su escaparate público'"
+      [title]="'Seguimiento oficial de la KingsPadelLeague'"
     />
   </section>
 }

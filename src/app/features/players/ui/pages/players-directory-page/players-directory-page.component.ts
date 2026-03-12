@@ -28,7 +28,7 @@ export class PlayersDirectoryPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content:
-        'Consulta los jugadores ya publicados de KingsPadelLeague y revisa su equipo antes de disponer del backend definitivo.',
+        'Descubre los jugadores inscritos en la KingsPadelLeague y consulta su equipo, lado de juego y estadísticas.',
     });
 
     void this.store.load();

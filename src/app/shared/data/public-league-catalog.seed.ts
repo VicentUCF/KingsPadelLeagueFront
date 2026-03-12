@@ -28,9 +28,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Kings Of Favar',
     presidentName: 'Vicent Ciscar',
     logoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
-    tagline: 'Primer bloque confirmado para arrancar la temporada pública.',
+    tagline: 'Primer bloque de jugadores confirmado para el inicio de la temporada.',
     identityDescription:
-      'Kings Of Favar ya muestra a sus primeros nombres confirmados mientras completa la plantilla definitiva para el arranque oficial.',
+      'Kings Of Favar ya cuenta con sus primeros jugadores confirmados mientras completa la plantilla con la que competirá en el arranque oficial de la temporada.',
     players: [
       createPlayer(
         'kings-of-favar',
@@ -72,9 +72,8 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Magic City',
     presidentName: 'Adri Alvarez',
     logoPath: '/teams_logos/magic_ng_bg.png',
-    tagline: 'Identidad técnica y plantilla en construcción con primeros nombres cerrados.',
-    identityDescription:
-      'Magic City abre su escaparate público con un único jugador confirmado por ahora y el resto de plazas pendientes de anunciar.',
+    tagline: 'Equipo confirmado para la temporada 2026.',
+    identityDescription: 'Plantilla en construcción de cara al inicio de la competición.',
     players: [
       createPlayer(
         'magic-city',
@@ -100,9 +99,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Titanics',
     presidentName: 'Adrian Asuncion',
     logoPath: '/teams_logos/titanics_no_bg.png',
-    tagline: 'Estructura competitiva definida a la espera del calendario oficial.',
+    tagline: 'Proyecto competitivo en formación para esta temporada.',
     identityDescription:
-      'Titanics ya tiene representante confirmado para la consulta pública mientras termina de cerrar el resto de la rotación.',
+      'Equipo confirmado para la temporada 2026 con su primera base de jugadores inscritos.',
     players: [
       createPlayer(
         'titanics',
@@ -165,9 +164,8 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Barbaridad Team',
     presidentName: 'Samu',
     logoPath: '/teams_logos/barbarida_no_bg.png',
-    tagline: 'Proyecto abierto con la primera ficha ya visible para la jornada de consulta.',
-    identityDescription:
-      'Barbaridad Team utiliza esta versión pública para enseñar los nombres ya confirmados mientras incorpora el resto de jugadores.',
+    tagline: 'Equipo confirmado para la temporada 2026.',
+    identityDescription: 'Plantilla en construcción de cara al inicio de la competición.',
     players: [
       createPlayer('barbaridad', 1, 'Samu', 'Revés', 'reves', '/stock_players/player-05.svg'),
       createPlayer(
@@ -194,9 +192,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Thormentadores',
     presidentName: 'Borja Vercher',
     logoPath: '/teams_logos/Thormentadores.png',
-    tagline: 'Nueva escuadra publicada con un primer nombre confirmado.',
+    tagline: 'Proyecto competitivo en formación para esta temporada.',
     identityDescription:
-      'Thormentadores entra en la web pública sin calendario ni estadísticas, con la plantilla todavía en proceso de confirmación.',
+      'Equipo confirmado para la temporada 2026 con su primera base de jugadores inscritos.',
     players: [
       createPlayer(
         'thormentadores',

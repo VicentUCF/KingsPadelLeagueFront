@@ -11,10 +11,12 @@ describe('LeagueStandingsPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    expect(await screen.findByRole('heading', { name: /KingsPadelLeague/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /Temporada 2026/i })).toBeVisible();
+    expect(
+      await screen.findByRole('heading', { name: /Clasificación oficial de la temporada 2026/i }),
+    ).toBeVisible();
+    expect(screen.getByRole('heading', { name: /^Clasificación$/i })).toBeVisible();
     expect(screen.getByRole('table', { name: /Clasificación de KingsPadelLeague/i })).toBeVisible();
-    expect(screen.getByText(/Desempates/i)).toBeVisible();
+    expect(screen.getByText(/Criterios de desempate/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver jornadas/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver calendario/i })).toBeVisible();
   });
@@ -24,7 +26,7 @@ describe('LeagueStandingsPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    await screen.findByRole('heading', { name: /KingsPadelLeague/i });
+    await screen.findByRole('heading', { name: /Clasificación oficial de la temporada 2026/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

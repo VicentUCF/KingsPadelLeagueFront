@@ -44,7 +44,7 @@ export class LeagueStandingsPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content:
-        'Consulta la clasificación actual de KingsPadelLeague con la jornada en curso y la jerarquía competitiva de la liga.',
+        'Consulta la clasificación oficial de la KingsPadelLeague y sigue la evolución de los equipos durante la temporada.',
     });
 
     void this.store.load();

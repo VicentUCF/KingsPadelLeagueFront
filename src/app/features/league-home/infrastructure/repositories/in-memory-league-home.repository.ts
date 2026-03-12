@@ -20,7 +20,7 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
     return {
       league: {
         name: 'KingsPadelLeague',
-        tagline: 'La liga de pádel competitiva',
+        tagline: 'Liga amateur de pádel por equipos con formato competitivo.',
         seasonLabel: 'Temporada 2026',
       },
       currentPhase: {
@@ -30,7 +30,7 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
       currentMatchday: {
         current: 0,
         total: 0,
-        label: 'Calendario pendiente de publicación',
+        label: 'Calendario oficial próximamente',
       },
       nextMatches: [],
       byeTeam: null,

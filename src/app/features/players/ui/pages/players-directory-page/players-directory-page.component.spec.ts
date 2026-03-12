@@ -11,7 +11,9 @@ describe('PlayersDirectoryPageComponent', () => {
       providers: [providePlayersFeature(), provideRouter([])],
     });
 
-    expect(await screen.findByRole('heading', { name: /Directorio de jugadores/i })).toBeVisible();
+    expect(
+      await screen.findByRole('heading', { name: /Jugadores de la KingsPadelLeague/i }),
+    ).toBeVisible();
     expect(await screen.findByRole('link', { name: /Vicent Ciscar/i })).toBeVisible();
     expect(screen.getByRole('searchbox')).toBeVisible();
   });

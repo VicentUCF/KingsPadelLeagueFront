@@ -38,13 +38,13 @@ export class LeagueMatchdaysPageComponent implements OnInit {
   protected readonly calendarIcon = CalendarDays;
   protected readonly emptyActions: readonly EmptyStateAction[] = [
     {
-      label: 'Abrir calendario general',
+      label: 'Ver calendario general',
       href: '/calendario',
       tone: 'primary',
       icon: this.calendarIcon,
     },
     {
-      label: 'Consultar clasificación',
+      label: 'Ver clasificación',
       href: '/clasificacion',
       tone: 'secondary',
       icon: this.standingsIcon,
@@ -62,7 +62,7 @@ export class LeagueMatchdaysPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content:
-        'Descubre próximamente las jornadas oficiales de KingsPadelLeague con cruces, horarios y acceso al detalle de cada enfrentamiento.',
+        'Consulta las jornadas oficiales de la KingsPadelLeague con cruces, horarios y resultados de cada enfrentamiento.',
     });
 
     void this.store.load();

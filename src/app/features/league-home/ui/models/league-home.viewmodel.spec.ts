@@ -59,7 +59,7 @@ describe('toLeagueHomeViewModel', () => {
       currentMatchday: {
         current: 0,
         total: 0,
-        label: 'Calendario pendiente de publicación',
+        label: 'Por anunciar',
       },
       standings: [
         createStandingEntry('titanics', 'Titanics', 1, 0, 0, 0),
@@ -104,7 +104,7 @@ function createSnapshot(overrides: Partial<LeagueHomeSnapshot> = {}): LeagueHome
   return {
     league: {
       name: 'KingsPadelLeague',
-      tagline: 'La liga de pádel competitiva',
+      tagline: 'Liga amateur de pádel por equipos con formato competitivo.',
       seasonLabel: 'Temporada 1',
     },
     currentPhase: {

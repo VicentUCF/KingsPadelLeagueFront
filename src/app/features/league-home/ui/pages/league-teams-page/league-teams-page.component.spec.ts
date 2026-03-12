@@ -11,8 +11,8 @@ describe('LeagueTeamsPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    expect(await screen.findByRole('heading', { name: /Identidad de equipos/i })).toBeVisible();
-    expect(screen.getByRole('link', { name: /Ver equipo completo/i })).toHaveAttribute(
+    expect(await screen.findByRole('heading', { name: /Equipos participantes/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /Ver plantilla completa/i })).toHaveAttribute(
       'href',
       '/equipos/kings-of-favar',
     );
@@ -20,7 +20,7 @@ describe('LeagueTeamsPageComponent', () => {
     await fireEvent.click(screen.getByRole('button', { name: /Titanics/i }));
 
     expect(screen.getByRole('heading', { name: /Titanics/i })).toBeVisible();
-    expect(screen.getByRole('link', { name: /Ver equipo completo/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ver plantilla completa/i })).toHaveAttribute(
       'href',
       '/equipos/titanics',
     );
@@ -31,7 +31,7 @@ describe('LeagueTeamsPageComponent', () => {
       providers: [provideLeagueHomeFeature(), provideRouter([])],
     });
 
-    await screen.findByRole('heading', { name: /Identidad de equipos/i });
+    await screen.findByRole('heading', { name: /Equipos participantes/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

@@ -64,7 +64,7 @@ describe('StandingsTableComponent', () => {
       },
     });
 
-    const table = screen.getByRole('table', { name: /Clasificación actual/i });
+    const table = screen.getByRole('table', { name: /Clasificación actual de KingsPadelLeague/i });
     const renderedRows = within(table).getAllByRole('row');
 
     expect(renderedRows).toHaveLength(4);

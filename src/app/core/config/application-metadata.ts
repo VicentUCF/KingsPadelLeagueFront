@@ -1,7 +1,7 @@
 export const applicationMetadata = {
   name: 'KingsPadelLeague',
-  tagline: 'La liga de pádel competitiva',
+  tagline: 'Liga amateur de pádel por equipos con formato competitivo.',
   logoPath: '/kpl-logo-wordmark.png',
   description:
-    'KingsPadelLeague es una liga de pádel competitiva con equipos, clasificación, jornadas y resultados actualizados.',
+    'Sigue la KingsPadelLeague: equipos participantes, clasificación, jugadores, jornadas y calendario oficial de la temporada 2026.',
 } as const;

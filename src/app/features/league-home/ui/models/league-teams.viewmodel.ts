@@ -18,9 +18,9 @@ export function toLeagueTeamsPageViewModel(snapshot: LeagueHomeSnapshot): League
 
   return {
     eyebrow: 'Equipos',
-    title: 'Identidad de equipos',
+    title: 'Equipos participantes',
     description:
-      'Explora la estética, el pulso competitivo y la plantilla completa de cada escudo de KingsPadelLeague.',
+      'Consulta los equipos participantes, su plantilla y su situación actual dentro de la KingsPadelLeague.',
     teams,
     initialSelectedSlug: teams[0]?.slug ?? null,
   };
