@@ -36,14 +36,16 @@
       }
     </dl>
 
-    <p class="team-showcase-hero__result">{{ team().latestResultLabel }}</p>
+    <div class="team-showcase-hero__footer">
+      <p class="team-showcase-hero__result">{{ team().latestResultLabel }}</p>
 
-    @if (actionLink() && actionLabel()) {
-      <a [routerLink]="actionLink()!" class="team-showcase-hero__action">
-        <span>{{ actionLabel() }}</span>
-        <lucide-angular [img]="arrowUpRightIcon" [size]="16" aria-hidden="true" />
-      </a>
-    }
+      @if (actionLink() && actionLabel()) {
+        <a [routerLink]="actionLink()!" class="team-showcase-hero__action">
+          <span>{{ actionLabel() }}</span>
+          <lucide-angular [img]="arrowUpRightIcon" [size]="16" aria-hidden="true" />
+        </a>
+      }
+    </div>
   </div>
 
   <div class="team-showcase-hero__visual">

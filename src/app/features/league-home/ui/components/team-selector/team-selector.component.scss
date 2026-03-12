@@ -79,7 +79,7 @@
 
   &__copy {
     display: grid;
-    gap: 0.35rem;
+    gap: var(--space-1);
     min-width: 0;
   }
 
