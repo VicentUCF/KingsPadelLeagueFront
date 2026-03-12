@@ -11,6 +11,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArrowLeft, LucideAngularModule } from 'lucide-angular';
 
+import { UNASSIGNED_PLAYER_TEAM_NAME } from '@features/players/domain/entities/player.entity';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
 import { PlayerProfileCardComponent } from '../../components/player-profile-card/player-profile-card.component';
@@ -41,6 +42,7 @@ export class PlayerProfilePageComponent implements OnInit {
 
   protected readonly store = inject(PlayerProfileStore);
   protected readonly arrowLeftIcon = ArrowLeft;
+  protected readonly unassignedTeamName = UNASSIGNED_PLAYER_TEAM_NAME;
 
   constructor() {
     effect(() => {
@@ -68,7 +70,7 @@ export class PlayerProfilePageComponent implements OnInit {
       this.meta.updateTag({
         name: 'description',
         content:
-          'Consulta el perfil individual de un jugador de KingsPadelLeague con equipo y estadísticas.',
+          'Consulta el perfil individual de un jugador de KingsPadelLeague con estado de equipo y estadísticas.',
       });
     });
   }

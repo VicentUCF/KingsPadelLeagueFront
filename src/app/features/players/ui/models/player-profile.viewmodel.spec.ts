@@ -33,4 +33,23 @@ describe('toPlayerProfileViewModel', () => {
     expect(viewModel.metaDescription).toContain('Alex Soler');
     expect(viewModel.metaDescription).toContain('Kings of Favar');
   });
+
+  it('describes pending team assignment when the player is not attached to a squad yet', () => {
+    const viewModel = toPlayerProfileViewModel(
+      new Player(
+        'alex-pla',
+        'alex-pla',
+        'Alex Pla',
+        'pending-team-assignment',
+        'Sin equipo todavía',
+        null,
+        null,
+        0,
+        0,
+      ),
+    );
+
+    expect(viewModel.teamName).toBe('Sin equipo todavía');
+    expect(viewModel.metaDescription).toContain('todavía no tiene equipo asignado');
+  });
 });

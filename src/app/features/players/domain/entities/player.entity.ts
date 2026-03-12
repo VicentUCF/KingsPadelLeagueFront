@@ -1,5 +1,12 @@
 export type PlayerSide = 'derecha' | 'reves' | 'ambas';
 
+export const UNASSIGNED_PLAYER_TEAM_ID = 'pending-team-assignment';
+export const UNASSIGNED_PLAYER_TEAM_NAME = 'Sin equipo todavía';
+
+export function isPlayerAssignedToTeam(teamId: string): boolean {
+  return teamId !== UNASSIGNED_PLAYER_TEAM_ID;
+}
+
 export class Player {
   readonly playedMatchesCount: number;
 

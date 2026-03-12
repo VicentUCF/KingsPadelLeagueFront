@@ -35,6 +35,24 @@ describe('PlayerProfilePageComponent', () => {
     );
   });
 
+  it('renders the pending assignment state for players without a team yet', async () => {
+    const { container } = await render(PlayerProfilePageComponent, {
+      providers: [
+        providePlayersFeature(),
+        provideRouter([]),
+        createActivatedRouteProvider('alex-pla'),
+      ],
+    });
+
+    expect(await screen.findByRole('heading', { name: /Alex Pla/i })).toBeVisible();
+    expect(screen.getAllByText('Sin equipo todavía').length).toBeGreaterThan(0);
+    expect(screen.getByRole('region', { name: /Estado del jugador/i })).toBeVisible();
+    expect(container.querySelector('.player-profile-page__brand-watermark-image')).toBeNull();
+    expect(
+      container.querySelector('.player-profile-page__brand-watermark-monogram'),
+    ).not.toBeNull();
+  });
+
   it('renders the not found state for an invalid player slug', async () => {
     await render(PlayerProfilePageComponent, {
       providers: [

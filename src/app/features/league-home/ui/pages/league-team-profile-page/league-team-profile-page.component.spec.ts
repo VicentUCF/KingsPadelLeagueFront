@@ -23,6 +23,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     expect(await screen.findByRole('heading', { name: /^Titanics$/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Plantilla del equipo/i })).toBeVisible();
+    expect(screen.getByText(/1 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /Adrian Asuncion/i, level: 3 })).toBeVisible();
     expect(screen.getByText(/Calendario oficial próximamente · Pretemporada/i)).toBeVisible();
   });
@@ -46,7 +47,28 @@ describe('LeagueTeamProfilePageComponent', () => {
     activatedRouteStub.paramMapSubject.next(convertToParamMap({ slug: 'magic-city' }));
 
     expect(await screen.findByRole('heading', { name: /^Magic City$/i })).toBeVisible();
+    expect(screen.getByText(/1 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /Adri Alvarez/i, level: 3 })).toBeVisible();
+  });
+
+  it('keeps both kings presidents inside the Kings Of Favar roster', async () => {
+    const activatedRouteStub = createActivatedRouteStub('kings-of-favar');
+
+    await render(LeagueTeamProfilePageComponent, {
+      providers: [
+        provideLeagueHomeFeature(),
+        provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: activatedRouteStub.route,
+        },
+      ],
+    });
+
+    expect(await screen.findByRole('heading', { name: /^Kings Of Favar$/i })).toBeVisible();
+    expect(screen.getByText(/2 jugadores inscritos/i)).toBeVisible();
+    expect(screen.getByRole('heading', { name: /Vicent Ciscar/i, level: 3 })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /Enric Bixquert/i, level: 3 })).toBeVisible();
   });
 
   it('shows a not found state for an unknown team slug', async () => {

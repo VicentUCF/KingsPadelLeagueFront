@@ -1,4 +1,7 @@
-import { type Player } from '@features/players/domain/entities/player.entity';
+import {
+  isPlayerAssignedToTeam,
+  type Player,
+} from '@features/players/domain/entities/player.entity';
 import { resolveTeamBranding, type TeamBrandingPalette } from '@shared/utils/team-branding';
 
 const SIDE_LABELS: Record<string, string> = {
@@ -30,6 +33,7 @@ export interface PlayerProfileViewModel {
 }
 
 export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel {
+  const hasAssignedTeam = isPlayerAssignedToTeam(player.teamId);
   const winRate =
     player.playedMatchesCount > 0
       ? Math.round((player.wonMatchesCount / player.playedMatchesCount) * 100)
@@ -38,16 +42,17 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
   const hasCompetitiveStats = player.playedMatchesCount > 0;
   const teamBranding = resolveTeamBranding({
     teamName: player.teamName,
-    teamSlug: player.teamId,
+    teamSlug: hasAssignedTeam ? player.teamId : null,
     fallbackLogoPath: player.teamLogoPath,
   });
+  const teamMonogram = hasAssignedTeam ? teamBranding.monogram : 'SE';
 
   return {
     id: player.id,
     displayName: player.displayName,
     teamName: player.teamName,
     teamLogoPath: teamBranding.logoPath,
-    teamMonogram: teamBranding.monogram,
+    teamMonogram,
     teamPalette: teamBranding.palette,
     avatarPath: player.avatarPath,
     wonMatchesCount: player.wonMatchesCount,
@@ -61,8 +66,22 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
     side: player.side,
     sideLabel: SIDE_LABELS[player.side] ?? player.side,
     pageTitle: `${player.displayName} | Jugadores | KingsPadelLeague`,
-    metaDescription: hasCompetitiveStats
-      ? `Perfil de ${player.displayName}, jugador de ${player.teamName}, con ${player.wonMatchesCount} partidos ganados y ${player.lostMatchesCount} perdidos.`
-      : `Perfil de ${player.displayName}, jugador de ${player.teamName}, pendiente de estadísticas oficiales.`,
+    metaDescription: createMetaDescription(player, hasAssignedTeam, hasCompetitiveStats),
   };
+}
+
+function createMetaDescription(
+  player: Player,
+  hasAssignedTeam: boolean,
+  hasCompetitiveStats: boolean,
+): string {
+  if (!hasAssignedTeam) {
+    return hasCompetitiveStats
+      ? `Perfil de ${player.displayName}, todavía no tiene equipo asignado y acumula ${player.wonMatchesCount} partidos ganados y ${player.lostMatchesCount} perdidos.`
+      : `Perfil de ${player.displayName}, todavía no tiene equipo asignado y está pendiente de estadísticas oficiales.`;
+  }
+
+  return hasCompetitiveStats
+    ? `Perfil de ${player.displayName}, jugador de ${player.teamName}, con ${player.wonMatchesCount} partidos ganados y ${player.lostMatchesCount} perdidos.`
+    : `Perfil de ${player.displayName}, jugador de ${player.teamName}, pendiente de estadísticas oficiales.`;
 }

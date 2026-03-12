@@ -37,11 +37,20 @@
     <app-player-profile-card [player]="player" />
 
     <div class="player-profile-page__detail o-stack">
-      <section aria-label="Equipo {{ player.teamName }}" class="player-profile-page__team-showcase">
+      <section
+        [attr.aria-label]="
+          player.teamName === unassignedTeamName
+            ? 'Estado del jugador'
+            : 'Equipo ' + player.teamName
+        "
+        class="player-profile-page__team-showcase"
+      >
         <div class="player-profile-page__team-showcase-copy">
           <p class="player-profile-page__eyebrow">Perfil del jugador</p>
           <h1>{{ player.displayName }}</h1>
-          <p class="player-profile-page__team-kicker">Equipo actual</p>
+          <p class="player-profile-page__team-kicker">
+            {{ player.teamName === unassignedTeamName ? 'Asignación pendiente' : 'Equipo actual' }}
+          </p>
           <p class="player-profile-page__team-name">{{ player.teamName }}</p>
 
           <div class="player-profile-page__team-pills" aria-label="Resumen del jugador">

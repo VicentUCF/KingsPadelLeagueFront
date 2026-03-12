@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
+import { UNASSIGNED_PLAYER_TEAM_ID } from '@features/players/domain/entities/player.entity';
 import {
   toPlayerDirectorySectionsViewModel,
   toRankedPlayersViewModel,
@@ -54,7 +55,9 @@ export class PlayersDirectoryStore {
     return filterPlayerDirectoryCards(this.rankedPlayers(), this.filters());
   });
 
-  readonly totalTeamsCount = computed(() => this.sections().length);
+  readonly totalTeamsCount = computed(() => {
+    return this.sections().filter((section) => section.teamId !== UNASSIGNED_PLAYER_TEAM_ID).length;
+  });
   readonly totalPlayersCount = computed(() => this.rankedPlayers().length);
   readonly totalPlayedMatchesCount = computed(() => {
     return this.rankedPlayers().reduce((total, p) => total + p.playedMatchesCount, 0);

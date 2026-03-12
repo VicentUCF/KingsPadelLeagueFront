@@ -20,6 +20,110 @@ export interface PublicLeagueTeamCatalogEntry {
   readonly players: readonly PublicLeaguePlayerCatalogEntry[];
 }
 
+const PENDING_ROSTER_TAGLINE =
+  'Presidencia confirmada y resto de plantilla pendiente de asignación.';
+const PENDING_ROSTER_DESCRIPTION =
+  'El equipo ya tiene presidencia confirmada y solo el presidente figura en la plantilla pública hasta cerrar la asignación oficial del resto de jugadores.';
+
+export const PUBLIC_LEAGUE_PLAYER_CATALOG: readonly PublicLeaguePlayerCatalogEntry[] = [
+  createPlayer(
+    'kings-of-favar',
+    1,
+    'Vicent Ciscar',
+    'Ambas',
+    'ambas',
+    '/stock_players/player-01.svg',
+  ),
+  createPlayer(
+    'kings-of-favar',
+    2,
+    'Enric Bixquert',
+    'Ambas',
+    'ambas',
+    '/stock_players/player-02.svg',
+  ),
+  createPlayer('kings-of-favar', 3, 'Alex Pla', 'Ambas', 'ambas', '/stock_players/player-03.svg'),
+  createPlayer(
+    'kings-of-favar',
+    4,
+    'Andreu Simo',
+    'Ambas',
+    'ambas',
+    '/stock_players/player-04.svg',
+  ),
+  createPlayer('magic-city', 1, 'Adri Alvarez', 'Revés', 'reves', '/stock_players/player-03.svg'),
+  createPlayer(
+    'magic-city',
+    2,
+    'Josep Castello',
+    'Derecha',
+    'derecha',
+    '/stock_players/player-04.svg',
+  ),
+  createPlayer('titanics', 1, 'Adrian Asuncion', 'Revés', 'reves', '/stock_players/player-04.svg'),
+  createPlayer('titanics', 2, 'Brigante', 'Derecha', 'derecha', '/stock_players/player-05.svg'),
+  createPlayer('titanics', 3, 'Carles Montilla', 'Revés', 'reves', null),
+  createPlayer('titanics', 4, 'Dani Sanchez', 'Ambas', 'ambas', '/stock_players/player-01.svg'),
+  createPlayer('titanics', 5, 'Dani Manzano', 'Revés', 'reves', '/stock_players/player-02.svg'),
+  createPlayer(
+    'titanics',
+    6,
+    'David Gregori',
+    'Derecha',
+    'derecha',
+    '/stock_players/player-03.svg',
+  ),
+  createPlayer('titanics', 7, 'Emilio Esteve', 'Ambas', 'ambas', '/stock_players/player-04.svg'),
+  createPlayer('titanics', 8, 'Gabi', 'Ambas', 'ambas', '/stock_players/player-05.svg'),
+  createPlayer(
+    'titanics',
+    9,
+    'Jordi Vitoria',
+    'Derecha',
+    'derecha',
+    '/stock_players/player-06.svg',
+  ),
+  createPlayer('titanics', 10, 'Jose Sanfelix', 'Ambas', 'ambas', '/stock_players/player-01.svg'),
+  createPlayer('titanics', 11, 'Marc Ripoll', 'Derecha', 'derecha', '/stock_players/player-02.svg'),
+  createPlayer('barbaridad', 1, 'Samu', 'Revés', 'reves', '/stock_players/player-05.svg'),
+  createPlayer('barbaridad', 2, 'Miguel Esteve', 'Ambas', 'ambas', '/stock_players/player-06.svg'),
+  createPlayer('barbaridad', 3, 'Raul Bataller', 'Ambas', 'ambas', '/stock_players/player-01.svg'),
+  createPlayer(
+    'thormentadores',
+    1,
+    'Borja Vercher',
+    'Ambas',
+    'ambas',
+    '/stock_players/player-06.svg',
+  ),
+  createPlayer(
+    'thormentadores',
+    2,
+    'Ruben Marzal',
+    'Derecha',
+    'derecha',
+    '/stock_players/player-01.svg',
+  ),
+  createPlayer('thormentadores', 3, 'Tomas', 'Revés', 'reves', '/stock_players/player-02.svg'),
+  createPlayer('thormentadores', 4, 'Tono', 'Ambas', 'ambas', '/stock_players/player-03.svg'),
+  createPlayer(
+    'thormentadores',
+    5,
+    'Javi Moya',
+    'Derecha',
+    'derecha',
+    '/stock_players/player-04.svg',
+  ),
+  createPlayer(
+    'thormentadores',
+    6,
+    'Alejandro',
+    'Derecha',
+    'derecha',
+    '/stock_players/player-05.svg',
+  ),
+] as const;
+
 // Temporary public catalog used until the backend is available.
 export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[] = [
   {
@@ -28,43 +132,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Kings Of Favar',
     presidentName: 'Vicent Ciscar',
     logoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
-    tagline: 'Primer bloque de jugadores confirmado para el inicio de la temporada.',
-    identityDescription:
-      'Kings Of Favar ya cuenta con sus primeros jugadores confirmados mientras completa la plantilla con la que competirá en el arranque oficial de la temporada.',
-    players: [
-      createPlayer(
-        'kings-of-favar',
-        1,
-        'Vicent Ciscar',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-01.svg',
-      ),
-      createPlayer(
-        'kings-of-favar',
-        2,
-        'Enric Bixquert',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-02.svg',
-      ),
-      createPlayer(
-        'kings-of-favar',
-        3,
-        'Alex Pla',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-03.svg',
-      ),
-      createPlayer(
-        'kings-of-favar',
-        4,
-        'Andreu Simo',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-04.svg',
-      ),
-    ],
+    tagline: PENDING_ROSTER_TAGLINE,
+    identityDescription: PENDING_ROSTER_DESCRIPTION,
+    players: buildAssignedRoster('kings-of-favar', ['Vicent Ciscar', 'Enric Bixquert']),
   },
   {
     id: 'magic-city',
@@ -72,26 +142,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Magic City',
     presidentName: 'Adri Alvarez',
     logoPath: '/teams_logos/magic_ng_bg.png',
-    tagline: 'Equipo confirmado para la temporada 2026.',
-    identityDescription: 'Plantilla en construcción de cara al inicio de la competición.',
-    players: [
-      createPlayer(
-        'magic-city',
-        1,
-        'Adri Alvarez',
-        'Revés',
-        'reves',
-        '/stock_players/player-03.svg',
-      ),
-      createPlayer(
-        'magic-city',
-        2,
-        'Josep Castello',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-04.svg',
-      ),
-    ],
+    tagline: PENDING_ROSTER_TAGLINE,
+    identityDescription: PENDING_ROSTER_DESCRIPTION,
+    players: buildAssignedRoster('magic-city', ['Adri Alvarez']),
   },
   {
     id: 'titanics',
@@ -99,64 +152,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Titanics',
     presidentName: 'Adrian Asuncion',
     logoPath: '/teams_logos/titanics_no_bg.png',
-    tagline: 'Proyecto competitivo en formación para esta temporada.',
-    identityDescription:
-      'Equipo confirmado para la temporada 2026 con su primera base de jugadores inscritos.',
-    players: [
-      createPlayer(
-        'titanics',
-        1,
-        'Adrian Asuncion',
-        'Revés',
-        'reves',
-        '/stock_players/player-04.svg',
-      ),
-      createPlayer('titanics', 2, 'Brigante', 'Derecha', 'derecha', '/stock_players/player-05.svg'),
-      createPlayer('titanics', 3, 'Carles Montilla', 'Revés', 'reves', null),
-      createPlayer('titanics', 4, 'Dani Sanchez', 'Ambas', 'ambas', '/stock_players/player-01.svg'),
-      createPlayer('titanics', 5, 'Dani Manzano', 'Revés', 'reves', '/stock_players/player-02.svg'),
-      createPlayer(
-        'titanics',
-        6,
-        'David Gregori',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-03.svg',
-      ),
-      createPlayer(
-        'titanics',
-        7,
-        'Emilio Esteve',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-04.svg',
-      ),
-      createPlayer('titanics', 8, 'Gabi', 'Ambas', 'ambas', '/stock_players/player-05.svg'),
-      createPlayer(
-        'titanics',
-        9,
-        'Jordi Vitoria',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-06.svg',
-      ),
-      createPlayer(
-        'titanics',
-        10,
-        'Jose Sanfelix',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-01.svg',
-      ),
-      createPlayer(
-        'titanics',
-        11,
-        'Marc Ripoll',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-02.svg',
-      ),
-    ],
+    tagline: PENDING_ROSTER_TAGLINE,
+    identityDescription: PENDING_ROSTER_DESCRIPTION,
+    players: buildAssignedRoster('titanics', ['Adrian Asuncion']),
   },
   {
     id: 'barbaridad',
@@ -164,27 +162,9 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Barbaridad Team',
     presidentName: 'Samu',
     logoPath: '/teams_logos/barbarida_no_bg.png',
-    tagline: 'Equipo confirmado para la temporada 2026.',
-    identityDescription: 'Plantilla en construcción de cara al inicio de la competición.',
-    players: [
-      createPlayer('barbaridad', 1, 'Samu', 'Revés', 'reves', '/stock_players/player-05.svg'),
-      createPlayer(
-        'barbaridad',
-        2,
-        'Miguel Esteve',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-06.svg',
-      ),
-      createPlayer(
-        'barbaridad',
-        3,
-        'Raul Bataller',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-01.svg',
-      ),
-    ],
+    tagline: PENDING_ROSTER_TAGLINE,
+    identityDescription: PENDING_ROSTER_DESCRIPTION,
+    players: buildAssignedRoster('barbaridad', ['Samu']),
   },
   {
     id: 'thormentadores',
@@ -192,47 +172,21 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     name: 'Thormentadores',
     presidentName: 'Borja Vercher',
     logoPath: '/teams_logos/Thormentadores.png',
-    tagline: 'Proyecto competitivo en formación para esta temporada.',
-    identityDescription:
-      'Equipo confirmado para la temporada 2026 con su primera base de jugadores inscritos.',
-    players: [
-      createPlayer(
-        'thormentadores',
-        1,
-        'Borja Vercher',
-        'Ambas',
-        'ambas',
-        '/stock_players/player-06.svg',
-      ),
-      createPlayer(
-        'thormentadores',
-        2,
-        'Ruben Marzal',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-01.svg',
-      ),
-      createPlayer('thormentadores', 3, 'Tomas', 'Revés', 'reves', '/stock_players/player-02.svg'),
-      createPlayer('thormentadores', 4, 'Tono', 'Ambas', 'ambas', '/stock_players/player-03.svg'),
-      createPlayer(
-        'thormentadores',
-        5,
-        'Javi Moya',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-04.svg',
-      ),
-      createPlayer(
-        'thormentadores',
-        6,
-        'Alejandro',
-        'Derecha',
-        'derecha',
-        '/stock_players/player-05.svg',
-      ),
-    ],
+    tagline: PENDING_ROSTER_TAGLINE,
+    identityDescription: PENDING_ROSTER_DESCRIPTION,
+    players: buildAssignedRoster('thormentadores', ['Borja Vercher']),
   },
 ] as const;
+
+function buildAssignedRoster(
+  teamId: string,
+  assignedPlayerNames: readonly string[],
+): readonly PublicLeaguePlayerCatalogEntry[] {
+  return PUBLIC_LEAGUE_PLAYER_CATALOG.filter(
+    (player) =>
+      player.id.startsWith(`${teamId}-`) && assignedPlayerNames.includes(player.displayName),
+  );
+}
 
 function createPlayer(
   teamId: string,
