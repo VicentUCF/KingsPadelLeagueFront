@@ -121,10 +121,25 @@
     &__hero,
     &__selector-panel {
       padding: var(--space-4);
+      border-radius: 1.35rem;
     }
 
     &__retry {
       width: 100%;
+    }
+  }
+}
+
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  .league-teams-page {
+    &__layout {
+      grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    &__layout > app-team-showcase-hero {
+      display: block;
+      min-width: 0;
     }
   }
 }
