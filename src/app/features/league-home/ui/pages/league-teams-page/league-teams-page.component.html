@@ -20,11 +20,9 @@
       <div class="league-teams-page__layout">
         <section aria-labelledby="team-selector-title" class="league-teams-page__selector-panel">
           <div class="league-teams-page__selector-heading">
-            <p class="league-teams-page__selector-kicker" id="team-selector-title">
-              Selector de escudos
-            </p>
+            <p class="league-teams-page__selector-kicker" id="team-selector-title">Equipos</p>
             <p class="league-teams-page__selector-copy">
-              Cambia de equipo para actualizar el preview y entrar directamente a su perfil.
+              Selecciona un equipo para consultar su perfil oficial.
             </p>
           </div>
 
@@ -36,7 +34,7 @@
         </section>
 
         <app-team-showcase-hero
-          [actionLabel]="'Ver equipo completo'"
+          [actionLabel]="'Ver plantilla completa'"
           [actionLink]="selectedTeam.teamLink"
           [team]="selectedTeam"
         />

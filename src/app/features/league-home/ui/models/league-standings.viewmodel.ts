@@ -5,7 +5,7 @@ import { toLeagueHomeViewModel, type StandingsRowViewModel } from './league-home
 export interface LeagueStandingsPageViewModel {
   readonly eyebrow: string;
   readonly title: string;
-  readonly seasonLabel: string;
+  readonly description: string;
   readonly currentMatchdayLabel: string;
   readonly phaseLabel: string;
   readonly tableCaption: string;
@@ -20,8 +20,9 @@ export function toLeagueStandingsPageViewModel(
 
   return {
     eyebrow: 'Clasificación',
-    title: snapshot.league.name,
-    seasonLabel: snapshot.league.seasonLabel,
+    title: `Clasificación oficial de la temporada ${snapshot.league.seasonLabel.replace('Temporada ', '')}`,
+    description:
+      'Consulta la tabla de equipos de la KingsPadelLeague y sigue la evolución de la competición jornada a jornada.',
     currentMatchdayLabel: snapshot.currentMatchday.label,
     phaseLabel: snapshot.currentPhase.label,
     tableCaption: `Clasificación de ${snapshot.league.name}`,

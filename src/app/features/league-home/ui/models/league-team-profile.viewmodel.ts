@@ -24,9 +24,8 @@ export function toLeagueTeamProfilePageViewModel(
 
   return {
     team,
-    eyebrow: 'Team spotlight',
+    eyebrow: 'Plantilla oficial',
     rosterTitle: 'Plantilla del equipo',
-    rosterDescription:
-      'La plantilla usa un icono temporal hasta disponer de fotografía editorial real.',
+    rosterDescription: 'Jugadores inscritos en la plantilla oficial del equipo.',
   };
 }

@@ -194,7 +194,7 @@ function toNextSectionTitle(phaseCode: LeagueHomeSnapshot['currentPhase']['code'
   }
 
   if (phaseCode === 'preseason') {
-    return 'Calendario pendiente';
+    return 'Calendario de la temporada';
   }
 
   return 'Próxima jornada';

@@ -81,7 +81,7 @@ export class LeagueTeamsPageComponent implements OnInit {
     this.meta.updateTag({
       name: 'description',
       content:
-        'Descubre la identidad visual y la plantilla completa de cada equipo de KingsPadelLeague desde una selección interactiva.',
+        'Conoce los equipos participantes de la KingsPadelLeague, su plantilla y su situación actual en la temporada.',
     });
 
     void this.store.load();

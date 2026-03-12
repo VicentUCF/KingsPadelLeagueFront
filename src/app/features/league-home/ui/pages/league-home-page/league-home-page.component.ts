@@ -51,13 +51,13 @@ export class LeagueHomePageComponent implements OnInit {
   protected readonly playersIcon = Users;
   protected readonly nextMatchdayEmptyActions: readonly EmptyStateAction[] = [
     {
-      label: 'Explorar equipos inscritos',
+      label: 'Ver equipos inscritos',
       href: '/equipos',
       tone: 'primary',
       icon: this.teamsIcon,
     },
     {
-      label: 'Consultar jugadores publicados',
+      label: 'Consultar jugadores',
       href: '/jugadores',
       tone: 'secondary',
       icon: this.playersIcon,
@@ -65,13 +65,13 @@ export class LeagueHomePageComponent implements OnInit {
   ];
   protected readonly resultsEmptyActions: readonly EmptyStateAction[] = [
     {
-      label: 'Ir a la clasificación actual',
+      label: 'Ver clasificación',
       href: '/clasificacion',
       tone: 'primary',
       icon: this.standingsIcon,
     },
     {
-      label: 'Ver equipos y plantillas',
+      label: 'Ver equipos',
       href: '/equipos',
       tone: 'secondary',
       icon: this.teamsIcon,
@@ -79,7 +79,7 @@ export class LeagueHomePageComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.title.setTitle('KingsPadelLeague | Liga de Pádel Competitiva');
+    this.title.setTitle('KingsPadelLeague | Liga amateur de pádel por equipos');
     this.meta.updateTag({
       name: 'description',
       content: applicationMetadata.description,

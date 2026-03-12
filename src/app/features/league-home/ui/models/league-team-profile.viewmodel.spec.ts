@@ -50,7 +50,7 @@ describe('toLeagueTeamProfilePageViewModel', () => {
         currentMatchday: {
           current: 0,
           total: 0,
-          label: 'Calendario pendiente de publicación',
+          label: 'Por anunciar',
         },
         standings: [
           {
@@ -71,8 +71,8 @@ describe('toLeagueTeamProfilePageViewModel', () => {
 
     expect(viewModel?.team).toEqual(
       expect.objectContaining({
-        nextMatchLabel: 'Calendario pendiente de publicación',
-        latestResultLabel: 'Todavía no hay resultado reciente publicado.',
+        nextMatchLabel: 'Por anunciar',
+        latestResultLabel: 'Aún no se ha disputado ningún partido oficial.',
         facts: expect.arrayContaining([
           expect.objectContaining({
             label: 'Clasificación',
@@ -80,7 +80,7 @@ describe('toLeagueTeamProfilePageViewModel', () => {
           }),
           expect.objectContaining({
             label: 'Próxima cita',
-            value: 'Calendario pendiente de publicación',
+            value: 'Por anunciar',
           }),
         ]),
       }),
@@ -92,7 +92,7 @@ function createSnapshot(): LeagueHomeSnapshot {
   return {
     league: {
       name: 'KingsPadelLeague',
-      tagline: 'La liga de pádel competitiva',
+      tagline: 'Liga amateur de pádel por equipos con formato competitivo.',
       seasonLabel: 'Temporada 1',
     },
     currentPhase: {

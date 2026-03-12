@@ -84,7 +84,7 @@ function toTeamShowcaseViewModel(
     logoPath: branding.logoPath,
     monogram: branding.monogram,
     palette: branding.palette,
-    playerCountLabel: `${teamProfile.players.length} jugadores en rotación`,
+    playerCountLabel: `${teamProfile.players.length} jugadores inscritos`,
     teamLink: `/equipos/${teamProfile.slug}`,
     pulseLabel: `${snapshot.currentMatchday.label} · ${snapshot.currentPhase.label}`,
     nextMatchLabel: createNextMatchLabel(
@@ -145,7 +145,7 @@ function createNextMatchLabel(
   }
 
   if (!nextMatch) {
-    return byeMatchdayLabel ? 'Sin partido anunciado' : 'Calendario pendiente de publicación';
+    return byeMatchdayLabel ? 'Sin partido anunciado' : 'Por anunciar';
   }
 
   const opponentName =
@@ -159,7 +159,7 @@ function createLatestResultLabel(
   teamName: string,
 ): string {
   if (!latestResult) {
-    return 'Todavía no hay resultado reciente publicado.';
+    return 'Aún no se ha disputado ningún partido oficial.';
   }
 
   if (latestResult.winnerTeamName === teamName) {

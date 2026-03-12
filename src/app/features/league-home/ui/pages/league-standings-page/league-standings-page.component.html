@@ -12,8 +12,9 @@
 
       <div class="league-standings-page__hero-main">
         <div class="league-standings-page__hero-copy">
-          <h3>{{ viewModel.seasonLabel }}</h3>
+          <h3>{{ viewModel.eyebrow }}</h3>
           <h1>{{ viewModel.title }}</h1>
+          <p class="league-standings-page__hero-description">{{ viewModel.description }}</p>
 
           <p class="league-standings-page__hero-meta">
             <span>{{ viewModel.currentMatchdayLabel }}</span>
@@ -40,7 +41,7 @@
 
     <section aria-labelledby="standings-tiebreaks-title" class="league-standings-page__tiebreaks">
       <p class="league-standings-page__tiebreaks-kicker" id="standings-tiebreaks-title">
-        Desempates
+        Criterios de desempate
       </p>
 
       <ol class="league-standings-page__tiebreaks-list">
@@ -68,7 +69,7 @@
 } @else {
   <section class="o-container league-standings-page__status-panel">
     <app-empty-state
-      [description]="'Todavía no hay datos publicados para construir la clasificación.'"
+      [description]="'La clasificación se activará tras la disputa de la primera jornada oficial.'"
       [title]="'No hay clasificación disponible'"
     />
   </section>

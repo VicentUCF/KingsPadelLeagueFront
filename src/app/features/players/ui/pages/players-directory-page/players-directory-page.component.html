@@ -5,10 +5,10 @@
 
   <div class="players-directory-page__hero-row">
     <div class="o-stack o-stack--compact">
-      <h1>Directorio de jugadores</h1>
+      <h1>Jugadores de la KingsPadelLeague</h1>
       <p>
-        Consulta los nombres ya publicados por equipo y posición. Las estadísticas competitivas se
-        activarán cuando arranque la competición.
+        Consulta la plantilla de jugadores inscritos en la competición y filtra por equipo o lado de
+        juego.
       </p>
     </div>
 
@@ -113,7 +113,7 @@
 
   <div class="players-directory-page__filters-footer">
     <p class="players-directory-page__filters-summary" role="status">
-      {{ store.filteredPlayers().length }} jugadores visibles
+      {{ store.filteredPlayers().length }} jugadores inscritos
     </p>
 
     @if (store.hasActiveFilters()) {
@@ -160,6 +160,10 @@
         <span class="players-directory-page__col players-directory-page__col--wr">%</span>
       </div>
 
+      <p class="players-directory-page__metrics-legend">
+        G: juegos ganados · P: juegos perdidos · PJ: partidos jugados · %: porcentaje de victorias
+      </p>
+
       <ol class="players-directory-page__ranking" aria-label="Directorio de jugadores">
         @for (player of store.filteredPlayers(); track player.id) {
           <li>
@@ -172,6 +176,6 @@
 } @else {
   <app-empty-state
     [description]="'Cuando carguemos las plantillas, los perfiles aparecerán aquí.'"
-    [title]="'Todavía no hay jugadores publicados'"
+    [title]="'Todavía no hay jugadores inscritos'"
   />
 }

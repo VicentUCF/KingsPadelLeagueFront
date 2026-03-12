@@ -24,7 +24,7 @@ describe('LeagueTeamProfilePageComponent', () => {
     expect(await screen.findByRole('heading', { name: /^Titanics$/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Plantilla del equipo/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Adrian Asuncion/i, level: 3 })).toBeVisible();
-    expect(screen.getByText(/Calendario pendiente de publicación · Pretemporada/i)).toBeVisible();
+    expect(screen.getByText(/Calendario oficial próximamente · Pretemporada/i)).toBeVisible();
   });
 
   it('updates the rendered profile when the slug changes on the same component instance', async () => {
