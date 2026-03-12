@@ -82,6 +82,30 @@ describe('StandingsTableComponent', () => {
     expect(screen.getByText('-7')).toBeVisible();
   });
 
+  it('renders stacked cards on narrow viewports', async () => {
+    const restoreMatchMedia = mockMatchMedia(false);
+
+    try {
+      await render(StandingsTableComponent, {
+        providers: [provideRouter([])],
+        inputs: {
+          rows,
+        },
+      });
+
+      expect(screen.queryByRole('table', { name: /Clasificación actual/i })).toBeNull();
+      expect(screen.getByRole('list', { name: /Clasificación actual/i })).toBeVisible();
+      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      expect(screen.getByRole('link', { name: /House Navarro/i })).toHaveAttribute(
+        'href',
+        '/equipos/house-navarro',
+      );
+      expect(screen.getByText('11 pts')).toBeVisible();
+    } finally {
+      restoreMatchMedia();
+    }
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = await render(StandingsTableComponent, {
       providers: [provideRouter([])],
@@ -101,5 +125,32 @@ function createPalette() {
     surface: '#24150b',
     glow: 'rgb(243 200 75 / 0.46)',
     contrast: '#0d0904',
+  };
+}
+
+function mockMatchMedia(matches: boolean) {
+  const originalMatchMedia = window.matchMedia;
+
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: jest.fn().mockImplementation(() => ({
+      matches,
+      media: '(min-width: 48rem)',
+      onchange: null,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
+
+  return () => {
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: originalMatchMedia,
+    });
   };
 }

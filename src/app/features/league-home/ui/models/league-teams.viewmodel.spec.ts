@@ -20,7 +20,7 @@ function createSnapshot(): LeagueHomeSnapshot {
   return {
     league: {
       name: 'KingsPadelLeague',
-      tagline: 'Liga amateur de pádel por equipos con formato competitivo.',
+      tagline: 'Liga amateur de pádel',
       seasonLabel: 'Temporada 1',
     },
     currentPhase: {

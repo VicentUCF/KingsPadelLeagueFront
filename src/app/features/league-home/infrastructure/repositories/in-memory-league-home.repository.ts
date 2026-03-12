@@ -20,7 +20,7 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
     return {
       league: {
         name: 'KingsPadelLeague',
-        tagline: 'Liga amateur de pádel por equipos con formato competitivo.',
+        tagline: 'Liga amateur de pádel',
         seasonLabel: 'Temporada 2026',
       },
       currentPhase: {

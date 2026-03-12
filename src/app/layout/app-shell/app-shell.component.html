@@ -52,6 +52,21 @@
       class="app-shell__nav"
       id="primary-navigation"
     >
+      <div aria-hidden="true" class="app-shell__nav-drawer-header">
+        <span class="app-shell__nav-drawer-mark">
+          <img
+            alt=""
+            class="app-shell__brand-image"
+            decoding="async"
+            height="135"
+            loading="lazy"
+            [src]="applicationMetadata.logoPath"
+            width="318"
+          />
+        </span>
+        <span class="app-shell__nav-drawer-name">{{ applicationMetadata.name }}</span>
+      </div>
+
       @for (navigationItem of primaryNavigation; track navigationItem.path) {
         <a
           class="app-shell__nav-link"

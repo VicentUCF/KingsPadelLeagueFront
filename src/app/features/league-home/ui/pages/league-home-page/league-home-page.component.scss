@@ -1,18 +1,20 @@
 .league-home-page {
   &__sections {
     display: grid;
-    gap: var(--space-10);
-    padding-block: var(--space-9) var(--space-12);
+    gap: var(--space-8);
+    padding-block: var(--space-7) var(--space-10);
   }
 
   &__section {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
+    min-width: 0;
   }
 
   &__section-heading {
     display: grid;
     gap: var(--space-3);
+    min-width: 0;
 
     h2 {
       margin: 0;
@@ -40,7 +42,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 3rem;
     padding-inline: var(--space-4);
     border: 1px solid var(--color-border-subtle);
@@ -48,6 +52,8 @@
     background: rgb(255 255 255 / 0.02);
     color: var(--color-text-strong);
     font-weight: 700;
+    overflow-wrap: anywhere;
+    text-align: center;
     text-decoration: none;
   }
 
@@ -55,7 +61,7 @@
   &__results-grid,
   &__teams-grid {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
 
   &__status-panel {
@@ -85,6 +91,7 @@
   }
 
   &__retry {
+    width: 100%;
     min-height: 3rem;
     padding-inline: var(--space-5);
     border: 0;
@@ -94,46 +101,39 @@
     font: inherit;
     font-weight: 700;
   }
-}
-
-@media (max-width: 47.999rem) {
-  .league-home-page {
-    .empty-state--feature {
-      min-height: 0;
-    }
-
-    &__sections {
-      gap: var(--space-8);
-      padding-block: var(--space-7) var(--space-10);
-    }
-
-    &__section {
-      gap: var(--space-4);
-    }
-
-    &__section-link,
-    &__retry {
-      width: 100%;
-    }
-
-    &__match-grid,
-    &__results-grid,
-    &__teams-grid {
-      gap: var(--space-4);
-    }
+  .empty-state--feature {
+    min-height: 0;
   }
 }
 
 @media (min-width: 48rem) {
   .league-home-page {
+    &__sections {
+      gap: var(--space-10);
+      padding-block: var(--space-9) var(--space-12);
+    }
+
+    &__section {
+      gap: var(--space-5);
+    }
+
     &__section-heading--split {
       grid-template-columns: 1fr auto;
+    }
+
+    &__section-link {
+      width: fit-content;
     }
 
     &__match-grid,
     &__results-grid,
     &__teams-grid {
+      gap: var(--space-5);
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__retry {
+      width: auto;
     }
   }
 }

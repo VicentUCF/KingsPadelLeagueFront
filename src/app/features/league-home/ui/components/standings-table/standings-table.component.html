@@ -1,58 +1,132 @@
-<div class="standings-table__scroll">
-  <table class="standings-table__table">
-    <caption class="u-visually-hidden">
-      {{
-        caption()
-      }}
-    </caption>
+@if (usesTableLayout()) {
+  <div class="standings-table__scroll">
+    <table class="standings-table__table">
+      <caption class="u-visually-hidden">
+        {{
+          caption()
+        }}
+      </caption>
 
-    <colgroup>
-      <col class="standings-table__column standings-table__column--rank" />
-      <col class="standings-table__column standings-table__column--team" />
-      <col class="standings-table__column standings-table__column--metric" />
-      <col class="standings-table__column standings-table__column--metric" />
-      <col class="standings-table__column standings-table__column--metric" />
-    </colgroup>
+      <colgroup>
+        <col class="standings-table__column standings-table__column--rank" />
+        <col class="standings-table__column standings-table__column--team" />
+        <col class="standings-table__column standings-table__column--metric" />
+        <col class="standings-table__column standings-table__column--metric" />
+        <col class="standings-table__column standings-table__column--metric" />
+      </colgroup>
 
-    <thead>
-      <tr class="standings-table__header-row">
-        <th class="standings-table__header-cell standings-table__header-cell--rank" scope="col">
-          Rank
-        </th>
-        <th class="standings-table__header-cell standings-table__header-cell--team" scope="col">
-          Equipo
-        </th>
-        <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
-          Puntos
-        </th>
-        <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
-          Partidos
-        </th>
-        <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
-          Dif Juegos
-        </th>
-      </tr>
-    </thead>
+      <thead>
+        <tr class="standings-table__header-row">
+          <th class="standings-table__header-cell standings-table__header-cell--rank" scope="col">
+            Rank
+          </th>
+          <th class="standings-table__header-cell standings-table__header-cell--team" scope="col">
+            Equipo
+          </th>
+          <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
+            Puntos
+          </th>
+          <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
+            Partidos
+          </th>
+          <th class="standings-table__header-cell standings-table__header-cell--metric" scope="col">
+            Dif Juegos
+          </th>
+        </tr>
+      </thead>
 
-    <tbody>
-      @for (row of rows(); track row.teamId) {
-        <tr
-          [class.standings-table__row--leader]="row.isLeader"
-          [class.standings-table__row--podium]="row.rankTone === 'podium'"
-          class="standings-table__row"
-        >
-          <td class="standings-table__rank" data-label="Rank">
-            <span class="standings-table__cell-label">Rank</span>
+      <tbody>
+        @for (row of rows(); track row.teamId) {
+          <tr
+            [class.standings-table__row--leader]="row.isLeader"
+            [class.standings-table__row--podium]="row.rankTone === 'podium'"
+            class="standings-table__row"
+          >
+            <td class="standings-table__rank" data-label="Rank">
+              <span class="standings-table__cell-label">Rank</span>
+              <app-rank-indicator
+                [compact]="true"
+                [isLast]="row.isLast"
+                [isLeader]="row.isLeader"
+                [rank]="row.rank"
+              />
+            </td>
+
+            <th class="standings-table__team" scope="row">
+              <span class="standings-table__cell-label">Equipo</span>
+              <app-team-badge
+                [compact]="true"
+                [interactive]="true"
+                [logoPath]="row.logoPath"
+                [monogram]="row.monogram"
+                [teamLink]="row.teamLink"
+                [teamName]="row.teamName"
+              />
+            </th>
+
+            <td class="standings-table__metric standings-table__metric--points" data-label="Puntos">
+              <span class="standings-table__cell-label">Puntos</span>
+              <span class="standings-table__metric-block">
+                <span class="standings-table__cell-value standings-table__cell-value--metric">
+                  {{ row.pointsLabel }}
+                </span>
+              </span>
+            </td>
+
+            <td
+              class="standings-table__metric standings-table__metric--played"
+              data-label="Partidos"
+            >
+              <span class="standings-table__cell-label">Partidos</span>
+              <span class="standings-table__metric-block">
+                <span class="standings-table__cell-value standings-table__cell-value--metric">
+                  {{ row.playedMatchesLabel }}
+                </span>
+              </span>
+            </td>
+
+            <td
+              [class.standings-table__metric--negative]="row.gameDifferenceTone === 'negative'"
+              [class.standings-table__metric--neutral]="row.gameDifferenceTone === 'neutral'"
+              [class.standings-table__metric--positive]="row.gameDifferenceTone === 'positive'"
+              class="standings-table__metric standings-table__metric--difference"
+              data-label="Dif Juegos"
+            >
+              <span class="standings-table__cell-label">Dif Juegos</span>
+              <span class="standings-table__metric-block">
+                <span
+                  class="standings-table__cell-value standings-table__cell-value--difference standings-table__cell-value--metric"
+                >
+                  {{ row.gameDifferenceLabel }}
+                </span>
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <ul [attr.aria-label]="caption()" class="standings-table__cards">
+    @for (row of rows(); track row.teamId) {
+      <li
+        [class.standings-table__card--leader]="row.isLeader"
+        [class.standings-table__card--podium]="row.rankTone === 'podium'"
+        class="standings-table__card"
+      >
+        <div class="standings-table__card-header">
+          <div class="standings-table__card-rank">
+            <span class="standings-table__card-label">Rank</span>
             <app-rank-indicator
               [compact]="true"
               [isLast]="row.isLast"
               [isLeader]="row.isLeader"
               [rank]="row.rank"
             />
-          </td>
+          </div>
 
-          <th class="standings-table__team" scope="row">
-            <span class="standings-table__cell-label">Equipo</span>
+          <div class="standings-table__card-team">
+            <span class="standings-table__card-label">Equipo</span>
             <app-team-badge
               [compact]="true"
               [interactive]="true"
@@ -61,44 +135,31 @@
               [teamLink]="row.teamLink"
               [teamName]="row.teamName"
             />
-          </th>
+          </div>
+        </div>
 
-          <td class="standings-table__metric" data-label="Puntos">
-            <span class="standings-table__cell-label">Puntos</span>
-            <span class="standings-table__metric-block">
-              <span class="standings-table__cell-value standings-table__cell-value--metric">
-                {{ row.pointsLabel }}
-              </span>
-            </span>
-          </td>
+        <dl class="standings-table__card-metrics">
+          <div class="standings-table__card-metric standings-table__card-metric--points">
+            <dt class="standings-table__card-label">Puntos</dt>
+            <dd class="standings-table__card-value">{{ row.pointsLabel }}</dd>
+          </div>
 
-          <td class="standings-table__metric" data-label="Partidos">
-            <span class="standings-table__cell-label">Partidos</span>
-            <span class="standings-table__metric-block">
-              <span class="standings-table__cell-value standings-table__cell-value--metric">
-                {{ row.playedMatchesLabel }}
-              </span>
-            </span>
-          </td>
+          <div class="standings-table__card-metric standings-table__card-metric--played">
+            <dt class="standings-table__card-label">Partidos</dt>
+            <dd class="standings-table__card-value">{{ row.playedMatchesLabel }}</dd>
+          </div>
 
-          <td
-            [class.standings-table__metric--negative]="row.gameDifferenceTone === 'negative'"
-            [class.standings-table__metric--neutral]="row.gameDifferenceTone === 'neutral'"
-            [class.standings-table__metric--positive]="row.gameDifferenceTone === 'positive'"
-            class="standings-table__metric standings-table__metric--difference"
-            data-label="Dif Juegos"
+          <div
+            [class.standings-table__card-metric--negative]="row.gameDifferenceTone === 'negative'"
+            [class.standings-table__card-metric--neutral]="row.gameDifferenceTone === 'neutral'"
+            [class.standings-table__card-metric--positive]="row.gameDifferenceTone === 'positive'"
+            class="standings-table__card-metric standings-table__card-metric--difference"
           >
-            <span class="standings-table__cell-label">Dif Juegos</span>
-            <span class="standings-table__metric-block">
-              <span
-                class="standings-table__cell-value standings-table__cell-value--difference standings-table__cell-value--metric"
-              >
-                {{ row.gameDifferenceLabel }}
-              </span>
-            </span>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
+            <dt class="standings-table__card-label">Dif Juegos</dt>
+            <dd class="standings-table__card-value">{{ row.gameDifferenceLabel }}</dd>
+          </div>
+        </dl>
+      </li>
+    }
+  </ul>
+}
