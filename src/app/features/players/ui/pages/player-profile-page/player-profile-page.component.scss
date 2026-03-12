@@ -284,20 +284,27 @@
   .player-profile-page {
     &__layout {
       grid-template-columns: 1fr;
+      justify-items: center;
+      gap: var(--space-5);
     }
     &__brand-watermark {
-      inset: 5rem -2rem auto auto;
+      inset: 0;
+      justify-items: center;
+      align-items: start;
+      padding-top: clamp(2.75rem, 8vw, 4.5rem);
     }
     &__brand-watermark-image {
-      width: min(85vw, 28rem);
-      opacity: 0.07;
+      width: min(92vw, 30rem);
+      opacity: 0.1;
     }
     &__brand-watermark-monogram {
-      font-size: clamp(7rem, 34vw, 12rem);
-      opacity: 0.07;
+      margin-inline-end: 0;
+      font-size: clamp(7.5rem, 38vw, 13rem);
+      opacity: 0.1;
     }
     &__detail {
       padding-top: 0;
+      width: 100%;
     }
   }
 }
