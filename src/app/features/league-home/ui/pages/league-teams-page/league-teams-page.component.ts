@@ -7,9 +7,9 @@ import {
   signal,
   type OnInit,
 } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { LucideAngularModule, Shield } from 'lucide-angular';
 
+import { SeoService } from '@core/services/seo.service';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
 import { TeamSelectorComponent } from '../../components/team-selector/team-selector.component';
@@ -37,8 +37,7 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   styleUrl: './league-teams-page.component.scss',
 })
 export class LeagueTeamsPageComponent implements OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
 
   protected readonly store = inject(LeagueHomeStore);
   protected readonly teamsIcon = Shield;
@@ -77,11 +76,11 @@ export class LeagueTeamsPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.title.setTitle('Equipos | KingsPadelLeague');
-    this.meta.updateTag({
-      name: 'description',
-      content:
+    this.seo.setPage({
+      title: 'Equipos | KingsPadelLeague',
+      description:
         'Conoce los equipos participantes de la KingsPadelLeague, su plantilla y su situación actual en la temporada.',
+      path: '/equipos',
     });
 
     void this.store.load();

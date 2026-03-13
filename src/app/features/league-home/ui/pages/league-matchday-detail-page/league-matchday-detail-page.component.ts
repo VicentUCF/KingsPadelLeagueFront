@@ -8,9 +8,10 @@ import {
   type OnDestroy,
   type OnInit,
 } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArrowLeft, LucideAngularModule, Swords } from 'lucide-angular';
+
+import { SeoService } from '@core/services/seo.service';
 import { Subscription } from 'rxjs';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
@@ -41,8 +42,7 @@ import { LeagueMatchdaysStore } from '../../state/league-matchdays.store';
   styleUrl: './league-matchday-detail-page.component.scss',
 })
 export class LeagueMatchdayDetailPageComponent implements OnDestroy, OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
   private readonly route = inject(ActivatedRoute);
   private readonly routeSubscription = new Subscription();
 
@@ -68,31 +68,31 @@ export class LeagueMatchdayDetailPageComponent implements OnDestroy, OnInit {
       const viewModel = this.viewModel();
 
       if (viewModel) {
-        this.title.setTitle(`${viewModel.title} | KingsPadelLeague`);
-        this.meta.updateTag({
-          name: 'description',
-          content: `${viewModel.title}: ${viewModel.description}`,
+        this.seo.setPage({
+          title: `${viewModel.title} | KingsPadelLeague`,
+          description: `${viewModel.title}: ${viewModel.description}`,
+          path: `/jornadas/${this.matchdayId()}`,
         });
 
         return;
       }
 
       if (this.isMatchdayMissing()) {
-        this.title.setTitle('Jornada no encontrada | KingsPadelLeague');
-        this.meta.updateTag({
-          name: 'description',
-          content:
+        this.seo.setPage({
+          title: 'Jornada no encontrada | KingsPadelLeague',
+          description:
             'No hemos encontrado la jornada solicitada. Vuelve al listado para abrir otra jornada publicada.',
+          path: '/jornadas',
         });
 
         return;
       }
 
-      this.title.setTitle('Jornadas | KingsPadelLeague');
-      this.meta.updateTag({
-        name: 'description',
-        content:
+      this.seo.setPage({
+        title: 'Jornadas | KingsPadelLeague',
+        description:
           'Consulta las jornadas de KingsPadelLeague para revisar cruces y resultados por pareja.',
+        path: '/jornadas',
       });
     });
   }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, type OnInit } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 
+import { SeoService } from '@core/services/seo.service';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
 import { PlayerCardComponent } from '../../components/player-card/player-card.component';
@@ -18,17 +18,16 @@ import { PlayersDirectoryStore } from '../../state/players-directory.store';
   styleUrl: './players-directory-page.component.scss',
 })
 export class PlayersDirectoryPageComponent implements OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
 
   protected readonly store = inject(PlayersDirectoryStore);
 
   ngOnInit(): void {
-    this.title.setTitle('Jugadores | KingsPadelLeague');
-    this.meta.updateTag({
-      name: 'description',
-      content:
+    this.seo.setPage({
+      title: 'Jugadores | KingsPadelLeague',
+      description:
         'Descubre los jugadores inscritos en la KingsPadelLeague y consulta su equipo, lado de juego y estadísticas.',
+      path: '/jugadores',
     });
 
     void this.store.load();

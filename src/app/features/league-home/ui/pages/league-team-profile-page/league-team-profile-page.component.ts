@@ -8,11 +8,11 @@ import {
   type OnDestroy,
   type OnInit,
 } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArrowLeft, LucideAngularModule, Users } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 
+import { SeoService } from '@core/services/seo.service';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
 import { TeamPlayerCardComponent } from '../../components/team-player-card/team-player-card.component';
@@ -41,8 +41,7 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   styleUrl: './league-team-profile-page.component.scss',
 })
 export class LeagueTeamProfilePageComponent implements OnDestroy, OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
   private readonly route = inject(ActivatedRoute);
   private readonly routeSubscription = new Subscription();
 
@@ -70,31 +69,51 @@ export class LeagueTeamProfilePageComponent implements OnDestroy, OnInit {
       const viewModel = this.viewModel();
 
       if (viewModel) {
-        this.title.setTitle(`${viewModel.team.name} | KingsPadelLeague`);
-        this.meta.updateTag({
-          name: 'description',
-          content: `${viewModel.team.name}: ${viewModel.team.tagline}. Explora la identidad del equipo y la plantilla completa de KingsPadelLeague.`,
+        const description = `${viewModel.team.name}: ${viewModel.team.tagline}. Explora la identidad del equipo y la plantilla completa de KingsPadelLeague.`;
+
+        this.seo.setPage({
+          title: `${viewModel.team.name} | KingsPadelLeague`,
+          description,
+          path: `/equipos/${this.teamSlug()}`,
+          ogImage: viewModel.team.logoPath
+            ? `https://kingspadelleague.com${viewModel.team.logoPath}`
+            : undefined,
+        });
+        this.seo.setJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'SportsTeam',
+          name: viewModel.team.name,
+          url: `https://kingspadelleague.com/equipos/${this.teamSlug()}`,
+          sport: 'Paddle Tennis',
+          description,
+          memberOf: {
+            '@type': 'SportsOrganization',
+            name: 'KingsPadelLeague',
+            url: 'https://kingspadelleague.com/',
+          },
         });
 
         return;
       }
+
+      this.seo.removeJsonLd();
 
       if (this.isTeamMissing()) {
-        this.title.setTitle('Equipo no encontrado | KingsPadelLeague');
-        this.meta.updateTag({
-          name: 'description',
-          content:
+        this.seo.setPage({
+          title: 'Equipo no encontrado | KingsPadelLeague',
+          description:
             'No hemos encontrado el equipo solicitado. Vuelve al selector de equipos para abrir otro perfil.',
+          path: '/equipos',
         });
 
         return;
       }
 
-      this.title.setTitle('Equipos | KingsPadelLeague');
-      this.meta.updateTag({
-        name: 'description',
-        content:
+      this.seo.setPage({
+        title: 'Equipos | KingsPadelLeague',
+        description:
           'Explora la identidad visual y la plantilla completa de cada equipo de KingsPadelLeague.',
+        path: '/equipos',
       });
     });
   }
@@ -111,6 +130,7 @@ export class LeagueTeamProfilePageComponent implements OnDestroy, OnInit {
 
   ngOnDestroy(): void {
     this.routeSubscription.unsubscribe();
+    this.seo.removeJsonLd();
   }
 
   protected reloadSnapshot(): void {

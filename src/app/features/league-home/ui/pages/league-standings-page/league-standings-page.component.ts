@@ -1,8 +1,8 @@
 import { computed, ChangeDetectionStrategy, Component, inject, type OnInit } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { CalendarDays, LucideAngularModule, Swords, Table2 } from 'lucide-angular';
 
+import { SeoService } from '@core/services/seo.service';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
 import { StandingsTableComponent } from '../../components/standings-table/standings-table.component';
@@ -24,8 +24,7 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   styleUrl: './league-standings-page.component.scss',
 })
 export class LeagueStandingsPageComponent implements OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
 
   protected readonly store = inject(LeagueHomeStore);
 
@@ -40,11 +39,11 @@ export class LeagueStandingsPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.title.setTitle('Clasificación | KingsPadelLeague');
-    this.meta.updateTag({
-      name: 'description',
-      content:
+    this.seo.setPage({
+      title: 'Clasificación | KingsPadelLeague',
+      description:
         'Consulta la clasificación oficial de la KingsPadelLeague y sigue la evolución de los equipos durante la temporada.',
+      path: '/clasificacion',
     });
 
     void this.store.load();

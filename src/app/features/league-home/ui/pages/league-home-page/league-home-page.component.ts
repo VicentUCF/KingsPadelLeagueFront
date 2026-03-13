@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, type OnInit } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { CalendarDays, LucideAngularModule, Shield, Table2, Trophy, Users } from 'lucide-angular';
 
 import { applicationMetadata } from '@core/config/application-metadata';
+import { SeoService } from '@core/services/seo.service';
 import {
   EmptyStateComponent,
   type EmptyStateAction,
@@ -39,8 +39,7 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   styleUrl: './league-home-page.component.scss',
 })
 export class LeagueHomePageComponent implements OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
 
   protected readonly store = inject(LeagueHomeStore);
 
@@ -79,10 +78,32 @@ export class LeagueHomePageComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.title.setTitle('KingsPadelLeague | Liga amateur de pádel por equipos');
-    this.meta.updateTag({
-      name: 'description',
-      content: applicationMetadata.description,
+    this.seo.setPage({
+      title: 'KingsPadelLeague | Liga amateur de pádel por equipos',
+      description: applicationMetadata.description,
+      path: '/',
+    });
+    this.seo.setJsonLd({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          '@id': 'https://kingspadelleague.com/#website',
+          url: 'https://kingspadelleague.com/',
+          name: applicationMetadata.name,
+          description: applicationMetadata.description,
+          inLanguage: 'es',
+        },
+        {
+          '@type': 'SportsOrganization',
+          '@id': 'https://kingspadelleague.com/#organization',
+          name: applicationMetadata.name,
+          url: 'https://kingspadelleague.com/',
+          logo: 'https://kingspadelleague.com/kpl-logo-wordmark.png',
+          description: applicationMetadata.tagline,
+          sport: 'Paddle Tennis',
+        },
+      ],
     });
 
     void this.store.load();

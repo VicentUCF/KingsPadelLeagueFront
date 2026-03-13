@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, type OnInit } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ArrowUpRight, LucideAngularModule, Swords, Table2 } from 'lucide-angular';
 import { CalendarDays } from 'lucide-angular';
 
+import { SeoService } from '@core/services/seo.service';
 import {
   EmptyStateComponent,
   type EmptyStateAction,
@@ -28,8 +28,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './league-matchdays-page.component.scss',
 })
 export class LeagueMatchdaysPageComponent implements OnInit {
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
 
   protected readonly store = inject(LeagueMatchdaysStore);
   protected readonly swordsIcon = Swords;
@@ -58,11 +57,11 @@ export class LeagueMatchdaysPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.title.setTitle('Jornadas | KingsPadelLeague');
-    this.meta.updateTag({
-      name: 'description',
-      content:
+    this.seo.setPage({
+      title: 'Jornadas | KingsPadelLeague',
+      description:
         'Consulta las jornadas oficiales de la KingsPadelLeague con cruces, horarios y resultados de cada enfrentamiento.',
+      path: '/jornadas',
     });
 
     void this.store.load();
