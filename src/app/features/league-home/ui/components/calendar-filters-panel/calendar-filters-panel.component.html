@@ -1,57 +1,94 @@
-<section aria-labelledby="calendar-filters-title" class="calendar-filters-panel">
-  <div class="calendar-filters-panel__header">
-    <div>
-      <h2 id="calendar-filters-title">Filtra la agenda</h2>
-      <p aria-live="polite" class="calendar-filters-panel__summary">{{ filteredResultsLabel() }}</p>
+<section
+  [class.calendar-filters-panel--open]="isOpen()"
+  aria-labelledby="calendar-filters-title"
+  class="calendar-filters-panel"
+>
+  <!-- Toggle bar: solo visible en mobile -->
+  <button
+    [attr.aria-expanded]="isOpen()"
+    class="calendar-filters-panel__toggle"
+    type="button"
+    (click)="toggleOpen()"
+  >
+    <div class="calendar-filters-panel__toggle-info">
+      <span class="calendar-filters-panel__toggle-title">Filtrar agenda</span>
+      <span class="calendar-filters-panel__toggle-summary">{{ filteredResultsLabel() }}</span>
     </div>
 
-    @if (hasActiveFilters()) {
-      <button class="calendar-filters-panel__clear" type="button" (click)="clearFilters()">
-        Limpiar filtros
-      </button>
-    }
-  </div>
+    <div class="calendar-filters-panel__toggle-end">
+      @if (hasActiveFilters()) {
+        <span class="calendar-filters-panel__toggle-badge">Activo</span>
+      }
+      <span aria-hidden="true" class="calendar-filters-panel__toggle-chevron"></span>
+    </div>
+  </button>
 
-  <div class="calendar-filters-panel__group">
-    <p class="calendar-filters-panel__label">Estado</p>
+  <!-- Body: siempre visible en desktop, colapsable en mobile -->
+  <div class="calendar-filters-panel__body">
+    <div class="calendar-filters-panel__header">
+      <div>
+        <h2 id="calendar-filters-title">Filtra la agenda</h2>
+        <p aria-live="polite" class="calendar-filters-panel__summary">
+          {{ filteredResultsLabel() }}
+        </p>
+      </div>
 
-    <div aria-label="Filtrar por estado" class="calendar-filters-panel__pills" role="group">
-      @for (filter of statusFilters(); track filter.value) {
-        <button
-          [attr.aria-pressed]="filter.isActive"
-          [class.calendar-filters-panel__pill--active]="filter.isActive"
-          class="calendar-filters-panel__pill"
-          type="button"
-          (click)="selectStatusFilter(filter.value)"
-        >
-          {{ filter.label }}
+      @if (hasActiveFilters()) {
+        <button class="calendar-filters-panel__clear" type="button" (click)="clearFilters()">
+          Limpiar filtros
         </button>
       }
     </div>
-  </div>
 
-  <div class="calendar-filters-panel__group">
-    <p class="calendar-filters-panel__label">Equipo</p>
+    <div class="calendar-filters-panel__group">
+      <p class="calendar-filters-panel__label">Estado</p>
 
-    <div aria-label="Filtrar por equipo" class="calendar-filters-panel__teams" role="group">
-      @for (filter of teamFilters(); track filter.value) {
-        <button
-          [attr.aria-pressed]="filter.isActive"
-          [class.calendar-filters-panel__team--active]="filter.isActive"
-          [style.--team-accent]="filter.palette.accent"
-          [style.--team-glow]="filter.palette.glow"
-          [style.--team-primary]="filter.palette.primary"
-          [style.--team-surface]="filter.palette.surface"
-          class="calendar-filters-panel__team"
-          type="button"
-          (click)="selectTeamFilter(filter.value)"
-        >
-          <span aria-hidden="true" class="calendar-filters-panel__team-mark">
-            {{ filter.monogram }}
-          </span>
-          <span>{{ filter.label }}</span>
-        </button>
-      }
+      <div aria-label="Filtrar por estado" class="calendar-filters-panel__pills" role="group">
+        @for (filter of statusFilters(); track filter.value) {
+          <button
+            [attr.aria-pressed]="filter.isActive"
+            [class.calendar-filters-panel__pill--active]="filter.isActive"
+            class="calendar-filters-panel__pill"
+            type="button"
+            (click)="selectStatusFilter(filter.value)"
+          >
+            {{ filter.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="calendar-filters-panel__group">
+      <p class="calendar-filters-panel__label">Equipo</p>
+
+      <div aria-label="Filtrar por equipo" class="calendar-filters-panel__teams" role="group">
+        @for (filter of teamFilters(); track filter.value) {
+          <button
+            [attr.aria-pressed]="filter.isActive"
+            [class.calendar-filters-panel__team--active]="filter.isActive"
+            [style.--team-accent]="filter.palette.accent"
+            [style.--team-glow]="filter.palette.glow"
+            [style.--team-primary]="filter.palette.primary"
+            [style.--team-surface]="filter.palette.surface"
+            class="calendar-filters-panel__team"
+            type="button"
+            (click)="selectTeamFilter(filter.value)"
+          >
+            <span aria-hidden="true" class="calendar-filters-panel__team-mark">
+              @if (filter.logoPath) {
+                <img
+                  [alt]="filter.label"
+                  [src]="filter.logoPath"
+                  class="calendar-filters-panel__team-logo"
+                />
+              } @else {
+                {{ filter.monogram }}
+              }
+            </span>
+            <span class="calendar-filters-panel__team-label">{{ filter.label }}</span>
+          </button>
+        }
+      </div>
     </div>
   </div>
 </section>

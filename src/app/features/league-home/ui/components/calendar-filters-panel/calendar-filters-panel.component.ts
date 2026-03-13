@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 
 import {
   type CalendarStatusFilter,
@@ -25,6 +25,12 @@ export class CalendarFiltersPanelComponent {
   readonly statusFilterSelected = output<CalendarStatusFilter>();
   readonly teamFilterSelected = output<CalendarTeamFilter>();
   readonly filtersCleared = output<void>();
+
+  protected readonly isOpen = signal(false);
+
+  protected toggleOpen(): void {
+    this.isOpen.update((v) => !v);
+  }
 
   protected selectStatusFilter(statusFilter: CalendarStatusFilter): void {
     this.statusFilterSelected.emit(statusFilter);
