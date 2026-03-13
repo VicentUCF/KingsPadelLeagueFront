@@ -1,0 +1,21 @@
+<header class="backoffice-players-page__header">
+  @if (isAdmin()) {
+    <button class="backoffice-players-page__cta" type="button" disabled>+ Nuevo jugador</button>
+  }
+</header>
+
+@if (playersStore.isLoading()) {
+  <p class="backoffice-players-page__loading">Cargando jugadores…</p>
+} @else if (playersStore.errorMessage(); as error) {
+  <p class="backoffice-players-page__error">{{ error }}</p>
+} @else if (playerCards().length === 0) {
+  <p class="backoffice-players-page__empty">No hay jugadores registrados todavía.</p>
+} @else {
+  <ul class="backoffice-players-page__list" aria-label="Jugadores">
+    @for (player of playerCards(); track player.id) {
+      <li>
+        <app-player-directory-card [player]="player" />
+      </li>
+    }
+  </ul>
+}

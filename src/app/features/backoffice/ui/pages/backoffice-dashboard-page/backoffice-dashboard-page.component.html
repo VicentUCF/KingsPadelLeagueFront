@@ -1,0 +1,194 @@
+@if (isAdmin()) {
+  <!-- ─── ADMIN VIEW ──────────────────────────────────────────────────────── -->
+  <section class="backoffice-dashboard-page__section">
+    <h2 class="backoffice-dashboard-page__section-title">Resumen de la liga</h2>
+
+    <div class="backoffice-dashboard-page__metrics">
+      <div class="c-metric">
+        <span class="c-metric__label">Equipos</span>
+        <span class="c-metric__value">{{ teamCount() }}</span>
+      </div>
+      <div class="c-metric">
+        <span class="c-metric__label">Jugadores</span>
+        <span class="c-metric__value">{{ playerCount() }}</span>
+      </div>
+      <div class="c-metric">
+        <span class="c-metric__label">Temporadas</span>
+        <span class="c-metric__value">{{ seasonCount() }}</span>
+      </div>
+      <div class="c-metric">
+        <span class="c-metric__label">Jornadas jugadas</span>
+        <span class="c-metric__value">{{ finishedMatchdayCount() }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="backoffice-dashboard-page__section">
+    <h2 class="backoffice-dashboard-page__section-title">Estado de la competición</h2>
+
+    <div class="backoffice-dashboard-page__matchday-grid">
+      @if (currentMatchdayRow(); as current) {
+        <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+          <p class="backoffice-dashboard-page__matchday-eyebrow">Jornada en curso</p>
+          <p class="backoffice-dashboard-page__matchday-name">{{ current.name }}</p>
+          <p class="backoffice-dashboard-page__matchday-date">{{ current.dateLabel }}</p>
+          <app-status-badge [label]="current.statusLabel" [tone]="current.statusTone" />
+          <a class="backoffice-dashboard-page__matchday-link" [routerLink]="current.detailPath"
+            >Ver jornada →</a
+          >
+        </div>
+      } @else {
+        <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+          <p class="backoffice-dashboard-page__matchday-eyebrow">Jornada en curso</p>
+          <p class="backoffice-dashboard-page__matchday-empty">Ninguna jornada activa</p>
+        </div>
+      }
+
+      @if (nextMatchdayRow(); as next) {
+        <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+          <p class="backoffice-dashboard-page__matchday-eyebrow">Próxima jornada</p>
+          <p class="backoffice-dashboard-page__matchday-name">{{ next.name }}</p>
+          <p class="backoffice-dashboard-page__matchday-date">{{ next.dateLabel }}</p>
+          <app-status-badge [label]="next.statusLabel" [tone]="next.statusTone" />
+          <a class="backoffice-dashboard-page__matchday-link" [routerLink]="next.detailPath"
+            >Ver jornada →</a
+          >
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="backoffice-dashboard-page__section">
+    <h2 class="backoffice-dashboard-page__section-title">Accesos rápidos</h2>
+
+    <nav aria-label="Accesos rápidos" class="backoffice-dashboard-page__shortcuts">
+      <a
+        class="backoffice-dashboard-page__shortcut c-surface-card"
+        routerLink="/backoffice/temporadas"
+      >
+        <span class="backoffice-dashboard-page__shortcut-label">Temporadas</span>
+        <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar temporadas →</span>
+      </a>
+      <a
+        class="backoffice-dashboard-page__shortcut c-surface-card"
+        routerLink="/backoffice/equipos"
+      >
+        <span class="backoffice-dashboard-page__shortcut-label">Equipos</span>
+        <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar equipos →</span>
+      </a>
+      <a
+        class="backoffice-dashboard-page__shortcut c-surface-card"
+        routerLink="/backoffice/jugadores"
+      >
+        <span class="backoffice-dashboard-page__shortcut-label">Jugadores</span>
+        <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar jugadores →</span>
+      </a>
+      <a
+        class="backoffice-dashboard-page__shortcut c-surface-card"
+        routerLink="/backoffice/jornadas"
+      >
+        <span class="backoffice-dashboard-page__shortcut-label">Jornadas</span>
+        <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar jornadas →</span>
+      </a>
+    </nav>
+  </section>
+} @else {
+  <!-- ─── PRESIDENT VIEW ────────────────────────────────────────────────── -->
+  <section class="backoffice-dashboard-page__section">
+    <div class="backoffice-dashboard-page__president-hero">
+      <p class="backoffice-dashboard-page__president-eyebrow">Bienvenido/a</p>
+      @if (presidentPlayerName(); as name) {
+        <h2 class="backoffice-dashboard-page__president-name">{{ name }}</h2>
+      }
+      @if (presidentTeam(); as team) {
+        <p class="backoffice-dashboard-page__president-team">{{ team.name }}</p>
+      }
+    </div>
+  </section>
+
+  @if (presidentTeam(); as team) {
+    <section class="backoffice-dashboard-page__section">
+      <h2 class="backoffice-dashboard-page__section-title">Mi equipo</h2>
+
+      <div class="backoffice-dashboard-page__team-panel c-surface-card">
+        <div class="backoffice-dashboard-page__team-header">
+          <img [src]="team.logo" [alt]="team.name" class="backoffice-dashboard-page__team-logo" />
+          <div>
+            <p class="backoffice-dashboard-page__team-name">{{ team.name }}</p>
+            <p class="backoffice-dashboard-page__team-desc">{{ team.description }}</p>
+          </div>
+        </div>
+
+        <ul class="backoffice-dashboard-page__player-list" aria-label="Plantilla">
+          @for (player of presidentTeamPlayers(); track player.id) {
+            <li class="backoffice-dashboard-page__player-item">
+              <span class="backoffice-dashboard-page__player-name">
+                {{ player.firstName }} {{ player.lastName }}
+              </span>
+              @if (player.isPresident) {
+                <span class="backoffice-dashboard-page__player-badge">Pres.</span>
+              }
+            </li>
+          }
+        </ul>
+
+        <a
+          class="backoffice-dashboard-page__team-link"
+          [routerLink]="'/backoffice/equipos/' + team.id"
+          >Ver ficha completa →</a
+        >
+      </div>
+    </section>
+  }
+
+  <section class="backoffice-dashboard-page__section">
+    <h2 class="backoffice-dashboard-page__section-title">Competición</h2>
+
+    <div class="backoffice-dashboard-page__matchday-grid">
+      @if (currentMatchdayRow(); as current) {
+        <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+          <p class="backoffice-dashboard-page__matchday-eyebrow">Jornada en curso</p>
+          <p class="backoffice-dashboard-page__matchday-name">{{ current.name }}</p>
+          <p class="backoffice-dashboard-page__matchday-date">{{ current.dateLabel }}</p>
+          <app-status-badge [label]="current.statusLabel" [tone]="current.statusTone" />
+          <a class="backoffice-dashboard-page__matchday-link" [routerLink]="current.detailPath"
+            >Ver jornada →</a
+          >
+        </div>
+      }
+
+      @if (nextMatchdayRow(); as next) {
+        <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+          <p class="backoffice-dashboard-page__matchday-eyebrow">Próxima jornada</p>
+          <p class="backoffice-dashboard-page__matchday-name">{{ next.name }}</p>
+          <p class="backoffice-dashboard-page__matchday-date">{{ next.dateLabel }}</p>
+          <app-status-badge [label]="next.statusLabel" [tone]="next.statusTone" />
+          <a class="backoffice-dashboard-page__matchday-link" [routerLink]="next.detailPath"
+            >Ver jornada →</a
+          >
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="backoffice-dashboard-page__section">
+    <h2 class="backoffice-dashboard-page__section-title">Accesos rápidos</h2>
+
+    <nav aria-label="Accesos rápidos" class="backoffice-dashboard-page__shortcuts">
+      <a
+        class="backoffice-dashboard-page__shortcut c-surface-card"
+        routerLink="/backoffice/jornadas"
+      >
+        <span class="backoffice-dashboard-page__shortcut-label">Jornadas</span>
+        <span class="backoffice-dashboard-page__shortcut-hint">Consultar el calendario →</span>
+      </a>
+      <a
+        class="backoffice-dashboard-page__shortcut c-surface-card"
+        routerLink="/backoffice/jugadores"
+      >
+        <span class="backoffice-dashboard-page__shortcut-label">Jugadores</span>
+        <span class="backoffice-dashboard-page__shortcut-hint">Directorio de jugadores →</span>
+      </a>
+    </nav>
+  </section>
+}

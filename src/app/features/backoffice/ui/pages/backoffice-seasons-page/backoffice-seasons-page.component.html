@@ -1,0 +1,21 @@
+<header class="backoffice-seasons-page__header">
+  @if (isAdmin()) {
+    <button class="backoffice-seasons-page__cta" type="button" disabled>+ Nueva temporada</button>
+  }
+</header>
+
+@if (seasonsStore.isLoading()) {
+  <p class="backoffice-seasons-page__loading">Cargando temporadas…</p>
+} @else if (seasonsStore.errorMessage(); as error) {
+  <p class="backoffice-seasons-page__error">{{ error }}</p>
+} @else if (seasonCards().length === 0) {
+  <p class="backoffice-seasons-page__empty">No hay temporadas registradas todavía.</p>
+} @else {
+  <ul class="backoffice-seasons-page__list" aria-label="Temporadas">
+    @for (season of seasonCards(); track season.id) {
+      <li>
+        <app-season-card [season]="season" />
+      </li>
+    }
+  </ul>
+}

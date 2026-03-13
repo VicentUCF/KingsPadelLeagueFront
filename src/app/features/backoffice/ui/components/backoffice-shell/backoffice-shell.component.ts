@@ -82,8 +82,6 @@ export class BackofficeShellComponent {
         return 'Administrador';
       case 'PRESIDENT':
         return 'Presidente';
-      case 'USER':
-        return 'Usuario';
     }
   }
 }

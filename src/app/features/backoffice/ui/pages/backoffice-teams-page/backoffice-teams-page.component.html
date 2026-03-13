@@ -1,0 +1,21 @@
+<header class="backoffice-teams-page__header">
+  @if (isAdmin()) {
+    <button class="backoffice-teams-page__cta" type="button" disabled>+ Nuevo equipo</button>
+  }
+</header>
+
+@if (teamsStore.isLoading()) {
+  <p class="backoffice-teams-page__loading">Cargando equipos…</p>
+} @else if (teamsStore.errorMessage(); as error) {
+  <p class="backoffice-teams-page__error">{{ error }}</p>
+} @else if (teamCards().length === 0) {
+  <p class="backoffice-teams-page__empty">No hay equipos registrados todavía.</p>
+} @else {
+  <ul class="backoffice-teams-page__list" aria-label="Equipos">
+    @for (team of teamCards(); track team.id) {
+      <li>
+        <app-team-list-card [team]="team" />
+      </li>
+    }
+  </ul>
+}

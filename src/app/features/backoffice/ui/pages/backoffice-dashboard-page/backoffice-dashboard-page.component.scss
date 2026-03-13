@@ -1,0 +1,247 @@
+.backoffice-dashboard-page {
+  display: grid;
+  gap: var(--space-8);
+
+  // ── Section ─────────────────────────────────────────────────────────────────
+  &__section {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  &__section-title {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  // ── Metrics ──────────────────────────────────────────────────────────────────
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+
+  // ── Matchday cards ────────────────────────────────────────────────────────────
+  &__matchday-grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__matchday-card {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-6);
+  }
+
+  &__matchday-eyebrow {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__matchday-name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  &__matchday-date {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  &__matchday-empty {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  &__matchday-link {
+    display: inline-block;
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-brand-strong);
+    }
+  }
+
+  // ── Shortcuts ─────────────────────────────────────────────────────────────────
+  &__shortcuts {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  &__shortcut {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-6);
+    text-decoration: none;
+    transition: border-color 120ms ease;
+
+    &:hover {
+      border-color: var(--color-border-strong);
+    }
+  }
+
+  &__shortcut-label {
+    color: var(--color-text-strong);
+    font-weight: 700;
+  }
+
+  &__shortcut-hint {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  // ── President hero ────────────────────────────────────────────────────────────
+  &__president-hero {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-7) var(--space-6);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(circle at top left, rgb(201 162 39 / 14%), transparent 55%),
+      var(--color-surface);
+  }
+
+  &__president-eyebrow {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__president-name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 0.95;
+  }
+
+  &__president-team {
+    margin: 0;
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+
+  // ── Team panel ────────────────────────────────────────────────────────────────
+  &__team-panel {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-6);
+  }
+
+  &__team-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  &__team-logo {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  &__team-name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  &__team-desc {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  &__player-list {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__player-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 0.75rem;
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  &__player-name {
+    flex: 1;
+    color: var(--color-text-default);
+    font-weight: 600;
+  }
+
+  &__player-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.5rem;
+    background: rgb(201 162 39 / 20%);
+    color: var(--color-brand);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  &__team-link {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-brand-strong);
+    }
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────────
+@media (min-width: 36rem) {
+  .backoffice-dashboard-page {
+    &__metrics {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    &__matchday-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &__shortcuts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+@media (min-width: 64rem) {
+  .backoffice-dashboard-page {
+    &__shortcuts {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}

@@ -1,0 +1,64 @@
+.backoffice-matchdays-page {
+  display: grid;
+  gap: var(--space-4);
+
+  &__list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  &__row-main {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  &__row-name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  &__row-date {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  &__row-end {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  &__row-link {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--color-brand-strong);
+    }
+  }
+
+  &__loading,
+  &__error,
+  &__empty {
+    color: var(--color-text-muted);
+  }
+}
