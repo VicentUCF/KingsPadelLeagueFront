@@ -19,7 +19,11 @@ export class BackofficeLineupsStore {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  private _loadedMatchdayId: string | null = null;
+  private _loadedTeamId: string | null = null;
+
   async loadForMatchday(matchdayId: string): Promise<void> {
+    if (this._loadedMatchdayId === matchdayId) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
@@ -40,6 +44,8 @@ export class BackofficeLineupsStore {
         this.lineups.set([]);
         this.pairs.set([]);
       }
+      this._loadedMatchdayId = matchdayId;
+      this._loadedTeamId = null;
     } catch {
       this.errorMessage.set('No se pudieron cargar las alineaciones.');
     } finally {
@@ -48,6 +54,7 @@ export class BackofficeLineupsStore {
   }
 
   async loadForTeam(teamId: string): Promise<void> {
+    if (this._loadedTeamId === teamId) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
@@ -68,6 +75,8 @@ export class BackofficeLineupsStore {
         this.lineups.set([]);
         this.pairs.set([]);
       }
+      this._loadedTeamId = teamId;
+      this._loadedMatchdayId = null;
     } catch {
       this.errorMessage.set('No se pudieron cargar las alineaciones.');
     } finally {

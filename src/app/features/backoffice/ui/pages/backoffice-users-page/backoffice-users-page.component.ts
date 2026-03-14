@@ -183,23 +183,6 @@ export class BackofficeUsersPageComponent implements OnInit {
     return `Se enviará un correo de invitación a ${state.user.email} para que ${state.user.fullName} configure su acceso.`;
   }
 
-  // ── Invite ────────────────────────────────────────────────────────────────
-
-  protected openInviteModal(): void {
-    this.inviteEmail.set('');
-    this.inviteRole.set('player');
-    this.inviteModalOpen.set(true);
-  }
-
-  protected closeInviteModal(): void {
-    this.inviteModalOpen.set(false);
-  }
-
-  protected sendInvite(): void {
-    // TODO: wire to API
-    this.inviteModalOpen.set(false);
-  }
-
   // ── Register (dar de alta) ────────────────────────────────────────────────
 
   protected openRegisterModal(): void {

@@ -175,11 +175,13 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   protected openPlanner(matchId: string, teamId: string): void {
     this.selectedMatchId.set(matchId);
     this.plannerTeamId.set(teamId);
-    this.plannerStep.set(1);
-    this.plannerPairs.set([
-      { id: 'pair-1', player1Id: null, player2Id: null },
-      { id: 'pair-2', player1Id: null, player2Id: null },
-    ]);
+    this.selectedPlayerId.set(null);
+    this.playerSearch.set('');
+
+    // Pre-populate from existing lineup if already submitted
+    const existingLineup = this.lineupsStore.lineupForMatch(matchId, teamId);
+    const existingPairs = existingLineup ? this.lineupsStore.pairsForLineup(existingLineup.id) : [];
+
     const initAvail: Record<string, 'available'> = {};
     this.playersStore
       .players()
@@ -188,8 +190,26 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
         initAvail[p.id] = 'available';
       });
     this.availability.set(initAvail);
-    this.selectedPlayerId.set(null);
-    this.playerSearch.set('');
+
+    if (existingPairs.length > 0) {
+      // Restore saved pairs (pad to 2 if needed)
+      const pairs: PlannerPair[] = existingPairs.slice(0, 2).map((p, i) => ({
+        id: `pair-${i + 1}`,
+        player1Id: p.player1Id,
+        player2Id: p.player2Id,
+      }));
+      while (pairs.length < 2) {
+        pairs.push({ id: `pair-${pairs.length + 1}`, player1Id: null, player2Id: null });
+      }
+      this.plannerPairs.set(pairs);
+      this.plannerStep.set(2);
+    } else {
+      this.plannerPairs.set([
+        { id: 'pair-1', player1Id: null, player2Id: null },
+        { id: 'pair-2', player1Id: null, player2Id: null },
+      ]);
+      this.plannerStep.set(1);
+    }
   }
 
   protected closePlanner(): void {

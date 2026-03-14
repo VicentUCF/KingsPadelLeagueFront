@@ -16,6 +16,8 @@ export class BackofficePlayersStore {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  private _loaded = false;
+
   buildCards(teams: readonly BackofficeTeam[]): readonly BackofficePlayerCardViewModel[] {
     return this.players().map((player) => {
       const team = teams.find((t) => t.id === player.teamId);
@@ -28,11 +30,13 @@ export class BackofficePlayersStore {
   );
 
   async load(): Promise<void> {
+    if (this._loaded) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       this.players.set(await this.loadPlayersUseCase.execute());
+      this._loaded = true;
     } catch {
       this.errorMessage.set('No hemos podido cargar los jugadores.');
     } finally {

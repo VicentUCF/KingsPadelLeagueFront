@@ -15,6 +15,8 @@ export class BackofficeMatchdaysStore {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  private _loaded = false;
+
   readonly rows = computed<readonly BackofficeMatchdayRowViewModel[]>(() =>
     this.matchdays().map(toBackofficeMatchdayRowViewModel),
   );
@@ -28,11 +30,13 @@ export class BackofficeMatchdaysStore {
   );
 
   async load(): Promise<void> {
+    if (this._loaded) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       this.matchdays.set(await this.loadMatchdaysUseCase.execute());
+      this._loaded = true;
     } catch {
       this.errorMessage.set('No hemos podido cargar las jornadas.');
     } finally {

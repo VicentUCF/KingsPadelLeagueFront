@@ -11,13 +11,6 @@
       <div class="users-header__actions">
         <button
           type="button"
-          class="c-button c-button--pill c-button--ghost c-button--md"
-          (click)="openInviteModal()"
-        >
-          Invitar por email
-        </button>
-        <button
-          type="button"
           class="c-button c-button--pill c-button--primary c-button--md"
           (click)="openRegisterModal()"
         >
@@ -160,25 +153,10 @@
               @if (user.hasEmail) {
                 <button
                   type="button"
-                  class="c-button c-button--pill c-button--ghost c-button--sm"
-                  (click)="openConfirm('resend-invite', user)"
-                >
-                  Reenviar acceso
-                </button>
-                <button
-                  type="button"
                   class="users-table__danger-btn"
                   (click)="openConfirm('unlink', user)"
                 >
                   Desvincular
-                </button>
-              } @else {
-                <button
-                  type="button"
-                  class="c-button c-button--pill c-button--ghost c-button--sm"
-                  (click)="openInviteModal()"
-                >
-                  Invitar
                 </button>
               }
             </div>
@@ -233,83 +211,6 @@
             {{ confirmLabel(state.action) }}
           </button>
         </div>
-      </div>
-    </div>
-  }
-
-  <!-- ── Invite modal ──────────────────────────────────────────────────────────── -->
-  @if (inviteModalOpen()) {
-    <div class="modal-overlay">
-      <div
-        class="invite-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="invite-dialog-title"
-        (keydown.escape)="closeInviteModal()"
-        tabindex="-1"
-      >
-        <header class="invite-dialog__header">
-          <div>
-            <p class="invite-dialog__eyebrow">Acceso existente</p>
-            <h2 id="invite-dialog-title" class="invite-dialog__title">Invitar por email</h2>
-            <p class="invite-dialog__subtitle">
-              Envía un enlace de configuración de cuenta a un jugador ya registrado.
-            </p>
-          </div>
-          <button
-            type="button"
-            class="invite-dialog__close"
-            aria-label="Cerrar"
-            (click)="closeInviteModal()"
-          >
-            ×
-          </button>
-        </header>
-
-        <div class="invite-dialog__body">
-          <label class="c-field">
-            <span class="c-field__label">Email del jugador <span aria-hidden="true">*</span></span>
-            <input
-              class="c-input c-input--md"
-              type="email"
-              placeholder="jugador@ejemplo.com"
-              [value]="inviteEmail()"
-              (input)="inviteEmail.set($any($event.target).value)"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="c-field">
-            <span class="c-field__label">Rol</span>
-            <select
-              class="c-select c-input--md"
-              [value]="inviteRole()"
-              (change)="inviteRole.set($any($event.target).value)"
-            >
-              @for (opt of roleOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-              }
-            </select>
-          </label>
-        </div>
-
-        <footer class="invite-dialog__footer">
-          <button
-            type="button"
-            class="c-button c-button--pill c-button--ghost c-button--md"
-            (click)="closeInviteModal()"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            class="c-button c-button--pill c-button--primary c-button--md"
-            [disabled]="!inviteEmail()"
-            (click)="sendInvite()"
-          >
-            Enviar invitación
-          </button>
-        </footer>
       </div>
     </div>
   }

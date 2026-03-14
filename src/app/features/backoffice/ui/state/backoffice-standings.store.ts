@@ -19,6 +19,8 @@ export class BackofficeStandingsStore {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  private _loaded = false;
+
   readonly rows = computed<readonly BackofficeStandingRow[]>(() =>
     toBackofficeStandingsViewModel(this.teamsStore.teams(), this.matches()),
   );
@@ -30,6 +32,7 @@ export class BackofficeStandingsStore {
   readonly currentMatchday = computed(() => this.matchdaysStore.currentMatchday());
 
   async load(): Promise<void> {
+    if (this._loaded) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
@@ -45,6 +48,7 @@ export class BackofficeStandingsStore {
       );
 
       this.matches.set(chunks.flat());
+      this._loaded = true;
     } catch {
       this.errorMessage.set('No se pudo cargar la clasificación.');
     } finally {
