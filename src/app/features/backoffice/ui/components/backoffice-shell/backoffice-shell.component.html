@@ -3,9 +3,25 @@
     Ir al contenido del backoffice
   </a>
 
-  <aside class="backoffice-shell__sidebar">
+  <div
+    class="backoffice-shell__backdrop"
+    [class.backoffice-shell__backdrop--visible]="sidebarOpen()"
+    aria-hidden="true"
+    (click)="sidebarOpen.set(false)"
+  ></div>
+
+  <aside class="backoffice-shell__sidebar" [class.backoffice-shell__sidebar--open]="sidebarOpen()">
     <!-- ── Header ─────────────────────────────────────────────────────────────── -->
     <header class="backoffice-shell__sidebar-header">
+      <button
+        type="button"
+        class="backoffice-shell__close-btn"
+        aria-label="Cerrar menú"
+        (click)="sidebarOpen.set(false)"
+      >
+        <lucide-angular [img]="closeIcon" [size]="18" aria-hidden="true" />
+      </button>
+
       <a aria-label="Backoffice" class="backoffice-shell__brand" routerLink="/backoffice">
         <span aria-hidden="true" class="backoffice-shell__brand-eyebrow">KingsPadelLeague</span>
         <span class="backoffice-shell__brand-title">Backoffice</span>
@@ -90,6 +106,15 @@
 
   <div class="backoffice-shell__main">
     <header class="backoffice-shell__topbar">
+      <button
+        type="button"
+        class="backoffice-shell__menu-toggle"
+        aria-label="Abrir menú"
+        (click)="sidebarOpen.set(true)"
+      >
+        <lucide-angular [img]="menuIcon" [size]="20" aria-hidden="true" />
+      </button>
+
       <nav aria-label="Breadcrumb" class="backoffice-shell__breadcrumb">
         <a routerLink="/backoffice">Backoffice</a>
         <lucide-angular [img]="chevronRightIcon" [size]="14" aria-hidden="true" />

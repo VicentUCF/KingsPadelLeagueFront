@@ -15,7 +15,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { ChevronRight, LucideAngularModule } from 'lucide-angular';
+import { ChevronRight, LucideAngularModule, Menu, X } from 'lucide-angular';
 import { filter } from 'rxjs';
 
 import { BACKOFFICE_ROOT_PATH } from '../../models/backoffice-navigation.model';
@@ -54,6 +54,10 @@ export class BackofficeShellComponent {
     return this.teamsStore.teams().find((t) => t.id === id)?.name ?? null;
   });
   protected readonly chevronRightIcon = ChevronRight;
+  protected readonly menuIcon = Menu;
+  protected readonly closeIcon = X;
+
+  protected readonly sidebarOpen = signal(false);
   protected readonly navigation = this.sessionStore.navigation;
   protected readonly pageContext = signal(resolvePageContext(this.activatedRoute.snapshot));
 
@@ -64,6 +68,7 @@ export class BackofficeShellComponent {
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => {
         this.pageContext.set(resolvePageContext(this.activatedRoute.snapshot));
+        this.sidebarOpen.set(false);
       });
 
     this.destroyRef.onDestroy(() => navigationSubscription.unsubscribe());
