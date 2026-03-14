@@ -11,7 +11,7 @@ describe('StandingsTableComponent', () => {
       rank: 1,
       teamName: 'House Navarro',
       monogram: 'HN',
-      logoPath: '/teams_logos/titanics_no_bg.png',
+      logoPath: '/teams_logos/titanics_no_bg.webp',
       palette: createPalette(),
       pointsLabel: '11 pts',
       playedMatchesLabel: '2',
@@ -73,7 +73,7 @@ describe('StandingsTableComponent', () => {
     ).toBeVisible();
     expect(container.querySelector('.team-badge__crest-image')).toHaveAttribute(
       'src',
-      '/teams_logos/titanics_no_bg.png',
+      '/teams_logos/titanics_no_bg.webp',
     );
     expect(screen.getByRole('link', { name: /House Navarro/i })).toHaveAttribute(
       'href',

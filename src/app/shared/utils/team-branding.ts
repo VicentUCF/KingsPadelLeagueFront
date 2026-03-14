@@ -36,7 +36,7 @@ const DEFAULT_TEAM_BRANDING: TeamBrandingRegistryEntry = {
 
 const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
   'kings-of-favar': {
-    logoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+    logoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
     palette: {
       primary: '#f3c84b',
       accent: '#f9e9a7',
@@ -46,7 +46,7 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
     },
   },
   titanics: {
-    logoPath: '/teams_logos/titanics_no_bg.png',
+    logoPath: '/teams_logos/titanics_no_bg.webp',
     palette: {
       primary: '#84d5ff',
       accent: '#f2f8ff',
@@ -56,7 +56,7 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
     },
   },
   barbaridad: {
-    logoPath: '/teams_logos/barbarida_no_bg.png',
+    logoPath: '/teams_logos/barbarida_no_bg.webp',
     palette: {
       primary: '#ff7848',
       accent: '#ffd0b5',
@@ -66,7 +66,7 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
     },
   },
   'magic-city': {
-    logoPath: '/teams_logos/magic_ng_bg.png',
+    logoPath: '/teams_logos/magic_ng_bg.webp',
     palette: {
       primary: '#69f6d1',
       accent: '#c7ffef',
@@ -86,7 +86,7 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
     },
   },
   thormentadores: {
-    logoPath: '/teams_logos/Thormentadores.png',
+    logoPath: '/teams_logos/Thormentadores.webp',
     palette: {
       primary: '#8da5ff',
       accent: '#dfe5ff',

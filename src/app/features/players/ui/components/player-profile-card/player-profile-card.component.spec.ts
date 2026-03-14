@@ -10,7 +10,7 @@ describe('PlayerProfileCardComponent', () => {
           id: 'alex-soler',
           displayName: 'Alex Soler',
           teamName: 'Kings of Favar',
-          teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+          teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
           teamMonogram: 'OF',
           teamPalette: {
             primary: '#f3c84b',

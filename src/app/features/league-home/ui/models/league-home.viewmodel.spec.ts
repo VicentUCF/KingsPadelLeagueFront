@@ -41,13 +41,13 @@ describe('toLeagueHomeViewModel', () => {
     expect(viewModel.standings[0]).toEqual(
       expect.objectContaining({
         teamName: 'Titanics',
-        logoPath: '/teams_logos/titanics_no_bg.png',
+        logoPath: '/teams_logos/titanics_no_bg.webp',
       }),
     );
     expect(viewModel.teams[0]).toEqual(
       expect.objectContaining({
         name: 'Magic City',
-        logoPath: '/teams_logos/magic_ng_bg.png',
+        logoPath: '/teams_logos/magic_ng_bg.webp',
         teamLink: '/equipos/magic-city',
       }),
     );

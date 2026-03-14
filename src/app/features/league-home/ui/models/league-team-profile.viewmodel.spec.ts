@@ -11,7 +11,7 @@ describe('toLeagueTeamProfilePageViewModel', () => {
         rosterTitle: 'Plantilla del equipo',
         team: expect.objectContaining({
           name: 'Titanics',
-          logoPath: '/teams_logos/titanics_no_bg.png',
+          logoPath: '/teams_logos/titanics_no_bg.webp',
           nextMatchLabel: 'Domingo 18:00 · vs Kings of Favar',
           latestResultLabel: 'Llega tras ganar a Barbaridad por 5-0.',
           roster: [

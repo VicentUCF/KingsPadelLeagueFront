@@ -15,7 +15,7 @@ describe('TeamShowcaseHeroComponent', () => {
           tagline: 'Control glacial y presión constante en cada juego',
           identityDescription: 'Equipo de prueba',
           presidentName: 'Torres',
-          logoPath: '/teams_logos/titanics_no_bg.png',
+          logoPath: '/teams_logos/titanics_no_bg.webp',
           monogram: 'TT',
           palette: {
             primary: '#8bd0ff',
