@@ -135,7 +135,7 @@ export const PUBLIC_LEAGUE_TEAM_CATALOG: readonly PublicLeagueTeamCatalogEntry[]
     slug: 'kings-of-favar',
     name: 'Kings Of Favar',
     presidentName: 'Vicent Ciscar',
-    logoPath: '/teams_logos/Kings_of_Favar_no_bg.wepb',
+    logoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
     tagline: PENDING_ROSTER_TAGLINE,
     identityDescription: PENDING_ROSTER_DESCRIPTION,
     players: buildAssignedRoster('kings-of-favar', ['Vicent Ciscar', 'Enric Bixquert']),
