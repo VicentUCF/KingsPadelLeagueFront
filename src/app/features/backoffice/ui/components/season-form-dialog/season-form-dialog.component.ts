@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { ChevronDown, LucideAngularModule } from 'lucide-angular';
 import {
   type AbstractControl,
   FormControl,
@@ -34,7 +35,7 @@ interface SeasonFormStep {
   host: {
     class: 'season-form-dialog',
   },
-  imports: [ModalShellComponent, ReactiveFormsModule],
+  imports: [LucideAngularModule, ModalShellComponent, ReactiveFormsModule],
   templateUrl: './season-form-dialog.component.html',
   styleUrl: './season-form-dialog.component.scss',
 })
@@ -48,6 +49,7 @@ export class SeasonFormDialogComponent {
   readonly cancelled = output<void>();
   readonly submitted = output<BackofficeSeasonFormValue>();
 
+  protected readonly chevronDownIcon = ChevronDown;
   protected readonly currentStep = signal(0);
   protected readonly steps: readonly SeasonFormStep[] = [
     { label: 'Identidad', subtitle: 'Nombre y año' },

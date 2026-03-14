@@ -7,6 +7,8 @@ import {
   type OnInit,
 } from '@angular/core';
 
+import { ChevronDown, LucideAngularModule } from 'lucide-angular';
+
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import { ActionToastStore } from '@core/state/action-toast.store';
@@ -31,11 +33,12 @@ interface PlannerPair {
   selector: 'app-backoffice-lineups-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-lineups-page' },
-  imports: [StatusBadgeComponent],
+  imports: [LucideAngularModule, StatusBadgeComponent],
   templateUrl: './backoffice-lineups-page.component.html',
   styleUrl: './backoffice-lineups-page.component.scss',
 })
 export class BackofficeLineupsPageComponent implements OnInit {
+  protected readonly chevronDownIcon = ChevronDown;
   protected readonly lineupsStore = inject(BackofficeLineupsStore);
   protected readonly matchdaysStore = inject(BackofficeMatchdaysStore);
   protected readonly teamsStore = inject(BackofficeTeamsStore);

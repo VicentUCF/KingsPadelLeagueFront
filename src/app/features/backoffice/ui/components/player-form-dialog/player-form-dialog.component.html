@@ -95,21 +95,31 @@
           <div class="player-form-dialog__grid">
             <label class="c-field">
               <span class="c-field__label">Perfil de pista</span>
-              <select class="c-select c-input--md" formControlName="preferredSideLabel">
-                <option value="Revés">Revés</option>
-                <option value="Derecha">Derecha</option>
-                <option value="Ambas">Ambas</option>
-              </select>
+              <div class="c-select-wrap">
+                <select class="c-select c-input--md" formControlName="preferredSideLabel">
+                  <option value="Revés">Revés</option>
+                  <option value="Derecha">Derecha</option>
+                  <option value="Ambas">Ambas</option>
+                </select>
+                <span class="c-select-wrap__icon">
+                  <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                </span>
+              </div>
             </label>
 
             <label class="c-field">
               <span class="c-field__label">Equipo actual</span>
-              <select class="c-select c-input--md" formControlName="currentTeamId">
-                <option value="">Sin equipo activo</option>
-                @for (team of teamOptions(); track team.id) {
-                  <option [value]="team.id">{{ team.label }}</option>
-                }
-              </select>
+              <div class="c-select-wrap">
+                <select class="c-select c-input--md" formControlName="currentTeamId">
+                  <option value="">Sin equipo activo</option>
+                  @for (team of teamOptions(); track team.id) {
+                    <option [value]="team.id">{{ team.label }}</option>
+                  }
+                </select>
+                <span class="c-select-wrap__icon">
+                  <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                </span>
+              </div>
             </label>
 
             <label class="c-field">
@@ -130,10 +140,15 @@
 
             <label class="c-field">
               <span class="c-field__label">Estado</span>
-              <select class="c-select c-input--md" formControlName="status">
-                <option value="ACTIVE">Activo</option>
-                <option value="INACTIVE">Inactivo</option>
-              </select>
+              <div class="c-select-wrap">
+                <select class="c-select c-input--md" formControlName="status">
+                  <option value="ACTIVE">Activo</option>
+                  <option value="INACTIVE">Inactivo</option>
+                </select>
+                <span class="c-select-wrap__icon">
+                  <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                </span>
+              </div>
             </label>
           </div>
         }

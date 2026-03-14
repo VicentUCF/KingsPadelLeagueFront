@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChevronDown, LucideAngularModule } from 'lucide-angular';
 
 import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.component';
 
@@ -25,7 +26,7 @@ type PlayerFormGroup = FormGroup<{
   host: {
     class: 'player-form-dialog',
   },
-  imports: [ModalShellComponent, ReactiveFormsModule],
+  imports: [LucideAngularModule, ModalShellComponent, ReactiveFormsModule],
   templateUrl: './player-form-dialog.component.html',
   styleUrl: './player-form-dialog.component.scss',
 })
@@ -40,6 +41,7 @@ export class PlayerFormDialogComponent {
   readonly cancelled = output<void>();
   readonly submitted = output<BackofficePlayerFormValue>();
 
+  protected readonly chevronDownIcon = ChevronDown;
   protected readonly currentStep = signal(0);
   protected readonly form: PlayerFormGroup = new FormGroup({
     fullName: new FormControl('', {

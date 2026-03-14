@@ -123,10 +123,15 @@
           <div class="season-form-dialog__stack">
             <label class="c-field">
               <span class="c-field__label">Estado base</span>
-              <select class="c-select c-input--md" formControlName="status">
-                <option value="DRAFT">Borrador</option>
-                <option value="ACTIVE">Activa</option>
-              </select>
+              <div class="c-select-wrap">
+                <select class="c-select c-input--md" formControlName="status">
+                  <option value="DRAFT">Borrador</option>
+                  <option value="ACTIVE">Activa</option>
+                </select>
+                <span class="c-select-wrap__icon">
+                  <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                </span>
+              </div>
             </label>
 
             <label class="c-field">

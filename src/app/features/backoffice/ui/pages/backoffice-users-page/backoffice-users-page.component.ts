@@ -7,6 +7,7 @@ import {
   type OnInit,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChevronDown, LucideAngularModule } from 'lucide-angular';
 
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
@@ -43,7 +44,7 @@ type RegisterFormGroup = PlayerFormGroup;
   selector: 'app-backoffice-users-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-users-page' },
-  imports: [StatusBadgeComponent, ReactiveFormsModule],
+  imports: [LucideAngularModule, StatusBadgeComponent, ReactiveFormsModule],
   templateUrl: './backoffice-users-page.component.html',
   styleUrl: './backoffice-users-page.component.scss',
 })
@@ -51,6 +52,7 @@ export class BackofficeUsersPageComponent implements OnInit {
   private readonly playersStore = inject(BackofficePlayersStore);
   protected readonly teamsStore = inject(BackofficeTeamsStore);
 
+  protected readonly chevronDownIcon = ChevronDown;
   protected readonly searchTerm = signal('');
   protected readonly segment = signal<UserSegment>('all');
   protected readonly confirmState = signal<ConfirmState | null>(null);

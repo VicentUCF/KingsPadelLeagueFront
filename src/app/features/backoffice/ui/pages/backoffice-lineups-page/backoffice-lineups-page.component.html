@@ -354,17 +354,22 @@
     @if (isAdmin()) {
       <div class="backoffice-lineups-page__selector-wrap">
         <label class="backoffice-lineups-page__selector-label" for="matchday-select">Jornada</label>
-        <select
-          id="matchday-select"
-          class="c-select backoffice-lineups-page__selector"
-          [value]="selectedMatchdayId() ?? ''"
-          (change)="onMatchdayChange($event)"
-        >
-          <option value="" disabled>Selecciona una jornada</option>
-          @for (matchday of matchdaysStore.matchdays(); track matchday.id) {
-            <option [value]="matchday.id">{{ matchday.name }}</option>
-          }
-        </select>
+        <div class="c-select-wrap">
+          <select
+            id="matchday-select"
+            class="c-select backoffice-lineups-page__selector"
+            [value]="selectedMatchdayId() ?? ''"
+            (change)="onMatchdayChange($event)"
+          >
+            <option value="" disabled>Selecciona una jornada</option>
+            @for (matchday of matchdaysStore.matchdays(); track matchday.id) {
+              <option [value]="matchday.id">{{ matchday.name }}</option>
+            }
+          </select>
+          <span class="c-select-wrap__icon">
+            <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+          </span>
+        </div>
       </div>
     } @else {
       @if (presidentTeam(); as team) {

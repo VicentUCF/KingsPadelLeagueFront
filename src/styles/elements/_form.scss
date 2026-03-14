@@ -87,12 +87,43 @@
 
 .c-select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23a49b8c' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: 1rem;
-  background-position: calc(100% - 0.75rem) 50%;
+  color-scheme: dark;
   padding-right: 2.25rem;
   cursor: pointer;
+
+  option {
+    background: #1c1c1c;
+    color: #e8e0d4;
+
+    &:checked {
+      background: #2a2520;
+    }
+
+    &:disabled {
+      color: #6b6560;
+    }
+  }
+}
+
+// Wrapper for placing a Lucide icon over the select control
+.c-select-wrap {
+  position: relative;
+  display: block;
+
+  .c-select {
+    width: 100%;
+  }
+
+  &__icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+  }
 }
 
 .c-textarea {

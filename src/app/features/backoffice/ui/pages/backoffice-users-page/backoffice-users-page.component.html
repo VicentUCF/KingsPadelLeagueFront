@@ -350,21 +350,31 @@
               <div class="register-dialog__grid">
                 <label class="c-field">
                   <span class="c-field__label">Posición preferida</span>
-                  <select class="c-select c-input--md" formControlName="preferredPosition">
-                    @for (opt of positionOptions; track opt.value) {
-                      <option [value]="opt.value">{{ opt.label }}</option>
-                    }
-                  </select>
+                  <div class="c-select-wrap">
+                    <select class="c-select c-input--md" formControlName="preferredPosition">
+                      @for (opt of positionOptions; track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
+                      }
+                    </select>
+                    <span class="c-select-wrap__icon">
+                      <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                    </span>
+                  </div>
                 </label>
 
                 <label class="c-field">
                   <span class="c-field__label">Equipo</span>
-                  <select class="c-select c-input--md" formControlName="teamId">
-                    <option value="">Sin equipo</option>
-                    @for (team of teamsStore.teams(); track team.id) {
-                      <option [value]="team.id">{{ team.name }}</option>
-                    }
-                  </select>
+                  <div class="c-select-wrap">
+                    <select class="c-select c-input--md" formControlName="teamId">
+                      <option value="">Sin equipo</option>
+                      @for (team of teamsStore.teams(); track team.id) {
+                        <option [value]="team.id">{{ team.name }}</option>
+                      }
+                    </select>
+                    <span class="c-select-wrap__icon">
+                      <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                    </span>
+                  </div>
                 </label>
 
                 <div class="c-field c-field--full">
@@ -509,21 +519,31 @@
 
               <label class="c-field">
                 <span class="c-field__label">Posición preferida</span>
-                <select class="c-select c-input--md" formControlName="preferredPosition">
-                  @for (opt of positionOptions; track opt.value) {
-                    <option [value]="opt.value">{{ opt.label }}</option>
-                  }
-                </select>
+                <div class="c-select-wrap">
+                  <select class="c-select c-input--md" formControlName="preferredPosition">
+                    @for (opt of positionOptions; track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                  <span class="c-select-wrap__icon">
+                    <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                  </span>
+                </div>
               </label>
 
               <label class="c-field">
                 <span class="c-field__label">Equipo</span>
-                <select class="c-select c-input--md" formControlName="teamId">
-                  <option value="">Sin equipo</option>
-                  @for (team of teamsStore.teams(); track team.id) {
-                    <option [value]="team.id">{{ team.name }}</option>
-                  }
-                </select>
+                <div class="c-select-wrap">
+                  <select class="c-select c-input--md" formControlName="teamId">
+                    <option value="">Sin equipo</option>
+                    @for (team of teamsStore.teams(); track team.id) {
+                      <option [value]="team.id">{{ team.name }}</option>
+                    }
+                  </select>
+                  <span class="c-select-wrap__icon">
+                    <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
+                  </span>
+                </div>
               </label>
 
               <div class="c-field c-field--full">
