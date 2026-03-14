@@ -1,9 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 
 const MAX_TOASTS = 3;
-const TOAST_TIMEOUT_MS = 4000;
+const DEDUPE_WINDOW_MS = 3000;
 
-export type ActionToastTone = 'success' | 'error' | 'info';
+const TONE_DURATIONS: Record<ActionToastTone, number> = {
+  success: 3500,
+  info: 4200,
+  warning: 5200,
+  error: 7000,
+};
+
+export type ActionToastTone = 'success' | 'error' | 'info' | 'warning';
 export type ActionToastPoliteness = 'polite' | 'assertive';
 
 export interface ActionToast {
@@ -14,30 +21,66 @@ export interface ActionToast {
   readonly politeness: ActionToastPoliteness;
 }
 
+export interface ActionToastOptions {
+  readonly dedupeKey?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ActionToastStore {
   private toastSequence = 0;
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly dedupeKeys = new Map<string, ReturnType<typeof setTimeout>>();
 
   readonly toasts = signal<readonly ActionToast[]>([]);
 
-  success(message: string, title = 'Acción completada'): void {
+  success(message: string, title = 'Acción completada', options?: ActionToastOptions): void {
+    if (this.isDedupe(options?.dedupeKey)) return;
+    this.trackDedupe(options?.dedupeKey);
     this.enqueueToast('success', title, message);
   }
 
-  error(message: string, title = 'No se ha podido completar la acción'): void {
+  error(
+    message: string,
+    title = 'No se ha podido completar la acción',
+    options?: ActionToastOptions,
+  ): void {
+    if (this.isDedupe(options?.dedupeKey)) return;
+    this.trackDedupe(options?.dedupeKey);
     this.enqueueToast('error', title, message);
   }
 
-  info(message: string, title = 'Información'): void {
+  info(message: string, title = 'Información', options?: ActionToastOptions): void {
+    if (this.isDedupe(options?.dedupeKey)) return;
+    this.trackDedupe(options?.dedupeKey);
     this.enqueueToast('info', title, message);
+  }
+
+  warning(message: string, title = 'Aviso', options?: ActionToastOptions): void {
+    if (this.isDedupe(options?.dedupeKey)) return;
+    this.trackDedupe(options?.dedupeKey);
+    this.enqueueToast('warning', title, message);
   }
 
   dismiss(toastId: string): void {
     this.clearTimer(toastId);
     this.toasts.update((toasts) => toasts.filter((toast) => toast.id !== toastId));
+  }
+
+  private isDedupe(key: string | undefined): boolean {
+    if (!key) return false;
+    return this.dedupeKeys.has(key);
+  }
+
+  private trackDedupe(key: string | undefined): void {
+    if (!key) return;
+    const existing = this.dedupeKeys.get(key);
+    if (existing !== undefined) clearTimeout(existing);
+    const timerId = globalThis.setTimeout(() => {
+      this.dedupeKeys.delete(key);
+    }, DEDUPE_WINDOW_MS);
+    this.dedupeKeys.set(key, timerId);
   }
 
   private enqueueToast(tone: ActionToastTone, title: string, message: string): void {
@@ -67,13 +110,13 @@ export class ActionToastStore {
 
       return nextToasts.slice(nextToasts.length - MAX_TOASTS);
     });
-    this.scheduleDismiss(toast.id);
+    this.scheduleDismiss(toast.id, TONE_DURATIONS[tone]);
   }
 
-  private scheduleDismiss(toastId: string): void {
+  private scheduleDismiss(toastId: string, durationMs: number): void {
     const timerId = globalThis.setTimeout(() => {
       this.dismiss(toastId);
-    }, TOAST_TIMEOUT_MS);
+    }, durationMs);
 
     this.timers.set(toastId, timerId);
   }

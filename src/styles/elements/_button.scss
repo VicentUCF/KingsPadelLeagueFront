@@ -1,0 +1,87 @@
+.c-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-content: center;
+  border-radius: 0.85rem;
+  border: 1px solid rgb(245 245 245 / 12%);
+  background: rgb(255 255 255 / 0.04);
+  color: var(--color-text-default);
+  padding: 0.35rem 0.9rem;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    border-color: rgb(201 162 39 / 50%);
+    background: rgb(201 162 39 / 8%);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &--pill {
+    border-radius: 999px;
+  }
+  &--sm {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  &--md {
+    padding: 0.5rem 1.1rem;
+  }
+  &--lg {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.925rem;
+  }
+
+  &--ghost {
+    border-color: rgb(245 245 245 / 10%);
+    background: transparent;
+    &:hover:not(:disabled) {
+      background: rgb(255 255 255 / 0.04);
+    }
+  }
+  &--outline {
+    border-color: rgb(245 245 245 / 18%);
+    background: transparent;
+    color: var(--color-text-default);
+    &:hover:not(:disabled) {
+      border-color: var(--color-brand);
+      color: var(--color-brand-strong);
+    }
+  }
+  &--primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-strong) 100%);
+    color: var(--color-brand-contrast);
+    font-weight: 700;
+    box-shadow: 0 8px 24px -8px rgb(201 162 39 / 40%);
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--color-brand-strong) 0%, #f5d060 100%);
+    }
+  }
+  &--secondary {
+    border-color: transparent;
+    background: rgb(255 255 255 / 0.08);
+    color: var(--color-text-strong);
+  }
+
+  &.is-active {
+    border-color: var(--color-brand);
+    background: rgb(201 162 39 / 12%);
+    color: var(--color-brand-strong);
+  }
+}

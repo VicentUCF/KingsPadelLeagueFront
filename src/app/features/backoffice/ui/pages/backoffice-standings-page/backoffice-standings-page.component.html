@@ -1,0 +1,140 @@
+<div class="backoffice-standings-page">
+  <!-- ── Page header ──────────────────────────────────────────────────────────────── -->
+  <header class="standings-header">
+    <div class="standings-header__heading">
+      <span class="standings-header__eyebrow">Clasificación</span>
+      <h1 class="standings-header__title">Tabla de posiciones</h1>
+      <p class="standings-header__subtitle">
+        Clasificación actualizada con los resultados de las jornadas finalizadas.
+      </p>
+    </div>
+
+    <div class="standings-header__stats">
+      <div class="standings-header__stat">
+        <span class="standings-header__stat-value">{{ standingsStore.rows().length }}</span>
+        <span class="standings-header__stat-label">Equipos</span>
+      </div>
+      <div class="standings-header__stat standings-header__stat--active">
+        <span class="standings-header__stat-value">{{
+          standingsStore.finishedMatchdayCount()
+        }}</span>
+        <span class="standings-header__stat-label">Jornadas jugadas</span>
+      </div>
+      <div class="standings-header__stat standings-header__stat--brand">
+        <span class="standings-header__stat-value">
+          @if (standingsStore.currentMatchday(); as md) {
+            {{ md.name }}
+          } @else {
+            —
+          }
+        </span>
+        <span class="standings-header__stat-label">Jornada en curso</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Table ──────────────────────────────────────────────────────────────────── -->
+  @if (standingsStore.isLoading()) {
+    <p class="standings-state">Cargando clasificación…</p>
+  } @else if (standingsStore.errorMessage(); as error) {
+    <p class="standings-state standings-state--error">{{ error }}</p>
+  } @else if (standingsStore.rows().length === 0) {
+    <p class="standings-state">No hay datos de clasificación disponibles.</p>
+  } @else {
+    <section class="standings-table" aria-label="Tabla de clasificación" aria-live="polite">
+      <div class="standings-table__header" role="row">
+        <span role="columnheader" class="standings-table__col-rank">#</span>
+        <span role="columnheader" class="standings-table__col-team">Equipo</span>
+        <span role="columnheader" class="standings-table__col-num" title="Partidos jugados">J</span>
+        <span role="columnheader" class="standings-table__col-num" title="Victorias">G</span>
+        <span role="columnheader" class="standings-table__col-num" title="Empates">E</span>
+        <span role="columnheader" class="standings-table__col-num" title="Derrotas">P</span>
+        <span role="columnheader" class="standings-table__col-num" title="Puntos a favor">PF</span>
+        <span role="columnheader" class="standings-table__col-num" title="Puntos en contra"
+          >PC</span
+        >
+        <span role="columnheader" class="standings-table__col-num" title="Diferencia">DIF</span>
+        <span role="columnheader" class="standings-table__col-form">Forma</span>
+        <span role="columnheader" class="standings-table__col-pts">PTS</span>
+      </div>
+
+      <ol class="standings-table__body" role="rowgroup">
+        @for (row of standingsStore.rows(); track row.teamId) {
+          <li
+            class="standings-table__row"
+            role="row"
+            [class.standings-table__row--gold]="row.rank === 1"
+            [class.standings-table__row--silver]="row.rank === 2"
+            [class.standings-table__row--bronze]="row.rank === 3"
+          >
+            <span class="standings-table__rank" role="cell">
+              <span
+                class="standings-table__rank-badge standings-table__rank-badge--{{
+                  row.rank <= 3 ? row.rank : 'default'
+                }}"
+              >
+                {{ row.rank }}
+              </span>
+            </span>
+
+            <div class="standings-table__team" role="cell">
+              @if (row.teamLogo) {
+                <img class="standings-table__logo" [src]="row.teamLogo" [alt]="row.teamName" />
+              } @else {
+                <span class="standings-table__logo standings-table__logo--placeholder">
+                  {{ row.teamName.charAt(0) }}
+                </span>
+              }
+              <span class="standings-table__team-name">{{ row.teamName }}</span>
+            </div>
+
+            <span class="standings-table__num" role="cell">{{ row.played }}</span>
+            <span class="standings-table__num standings-table__num--won" role="cell">{{
+              row.won
+            }}</span>
+            <span class="standings-table__num" role="cell">{{ row.drawn }}</span>
+            <span class="standings-table__num standings-table__num--lost" role="cell">{{
+              row.lost
+            }}</span>
+            <span class="standings-table__num" role="cell">{{ row.pointsFor }}</span>
+            <span class="standings-table__num" role="cell">{{ row.pointsAgainst }}</span>
+            <span
+              class="standings-table__num standings-table__num--diff"
+              role="cell"
+              [class.standings-table__num--positive]="row.pointsDiff > 0"
+              [class.standings-table__num--negative]="row.pointsDiff < 0"
+            >
+              {{ row.pointsDiff > 0 ? '+' : '' }}{{ row.pointsDiff }}
+            </span>
+
+            <div class="standings-table__form" role="cell" aria-label="Últimos resultados">
+              @for (result of row.form; track $index) {
+                <span
+                  class="standings-table__form-badge standings-table__form-badge--{{ result }}"
+                  [attr.aria-label]="
+                    result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'
+                  "
+                >
+                  {{ result === 'W' ? 'V' : result === 'D' ? 'E' : 'D' }}
+                </span>
+              }
+            </div>
+
+            <span class="standings-table__pts" role="cell">{{ row.points }}</span>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <p class="standings-legend">
+      <span class="standings-legend__item">J — Jugados</span>
+      <span class="standings-legend__item">G — Ganados</span>
+      <span class="standings-legend__item">E — Empatados</span>
+      <span class="standings-legend__item">P — Perdidos</span>
+      <span class="standings-legend__item">PF — Puntos a favor</span>
+      <span class="standings-legend__item">PC — Puntos en contra</span>
+      <span class="standings-legend__item">DIF — Diferencia</span>
+      <span class="standings-legend__item">PTS — Puntos de liga</span>
+    </p>
+  }
+</div>

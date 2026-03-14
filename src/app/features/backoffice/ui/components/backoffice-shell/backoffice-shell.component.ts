@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   ActivatedRoute,
   type ActivatedRouteSnapshot,
@@ -14,8 +21,8 @@ import { filter } from 'rxjs';
 import { BACKOFFICE_ROOT_PATH } from '../../models/backoffice-navigation.model';
 import { type BackofficeRouteData } from '../../models/backoffice-route-data';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
+import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { RoleBadgeComponent } from '../role-badge/role-badge.component';
-import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import { type BackofficeRole } from '../../../domain/entities/backoffice-role';
 
 interface BackofficePageContext {
@@ -30,14 +37,7 @@ interface BackofficePageContext {
   host: {
     class: 'backoffice-shell',
   },
-  imports: [
-    LucideAngularModule,
-    RoleBadgeComponent,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    StatusBadgeComponent,
-  ],
+  imports: [LucideAngularModule, RoleBadgeComponent, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './backoffice-shell.component.html',
   styleUrl: './backoffice-shell.component.scss',
 })
@@ -47,12 +47,19 @@ export class BackofficeShellComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
 
   protected readonly sessionStore = inject(BackofficeSessionStore);
+  protected readonly teamsStore = inject(BackofficeTeamsStore);
   protected readonly rootPath = BACKOFFICE_ROOT_PATH;
+  protected readonly presidentTeamName = computed(() => {
+    const id = this.sessionStore.currentPresidentTeamId();
+    return this.teamsStore.teams().find((t) => t.id === id)?.name ?? null;
+  });
   protected readonly chevronRightIcon = ChevronRight;
   protected readonly navigation = this.sessionStore.navigation;
   protected readonly pageContext = signal(resolvePageContext(this.activatedRoute.snapshot));
 
   constructor() {
+    void this.teamsStore.load();
+
     const navigationSubscription = this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -74,6 +81,16 @@ export class BackofficeShellComponent {
     }
 
     this.sessionStore.updateRoleFromValue(target.value);
+  }
+
+  protected onPresidentTeamChange(event: Event): void {
+    const target = event.target;
+
+    if (!(target instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    this.sessionStore.updatePresidentTeam(target.value);
   }
 
   protected toRoleOptionLabel(role: BackofficeRole): string {

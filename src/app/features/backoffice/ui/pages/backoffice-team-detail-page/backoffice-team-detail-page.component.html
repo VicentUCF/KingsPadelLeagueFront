@@ -1,0 +1,98 @@
+<div class="team-detail">
+  @if (teamsStore.isLoading() || playersStore.isLoading()) {
+    <p class="team-detail__loading">Cargando equipo…</p>
+  } @else if (!teamCard()) {
+    <p class="team-detail__error">Equipo no encontrado.</p>
+  } @else {
+    <header
+      class="team-detail__hero"
+      [style.--team-primary]="teamCard()!.primaryColor"
+      [style.--team-secondary]="teamCard()!.secondaryColor"
+    >
+      <div class="team-detail__hero-swatch" aria-hidden="true"></div>
+      <div class="team-detail__hero-copy">
+        <h1 class="team-detail__hero-name">{{ teamCard()!.title }}</h1>
+        <p class="team-detail__hero-sub">{{ teamCard()!.subtitle }}</p>
+        <p class="team-detail__hero-president">{{ teamCard()!.presidentLabel }}</p>
+      </div>
+      <div class="team-detail__hero-stats" aria-label="Estadísticas del equipo">
+        <div class="team-detail__stat">
+          <span class="team-detail__stat-value">{{ roster().length }}</span>
+          <span class="team-detail__stat-label">Jugadores</span>
+        </div>
+        <div class="team-detail__stat">
+          <span class="team-detail__stat-value">{{ totalWon() }}</span>
+          <span class="team-detail__stat-label">Partidas ganadas</span>
+        </div>
+        <div class="team-detail__stat">
+          <span class="team-detail__stat-value">{{ totalLost() }}</span>
+          <span class="team-detail__stat-label">Partidas perdidas</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="team-detail__section">
+      <header class="team-detail__section-header">
+        <h2>Plantilla</h2>
+        <span class="c-chip c-chip--small c-chip--tone-brand">{{ roster().length }} jugadores</span>
+      </header>
+
+      @if (roster().length === 0) {
+        <p class="team-detail__empty">No hay jugadores registrados en este equipo.</p>
+      } @else {
+        <div class="roster-table" role="table" aria-label="Plantilla del equipo">
+          <div class="roster-table__head" role="row">
+            <span role="columnheader">Jugador</span>
+            <span role="columnheader">Posición</span>
+            <span role="columnheader" title="Partidas jugadas">PJ</span>
+            <span role="columnheader" title="Partidas ganadas">PG</span>
+            <span role="columnheader" title="Partidas perdidas">PP</span>
+            <span role="columnheader">% Vic.</span>
+            <span role="columnheader">Valor</span>
+          </div>
+
+          @for (player of roster(); track player.id) {
+            <div
+              class="roster-table__row"
+              [class.roster-table__row--president]="player.isPresident"
+              role="row"
+            >
+              <div class="roster-table__player" role="cell">
+                <span class="roster-table__avatar" aria-hidden="true">
+                  {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                </span>
+                <div class="roster-table__player-info">
+                  <p class="roster-table__name">{{ player.firstName }} {{ player.lastName }}</p>
+                  @if (player.isPresident) {
+                    <span class="roster-table__president-badge">Presidente</span>
+                  }
+                </div>
+              </div>
+              <span class="roster-table__pos" role="cell">
+                {{ positionLabel(player.preferredPosition) }}
+              </span>
+              <span class="roster-table__num" role="cell">
+                {{ player.wonGames + player.lostGames }}
+              </span>
+              <span class="roster-table__num roster-table__num--won" role="cell">
+                {{ player.wonGames }}
+              </span>
+              <span class="roster-table__num roster-table__num--lost" role="cell">
+                {{ player.lostGames }}
+              </span>
+              <span class="roster-table__num" role="cell">{{ winRate(player) }}</span>
+              <span class="roster-table__value" role="cell">{{ player.value }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <a
+      class="c-button c-button--pill c-button--ghost c-button--sm"
+      routerLink="/backoffice/equipos"
+    >
+      ← Volver a equipos
+    </a>
+  }
+</div>

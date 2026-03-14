@@ -10,17 +10,33 @@
   (closed)="close()"
 >
   <div modalBody class="team-form-dialog__body">
-    <div class="team-form-dialog__steps" aria-label="Progreso del formulario">
-      <div [class.team-form-dialog__step--active]="isCurrentStep(0)" class="team-form-dialog__step">
-        <span>1</span>
-        <strong>Identidad</strong>
-      </div>
-
-      <div [class.team-form-dialog__step--active]="isCurrentStep(1)" class="team-form-dialog__step">
-        <span>2</span>
-        <strong>Operación</strong>
-      </div>
-    </div>
+    <nav class="team-form-dialog__steps" aria-label="Progreso del formulario">
+      <button
+        type="button"
+        class="team-form-dialog__step"
+        [class.team-form-dialog__step--active]="isCurrentStep(0)"
+        (click)="currentStep.set(0)"
+      >
+        <span class="team-form-dialog__step-num">1</span>
+        <div>
+          <strong>Identidad</strong>
+          <small>Nombre y siglas</small>
+        </div>
+      </button>
+      <div class="team-form-dialog__step-divider" aria-hidden="true"></div>
+      <button
+        type="button"
+        class="team-form-dialog__step"
+        [class.team-form-dialog__step--active]="isCurrentStep(1)"
+        (click)="nextStep()"
+      >
+        <span class="team-form-dialog__step-num">2</span>
+        <div>
+          <strong>Operación</strong>
+          <small>Presidente y colores</small>
+        </div>
+      </button>
+    </nav>
 
     @if (submissionError()) {
       <p class="team-form-dialog__error" role="alert">{{ submissionError() }}</p>
@@ -30,61 +46,86 @@
       @switch (currentStep()) {
         @case (0) {
           <div class="team-form-dialog__grid">
-            <app-base-input
-              formControlName="name"
-              label="Nombre"
-              [errorMessage]="
-                hasControlError('name') ? 'El nombre del equipo es obligatorio.' : null
-              "
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Nombre <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('name')"
+                formControlName="name"
+                type="text"
+                autocomplete="off"
+              />
+              @if (hasControlError('name')) {
+                <p class="c-field__error" role="alert">El nombre del equipo es obligatorio.</p>
+              }
+            </label>
 
-            <app-base-input
-              formControlName="shortName"
-              label="Siglas"
-              [errorMessage]="
-                hasControlError('shortName') ? 'Usa entre 2 y 5 letras en mayúsculas.' : null
-              "
-              [maxLength]="5"
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Siglas <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('shortName')"
+                formControlName="shortName"
+                type="text"
+                maxlength="5"
+                autocomplete="off"
+                placeholder="KOF"
+              />
+              @if (hasControlError('shortName')) {
+                <p class="c-field__error" role="alert">Usa entre 2 y 5 letras en mayúsculas.</p>
+              } @else {
+                <p class="c-field__helper">2-5 letras en mayúsculas (ej. KOF, MJR)</p>
+              }
+            </label>
           </div>
         }
         @case (1) {
           <div class="team-form-dialog__grid">
-            <app-base-input
-              formControlName="presidentName"
-              label="Presidente"
-              [errorMessage]="
-                hasControlError('presidentName') ? 'La presidencia actual es obligatoria.' : null
-              "
-              required
-              type="text"
-            />
+            <label class="c-field c-field--full">
+              <span class="c-field__label">Presidente <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('presidentName')"
+                formControlName="presidentName"
+                type="text"
+                autocomplete="off"
+              />
+              @if (hasControlError('presidentName')) {
+                <p class="c-field__error" role="alert">La presidencia actual es obligatoria.</p>
+              }
+            </label>
 
-            <app-base-input
-              formControlName="primaryColor"
-              helperText="Formato hexadecimal, por ejemplo #1B1F3B."
-              label="Color principal"
-              [errorMessage]="
-                hasControlError('primaryColor') ? 'Introduce un color hexadecimal válido.' : null
-              "
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Color principal <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('primaryColor')"
+                formControlName="primaryColor"
+                type="text"
+                placeholder="#1B1F3B"
+              />
+              @if (hasControlError('primaryColor')) {
+                <p class="c-field__error" role="alert">Introduce un color hexadecimal válido.</p>
+              } @else {
+                <p class="c-field__helper">Formato hexadecimal, p.ej. #1B1F3B</p>
+              }
+            </label>
 
-            <app-base-input
-              formControlName="secondaryColor"
-              helperText="Formato hexadecimal, por ejemplo #D4AF37."
-              label="Color secundario"
-              [errorMessage]="
-                hasControlError('secondaryColor') ? 'Introduce un color hexadecimal válido.' : null
-              "
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Color secundario <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('secondaryColor')"
+                formControlName="secondaryColor"
+                type="text"
+                placeholder="#D4AF37"
+              />
+              @if (hasControlError('secondaryColor')) {
+                <p class="c-field__error" role="alert">Introduce un color hexadecimal válido.</p>
+              } @else {
+                <p class="c-field__helper">Formato hexadecimal, p.ej. #D4AF37</p>
+              }
+            </label>
           </div>
         }
       }
@@ -93,7 +134,7 @@
 
   <div class="team-form-dialog__actions" modalFooter>
     <button
-      class="team-form-dialog__button team-form-dialog__button--secondary"
+      class="c-button c-button--pill c-button--ghost c-button--md"
       type="button"
       (click)="close()"
     >
@@ -102,31 +143,31 @@
 
     @if (!isFirstStep()) {
       <button
-        class="team-form-dialog__button team-form-dialog__button--secondary"
+        class="c-button c-button--pill c-button--ghost c-button--md"
         type="button"
         (click)="previousStep()"
       >
-        Anterior
+        ← Anterior
       </button>
     }
 
     @if (isFirstStep()) {
       <button
-        class="team-form-dialog__button team-form-dialog__button--primary"
+        class="c-button c-button--pill c-button--primary c-button--md"
         type="button"
         (click)="nextStep()"
       >
-        Siguiente
+        Siguiente →
       </button>
     } @else {
       <button
-        class="team-form-dialog__button team-form-dialog__button--primary"
+        class="c-button c-button--pill c-button--primary c-button--md"
         form="team-form"
         [disabled]="isSubmitting()"
         type="submit"
       >
         {{
-          isSubmitting() ? 'Guardando...' : mode() === 'create' ? 'Crear equipo' : 'Guardar cambios'
+          isSubmitting() ? 'Guardando…' : mode() === 'create' ? 'Crear equipo' : 'Guardar cambios'
         }}
       </button>
     }

@@ -10,17 +10,32 @@
   (closed)="close()"
 >
   <div modalBody class="season-form-dialog__body">
-    <div class="season-form-dialog__steps" aria-label="Progreso del formulario">
+    <nav class="season-form-dialog__steps" aria-label="Progreso del formulario">
       @for (step of steps; track step.label; let index = $index) {
-        <div
-          [class.season-form-dialog__step--active]="isCurrentStep(index)"
+        @if (index > 0) {
+          <div class="season-form-dialog__step-divider" aria-hidden="true"></div>
+        }
+        <button
+          type="button"
           class="season-form-dialog__step"
+          [class.season-form-dialog__step--active]="isCurrentStep(index)"
+          [class.season-form-dialog__step--done]="currentStep() > index"
+          (click)="goToStep(index)"
         >
-          <span>{{ index + 1 }}</span>
-          <strong>{{ step.label }}</strong>
-        </div>
+          <span class="season-form-dialog__step-num">
+            @if (currentStep() > index) {
+              ✓
+            } @else {
+              {{ index + 1 }}
+            }
+          </span>
+          <div>
+            <strong>{{ step.label }}</strong>
+            <small>{{ step.subtitle }}</small>
+          </div>
+        </button>
       }
-    </div>
+    </nav>
 
     @if (submissionError()) {
       <p class="season-form-dialog__error" role="alert">{{ submissionError() }}</p>
@@ -35,48 +50,67 @@
       @switch (currentStep()) {
         @case (0) {
           <div class="season-form-dialog__grid">
-            <app-base-input
-              formControlName="name"
-              label="Nombre"
-              [errorMessage]="
-                hasControlError('name') ? 'El nombre de la season es obligatorio.' : null
-              "
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Nombre <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('name')"
+                formControlName="name"
+                type="text"
+                autocomplete="off"
+                placeholder="Temporada 2025"
+              />
+              @if (hasControlError('name')) {
+                <p class="c-field__error" role="alert">El nombre de la season es obligatorio.</p>
+              }
+            </label>
 
-            <app-base-input
-              formControlName="year"
-              label="Año"
-              [errorMessage]="
-                hasControlError('year') ? 'Introduce un año válido entre 2000 y 2100.' : null
-              "
-              [max]="2100"
-              [min]="2000"
-              required
-              type="number"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Año <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('year')"
+                formControlName="year"
+                type="number"
+                min="2000"
+                max="2100"
+                placeholder="2025"
+              />
+              @if (hasControlError('year')) {
+                <p class="c-field__error" role="alert">
+                  Introduce un año válido entre 2000 y 2100.
+                </p>
+              }
+            </label>
           </div>
         }
         @case (1) {
           <div class="season-form-dialog__grid">
-            <app-base-input
-              formControlName="startDate"
-              label="Inicio"
-              [errorMessage]="
-                hasControlError('startDate') ? 'La fecha de inicio es obligatoria.' : null
-              "
-              required
-              type="date"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Fecha de inicio <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('startDate')"
+                formControlName="startDate"
+                type="date"
+              />
+              @if (hasControlError('startDate')) {
+                <p class="c-field__error" role="alert">La fecha de inicio es obligatoria.</p>
+              }
+            </label>
 
-            <app-base-input
-              formControlName="endDate"
-              label="Fin"
-              [errorMessage]="hasControlError('endDate') ? 'La fecha de fin es obligatoria.' : null"
-              required
-              type="date"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Fecha de fin <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('endDate')"
+                formControlName="endDate"
+                type="date"
+              />
+              @if (hasControlError('endDate')) {
+                <p class="c-field__error" role="alert">La fecha de fin es obligatoria.</p>
+              }
+            </label>
           </div>
 
           @if (hasDateRangeError()) {
@@ -87,17 +121,24 @@
         }
         @case (2) {
           <div class="season-form-dialog__stack">
-            <app-base-select formControlName="status" label="Estado base">
-              <option value="DRAFT">Borrador</option>
-              <option value="ACTIVE">Activa</option>
-            </app-base-select>
+            <label class="c-field">
+              <span class="c-field__label">Estado base</span>
+              <select class="c-select c-input--md" formControlName="status">
+                <option value="DRAFT">Borrador</option>
+                <option value="ACTIVE">Activa</option>
+              </select>
+            </label>
 
-            <app-base-textarea
-              formControlName="notes"
-              helperText="Usa una línea por nota."
-              label="Notas operativas"
-              rows="5"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Notas operativas</span>
+              <textarea
+                class="c-input c-textarea"
+                formControlName="notes"
+                rows="5"
+                placeholder="Una nota por línea…"
+              ></textarea>
+              <p class="c-field__helper">Usa una línea por nota.</p>
+            </label>
           </div>
         }
       }
@@ -106,7 +147,7 @@
 
   <div class="season-form-dialog__actions" modalFooter>
     <button
-      class="season-form-dialog__button season-form-dialog__button--secondary"
+      class="c-button c-button--pill c-button--ghost c-button--md"
       type="button"
       (click)="close()"
     >
@@ -115,31 +156,31 @@
 
     @if (!isFirstStep()) {
       <button
-        class="season-form-dialog__button season-form-dialog__button--secondary"
+        class="c-button c-button--pill c-button--ghost c-button--md"
         type="button"
         (click)="previousStep()"
       >
-        Anterior
+        ← Anterior
       </button>
     }
 
     @if (!isLastStep()) {
       <button
-        class="season-form-dialog__button season-form-dialog__button--primary"
+        class="c-button c-button--pill c-button--primary c-button--md"
         type="button"
         (click)="nextStep()"
       >
-        Siguiente
+        Siguiente →
       </button>
     } @else {
       <button
-        class="season-form-dialog__button season-form-dialog__button--primary"
+        class="c-button c-button--pill c-button--primary c-button--md"
         form="season-form"
         [disabled]="isSubmitting()"
         type="submit"
       >
         {{
-          isSubmitting() ? 'Guardando...' : mode() === 'create' ? 'Crear season' : 'Guardar cambios'
+          isSubmitting() ? 'Guardando…' : mode() === 'create' ? 'Crear season' : 'Guardar cambios'
         }}
       </button>
     }

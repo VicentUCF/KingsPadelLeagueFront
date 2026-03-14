@@ -1,85 +1,67 @@
-<a class="backoffice-shell__skip-link u-visually-hidden-focusable" href="#backoffice-content">
-  Ir al contenido del backoffice
-</a>
-
-<aside class="backoffice-shell__sidebar">
-  <a aria-label="Backoffice" class="backoffice-shell__brand" routerLink="/backoffice">
-    <span aria-hidden="true" class="backoffice-shell__brand-eyebrow">KingsPadelLeague</span>
-    <span class="backoffice-shell__brand-title">Backoffice</span>
-    <span class="backoffice-shell__brand-copy">
-      Operación interna de jornadas, equipos y decisiones de liga.
-    </span>
+<div class="backoffice-shell">
+  <a class="backoffice-shell__skip-link u-visually-hidden-focusable" href="#backoffice-content">
+    Ir al contenido del backoffice
   </a>
 
-  <nav aria-label="Backoffice" class="backoffice-shell__nav">
-    @for (navigationItem of navigation(); track navigationItem.path) {
-      @if (navigationItem.isAccessible) {
-        <a
-          class="backoffice-shell__nav-link"
-          [routerLink]="navigationItem.path"
-          [routerLinkActiveOptions]="{ exact: isDashboardLink(navigationItem.path) }"
-          routerLinkActive="backoffice-shell__nav-link--active"
-        >
-          <div class="backoffice-shell__nav-main">
-            <lucide-angular
-              [img]="navigationItem.icon"
-              [size]="16"
-              aria-hidden="true"
-              class="backoffice-shell__nav-icon"
-            />
-            <span>{{ navigationItem.label }}</span>
-          </div>
+  <aside class="backoffice-shell__sidebar">
+    <!-- ── Header ─────────────────────────────────────────────────────────────── -->
+    <header class="backoffice-shell__sidebar-header">
+      <a aria-label="Backoffice" class="backoffice-shell__brand" routerLink="/backoffice">
+        <span aria-hidden="true" class="backoffice-shell__brand-eyebrow">KingsPadelLeague</span>
+        <span class="backoffice-shell__brand-title">Backoffice</span>
+      </a>
 
-          <app-status-badge
-            [label]="navigationItem.isImplemented ? 'Activo' : 'Roadmap'"
-            [tone]="navigationItem.isImplemented ? 'success' : 'neutral'"
-          />
-        </a>
-      } @else {
-        <span
-          aria-disabled="true"
-          class="backoffice-shell__nav-link backoffice-shell__nav-link--disabled"
-        >
-          <span class="backoffice-shell__nav-main">
-            <lucide-angular
-              [img]="navigationItem.icon"
-              [size]="16"
-              aria-hidden="true"
-              class="backoffice-shell__nav-icon"
-            />
-            <span>{{ navigationItem.label }}</span>
-          </span>
-
-          <app-status-badge label="Bloqueado" tone="warning" />
-        </span>
-      }
-    }
-  </nav>
-</aside>
-
-<div class="backoffice-shell__main">
-  <header class="backoffice-shell__topbar">
-    <nav aria-label="Breadcrumb" class="backoffice-shell__breadcrumb">
-      <a routerLink="/backoffice">Backoffice</a>
-      <lucide-angular [img]="chevronRightIcon" [size]="14" aria-hidden="true" />
-      <span aria-current="page">{{ pageContext().breadcrumb }}</span>
-    </nav>
-
-    <div class="backoffice-shell__topbar-grid">
-      <div class="backoffice-shell__page-copy">
-        <p class="backoffice-shell__eyebrow">Panel operativo interno</p>
-        <h1>{{ pageContext().title }}</h1>
-        <p class="backoffice-shell__description">{{ pageContext().description }}</p>
-      </div>
-
-      <div class="backoffice-shell__role-panel">
+      <div class="backoffice-shell__session">
         <app-role-badge [role]="sessionStore.currentRole()" />
+        <div class="backoffice-shell__session-info">
+          @if (sessionStore.currentRole() === 'ADMIN') {
+            <span class="backoffice-shell__session-name">Administrador</span>
+            <span class="backoffice-shell__session-sub">Acceso total</span>
+          } @else {
+            <span class="backoffice-shell__session-name">Presidente</span>
+            @if (presidentTeamName(); as teamName) {
+              <span class="backoffice-shell__session-sub">{{ teamName }}</span>
+            }
+          }
+        </div>
+      </div>
+    </header>
 
-        <label class="backoffice-shell__role-label" for="backoffice-role-switch">
-          Rol simulado
-        </label>
+    <!-- ── Navigation ─────────────────────────────────────────────────────────── -->
+    <div class="backoffice-shell__nav-section">
+      <p aria-hidden="true" class="backoffice-shell__nav-heading">Navegación</p>
+      <nav aria-label="Backoffice" class="backoffice-shell__nav">
+        @for (navigationItem of navigation(); track navigationItem.path) {
+          @if (navigationItem.isAccessible) {
+            <a
+              class="backoffice-shell__nav-link"
+              [routerLink]="navigationItem.path"
+              [routerLinkActiveOptions]="{ exact: isDashboardLink(navigationItem.path) }"
+              routerLinkActive="backoffice-shell__nav-link--active"
+            >
+              <div class="backoffice-shell__nav-main">
+                <lucide-angular
+                  [img]="navigationItem.icon"
+                  [size]="16"
+                  aria-hidden="true"
+                  class="backoffice-shell__nav-icon"
+                />
+                <span>{{ navigationItem.label }}</span>
+              </div>
+            </a>
+          }
+        }
+      </nav>
+    </div>
+
+    <!-- ── Footer: role simulator ─────────────────────────────────────────────── -->
+    <footer class="backoffice-shell__sidebar-footer">
+      <p aria-hidden="true" class="backoffice-shell__nav-heading">Simulador de rol</p>
+
+      <div class="backoffice-shell__sim">
+        <label class="backoffice-shell__sim-label" for="backoffice-role-switch">Rol</label>
         <select
-          class="backoffice-shell__role-select"
+          class="backoffice-shell__sim-select"
           id="backoffice-role-switch"
           [value]="sessionStore.currentRole()"
           (change)="onRoleChange($event)"
@@ -88,11 +70,41 @@
             <option [value]="role">{{ toRoleOptionLabel(role) }}</option>
           }
         </select>
-      </div>
-    </div>
-  </header>
 
-  <main class="backoffice-shell__content" id="backoffice-content">
-    <router-outlet />
-  </main>
+        @if (sessionStore.currentRole() === 'PRESIDENT') {
+          <label class="backoffice-shell__sim-label" for="backoffice-president-team">Equipo</label>
+          <select
+            class="backoffice-shell__sim-select"
+            id="backoffice-president-team"
+            [value]="sessionStore.currentPresidentTeamId()"
+            (change)="onPresidentTeamChange($event)"
+          >
+            @for (team of teamsStore.teams(); track team.id) {
+              <option [value]="team.id">{{ team.name }}</option>
+            }
+          </select>
+        }
+      </div>
+    </footer>
+  </aside>
+
+  <div class="backoffice-shell__main">
+    <header class="backoffice-shell__topbar">
+      <nav aria-label="Breadcrumb" class="backoffice-shell__breadcrumb">
+        <a routerLink="/backoffice">Backoffice</a>
+        <lucide-angular [img]="chevronRightIcon" [size]="14" aria-hidden="true" />
+        <span aria-current="page">{{ pageContext().breadcrumb }}</span>
+      </nav>
+
+      <div class="backoffice-shell__page-copy">
+        <p class="backoffice-shell__eyebrow">Panel operativo interno</p>
+        <h1>{{ pageContext().title }}</h1>
+        <p class="backoffice-shell__description">{{ pageContext().description }}</p>
+      </div>
+    </header>
+
+    <main class="backoffice-shell__content" id="backoffice-content">
+      <router-outlet />
+    </main>
+  </div>
 </div>

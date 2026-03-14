@@ -10,23 +10,33 @@
   (closed)="close()"
 >
   <div modalBody class="player-form-dialog__body">
-    <div class="player-form-dialog__steps" aria-label="Progreso del formulario">
-      <div
+    <nav class="player-form-dialog__steps" aria-label="Progreso del formulario">
+      <button
+        type="button"
+        class="player-form-dialog__step"
         [class.player-form-dialog__step--active]="isCurrentStep(0)"
-        class="player-form-dialog__step"
+        (click)="currentStep.set(0)"
       >
-        <span>1</span>
-        <strong>Identidad</strong>
-      </div>
-
-      <div
+        <span class="player-form-dialog__step-num">1</span>
+        <div class="player-form-dialog__step-info">
+          <strong>Identidad</strong>
+          <small>Nombre y avatar</small>
+        </div>
+      </button>
+      <div class="player-form-dialog__step-divider" aria-hidden="true"></div>
+      <button
+        type="button"
+        class="player-form-dialog__step"
         [class.player-form-dialog__step--active]="isCurrentStep(1)"
-        class="player-form-dialog__step"
+        (click)="nextStep()"
       >
-        <span>2</span>
-        <strong>Perfil</strong>
-      </div>
-    </div>
+        <span class="player-form-dialog__step-num">2</span>
+        <div class="player-form-dialog__step-info">
+          <strong>Perfil</strong>
+          <small>Posición y equipo</small>
+        </div>
+      </button>
+    </nav>
 
     @if (submissionError()) {
       <p class="player-form-dialog__error" role="alert">{{ submissionError() }}</p>
@@ -41,63 +51,90 @@
       @switch (currentStep()) {
         @case (0) {
           <div class="player-form-dialog__grid">
-            <app-base-input
-              formControlName="fullName"
-              label="Nombre completo"
-              [errorMessage]="
-                hasControlError('fullName') ? 'El nombre completo es obligatorio.' : null
-              "
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Nombre completo <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('fullName')"
+                formControlName="fullName"
+                type="text"
+                autocomplete="off"
+              />
+              @if (hasControlError('fullName')) {
+                <p class="c-field__error" role="alert">El nombre completo es obligatorio.</p>
+              }
+            </label>
 
-            <app-base-input
-              formControlName="nickName"
-              label="Nick"
-              [errorMessage]="hasControlError('nickName') ? 'El nick es obligatorio.' : null"
-              required
-              type="text"
-            />
+            <label class="c-field">
+              <span class="c-field__label">Nick <span aria-hidden="true">*</span></span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('nickName')"
+                formControlName="nickName"
+                type="text"
+                autocomplete="off"
+              />
+              @if (hasControlError('nickName')) {
+                <p class="c-field__error" role="alert">El nick es obligatorio.</p>
+              }
+            </label>
 
-            <app-base-input
-              class="player-form-dialog__field--full"
-              formControlName="avatarPath"
-              helperText="Ruta opcional de imagen. Si se deja vacía, se mostrará un fallback textual."
-              label="Avatar"
-              type="text"
-            />
+            <label class="c-field c-field--full">
+              <span class="c-field__label">Avatar</span>
+              <input
+                class="c-input c-input--md"
+                formControlName="avatarPath"
+                type="text"
+                placeholder="Ruta o URL de imagen (opcional)"
+              />
+              <p class="c-field__helper">Si se deja vacío se mostrará un fallback textual.</p>
+            </label>
           </div>
         }
         @case (1) {
           <div class="player-form-dialog__grid">
-            <app-base-select formControlName="preferredSideLabel" label="Perfil de pista">
-              <option value="Revés">Revés</option>
-              <option value="Derecha">Derecha</option>
-              <option value="Ambas">Ambas</option>
-            </app-base-select>
+            <label class="c-field">
+              <span class="c-field__label">Perfil de pista</span>
+              <select class="c-select c-input--md" formControlName="preferredSideLabel">
+                <option value="Revés">Revés</option>
+                <option value="Derecha">Derecha</option>
+                <option value="Ambas">Ambas</option>
+              </select>
+            </label>
 
-            <app-base-select formControlName="currentTeamId" label="Equipo actual">
-              <option value="">Sin equipo activo</option>
-              @for (team of teamOptions(); track team.id) {
-                <option [value]="team.id">{{ team.label }}</option>
+            <label class="c-field">
+              <span class="c-field__label">Equipo actual</span>
+              <select class="c-select c-input--md" formControlName="currentTeamId">
+                <option value="">Sin equipo activo</option>
+                @for (team of teamOptions(); track team.id) {
+                  <option [value]="team.id">{{ team.label }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="c-field">
+              <span class="c-field__label">Email vinculado</span>
+              <input
+                class="c-input c-input--md"
+                [class.c-input--invalid]="hasControlError('linkedUserEmail')"
+                formControlName="linkedUserEmail"
+                type="email"
+                placeholder="usuario@ejemplo.com"
+              />
+              @if (hasControlError('linkedUserEmail')) {
+                <p class="c-field__error" role="alert">
+                  Introduce un email válido o deja el campo vacío.
+                </p>
               }
-            </app-base-select>
+            </label>
 
-            <app-base-input
-              formControlName="linkedUserEmail"
-              label="Email vinculado"
-              [errorMessage]="
-                hasControlError('linkedUserEmail')
-                  ? 'Introduce un email válido o deja el campo vacío.'
-                  : null
-              "
-              type="email"
-            />
-
-            <app-base-select formControlName="status" label="Estado">
-              <option value="ACTIVE">Activo</option>
-              <option value="INACTIVE">Inactivo</option>
-            </app-base-select>
+            <label class="c-field">
+              <span class="c-field__label">Estado</span>
+              <select class="c-select c-input--md" formControlName="status">
+                <option value="ACTIVE">Activo</option>
+                <option value="INACTIVE">Inactivo</option>
+              </select>
+            </label>
           </div>
         }
       }
@@ -106,7 +143,7 @@
 
   <div class="player-form-dialog__actions" modalFooter>
     <button
-      class="player-form-dialog__button player-form-dialog__button--secondary"
+      class="c-button c-button--pill c-button--ghost c-button--md"
       type="button"
       (click)="close()"
     >
@@ -115,31 +152,31 @@
 
     @if (!isFirstStep()) {
       <button
-        class="player-form-dialog__button player-form-dialog__button--secondary"
+        class="c-button c-button--pill c-button--ghost c-button--md"
         type="button"
         (click)="previousStep()"
       >
-        Anterior
+        ← Anterior
       </button>
     }
 
     @if (isFirstStep()) {
       <button
-        class="player-form-dialog__button player-form-dialog__button--primary"
+        class="c-button c-button--pill c-button--primary c-button--md"
         type="button"
         (click)="nextStep()"
       >
-        Siguiente
+        Siguiente →
       </button>
     } @else {
       <button
-        class="player-form-dialog__button player-form-dialog__button--primary"
+        class="c-button c-button--pill c-button--primary c-button--md"
         form="player-form"
         [disabled]="isSubmitting()"
         type="submit"
       >
         {{
-          isSubmitting() ? 'Guardando...' : mode() === 'create' ? 'Crear ficha' : 'Guardar cambios'
+          isSubmitting() ? 'Guardando…' : mode() === 'create' ? 'Crear ficha' : 'Guardar cambios'
         }}
       </button>
     }

@@ -12,9 +12,6 @@ import {
   type BackofficeCrudFormMode,
   type BackofficeSeasonFormValue,
 } from '../../models/backoffice-crud.model';
-import { BaseInputComponent } from '@shared/ui/base-input/base-input.component';
-import { BaseSelectComponent } from '@shared/ui/base-select/base-select.component';
-import { BaseTextareaComponent } from '@shared/ui/base-textarea/base-textarea.component';
 import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.component';
 
 type SeasonFormGroup = FormGroup<{
@@ -27,6 +24,7 @@ type SeasonFormGroup = FormGroup<{
 }>;
 
 interface SeasonFormStep {
+  readonly subtitle: string;
   readonly label: string;
 }
 
@@ -36,13 +34,7 @@ interface SeasonFormStep {
   host: {
     class: 'season-form-dialog',
   },
-  imports: [
-    BaseInputComponent,
-    BaseSelectComponent,
-    BaseTextareaComponent,
-    ModalShellComponent,
-    ReactiveFormsModule,
-  ],
+  imports: [ModalShellComponent, ReactiveFormsModule],
   templateUrl: './season-form-dialog.component.html',
   styleUrl: './season-form-dialog.component.scss',
 })
@@ -58,9 +50,9 @@ export class SeasonFormDialogComponent {
 
   protected readonly currentStep = signal(0);
   protected readonly steps: readonly SeasonFormStep[] = [
-    { label: 'Identidad' },
-    { label: 'Calendario' },
-    { label: 'Estado y notas' },
+    { label: 'Identidad', subtitle: 'Nombre y año' },
+    { label: 'Calendario', subtitle: 'Fechas de inicio y fin' },
+    { label: 'Estado y notas', subtitle: 'Estado y notas adicionales' },
   ];
   protected readonly form: SeasonFormGroup = new FormGroup(
     {
@@ -129,6 +121,14 @@ export class SeasonFormDialogComponent {
     }
 
     this.currentStep.update((step) => Math.min(step + 1, this.steps.length - 1));
+  }
+
+  protected goToStep(index: number): void {
+    if (index < this.currentStep()) {
+      this.currentStep.set(index);
+    } else {
+      this.nextStep();
+    }
   }
 
   protected previousStep(): void {

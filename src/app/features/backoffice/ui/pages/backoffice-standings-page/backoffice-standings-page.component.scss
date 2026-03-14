@@ -1,0 +1,386 @@
+.backoffice-standings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────────
+
+.standings-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2.5rem;
+  padding: 1.75rem 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgb(201 162 39 / 15%);
+  background: linear-gradient(135deg, rgb(201 162 39 / 6%), rgb(255 255 255 / 0.01));
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4rem;
+    right: -4rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(201 162 39 / 8%), transparent 70%);
+    pointer-events: none;
+  }
+
+  &__heading {
+    flex: 1 1 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    position: relative;
+  }
+
+  &__eyebrow {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-brand-strong);
+  }
+
+  &__title {
+    font-size: clamp(1.4rem, 2vw + 1rem, 1.9rem);
+    font-weight: 750;
+    color: var(--color-text-strong);
+    letter-spacing: -0.02em;
+    margin: 0;
+    font-family: var(--font-family-heading);
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+    max-width: 36rem;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(7rem, 1fr));
+    gap: 0.6rem;
+    align-content: start;
+
+    @media (max-width: 520px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.85rem;
+    border: 1px solid rgb(245 245 245 / 8%);
+    background: rgb(255 255 255 / 0.03);
+
+    &--active {
+      border-color: rgb(16 185 129 / 20%);
+      background: rgb(16 185 129 / 5%);
+    }
+    &--brand {
+      border-color: rgb(201 162 39 / 25%);
+      background: rgb(201 162 39 / 6%);
+    }
+  }
+
+  &__stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    line-height: 1;
+  }
+
+  &__stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+  }
+}
+
+// ── State ──────────────────────────────────────────────────────────────────────
+
+.standings-state {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+  &--error {
+    color: #f87171;
+  }
+}
+
+// ── Table ──────────────────────────────────────────────────────────────────────
+
+.standings-table {
+  border-radius: 1rem;
+  border: 1px solid rgb(245 245 245 / 7%);
+  overflow: hidden;
+
+  $cols: 2.5rem 1fr repeat(7, 2.5rem) 5rem 2.75rem;
+
+  &__header {
+    display: grid;
+    grid-template-columns: $cols;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: rgb(255 255 255 / 0.02);
+    border-bottom: 1px solid rgb(245 245 245 / 8%);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-muted);
+    align-items: center;
+  }
+
+  &__body {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: $cols;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgb(245 245 245 / 5%);
+    transition: background 0.15s;
+    position: relative;
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: rgb(255 255 255 / 0.015);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      background: transparent;
+      transition: background 0.2s;
+    }
+
+    &--gold::before {
+      background: #c9a227;
+    }
+    &--silver::before {
+      background: #9ca3af;
+    }
+    &--bronze::before {
+      background: #b45309;
+    }
+  }
+
+  &__rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__rank-badge {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+
+    &--1 {
+      background: rgb(201 162 39 / 20%);
+      border: 1.5px solid rgb(201 162 39 / 50%);
+      color: #c9a227;
+    }
+    &--2 {
+      background: rgb(156 163 175 / 15%);
+      border: 1.5px solid rgb(156 163 175 / 40%);
+      color: #d1d5db;
+    }
+    &--3 {
+      background: rgb(180 83 9 / 15%);
+      border: 1.5px solid rgb(180 83 9 / 40%);
+      color: #d97706;
+    }
+    &--default {
+      background: transparent;
+      border: 1.5px solid rgb(245 245 245 / 12%);
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__team {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+
+  &__logo {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    object-fit: contain;
+    background: rgb(255 255 255 / 0.04);
+
+    &--placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--color-brand-strong);
+      border: 1px solid rgb(201 162 39 / 20%);
+      background: rgb(201 162 39 / 8%);
+    }
+  }
+
+  &__team-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-strong);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__num {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    text-align: center;
+
+    &--won {
+      color: #6ee7b7;
+      font-weight: 600;
+    }
+    &--lost {
+      color: #fca5a5;
+    }
+
+    &--diff {
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+    &--positive {
+      color: #6ee7b7;
+    }
+    &--negative {
+      color: #fca5a5;
+    }
+  }
+
+  &__form {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  &__form-badge {
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+
+    &--W {
+      background: rgb(16 185 129 / 20%);
+      color: #6ee7b7;
+    }
+    &--D {
+      background: rgb(245 245 245 / 8%);
+      color: var(--color-text-muted);
+    }
+    &--L {
+      background: rgb(248 113 113 / 15%);
+      color: #fca5a5;
+    }
+  }
+
+  &__pts {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-strong);
+    text-align: center;
+  }
+
+  &__col-rank {
+    text-align: center;
+  }
+  &__col-num {
+    text-align: center;
+  }
+  &__col-form {
+  }
+  &__col-pts {
+    text-align: center;
+  }
+}
+
+// ── Legend ─────────────────────────────────────────────────────────────────────
+
+.standings-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+
+  &__item {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────────
+
+@media (max-width: 900px) {
+  .standings-table {
+    $cols-mobile: 2rem 1fr 2rem 2rem 2rem 4rem 2.5rem;
+
+    &__header {
+      grid-template-columns: $cols-mobile;
+
+      .standings-table__col-num:nth-child(5),
+      .standings-table__col-num:nth-child(6),
+      .standings-table__col-num:nth-child(7),
+      .standings-table__col-num:nth-child(8),
+      .standings-table__col-num:nth-child(9) {
+        display: none;
+      }
+    }
+
+    &__row {
+      grid-template-columns: $cols-mobile;
+    }
+
+    // hide E, PF, PC, DIF columns on mobile — keep J, G, P, form, PTS
+    & .standings-table__num:nth-child(4),
+    & .standings-table__num:nth-child(6),
+    & .standings-table__num:nth-child(7),
+    & .standings-table__num:nth-child(8) {
+      display: none;
+    }
+  }
+}

@@ -87,27 +87,6 @@ describe('BackofficeShellComponent', () => {
     expect(await screen.findByRole('heading', { name: /^Dashboard$/i })).toBeVisible();
   });
 
-  it('reflects page title and breadcrumb on placeholder modules', async () => {
-    const { fixture } = await render(RouterHostComponent, {
-      providers: [provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }])],
-    });
-
-    const router = fixture.componentRef.injector.get(Router);
-
-    await router.navigateByUrl('/backoffice/temporadas');
-    fixture.detectChanges();
-
-    expect(await screen.findByRole('heading', { name: /^Temporadas$/i })).toBeVisible();
-
-    const breadcrumb = screen.getByRole('navigation', { name: /Breadcrumb/i });
-
-    expect(within(breadcrumb).getByRole('link', { name: /Backoffice/i })).toHaveAttribute(
-      'href',
-      '/backoffice',
-    );
-    expect(within(breadcrumb).getByText('Temporadas')).toBeVisible();
-  });
-
   it('has no accessibility violations in the backoffice shell', async () => {
     const { container, fixture } = await render(RouterHostComponent, {
       providers: [provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }])],

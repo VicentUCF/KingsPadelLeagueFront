@@ -1,0 +1,43 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
+import { API_BASE_URL } from '@core/api/api-base-url.token';
+import type { PaginatedResponse, PlayerHttpV1 } from '@core/api/kings-padel-api.types';
+import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
+import { BackofficePlayersRepository } from '@features/backoffice/application/ports/backoffice-players.repository';
+import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
+
+@Injectable()
+export class HttpBackofficePlayersRepository extends BackofficePlayersRepository {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = inject(API_BASE_URL);
+
+  override loadAll(): Promise<readonly BackofficePlayer[]> {
+    return firstValueFrom(
+      this.http.get<PaginatedResponse<PlayerHttpV1>>(`${this.baseUrl}/v1/players`, {
+        params: { limit: '200' },
+        context: withHttpErrorToast({ key: 'load-players' }),
+      }),
+    ).then((res) => res.items.map(mapPlayer));
+  }
+}
+
+function mapPlayer(raw: PlayerHttpV1): BackofficePlayer {
+  return {
+    id: raw.id,
+    firstName: raw.firstName,
+    lastName: raw.lastName,
+    ...(raw.alias != null ? { alias: raw.alias } : {}),
+    email: raw.email,
+    profileImage: raw.profileImage,
+    isPresident: raw.isPresident,
+    ...(raw.teamId != null ? { teamId: raw.teamId } : {}),
+    value: raw.value,
+    wonGames: raw.wonGames,
+    lostGames: raw.lostGames,
+    preferredPosition: raw.preferredPosition,
+    description: raw.description,
+    ...(raw.instagramUrl != null ? { instagramUrl: raw.instagramUrl } : {}),
+  };
+}

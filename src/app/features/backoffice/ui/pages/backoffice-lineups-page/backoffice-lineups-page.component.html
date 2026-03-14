@@ -1,0 +1,429 @@
+<div class="lineups">
+  @if (selectedMatchId()) {
+    <!-- PLANNER VIEW -->
+    <div class="lineup-planner">
+      <header class="lineup-planner__header">
+        <button
+          class="c-button c-button--pill c-button--ghost c-button--sm"
+          type="button"
+          (click)="closePlanner()"
+        >
+          ← Volver a partidos
+        </button>
+        <div class="lineup-planner__heading">
+          <span class="c-chip c-chip--small c-chip--tone-brand">Alineación</span>
+          <h2>{{ plannerMatchTitle() }}</h2>
+          <p>Gestiona disponibilidad y crea las parejas para este partido.</p>
+        </div>
+        <div class="lineup-planner__hero">
+          <div class="lineup-planner__hero-stats">
+            <div class="lineup-planner__hero-stat">
+              <span>{{ requiredPlayers() }}</span>
+              <small>Requeridos</small>
+            </div>
+            <div class="lineup-planner__hero-stat">
+              <span>{{ availableCount() }}</span>
+              <small>Disponibles</small>
+            </div>
+            <div class="lineup-planner__hero-stat">
+              <span>{{ assignedCount() }}</span>
+              <small>Asignados</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="lineup-planner__steps" aria-label="Pasos">
+        <button
+          type="button"
+          class="lineup-planner__step"
+          [class.lineup-planner__step--active]="plannerStep() === 1"
+          (click)="goToStep(1)"
+        >
+          <span class="lineup-planner__step-num">1</span>
+          <div>
+            <p>Disponibilidad</p>
+            <small>Confirma quién puede jugar</small>
+          </div>
+        </button>
+        <button
+          type="button"
+          class="lineup-planner__step"
+          [class.lineup-planner__step--active]="plannerStep() === 2"
+          (click)="goToStep(2)"
+        >
+          <span class="lineup-planner__step-num">2</span>
+          <div>
+            <p>Parejas</p>
+            <small>Asigna y ordena jugadores</small>
+          </div>
+        </button>
+      </nav>
+
+      @if (plannerStep() === 1) {
+        <!-- STEP 1: Availability -->
+        <div class="lineup-planner__panel">
+          <article class="planner-card">
+            <header class="planner-card__header">
+              <div>
+                <p class="planner-card__eyebrow">Disponibilidad</p>
+                <h3>Confirmar asistencia</h3>
+                <p class="planner-card__subtitle">Marca quién puede jugar este partido.</p>
+              </div>
+              <div class="planner-card__chips">
+                <span class="c-chip c-chip--xs c-chip--tone-info"
+                  >{{ availableCount() }}/{{ requiredPlayers() }}</span
+                >
+              </div>
+            </header>
+
+            @if (plannerPlayers().length === 0) {
+              <p class="planner-card__empty">No hay jugadores en este equipo.</p>
+            } @else {
+              <div class="availability-list">
+                @for (player of plannerPlayers(); track player.id) {
+                  <div
+                    class="availability-row"
+                    [class.availability-row--active]="availabilityFor(player.id) === 'available'"
+                    [class.availability-row--inactive]="
+                      availabilityFor(player.id) === 'unavailable'
+                    "
+                  >
+                    <div class="availability-row__info">
+                      <span class="availability-row__avatar">{{
+                        (player.firstName + player.lastName).slice(0, 2).toUpperCase()
+                      }}</span>
+                      <div>
+                        <h4>{{ player.firstName }} {{ player.lastName }}</h4>
+                        <p>{{ positionLabel(player.preferredPosition) }}</p>
+                      </div>
+                    </div>
+                    <div class="availability-row__actions">
+                      <button
+                        type="button"
+                        class="c-button c-button--pill c-button--ghost c-button--sm"
+                        [class.is-active]="availabilityFor(player.id) === 'available'"
+                        (click)="setAvailability(player.id, 'available')"
+                      >
+                        Disponible
+                      </button>
+                      <button
+                        type="button"
+                        class="c-button c-button--pill c-button--ghost c-button--sm"
+                        [class.is-active]="availabilityFor(player.id) === 'unavailable'"
+                        (click)="setAvailability(player.id, 'unavailable')"
+                      >
+                        No puede
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </article>
+
+          <div class="lineup-planner__footer-actions">
+            <button
+              type="button"
+              class="c-button c-button--pill c-button--primary c-button--md"
+              (click)="goToStep(2)"
+            >
+              Continuar a parejas
+            </button>
+          </div>
+        </div>
+      } @else {
+        <!-- STEP 2: Pairs -->
+        <div class="lineup-planner__grid">
+          <!-- Available players panel -->
+          <article class="planner-card">
+            <header class="planner-card__header">
+              <div>
+                <p class="planner-card__eyebrow">Disponibles</p>
+                <h3>Jugadores disponibles</h3>
+                <p class="planner-card__subtitle">Arrastra o toca para asignar a una pareja.</p>
+              </div>
+              <div class="planner-card__chips">
+                <span class="c-chip c-chip--xs c-chip--tone-info"
+                  >{{ availablePlayers().length }} sin asignar</span
+                >
+              </div>
+            </header>
+
+            <div class="planner-card__toolbar">
+              <input
+                type="search"
+                class="c-input c-input--md c-input--search"
+                placeholder="Buscar jugador…"
+                [value]="playerSearch()"
+                (input)="playerSearch.set($any($event.target).value)"
+              />
+            </div>
+
+            @if (filteredAvailablePlayers().length === 0) {
+              <div class="planner-card__empty"><p>Sin jugadores disponibles sin asignar.</p></div>
+            } @else {
+              <div class="available-list">
+                @for (player of filteredAvailablePlayers(); track player.id) {
+                  <div
+                    class="available-card"
+                    [class.available-card--selected]="selectedPlayerId() === player.id"
+                    draggable="true"
+                    role="button"
+                    tabindex="0"
+                    (click)="selectPlayerMobile(player.id)"
+                    (keydown.enter)="selectPlayerMobile(player.id)"
+                    (keydown.space)="selectPlayerMobile(player.id)"
+                    (dragstart)="onDragStart($event, player.id)"
+                  >
+                    <div class="available-card__info">
+                      <span class="available-card__avatar"
+                        >{{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}</span
+                      >
+                      <div>
+                        <h4>{{ player.firstName }} {{ player.lastName }}</h4>
+                        <p>{{ positionLabel(player.preferredPosition) }}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="c-button c-button--pill c-button--outline c-button--sm"
+                      [class.is-active]="selectedPlayerId() === player.id"
+                      (click)="$event.stopPropagation(); selectPlayerMobile(player.id)"
+                    >
+                      {{ selectedPlayerId() === player.id ? 'Seleccionado' : 'Seleccionar' }}
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </article>
+
+          <!-- Pairs panel -->
+          <article class="planner-card planner-card--wide">
+            <header class="planner-card__header">
+              <div>
+                <p class="planner-card__eyebrow">Parejas</p>
+                <h3>Formación de parejas</h3>
+                <p class="planner-card__subtitle">Asigna jugadores a cada posición.</p>
+              </div>
+              <div class="planner-card__chips">
+                <span class="c-chip c-chip--xs c-chip--tone-info"
+                  >{{ assignedCount() }}/{{ requiredPlayers() }}</span
+                >
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--ghost c-button--sm"
+                  [disabled]="availablePlayers().length === 0"
+                  (click)="autoAssign()"
+                >
+                  Autoasignar
+                </button>
+              </div>
+            </header>
+
+            <div class="pair-grid">
+              @for (pair of plannerPairs(); track pair.id; let idx = $index) {
+                <div class="pair-row">
+                  <div class="pair-row__header">
+                    <span class="pair-row__label">Pareja {{ idx + 1 }}</span>
+                    <div class="pair-row__actions">
+                      <button
+                        type="button"
+                        class="c-button c-button--pill c-button--ghost c-button--sm"
+                        (click)="swapPair(idx)"
+                      >
+                        ↔
+                      </button>
+                      <button
+                        type="button"
+                        class="c-button c-button--pill c-button--ghost c-button--sm"
+                        (click)="clearPair(idx)"
+                      >
+                        Vaciar
+                      </button>
+                    </div>
+                  </div>
+                  <div class="pair-row__slots">
+                    <div
+                      class="pair-slot"
+                      [class.pair-slot--filled]="!!pair.player1Id"
+                      [class.pair-slot--drop-target]="dragOverSlot() === idx + '-1'"
+                      role="button"
+                      tabindex="0"
+                      (click)="assignSelectedToSlot(idx, 'player1')"
+                      (keydown.enter)="assignSelectedToSlot(idx, 'player1')"
+                      (keydown.space)="assignSelectedToSlot(idx, 'player1')"
+                      (dragover)="$event.preventDefault()"
+                      (dragenter)="dragOverSlot.set(idx + '-1')"
+                      (dragleave)="dragOverSlot.set(null)"
+                      (drop)="onDrop($event, idx, 'player1')"
+                    >
+                      @if (pair.player1Id) {
+                        @if (playerById(pair.player1Id); as p) {
+                          <div class="pair-slot__player">
+                            <span class="pair-slot__avatar"
+                              >{{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}</span
+                            >
+                            <div>
+                              <p class="pair-slot__name">{{ p.firstName }} {{ p.lastName }}</p>
+                              <p class="pair-slot__pos">{{ positionLabel(p.preferredPosition) }}</p>
+                            </div>
+                            <button
+                              type="button"
+                              class="pair-slot__remove"
+                              aria-label="Quitar"
+                              (click)="$event.stopPropagation(); clearSlot(idx, 'player1')"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        }
+                      } @else {
+                        <p class="pair-slot__empty">Drive</p>
+                      }
+                    </div>
+
+                    <span class="pair-row__divider">·</span>
+
+                    <div
+                      class="pair-slot"
+                      [class.pair-slot--filled]="!!pair.player2Id"
+                      [class.pair-slot--drop-target]="dragOverSlot() === idx + '-2'"
+                      role="button"
+                      tabindex="0"
+                      (click)="assignSelectedToSlot(idx, 'player2')"
+                      (keydown.enter)="assignSelectedToSlot(idx, 'player2')"
+                      (keydown.space)="assignSelectedToSlot(idx, 'player2')"
+                      (dragover)="$event.preventDefault()"
+                      (dragenter)="dragOverSlot.set(idx + '-2')"
+                      (dragleave)="dragOverSlot.set(null)"
+                      (drop)="onDrop($event, idx, 'player2')"
+                    >
+                      @if (pair.player2Id) {
+                        @if (playerById(pair.player2Id); as p) {
+                          <div class="pair-slot__player">
+                            <span class="pair-slot__avatar"
+                              >{{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}</span
+                            >
+                            <div>
+                              <p class="pair-slot__name">{{ p.firstName }} {{ p.lastName }}</p>
+                              <p class="pair-slot__pos">{{ positionLabel(p.preferredPosition) }}</p>
+                            </div>
+                            <button
+                              type="button"
+                              class="pair-slot__remove"
+                              aria-label="Quitar"
+                              (click)="$event.stopPropagation(); clearSlot(idx, 'player2')"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        }
+                      } @else {
+                        <p class="pair-slot__empty">Revés</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </article>
+        </div>
+
+        <div class="lineup-planner__footer-actions">
+          <button
+            type="button"
+            class="c-button c-button--pill c-button--ghost c-button--md"
+            (click)="goToStep(1)"
+          >
+            ← Disponibilidad
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--pill c-button--primary c-button--md"
+            (click)="saveDraft()"
+          >
+            Guardar borrador
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- MATCH LIST VIEW -->
+    @if (isAdmin()) {
+      <div class="backoffice-lineups-page__selector-wrap">
+        <label class="backoffice-lineups-page__selector-label" for="matchday-select">Jornada</label>
+        <select
+          id="matchday-select"
+          class="c-select backoffice-lineups-page__selector"
+          [value]="selectedMatchdayId() ?? ''"
+          (change)="onMatchdayChange($event)"
+        >
+          <option value="" disabled>Selecciona una jornada</option>
+          @for (matchday of matchdaysStore.matchdays(); track matchday.id) {
+            <option [value]="matchday.id">{{ matchday.name }}</option>
+          }
+        </select>
+      </div>
+    } @else {
+      @if (presidentTeam(); as team) {
+        <p class="backoffice-lineups-page__team-label">
+          Partidos de <strong>{{ team.name }}</strong>
+        </p>
+      }
+    }
+
+    @if (lineupsStore.isLoading()) {
+      <p class="backoffice-lineups-page__loading">Cargando alineaciones…</p>
+    } @else if (lineupsStore.errorMessage(); as error) {
+      <p class="backoffice-lineups-page__error">{{ error }}</p>
+    } @else if (matchCards().length === 0) {
+      <p class="backoffice-lineups-page__empty">No hay partidos para esta jornada.</p>
+    } @else {
+      <ol class="backoffice-lineups-page__list" aria-label="Partidos">
+        @for (card of matchCards(); track card.matchId) {
+          <li class="backoffice-lineups-page__card c-surface-card">
+            <div class="backoffice-lineups-page__card-header">
+              <p class="backoffice-lineups-page__scheduled">{{ card.scheduledLabel }}</p>
+              <app-status-badge [label]="card.lineupStatusLabel" [tone]="card.lineupStatusTone" />
+            </div>
+
+            <div class="backoffice-lineups-page__match">
+              <span class="backoffice-lineups-page__team backoffice-lineups-page__team--local">
+                {{ card.localTeamName }}
+              </span>
+              <span class="backoffice-lineups-page__vs">vs</span>
+              <span class="backoffice-lineups-page__team backoffice-lineups-page__team--away">
+                {{ card.awayTeamName }}
+              </span>
+            </div>
+
+            <div class="backoffice-lineups-page__card-footer">
+              <span class="backoffice-lineups-page__pairs">
+                {{ card.pairCount }} {{ card.pairCount === 1 ? 'pareja' : 'parejas' }}
+              </span>
+              @if (isAdmin()) {
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--primary c-button--sm"
+                  (click)="openPlanner(card.matchId, card.localTeamId)"
+                >
+                  Gestionar (Local)
+                </button>
+              } @else if (presidentTeam(); as team) {
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--primary c-button--sm"
+                  (click)="openPlanner(card.matchId, team.id)"
+                >
+                  Gestionar
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    }
+  }
+</div>

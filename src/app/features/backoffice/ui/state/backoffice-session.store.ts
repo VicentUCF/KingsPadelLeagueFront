@@ -1,15 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import {
-  CalendarRange,
-  ClipboardList,
-  History,
-  LayoutDashboard,
-  Shield,
-  Swords,
-  Trophy,
-  UserCog,
-  Users,
-} from 'lucide-angular';
+import { LayoutDashboard, Shield, Swords, Trophy, UserCog, Users } from 'lucide-angular';
 
 import type { BackofficeRole } from '@features/backoffice/domain/entities/backoffice-role';
 import {
@@ -21,6 +11,7 @@ import {
 export class BackofficeSessionStore {
   readonly currentRole = signal<BackofficeRole>('ADMIN');
   readonly availableRoles: readonly BackofficeRole[] = ['ADMIN', 'PRESIDENT'];
+  readonly currentPresidentTeamId = signal<string>('kings-of-favar');
 
   readonly navigation = computed(() => this.buildNavigation(this.currentRole()));
 
@@ -30,24 +21,28 @@ export class BackofficeSessionStore {
     }
   }
 
+  updatePresidentTeam(teamId: string): void {
+    this.currentPresidentTeamId.set(teamId);
+  }
+
   private buildNavigation(role: BackofficeRole): readonly BackofficeNavigationItem[] {
     const isAdmin = role === 'ADMIN';
 
     return [
       {
         path: BACKOFFICE_ROOT_PATH,
-        label: 'Dashboard',
+        label: isAdmin ? 'Dashboard' : 'Mi equipo',
         icon: LayoutDashboard,
         isAccessible: true,
         isImplemented: true,
       },
-      {
-        path: `${BACKOFFICE_ROOT_PATH}/temporadas`,
-        label: 'Temporadas',
-        icon: CalendarRange,
-        isAccessible: true,
-        isImplemented: true,
-      },
+      // {
+      //   path: `${BACKOFFICE_ROOT_PATH}/temporadas`,
+      //   label: 'Temporadas',
+      //   icon: CalendarRange,
+      //   isAccessible: isAdmin,
+      //   isImplemented: true,
+      // },
       {
         path: `${BACKOFFICE_ROOT_PATH}/equipos`,
         label: 'Equipos',
@@ -73,29 +68,22 @@ export class BackofficeSessionStore {
         path: `${BACKOFFICE_ROOT_PATH}/clasificacion`,
         label: 'Clasificación',
         icon: Trophy,
-        isAccessible: !isAdmin,
-        isImplemented: false,
-      },
-      {
-        path: `${BACKOFFICE_ROOT_PATH}/alineaciones`,
-        label: 'Alineaciones',
-        icon: ClipboardList,
         isAccessible: true,
-        isImplemented: false,
+        isImplemented: true,
       },
+      // {
+      //   path: `${BACKOFFICE_ROOT_PATH}/alineaciones`,
+      //   label: 'Alineaciones',
+      //   icon: ClipboardList,
+      //   isAccessible: true,
+      //   isImplemented: true,
+      // },
       {
         path: `${BACKOFFICE_ROOT_PATH}/usuarios`,
         label: 'Usuarios',
         icon: UserCog,
         isAccessible: isAdmin,
-        isImplemented: false,
-      },
-      {
-        path: `${BACKOFFICE_ROOT_PATH}/auditoria`,
-        label: 'Auditoría',
-        icon: History,
-        isAccessible: isAdmin,
-        isImplemented: false,
+        isImplemented: true,
       },
     ];
   }

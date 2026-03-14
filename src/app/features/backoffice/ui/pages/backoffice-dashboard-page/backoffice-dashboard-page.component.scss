@@ -1,7 +1,8 @@
-.backoffice-dashboard-page {
+.dashboard {
   display: grid;
   gap: var(--space-8);
-
+}
+.backoffice-dashboard-page {
   // ── Section ─────────────────────────────────────────────────────────────────
   &__section {
     display: grid;
@@ -243,5 +244,424 @@
     &__shortcuts {
       grid-template-columns: repeat(4, 1fr);
     }
+  }
+}
+
+// ── President Arena ─────────────────────────────────────────────────────────
+.president-arena {
+  display: grid;
+  gap: var(--space-8);
+}
+
+// ── President Hero ──────────────────────────────────────────────────────────
+.president-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 2rem 1.75rem;
+  border: 1px solid color-mix(in srgb, var(--team-primary, #c9a227) 22%, transparent);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(
+      ellipse at top left,
+      color-mix(in srgb, var(--team-primary, #c9a227) 18%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      color-mix(in srgb, var(--team-secondary, #0b0b0b) 40%, transparent) 0%,
+      transparent 70%
+    ),
+    var(--color-surface-raised, #161616);
+
+  &__watermark {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 1.5rem;
+    pointer-events: none;
+  }
+
+  &__watermark-img {
+    width: min(28rem, 55%);
+    height: auto;
+    opacity: 0.07;
+    object-fit: contain;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: color-mix(in srgb, var(--team-primary, #c9a227) 85%, white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 750;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+
+  &__team {
+    margin: 0;
+    color: color-mix(in srgb, var(--team-primary, #c9a227) 90%, white);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &__stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid rgb(245 245 245 / 8%);
+    border-radius: 1rem;
+    background: rgb(0 0 0 / 30%);
+    width: fit-content;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 3rem;
+  }
+
+  &__stat-value {
+    color: color-mix(in srgb, var(--team-primary, #c9a227) 90%, white);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    line-height: 1;
+
+    small {
+      color: var(--color-text-muted);
+      font-family: inherit;
+      font-size: 0.65em;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+  }
+
+  &__stat-label {
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__stat-divider {
+    width: 1px;
+    height: 2.5rem;
+    background: rgb(245 245 245 / 12%);
+    flex-shrink: 0;
+  }
+
+  &__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  &__form-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.4rem;
+    background: rgb(245 245 245 / 8%);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &--w {
+      background: rgb(34 197 94 / 18%);
+      color: #4ade80;
+    }
+
+    &--d {
+      background: rgb(234 179 8 / 15%);
+      color: #facc15;
+    }
+
+    &--l {
+      background: rgb(239 68 68 / 15%);
+      color: #f87171;
+    }
+  }
+}
+
+// ── President Section ───────────────────────────────────────────────────────
+.president-section {
+  display: grid;
+  gap: var(--space-5);
+
+  &__title {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  &__action {
+    display: inline-flex;
+    align-self: start;
+    color: color-mix(in srgb, var(--team-primary, #c9a227) 90%, white);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: calc(var(--space-5) * -1 + var(--space-2));
+
+    &:hover {
+      color: var(--color-brand-strong);
+    }
+  }
+}
+
+// ── Roster Grid ─────────────────────────────────────────────────────────────
+.president-roster__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-3);
+}
+
+.roster-player-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid rgb(245 245 245 / 7%);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 0.03);
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+
+  &:hover {
+    border-color: rgb(245 245 245 / 14%);
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  &--captain {
+    border-color: color-mix(in srgb, var(--team-primary, #c9a227) 35%, transparent);
+    background: color-mix(in srgb, var(--team-primary, #c9a227) 6%, transparent);
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--team-primary, #c9a227) 18%, transparent);
+    color: color-mix(in srgb, var(--team-primary, #c9a227) 90%, white);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-size: 0.9rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__pos {
+    margin: 0.15rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+    flex-shrink: 0;
+  }
+
+  &__stat {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    strong {
+      color: var(--color-text-strong);
+      font-weight: 700;
+      margin-right: 0.15em;
+    }
+
+    &--won strong {
+      color: #4ade80;
+    }
+
+    &--value {
+      color: color-mix(in srgb, var(--team-primary, #c9a227) 85%, white);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+  }
+}
+
+// ── President Competition ───────────────────────────────────────────────────
+.president-competition {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.president-matchday-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+
+  &--empty {
+    opacity: 0.6;
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  &__date {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  &__empty {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  &__cta {
+    align-self: start;
+    justify-self: start;
+    text-decoration: none;
+  }
+
+  &__link {
+    display: inline-block;
+    color: color-mix(in srgb, var(--team-primary, #c9a227) 85%, white);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-brand-strong);
+    }
+  }
+}
+
+// ── President Shortcuts ─────────────────────────────────────────────────────
+.president-shortcuts {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.president-shortcut {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  text-decoration: none;
+  border-color: color-mix(in srgb, var(--team-primary, #c9a227) 14%, transparent) !important;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--team-primary, #c9a227) 30%, transparent) !important;
+    background: color-mix(in srgb, var(--team-primary, #c9a227) 5%, transparent);
+  }
+
+  &__label {
+    color: var(--color-text-strong);
+    font-weight: 700;
+  }
+
+  &__hint {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+}
+
+// ── President Responsive ────────────────────────────────────────────────────
+@media (min-width: 36rem) {
+  .president-competition {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .president-shortcuts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .president-hero {
+    padding: 2.5rem 2.25rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .president-shortcuts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .president-hero {
+    padding: 3rem 2.75rem;
+  }
+}
+
+@media (max-width: 35.9rem) {
+  .president-hero__watermark-img {
+    opacity: 0.04;
   }
 }

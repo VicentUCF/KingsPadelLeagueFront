@@ -21,18 +21,18 @@ export const BACKOFFICE_ROUTES: Routes = [
           description: 'Estado operativo actual de la liga.',
         },
       },
-      {
-        path: 'temporadas',
-        loadComponent: () =>
-          import('./pages/backoffice-seasons-page/backoffice-seasons-page.component').then(
-            (m) => m.BackofficeSeasonsPageComponent,
-          ),
-        data: {
-          title: 'Temporadas',
-          breadcrumb: 'Temporadas',
-          description: 'Gestión de temporadas oficiales de la liga.',
-        },
-      },
+      // {
+      //   path: 'temporadas',
+      //   loadComponent: () =>
+      //     import('./pages/backoffice-seasons-page/backoffice-seasons-page.component').then(
+      //       (m) => m.BackofficeSeasonsPageComponent,
+      //     ),
+      //   data: {
+      //     title: 'Temporadas',
+      //     breadcrumb: 'Temporadas',
+      //     description: 'Gestión de temporadas oficiales de la liga.',
+      //   },
+      // },
       {
         path: 'equipos',
         loadComponent: () =>
@@ -43,6 +43,18 @@ export const BACKOFFICE_ROUTES: Routes = [
           title: 'Equipos',
           breadcrumb: 'Equipos',
           description: 'Directorio y gestión de equipos participantes.',
+        },
+      },
+      {
+        path: 'equipos/:teamId',
+        loadComponent: () =>
+          import('./pages/backoffice-team-detail-page/backoffice-team-detail-page.component').then(
+            (m) => m.BackofficeTeamDetailPageComponent,
+          ),
+        data: {
+          title: 'Detalle del equipo',
+          breadcrumb: 'Equipo',
+          description: 'Plantilla y estadísticas del equipo.',
         },
       },
       {
@@ -67,6 +79,54 @@ export const BACKOFFICE_ROUTES: Routes = [
           title: 'Jornadas',
           breadcrumb: 'Jornadas',
           description: 'Calendario y estado de todas las jornadas de la liga.',
+        },
+      },
+      {
+        path: 'jornadas/:matchdayId',
+        loadComponent: () =>
+          import('./pages/backoffice-matchday-detail-page/backoffice-matchday-detail-page.component').then(
+            (m) => m.BackofficeMatchdayDetailPageComponent,
+          ),
+        data: {
+          title: 'Detalle de jornada',
+          breadcrumb: 'Jornada',
+          description: 'Partidos y gestión de alineaciones de la jornada.',
+        },
+      },
+      {
+        path: 'clasificacion',
+        loadComponent: () =>
+          import('./pages/backoffice-standings-page/backoffice-standings-page.component').then(
+            (m) => m.BackofficeStandingsPageComponent,
+          ),
+        data: {
+          title: 'Clasificación',
+          breadcrumb: 'Clasificación',
+          description: 'Tabla de posiciones de la temporada actual.',
+        },
+      },
+      {
+        path: 'alineaciones',
+        loadComponent: () =>
+          import('./pages/backoffice-lineups-page/backoffice-lineups-page.component').then(
+            (m) => m.BackofficeLineupsPageComponent,
+          ),
+        data: {
+          title: 'Alineaciones',
+          breadcrumb: 'Alineaciones',
+          description: 'Gestión de alineaciones de los partidos.',
+        },
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./pages/backoffice-users-page/backoffice-users-page.component').then(
+            (m) => m.BackofficeUsersPageComponent,
+          ),
+        data: {
+          title: 'Usuarios',
+          breadcrumb: 'Usuarios',
+          description: 'Directorio de usuarios y vinculación con jugadores.',
         },
       },
       {

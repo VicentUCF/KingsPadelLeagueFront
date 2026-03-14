@@ -14,7 +14,7 @@ export interface BackofficeTeamCardViewModel {
   readonly detailPath: string;
 }
 
-const TEAM_PALETTE: Record<string, { primary: string; secondary: string }> = {
+export const TEAM_PALETTE: Record<string, { primary: string; secondary: string }> = {
   'kings-of-favar': { primary: '#c9a227', secondary: '#0b0b0b' },
   'magic-city': { primary: '#3b82f6', secondary: '#1e1b4b' },
   titanics: { primary: '#0ea5e9', secondary: '#0c4a6e' },
@@ -22,7 +22,7 @@ const TEAM_PALETTE: Record<string, { primary: string; secondary: string }> = {
   thormentadores: { primary: '#a855f7', secondary: '#2e1065' },
 };
 
-const DEFAULT_PALETTE = { primary: '#c9a227', secondary: '#0b0b0b' };
+export const DEFAULT_PALETTE = { primary: '#c9a227', secondary: '#0b0b0b' };
 
 export function toBackofficeTeamCardViewModel(
   team: BackofficeTeam,

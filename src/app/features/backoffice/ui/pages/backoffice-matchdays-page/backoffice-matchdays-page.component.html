@@ -1,23 +1,25 @@
-@if (matchdaysStore.isLoading()) {
-  <p class="backoffice-matchdays-page__loading">Cargando jornadas…</p>
-} @else if (matchdaysStore.errorMessage(); as error) {
-  <p class="backoffice-matchdays-page__error">{{ error }}</p>
-} @else if (matchdaysStore.rows().length === 0) {
-  <p class="backoffice-matchdays-page__empty">No hay jornadas registradas todavía.</p>
-} @else {
-  <ol class="backoffice-matchdays-page__list" aria-label="Jornadas">
-    @for (row of matchdaysStore.rows(); track row.id) {
-      <li class="backoffice-matchdays-page__row c-surface-card">
-        <div class="backoffice-matchdays-page__row-main">
-          <p class="backoffice-matchdays-page__row-name">{{ row.name }}</p>
-          <p class="backoffice-matchdays-page__row-date">{{ row.dateLabel }}</p>
-        </div>
+<div class="backoffice-matchdays-page">
+  @if (matchdaysStore.isLoading()) {
+    <p class="backoffice-matchdays-page__loading">Cargando jornadas…</p>
+  } @else if (matchdaysStore.errorMessage(); as error) {
+    <p class="backoffice-matchdays-page__error">{{ error }}</p>
+  } @else if (matchdaysStore.rows().length === 0) {
+    <p class="backoffice-matchdays-page__empty">No hay jornadas registradas todavía.</p>
+  } @else {
+    <ol class="backoffice-matchdays-page__list" aria-label="Jornadas">
+      @for (row of matchdaysStore.rows(); track row.id) {
+        <li class="backoffice-matchdays-page__row c-surface-card">
+          <div class="backoffice-matchdays-page__row-main">
+            <p class="backoffice-matchdays-page__row-name">{{ row.name }}</p>
+            <p class="backoffice-matchdays-page__row-date">{{ row.dateLabel }}</p>
+          </div>
 
-        <div class="backoffice-matchdays-page__row-end">
-          <app-status-badge [label]="row.statusLabel" [tone]="row.statusTone" />
-          <a class="backoffice-matchdays-page__row-link" [routerLink]="row.detailPath">Ver →</a>
-        </div>
-      </li>
-    }
-  </ol>
-}
+          <div class="backoffice-matchdays-page__row-end">
+            <app-status-badge [label]="row.statusLabel" [tone]="row.statusTone" />
+            <a class="backoffice-matchdays-page__row-link" [routerLink]="row.detailPath">Ver →</a>
+          </div>
+        </li>
+      }
+    </ol>
+  }
+</div>
