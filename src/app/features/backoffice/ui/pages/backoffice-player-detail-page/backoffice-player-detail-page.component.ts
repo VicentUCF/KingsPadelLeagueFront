@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, type OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 import { ConfirmActionDialogComponent } from '@shared/ui/confirm-action-dialog/confirm-action-dialog.component';
@@ -20,7 +22,6 @@ import { type BackofficePlayerStatusAction } from '../../state/backoffice-player
     ConfirmActionDialogComponent,
     EmptyStateComponent,
     PlayerFormDialogComponent,
-    RouterLink,
     StatusBadgeComponent,
   ],
   providers: [BackofficePlayerDetailStore],
@@ -30,8 +31,13 @@ import { type BackofficePlayerStatusAction } from '../../state/backoffice-player
 export class BackofficePlayerDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly navHistory = inject(NavigationHistoryService);
 
   protected readonly store = inject(BackofficePlayerDetailStore);
+
+  protected goBack(): void {
+    this.navHistory.goBack('/backoffice/jugadores');
+  }
 
   ngOnInit(): void {
     const routeSubscription = this.route.paramMap.subscribe((paramMap) => {

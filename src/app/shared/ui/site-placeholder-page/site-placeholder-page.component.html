@@ -3,8 +3,8 @@
   <h1>{{ title }}</h1>
   <p>{{ description }}</p>
 
-  <a class="site-placeholder-page__back-link" routerLink="/">
+  <button class="site-placeholder-page__back-link" type="button" (click)="goBack()">
     <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
     <span>Volver a la home</span>
-  </a>
+  </button>
 </section>

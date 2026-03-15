@@ -12,6 +12,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArrowLeft, LucideAngularModule, Users } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
 import { SeoService } from '@core/services/seo.service';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
@@ -43,6 +44,7 @@ import { LeagueHomeStore } from '../../state/league-home.store';
 export class LeagueTeamProfilePageComponent implements OnDestroy, OnInit {
   private readonly seo = inject(SeoService);
   private readonly route = inject(ActivatedRoute);
+  private readonly navHistory = inject(NavigationHistoryService);
   private readonly routeSubscription = new Subscription();
 
   protected readonly store = inject(LeagueHomeStore);
@@ -131,6 +133,10 @@ export class LeagueTeamProfilePageComponent implements OnDestroy, OnInit {
   ngOnDestroy(): void {
     this.routeSubscription.unsubscribe();
     this.seo.removeJsonLd();
+  }
+
+  protected goBack(): void {
+    this.navHistory.goBack('/equipos');
   }
 
   protected reloadSnapshot(): void {

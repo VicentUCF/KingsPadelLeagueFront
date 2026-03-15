@@ -8,9 +8,10 @@ import {
   signal,
   type OnInit,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ArrowLeft, LucideAngularModule } from 'lucide-angular';
 
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
 import { SeoService } from '@core/services/seo.service';
 import { UNASSIGNED_PLAYER_TEAM_NAME } from '@features/players/domain/entities/player.entity';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
@@ -24,13 +25,7 @@ import { PlayerProfileStore } from '../../state/player-profile.store';
   host: {
     class: 'player-profile-page o-stack o-container',
   },
-  imports: [
-    EmptyStateComponent,
-    LucideAngularModule,
-    NgOptimizedImage,
-    PlayerProfileCardComponent,
-    RouterLink,
-  ],
+  imports: [EmptyStateComponent, LucideAngularModule, NgOptimizedImage, PlayerProfileCardComponent],
   providers: [PlayerProfileStore],
   templateUrl: './player-profile-page.component.html',
   styleUrl: './player-profile-page.component.scss',
@@ -39,11 +34,16 @@ export class PlayerProfilePageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly seo = inject(SeoService);
+  private readonly navHistory = inject(NavigationHistoryService);
 
   protected readonly store = inject(PlayerProfileStore);
   protected readonly arrowLeftIcon = ArrowLeft;
   protected readonly unassignedTeamName = UNASSIGNED_PLAYER_TEAM_NAME;
   protected readonly playerSlug = signal('');
+
+  protected goBack(): void {
+    this.navHistory.goBack('/jugadores');
+  }
 
   constructor() {
     effect(() => {

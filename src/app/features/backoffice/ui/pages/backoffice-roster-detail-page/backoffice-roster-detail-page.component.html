@@ -14,9 +14,9 @@
       title="No hemos encontrado esta plantilla"
     />
 
-    <a class="backoffice-roster-detail-page__back-link" routerLink="/backoffice/plantillas">
+    <button class="backoffice-roster-detail-page__back-link" type="button" (click)="goBack()">
       Volver a plantillas
-    </a>
+    </button>
   </section>
 } @else if (store.viewModel(); as roster) {
   <div class="backoffice-roster-detail-page__layout">

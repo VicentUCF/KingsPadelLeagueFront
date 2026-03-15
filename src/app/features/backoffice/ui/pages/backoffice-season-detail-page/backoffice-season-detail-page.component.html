@@ -11,9 +11,9 @@
       title="No hemos encontrado esta season"
     />
 
-    <a class="backoffice-season-detail-page__back-link" routerLink="/backoffice/temporadas">
+    <button class="backoffice-season-detail-page__back-link" type="button" (click)="goBack()">
       Volver a temporadas
-    </a>
+    </button>
   </section>
 } @else if (store.viewModel(); as season) {
   <div class="backoffice-season-detail-page__layout">

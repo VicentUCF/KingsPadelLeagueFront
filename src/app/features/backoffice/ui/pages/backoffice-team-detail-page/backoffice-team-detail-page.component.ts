@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, type OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 import { ConfirmActionDialogComponent } from '@shared/ui/confirm-action-dialog/confirm-action-dialog.component';
@@ -24,7 +26,6 @@ import { TeamFormDialogComponent } from '../../components/team-form-dialog/team-
   imports: [
     ConfirmActionDialogComponent,
     EmptyStateComponent,
-    RouterLink,
     StatusBadgeComponent,
     TeamFormDialogComponent,
   ],
@@ -35,9 +36,14 @@ import { TeamFormDialogComponent } from '../../components/team-form-dialog/team-
 export class BackofficeTeamDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly navHistory = inject(NavigationHistoryService);
 
   protected readonly store = inject(BackofficeTeamDetailStore);
   protected readonly tabs = BACKOFFICE_TEAM_TABS;
+
+  protected goBack(): void {
+    this.navHistory.goBack('/backoffice/equipos');
+  }
 
   ngOnInit(): void {
     const routeSubscription = this.route.paramMap.subscribe((paramMap) => {

@@ -11,9 +11,9 @@
       title="No hemos encontrado este equipo"
     />
 
-    <a class="backoffice-team-detail-page__back-link" routerLink="/backoffice/equipos">
+    <button class="backoffice-team-detail-page__back-link" type="button" (click)="goBack()">
       Volver a equipos
-    </a>
+    </button>
   </section>
 } @else if (store.viewModel(); as team) {
   <div class="backoffice-team-detail-page__layout">

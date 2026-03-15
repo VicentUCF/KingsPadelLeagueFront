@@ -11,9 +11,9 @@
       title="No hemos encontrado este jugador"
     />
 
-    <a class="backoffice-player-detail-page__back-link" routerLink="/backoffice/jugadores">
+    <button class="backoffice-player-detail-page__back-link" type="button" (click)="goBack()">
       Volver a jugadores
-    </a>
+    </button>
   </section>
 } @else if (store.viewModel(); as player) {
   <div class="backoffice-player-detail-page__layout">

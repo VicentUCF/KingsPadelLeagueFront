@@ -5,10 +5,10 @@
 } @else if (viewModel(); as viewModel) {
   <section class="league-team-profile-page__hero-shell">
     <div class="o-container league-team-profile-page__hero-content">
-      <a class="league-team-profile-page__back-link" routerLink="/equipos">
+      <button class="league-team-profile-page__back-link" type="button" (click)="goBack()">
         <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
-        <span>Volver al selector</span>
-      </a>
+        <span>Volver</span>
+      </button>
 
       <app-team-showcase-hero [mode]="'page'" [team]="viewModel.team" />
     </div>

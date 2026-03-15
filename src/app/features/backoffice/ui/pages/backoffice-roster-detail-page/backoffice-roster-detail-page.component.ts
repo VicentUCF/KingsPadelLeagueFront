@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, type OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 
@@ -17,7 +19,7 @@ import { StatusBadgeComponent } from '../../components/status-badge/status-badge
   host: {
     class: 'backoffice-roster-detail-page',
   },
-  imports: [EmptyStateComponent, RouterLink, StatusBadgeComponent],
+  imports: [EmptyStateComponent, StatusBadgeComponent],
   providers: [BackofficeRosterDetailStore],
   templateUrl: './backoffice-roster-detail-page.component.html',
   styleUrl: './backoffice-roster-detail-page.component.scss',
@@ -25,8 +27,13 @@ import { StatusBadgeComponent } from '../../components/status-badge/status-badge
 export class BackofficeRosterDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly navHistory = inject(NavigationHistoryService);
 
   protected readonly store = inject(BackofficeRosterDetailStore);
+
+  protected goBack(): void {
+    this.navHistory.goBack('/backoffice/plantillas');
+  }
   protected readonly tabs = BACKOFFICE_ROSTER_TABS;
 
   ngOnInit(): void {
