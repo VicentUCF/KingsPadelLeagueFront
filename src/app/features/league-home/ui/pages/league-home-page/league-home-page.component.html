@@ -125,7 +125,7 @@
         <h2>Equipos participantes</h2>
       </div>
 
-      <div class="league-home-page__teams-grid" role="list">
+      <div id="equipos" class="league-home-page__teams-grid" role="list">
         @for (team of viewModel.teams; track team.id) {
           <div role="listitem">
             <app-team-card [team]="team" />
