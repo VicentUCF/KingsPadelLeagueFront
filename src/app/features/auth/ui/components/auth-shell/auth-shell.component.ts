@@ -1,0 +1,14 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-auth-shell',
+  standalone: true,
+  imports: [RouterOutlet],
+  templateUrl: './auth-shell.component.html',
+  styleUrl: './auth-shell.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AuthShellComponent {
+  readonly year = new Date().getFullYear();
+}

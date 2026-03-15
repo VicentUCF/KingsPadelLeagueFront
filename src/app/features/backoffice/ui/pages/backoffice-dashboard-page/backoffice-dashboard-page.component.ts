@@ -85,7 +85,7 @@ export class BackofficeDashboardPageComponent implements OnInit {
   });
 
   protected readonly presidentTeamPalette = computed(() => {
-    const teamId = this.sessionStore.currentPresidentTeamId();
+    const teamId = this.sessionStore.currentPresidentTeamId() ?? 'defaultl';
     return TEAM_PALETTE[teamId] ?? DEFAULT_PALETTE;
   });
 

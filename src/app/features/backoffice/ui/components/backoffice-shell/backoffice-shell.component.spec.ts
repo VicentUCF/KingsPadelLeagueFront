@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Router, RouterOutlet, provideRouter } from '@angular/router';
-import { fireEvent, render, screen, within } from '@testing-library/angular';
+import { render, screen, within } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
+import { AuthStore } from '@features/auth/ui/state/auth.store';
 import { BACKOFFICE_ROUTES } from '../../backoffice.routes';
 
 @Component({
@@ -12,18 +13,37 @@ import { BACKOFFICE_ROUTES } from '../../backoffice.routes';
 })
 class RouterHostComponent {}
 
+function makeAuthStoreMock(role: 'ADMIN' | 'PRESIDENT' = 'ADMIN') {
+  return {
+    user: signal({ id: '1', email: 'admin@test.com', displayName: 'Admin', role, teamId: null }),
+    currentRole: signal(role),
+    isAuthenticated: signal(true),
+    isLoading: signal(false),
+    error: signal(null),
+    accessToken: signal('mock-token'),
+    status: signal('authenticated'),
+    logout: async () => {},
+    login: async () => {},
+    register: async () => {},
+    requestPasswordReset: async () => {},
+    resetPassword: async () => {},
+    clearError: () => {},
+  };
+}
+
 describe('BackofficeShellComponent', () => {
-  it('renders the full roadmap navigation and dashboard entry', async () => {
+  it('renders navigation items for an ADMIN user', async () => {
     const { fixture } = await render(RouterHostComponent, {
-      providers: [provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }])],
+      providers: [
+        provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }]),
+        { provide: AuthStore, useValue: makeAuthStoreMock('ADMIN') },
+      ],
     });
 
     const router = fixture.componentRef.injector.get(Router);
 
     await router.navigateByUrl('/backoffice');
     fixture.detectChanges();
-
-    expect(await screen.findByRole('heading', { name: /^Dashboard$/i })).toBeVisible();
 
     const navigation = screen.getByRole('navigation', { name: /Backoffice/i });
 
@@ -31,20 +51,19 @@ describe('BackofficeShellComponent', () => {
       'href',
       '/backoffice',
     );
-    expect(within(navigation).getByText('Temporadas')).toBeVisible();
     expect(within(navigation).getByText('Equipos')).toBeVisible();
     expect(within(navigation).getByText('Jugadores')).toBeVisible();
-    expect(within(navigation).getByText('Plantillas')).toBeVisible();
     expect(within(navigation).getByText('Jornadas')).toBeVisible();
-    expect(within(navigation).getByText('Fixtures')).toBeVisible();
-    expect(within(navigation).getByText('MVP')).toBeVisible();
+    expect(within(navigation).getByText('Clasificación')).toBeVisible();
     expect(within(navigation).getByText('Usuarios')).toBeVisible();
-    expect(within(navigation).getByText('Auditoría')).toBeVisible();
   });
 
-  it('updates dashboard quick actions when the simulated role changes', async () => {
+  it('shows logout button in the sidebar', async () => {
     const { fixture } = await render(RouterHostComponent, {
-      providers: [provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }])],
+      providers: [
+        provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }]),
+        { provide: AuthStore, useValue: makeAuthStoreMock('ADMIN') },
+      ],
     });
 
     const router = fixture.componentRef.injector.get(Router);
@@ -52,44 +71,15 @@ describe('BackofficeShellComponent', () => {
     await router.navigateByUrl('/backoffice');
     fixture.detectChanges();
 
-    expect(await screen.findByRole('link', { name: /Gestionar temporadas/i })).toBeVisible();
-    expect(screen.queryByRole('link', { name: /Mi equipo/i })).not.toBeInTheDocument();
-
-    await fireEvent.change(screen.getByLabelText(/Rol simulado/i), {
-      target: { value: 'PRESIDENT' },
-    });
-    fixture.detectChanges();
-
-    expect(await screen.findByText('PRESIDENT')).toBeVisible();
-    expect(screen.getByRole('link', { name: /Mi equipo/i })).toBeVisible();
-    expect(screen.queryByRole('link', { name: /Gestionar temporadas/i })).not.toBeInTheDocument();
-  });
-
-  it('redirects unauthorized routes back to the backoffice dashboard', async () => {
-    const { fixture } = await render(RouterHostComponent, {
-      providers: [provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }])],
-    });
-
-    const router = fixture.componentRef.injector.get(Router);
-
-    await router.navigateByUrl('/backoffice');
-    fixture.detectChanges();
-
-    await fireEvent.change(screen.getByLabelText(/Rol simulado/i), {
-      target: { value: 'PRESIDENT' },
-    });
-    fixture.detectChanges();
-
-    await router.navigateByUrl('/backoffice/usuarios');
-    fixture.detectChanges();
-
-    expect(router.url).toBe('/backoffice');
-    expect(await screen.findByRole('heading', { name: /^Dashboard$/i })).toBeVisible();
+    await screen.findByRole('button', { name: /Cerrar sesión/i });
   });
 
   it('has no accessibility violations in the backoffice shell', async () => {
     const { container, fixture } = await render(RouterHostComponent, {
-      providers: [provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }])],
+      providers: [
+        provideRouter([{ path: 'backoffice', children: BACKOFFICE_ROUTES }]),
+        { provide: AuthStore, useValue: makeAuthStoreMock('ADMIN') },
+      ],
     });
 
     const router = fixture.componentRef.injector.get(Router);

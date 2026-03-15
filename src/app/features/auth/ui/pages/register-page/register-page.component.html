@@ -1,0 +1,135 @@
+<div class="auth-card">
+  @if (registered()) {
+    <div class="auth-card__success">
+      <div class="auth-card__success-icon">✉️</div>
+      <h2 class="auth-card__success-title">¡Revisa tu email!</h2>
+      <p class="auth-card__success-text">
+        Te hemos enviado un enlace de confirmación. Haz clic en él para activar tu cuenta.
+      </p>
+      <a routerLink="/auth/login" class="c-button c-button--outline c-button--lg auth-card__submit">
+        Volver al inicio de sesión
+      </a>
+    </div>
+  } @else {
+    <header class="auth-card__header">
+      <h1 class="auth-card__title">Crear cuenta</h1>
+      <p class="auth-card__subtitle">Únete y gestiona tu equipo</p>
+    </header>
+
+    @if (error()) {
+      <div class="auth-card__alert" role="alert">{{ error() }}</div>
+    }
+
+    <form class="auth-card__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="c-field">
+        <label class="c-field__label" for="displayName">Nombre</label>
+        <input
+          id="displayName"
+          type="text"
+          class="c-input c-input--lg"
+          [class.c-input--invalid]="displayNameError"
+          formControlName="displayName"
+          placeholder="Tu nombre o apodo"
+          autocomplete="name"
+        />
+        @if (displayNameError) {
+          <p class="c-field__error">{{ displayNameError }}</p>
+        }
+      </div>
+
+      <div class="c-field">
+        <label class="c-field__label" for="email">Correo electrónico</label>
+        <input
+          id="email"
+          type="email"
+          class="c-input c-input--lg"
+          [class.c-input--invalid]="emailError"
+          formControlName="email"
+          placeholder="tu@email.com"
+          autocomplete="email"
+        />
+        @if (emailError) {
+          <p class="c-field__error">{{ emailError }}</p>
+        }
+      </div>
+
+      <div class="c-field">
+        <label class="c-field__label" for="password">Contraseña</label>
+        <div class="auth-card__input-wrap">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            class="c-input c-input--lg"
+            [class.c-input--invalid]="passwordError"
+            formControlName="password"
+            placeholder="Mínimo 8 caracteres"
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            class="auth-card__eye-btn"
+            (click)="showPassword.update(v => !v)"
+            aria-label="Mostrar contraseña"
+          >
+            @if (showPassword()) {
+              <lucide-icon [img]="EyeOffIcon" size="18" />
+            } @else {
+              <lucide-icon [img]="EyeIcon" size="18" />
+            }
+          </button>
+        </div>
+        @if (passwordError) {
+          <p class="c-field__error">{{ passwordError }}</p>
+        }
+      </div>
+
+      <div class="c-field">
+        <label class="c-field__label" for="confirmPassword">Confirmar contraseña</label>
+        <div class="auth-card__input-wrap">
+          <input
+            id="confirmPassword"
+            [type]="showConfirm() ? 'text' : 'password'"
+            class="c-input c-input--lg"
+            [class.c-input--invalid]="confirmPasswordError"
+            formControlName="confirmPassword"
+            placeholder="Repite tu contraseña"
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            class="auth-card__eye-btn"
+            (click)="showConfirm.update(v => !v)"
+            aria-label="Mostrar confirmación"
+          >
+            @if (showConfirm()) {
+              <lucide-icon [img]="EyeOffIcon" size="18" />
+            } @else {
+              <lucide-icon [img]="EyeIcon" size="18" />
+            }
+          </button>
+        </div>
+        @if (confirmPasswordError) {
+          <p class="c-field__error">{{ confirmPasswordError }}</p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="c-button c-button--primary c-button--lg auth-card__submit"
+        [disabled]="isLoading()"
+      >
+        @if (isLoading()) {
+          <span class="auth-card__spinner" aria-hidden="true"></span>
+          Creando cuenta...
+        } @else {
+          <lucide-icon [img]="UserPlusIcon" size="16" />
+          Crear cuenta
+        }
+      </button>
+    </form>
+
+    <footer class="auth-card__footer">
+      <p>¿Ya tienes cuenta? <a routerLink="/auth/login">Iniciar sesión</a></p>
+    </footer>
+  }
+</div>

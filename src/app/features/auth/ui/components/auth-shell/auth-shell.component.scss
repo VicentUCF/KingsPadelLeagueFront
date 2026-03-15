@@ -1,0 +1,57 @@
+.auth-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  background: #0b0b0b;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgb(201 162 39 / 12%) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgb(201 162 39 / 6%) 0%, transparent 60%);
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1rem 1.5rem;
+  }
+
+  &__logo {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-strong) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 0 32px -4px rgb(201 162 39 / 45%);
+  }
+
+  &__tagline {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  &__content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  &__footer {
+    padding: 1.5rem 1rem;
+    text-align: center;
+
+    p {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+  }
+}

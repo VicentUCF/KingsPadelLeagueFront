@@ -30,7 +30,10 @@
       <div class="backoffice-shell__session">
         <app-role-badge [role]="sessionStore.currentRole()" />
         <div class="backoffice-shell__session-info">
-          @if (sessionStore.currentRole() === 'ADMIN') {
+          @if (sessionStore.currentUser(); as user) {
+            <span class="backoffice-shell__session-name">{{ user.displayName }}</span>
+            <span class="backoffice-shell__session-sub">{{ user.email }}</span>
+          } @else if (sessionStore.currentRole() === 'ADMIN') {
             <span class="backoffice-shell__session-name">Administrador</span>
             <span class="backoffice-shell__session-sub">Acceso total</span>
           } @else {
@@ -70,37 +73,17 @@
       </nav>
     </div>
 
-    <!-- ── Footer: role simulator ─────────────────────────────────────────────── -->
+    <!-- ── Footer: logout ────────────────────────────────────────────────────── -->
     <footer class="backoffice-shell__sidebar-footer">
-      <p aria-hidden="true" class="backoffice-shell__nav-heading">Simulador de rol</p>
-
-      <div class="backoffice-shell__sim">
-        <label class="backoffice-shell__sim-label" for="backoffice-role-switch">Rol</label>
-        <select
-          class="backoffice-shell__sim-select"
-          id="backoffice-role-switch"
-          [value]="sessionStore.currentRole()"
-          (change)="onRoleChange($event)"
-        >
-          @for (role of sessionStore.availableRoles; track role) {
-            <option [value]="role">{{ toRoleOptionLabel(role) }}</option>
-          }
-        </select>
-
-        @if (sessionStore.currentRole() === 'PRESIDENT') {
-          <label class="backoffice-shell__sim-label" for="backoffice-president-team">Equipo</label>
-          <select
-            class="backoffice-shell__sim-select"
-            id="backoffice-president-team"
-            [value]="sessionStore.currentPresidentTeamId()"
-            (change)="onPresidentTeamChange($event)"
-          >
-            @for (team of teamsStore.teams(); track team.id) {
-              <option [value]="team.id">{{ team.name }}</option>
-            }
-          </select>
-        }
-      </div>
+      <button
+        type="button"
+        class="backoffice-shell__logout-btn"
+        (click)="onLogout()"
+        aria-label="Cerrar sesión"
+      >
+        <lucide-angular [img]="logoutIcon" [size]="16" aria-hidden="true" />
+        Cerrar sesión
+      </button>
     </footer>
   </aside>
 

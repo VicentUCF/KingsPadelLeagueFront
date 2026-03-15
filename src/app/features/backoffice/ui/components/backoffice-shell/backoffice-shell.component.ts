@@ -15,7 +15,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { ChevronRight, LucideAngularModule, Menu, X } from 'lucide-angular';
+import { ChevronRight, LogOut, LucideAngularModule, Menu, X } from 'lucide-angular';
 import { filter } from 'rxjs';
 
 import { BACKOFFICE_ROOT_PATH } from '../../models/backoffice-navigation.model';
@@ -23,7 +23,6 @@ import { type BackofficeRouteData } from '../../models/backoffice-route-data';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { RoleBadgeComponent } from '../role-badge/role-badge.component';
-import { type BackofficeRole } from '../../../domain/entities/backoffice-role';
 
 interface BackofficePageContext {
   readonly title: string;
@@ -56,6 +55,7 @@ export class BackofficeShellComponent {
   protected readonly chevronRightIcon = ChevronRight;
   protected readonly menuIcon = Menu;
   protected readonly closeIcon = X;
+  protected readonly logoutIcon = LogOut;
 
   protected readonly sidebarOpen = signal(false);
   protected readonly navigation = this.sessionStore.navigation;
@@ -78,33 +78,8 @@ export class BackofficeShellComponent {
     return path === this.rootPath;
   }
 
-  protected onRoleChange(event: Event): void {
-    const target = event.target;
-
-    if (!(target instanceof HTMLSelectElement)) {
-      return;
-    }
-
-    this.sessionStore.updateRoleFromValue(target.value);
-  }
-
-  protected onPresidentTeamChange(event: Event): void {
-    const target = event.target;
-
-    if (!(target instanceof HTMLSelectElement)) {
-      return;
-    }
-
-    this.sessionStore.updatePresidentTeam(target.value);
-  }
-
-  protected toRoleOptionLabel(role: BackofficeRole): string {
-    switch (role) {
-      case 'ADMIN':
-        return 'Administrador';
-      case 'PRESIDENT':
-        return 'Presidente';
-    }
+  protected async onLogout(): Promise<void> {
+    await this.sessionStore.logout();
   }
 }
 

@@ -1,6 +1,8 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { LayoutDashboard, Shield, Swords, Trophy, UserCog, Users } from 'lucide-angular';
 
+import { AuthStore } from '@features/auth/ui/state/auth.store';
 import type { BackofficeRole } from '@features/backoffice/domain/entities/backoffice-role';
 import {
   BACKOFFICE_ROOT_PATH,
@@ -9,20 +11,23 @@ import {
 
 @Injectable()
 export class BackofficeSessionStore {
-  readonly currentRole = signal<BackofficeRole>('ADMIN');
-  readonly availableRoles: readonly BackofficeRole[] = ['ADMIN', 'PRESIDENT'];
-  readonly currentPresidentTeamId = signal<string>('kings-of-favar');
+  private readonly authStore = inject(AuthStore);
+  private readonly router = inject(Router);
+
+  readonly currentRole = computed<BackofficeRole>(() => {
+    const role = this.authStore.currentRole();
+    return role === 'ADMIN' ? 'ADMIN' : 'PRESIDENT';
+  });
+
+  readonly currentUser = this.authStore.user;
+
+  readonly currentPresidentTeamId = computed(() => this.authStore.user()?.teamId ?? null);
 
   readonly navigation = computed(() => this.buildNavigation(this.currentRole()));
 
-  updateRoleFromValue(value: string): void {
-    if (value === 'ADMIN' || value === 'PRESIDENT') {
-      this.currentRole.set(value);
-    }
-  }
-
-  updatePresidentTeam(teamId: string): void {
-    this.currentPresidentTeamId.set(teamId);
+  async logout(): Promise<void> {
+    await this.authStore.logout();
+    await this.router.navigate(['/auth/login']);
   }
 
   private buildNavigation(role: BackofficeRole): readonly BackofficeNavigationItem[] {
@@ -36,13 +41,6 @@ export class BackofficeSessionStore {
         isAccessible: true,
         isImplemented: true,
       },
-      // {
-      //   path: `${BACKOFFICE_ROOT_PATH}/temporadas`,
-      //   label: 'Temporadas',
-      //   icon: CalendarRange,
-      //   isAccessible: isAdmin,
-      //   isImplemented: true,
-      // },
       {
         path: `${BACKOFFICE_ROOT_PATH}/equipos`,
         label: 'Equipos',
@@ -71,13 +69,6 @@ export class BackofficeSessionStore {
         isAccessible: true,
         isImplemented: true,
       },
-      // {
-      //   path: `${BACKOFFICE_ROOT_PATH}/alineaciones`,
-      //   label: 'Alineaciones',
-      //   icon: ClipboardList,
-      //   isAccessible: true,
-      //   isImplemented: true,
-      // },
       {
         path: `${BACKOFFICE_ROOT_PATH}/usuarios`,
         label: 'Usuarios',

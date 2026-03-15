@@ -1,5 +1,6 @@
 import { type Routes } from '@angular/router';
 
+import { authGuard } from '@core/guards/auth.guard';
 import { provideLeagueHomeFeature } from '@features/league-home/ui/providers/league-home.providers';
 import { AppShellComponent } from '@layout/app-shell/app-shell.component';
 
@@ -54,7 +55,13 @@ const publicSiteRoutes: Routes = [
 
 export const routes: Routes = [
   {
+    path: 'auth',
+    loadChildren: () =>
+      import('@features/auth/ui/auth.routes').then((module) => module.AUTH_ROUTES),
+  },
+  {
     path: 'backoffice',
+    canMatch: [authGuard],
     loadChildren: () =>
       import('@features/backoffice/ui/backoffice.routes').then(
         (module) => module.BACKOFFICE_ROUTES,
