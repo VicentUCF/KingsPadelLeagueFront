@@ -13,19 +13,34 @@
   <aside class="backoffice-shell__sidebar" [class.backoffice-shell__sidebar--open]="sidebarOpen()">
     <!-- ── Header ─────────────────────────────────────────────────────────────── -->
     <header class="backoffice-shell__sidebar-header">
-      <button
-        type="button"
-        class="backoffice-shell__close-btn"
-        aria-label="Cerrar menú"
-        (click)="sidebarOpen.set(false)"
-      >
-        <lucide-angular [img]="closeIcon" [size]="18" aria-hidden="true" />
-      </button>
-
-      <a aria-label="Backoffice" class="backoffice-shell__brand" routerLink="/backoffice">
-        <span aria-hidden="true" class="backoffice-shell__brand-eyebrow">KingsPadelLeague</span>
-        <span class="backoffice-shell__brand-title">Backoffice</span>
-      </a>
+      <!-- Drawer title row: logo + close button -->
+      <div class="backoffice-shell__drawer-header">
+        <a aria-label="Backoffice" class="backoffice-shell__brand" routerLink="/backoffice">
+          <span aria-hidden="true" class="backoffice-shell__brand-mark">
+            <img
+              alt=""
+              class="backoffice-shell__brand-image"
+              decoding="async"
+              height="135"
+              loading="lazy"
+              [src]="applicationMetadata.logoPath"
+              width="318"
+            />
+          </span>
+          <span class="backoffice-shell__brand-copy">
+            <span class="backoffice-shell__brand-eyebrow">KingsPadelLeague</span>
+            <span class="backoffice-shell__brand-title">Backoffice</span>
+          </span>
+        </a>
+        <button
+          type="button"
+          class="backoffice-shell__close-btn"
+          aria-label="Cerrar menú"
+          (click)="sidebarOpen.set(false)"
+        >
+          <lucide-angular [img]="closeIcon" [size]="18" aria-hidden="true" />
+        </button>
+      </div>
 
       <div class="backoffice-shell__session">
         <app-role-badge [role]="sessionStore.currentRole()" />

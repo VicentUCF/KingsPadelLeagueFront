@@ -36,6 +36,17 @@
     margin: 0;
   }
 
+  &__back-link {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+
+    &:hover {
+      color: var(--color-brand);
+    }
+  }
+
   &__content {
     display: flex;
     align-items: flex-start;

@@ -25,7 +25,6 @@
           width="318"
         />
       </span>
-
       <span class="app-shell__brand-copy">
         <span class="app-shell__brand-title">{{ applicationMetadata.name }}</span>
         <span class="app-shell__brand-tagline">{{ applicationMetadata.tagline }}</span>
@@ -52,6 +51,7 @@
       class="app-shell__nav"
       id="primary-navigation"
     >
+      <!-- Drawer header (mobile only) -->
       <div aria-hidden="true" class="app-shell__nav-drawer-header">
         <span class="app-shell__nav-drawer-mark">
           <img
@@ -67,23 +67,196 @@
         <span class="app-shell__nav-drawer-name">{{ applicationMetadata.name }}</span>
       </div>
 
-      @for (navigationItem of primaryNavigation; track navigationItem.path) {
-        <a
-          class="app-shell__nav-link"
-          [routerLink]="navigationItem.path"
-          [routerLinkActiveOptions]="navigationItem.matchOptions"
-          routerLinkActive="app-shell__nav-link--active"
-          (click)="closeNavigation()"
+      <!-- Home -->
+      <a
+        class="app-shell__nav-link"
+        [routerLink]="homeLink.path"
+        [routerLinkActiveOptions]="homeLink.matchOptions"
+        routerLinkActive="app-shell__nav-link--active"
+        (click)="closeNavigation()"
+      >
+        <lucide-angular
+          [img]="homeLink.icon"
+          [size]="16"
+          aria-hidden="true"
+          class="app-shell__nav-link-icon"
+        />
+        <span>{{ homeLink.label }}</span>
+      </a>
+
+      <!-- Grouped dropdowns -->
+      @for (group of navGroups; track group.id) {
+        <!-- Desktop: dropdown trigger -->
+        <div
+          class="app-shell__nav-group"
+          [class.app-shell__nav-group--active]="isGroupActive(group)"
         >
-          <lucide-angular
-            [img]="navigationItem.icon"
-            [size]="16"
-            aria-hidden="true"
-            class="app-shell__nav-link-icon"
-          />
-          <span>{{ navigationItem.label }}</span>
-        </a>
+          <button
+            class="app-shell__nav-link app-shell__nav-group-trigger"
+            [class.app-shell__nav-link--active]="isGroupActive(group)"
+            type="button"
+            [attr.aria-expanded]="openDropdown() === group.id"
+            [attr.aria-haspopup]="'true'"
+            (click)="toggleDropdown(group.id)"
+          >
+            <span>{{ group.label }}</span>
+            <lucide-angular
+              [img]="chevronDownIcon"
+              [size]="13"
+              aria-hidden="true"
+              class="app-shell__nav-chevron"
+              [class.app-shell__nav-chevron--open]="openDropdown() === group.id"
+            />
+          </button>
+
+          @if (openDropdown() === group.id) {
+            <div class="app-shell__nav-dropdown" role="menu">
+              @for (item of group.items; track item.path) {
+                <a
+                  class="app-shell__nav-dropdown-item"
+                  [routerLink]="item.path"
+                  [routerLinkActiveOptions]="item.matchOptions"
+                  routerLinkActive="app-shell__nav-dropdown-item--active"
+                  role="menuitem"
+                  (click)="closeDropdowns(); closeNavigation()"
+                >
+                  <lucide-angular [img]="item.icon" [size]="15" aria-hidden="true" />
+                  <span>{{ item.label }}</span>
+                </a>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Mobile: section heading + flat links (shown inside drawer) -->
+        <div class="app-shell__nav-mobile-group">
+          <p class="app-shell__nav-mobile-heading" aria-hidden="true">{{ group.label }}</p>
+          @for (item of group.items; track item.path) {
+            <a
+              class="app-shell__nav-link"
+              [routerLink]="item.path"
+              [routerLinkActiveOptions]="item.matchOptions"
+              routerLinkActive="app-shell__nav-link--active"
+              (click)="closeNavigation()"
+            >
+              <lucide-angular
+                [img]="item.icon"
+                [size]="16"
+                aria-hidden="true"
+                class="app-shell__nav-link-icon"
+              />
+              <span>{{ item.label }}</span>
+            </a>
+          }
+        </div>
       }
+
+      <!-- Auth section -->
+      <div class="app-shell__nav-auth">
+        @if (authStore.isLoading()) {
+          <div class="app-shell__auth-skeleton" aria-hidden="true"></div>
+        } @else if (!authStore.isAuthenticated()) {
+          <a
+            class="app-shell__login-btn c-button c-button--pill c-button--primary"
+            routerLink="/auth/login"
+            (click)="closeNavigation()"
+          >
+            <lucide-angular [img]="logInIcon" [size]="15" aria-hidden="true" />
+            Iniciar sesión
+          </a>
+        } @else {
+          <div class="app-shell__user-wrap">
+            <!-- Desktop trigger -->
+            <button
+              class="app-shell__user-trigger"
+              type="button"
+              [attr.aria-expanded]="isUserMenuOpen()"
+              aria-haspopup="menu"
+              (click)="toggleUserMenu()"
+            >
+              <span class="app-shell__user-avatar" aria-hidden="true">{{ userInitials() }}</span>
+              <span class="app-shell__user-name">{{ authStore.user()?.displayName }}</span>
+              <lucide-angular
+                [img]="chevronDownIcon"
+                [size]="13"
+                aria-hidden="true"
+                class="app-shell__user-chevron"
+                [class.app-shell__user-chevron--open]="isUserMenuOpen()"
+              />
+            </button>
+
+            @if (isUserMenuOpen()) {
+              <div class="app-shell__user-menu" role="menu">
+                <div class="app-shell__user-menu-info">
+                  <span class="app-shell__user-menu-avatar" aria-hidden="true">{{
+                    userInitials()
+                  }}</span>
+                  <div class="app-shell__user-menu-copy">
+                    <span class="app-shell__user-menu-name">{{
+                      authStore.user()?.displayName
+                    }}</span>
+                    <span class="app-shell__user-menu-email">{{ authStore.user()?.email }}</span>
+                  </div>
+                </div>
+                <div class="app-shell__user-menu-divider" role="separator"></div>
+                <a
+                  class="app-shell__user-menu-item"
+                  routerLink="/perfil"
+                  role="menuitem"
+                  (click)="closeUserMenu()"
+                >
+                  Editar perfil
+                </a>
+                <a
+                  class="app-shell__user-menu-item"
+                  routerLink="/backoffice"
+                  role="menuitem"
+                  (click)="closeUserMenu()"
+                >
+                  <lucide-angular [img]="dashboardIcon" [size]="14" aria-hidden="true" />
+                  Panel backoffice
+                </a>
+                <div class="app-shell__user-menu-divider" role="separator"></div>
+                <button
+                  class="app-shell__user-menu-item app-shell__user-menu-item--logout"
+                  type="button"
+                  role="menuitem"
+                  (click)="onLogout()"
+                >
+                  <lucide-angular [img]="logOutIcon" [size]="14" aria-hidden="true" />
+                  Cerrar sesión
+                </button>
+              </div>
+            }
+
+            <!-- Mobile flat items -->
+            <div class="app-shell__mobile-user-items">
+              <div class="app-shell__mobile-user-info">
+                <span class="app-shell__user-avatar" aria-hidden="true">{{ userInitials() }}</span>
+                <div>
+                  <p class="app-shell__mobile-user-name">{{ authStore.user()?.displayName }}</p>
+                  <p class="app-shell__mobile-user-email">{{ authStore.user()?.email }}</p>
+                </div>
+              </div>
+              <a class="app-shell__nav-link" routerLink="/perfil" (click)="closeNavigation()"
+                >Editar perfil</a
+              >
+              <a class="app-shell__nav-link" routerLink="/backoffice" (click)="closeNavigation()">
+                <lucide-angular [img]="dashboardIcon" [size]="16" aria-hidden="true" />
+                Panel backoffice
+              </a>
+              <button
+                class="app-shell__nav-link app-shell__nav-link--danger"
+                type="button"
+                (click)="onLogout()"
+              >
+                <lucide-angular [img]="logOutIcon" [size]="16" aria-hidden="true" />
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     </nav>
   </div>
 </header>
@@ -98,7 +271,6 @@
       <p class="app-shell__footer-title">{{ applicationMetadata.name }}</p>
       <p class="app-shell__footer-tagline">{{ applicationMetadata.tagline }}</p>
     </div>
-
     <nav aria-label="Footer" class="app-shell__footer-nav">
       @for (navigationItem of footerNavigation; track navigationItem.path) {
         <a
@@ -106,7 +278,6 @@
           [routerLink]="navigationItem.path"
           [routerLinkActiveOptions]="navigationItem.matchOptions"
           routerLinkActive="app-shell__footer-link--active"
-          (click)="closeNavigation()"
         >
           <span>{{ navigationItem.label }}</span>
           <lucide-angular [img]="arrowRightIcon" [size]="14" aria-hidden="true" />

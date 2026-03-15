@@ -222,6 +222,9 @@
     text-decoration: none;
     border: 1px solid rgb(255 255 255 / 0.07);
     background: rgb(255 255 255 / 0.04);
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
     transition:
       border-color 180ms ease,
       background-color 180ms ease,
@@ -248,6 +251,141 @@
       border-color: color-mix(in srgb, var(--color-brand) 70%, white 10%);
       transform: translateY(-1px);
     }
+
+    &--danger {
+      color: #fca5a5;
+      border-color: rgb(248 113 113 / 20%);
+      background: rgb(248 113 113 / 5%);
+
+      &:hover {
+        background: rgb(248 113 113 / 12%);
+        border-color: rgb(248 113 113 / 40%);
+        color: #fca5a5;
+      }
+    }
+  }
+
+  // ── Nav groups (desktop: dropdown trigger; mobile: hidden — see mobile group) ─
+
+  &__nav-group {
+    display: none; // hidden on mobile — replaced by nav-mobile-group
+    position: relative;
+    width: 100%;
+  }
+
+  &__nav-group-trigger {
+    // inherits app-shell__nav-link styles
+  }
+
+  &__nav-chevron {
+    transition: transform 180ms ease;
+    margin-inline-start: auto;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  // Desktop dropdown panel — hidden on mobile
+  &__nav-dropdown {
+    display: none;
+  }
+
+  // Mobile section groups — shown in drawer
+  &__nav-mobile-group {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  &__nav-mobile-heading {
+    margin: 0;
+    padding: var(--space-1) var(--space-4) 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  // ── Auth section ─────────────────────────────────────────────────────────────
+
+  &__nav-auth {
+    width: 100%;
+    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-3);
+    border-block-start: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  &__login-btn {
+    width: 100%;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 3rem;
+  }
+
+  &__auth-skeleton {
+    width: 100%;
+    height: 3rem;
+    border-radius: 1.15rem;
+    background: rgb(255 255 255 / 0.04);
+    animation: auth-skeleton-pulse 1.4s ease-in-out infinite;
+  }
+
+  &__user-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  // Desktop trigger — hidden on mobile
+  &__user-trigger {
+    display: none;
+  }
+
+  // Mobile flat auth items — shown on mobile
+  &__mobile-user-items {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  &__mobile-user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    margin-block-end: var(--space-1);
+  }
+
+  &__mobile-user-name {
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-text-strong);
+  }
+
+  &__mobile-user-email {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  &__user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-strong) 100%);
+    color: var(--color-brand-contrast);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  // Desktop dropdown — never shown on mobile
+  &__user-menu {
+    display: none;
   }
 
   &__content {
@@ -405,6 +543,253 @@
       }
     }
 
+    // ── Nav groups — desktop overrides ────────────────────────────────────────
+
+    &__nav-group {
+      display: block;
+      width: auto;
+    }
+
+    &__nav-group-trigger {
+      // pill shape like nav-link (already inherited)
+      gap: var(--space-1);
+    }
+
+    &__nav-chevron {
+      margin-inline-start: 0;
+    }
+
+    &__nav-dropdown {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      position: absolute;
+      inset-block-start: calc(100% + var(--space-2));
+      inset-inline-start: 0;
+      min-width: 190px;
+      padding: var(--space-2);
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 1rem;
+      box-shadow:
+        0 0 0 1px rgb(0 0 0 / 20%),
+        0 1rem 3rem -0.5rem var(--color-shadow);
+      z-index: calc(var(--z-index-header) + 10);
+      animation: user-menu-in 140ms ease;
+    }
+
+    &__nav-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: 0.65rem;
+      color: var(--color-text-default);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition:
+        background 140ms ease,
+        color 140ms ease;
+
+      &:hover {
+        background: rgb(255 255 255 / 0.06);
+        color: var(--color-text-strong);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: -2px;
+        border-radius: 0.65rem;
+      }
+
+      &--active {
+        color: var(--color-brand);
+        background: rgb(201 162 39 / 10%);
+      }
+    }
+
+    // Mobile groups hidden on desktop
+    &__nav-mobile-group {
+      display: none;
+    }
+
+    // ── Auth section — desktop overrides ───────────────────────────────────────
+
+    &__nav-auth {
+      width: auto;
+      margin-block-start: 0;
+      padding-block-start: 0;
+      border-block-start: none;
+      margin-inline-start: var(--space-2);
+      padding-inline-start: var(--space-4);
+      border-inline-start: 1px solid var(--color-border-subtle);
+    }
+
+    &__login-btn {
+      width: auto;
+      min-height: unset;
+      padding: var(--space-2) var(--space-4);
+    }
+
+    &__user-wrap {
+      width: auto;
+    }
+
+    // Desktop trigger shown, mobile items hidden
+    &__user-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: 999px;
+      border: 1px solid var(--color-border-subtle);
+      background: rgb(255 255 255 / 0.04);
+      color: var(--color-text-default);
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        color 180ms ease;
+
+      &:hover {
+        border-color: var(--color-border-strong);
+        color: var(--color-text-strong);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+      }
+    }
+
+    &__user-chevron {
+      transition: transform 180ms ease;
+
+      &--open {
+        transform: rotate(180deg);
+      }
+    }
+
+    &__mobile-user-items {
+      display: none;
+    }
+
+    // Dropdown panel
+    &__user-menu {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      position: absolute;
+      inset-block-start: calc(100% + var(--space-2));
+      inset-inline-end: 0;
+      min-width: 220px;
+      padding: var(--space-2);
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 1rem;
+      box-shadow:
+        0 0 0 1px rgb(0 0 0 / 20%),
+        0 1rem 3rem -0.5rem var(--color-shadow);
+      z-index: calc(var(--z-index-header) + 10);
+      animation: user-menu-in 140ms ease;
+    }
+
+    &__user-menu-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-3) var(--space-2);
+    }
+
+    &__user-menu-avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-strong) 100%);
+      color: var(--color-brand-contrast);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    &__user-menu-copy {
+      display: grid;
+      gap: 0.1rem;
+      min-width: 0;
+    }
+
+    &__user-menu-name {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--color-text-strong);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__user-menu-email {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__user-menu-divider {
+      height: 1px;
+      background: var(--color-border-subtle);
+      margin-block: var(--space-1);
+    }
+
+    &__user-menu-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: 0.65rem;
+      color: var(--color-text-default);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      background: transparent;
+      font: inherit;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition:
+        background 140ms ease,
+        color 140ms ease;
+
+      &:hover {
+        background: rgb(255 255 255 / 0.06);
+        color: var(--color-text-strong);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: -2px;
+        border-radius: 0.65rem;
+      }
+
+      &--logout {
+        color: #fca5a5;
+
+        &:hover {
+          background: rgb(248 113 113 / 10%);
+          color: #fca5a5;
+        }
+      }
+    }
+
     &__footer-inner {
       flex-direction: row;
     }
@@ -428,5 +813,26 @@
     &__brand-tagline {
       display: block;
     }
+  }
+}
+
+@keyframes user-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auth-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
   }
 }

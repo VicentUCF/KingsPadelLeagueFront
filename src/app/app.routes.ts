@@ -60,6 +60,14 @@ export const routes: Routes = [
       import('@features/auth/ui/auth.routes').then((module) => module.AUTH_ROUTES),
   },
   {
+    path: 'perfil',
+    canMatch: [authGuard],
+    loadComponent: () =>
+      import('@features/auth/ui/pages/profile-page/profile-page.component').then(
+        (m) => m.ProfilePageComponent,
+      ),
+  },
+  {
     path: 'backoffice',
     canMatch: [authGuard],
     loadChildren: () =>

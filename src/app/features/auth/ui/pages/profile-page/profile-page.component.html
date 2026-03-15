@@ -1,0 +1,142 @@
+<div class="profile-page">
+  <header class="profile-page__header">
+    <a class="profile-page__back" routerLink="/">
+      <lucide-icon [img]="ArrowLeftIcon" size="16" />
+      Volver a la web
+    </a>
+    <div class="profile-page__avatar" aria-hidden="true">
+      {{ authStore.user()?.displayName?.[0]?.toUpperCase() ?? '?' }}
+    </div>
+    <h1 class="profile-page__title">Mi perfil</h1>
+    <p class="profile-page__email">{{ authStore.user()?.email }}</p>
+  </header>
+
+  <!-- ── Datos personales ─────────────────────────────────────────────────────── -->
+  <section class="profile-card" aria-labelledby="section-profile">
+    <header class="profile-card__header">
+      <lucide-icon [img]="UserIcon" size="18" aria-hidden="true" />
+      <h2 id="section-profile" class="profile-card__title">Datos personales</h2>
+    </header>
+
+    @if (profileError()) {
+      <div class="profile-card__alert" role="alert">{{ profileError() }}</div>
+    }
+
+    @if (profileSaved()) {
+      <div class="profile-card__success" role="status">
+        <lucide-icon [img]="CheckIcon" size="16" />
+        Cambios guardados correctamente
+      </div>
+    }
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" novalidate>
+      <div class="c-field">
+        <label class="c-field__label" for="displayName">Nombre</label>
+        <input
+          id="displayName"
+          type="text"
+          class="c-input"
+          [class.c-input--invalid]="displayNameError"
+          formControlName="displayName"
+          placeholder="Tu nombre o apodo"
+          autocomplete="name"
+        />
+        @if (displayNameError) {
+          <p class="c-field__error">{{ displayNameError }}</p>
+        }
+      </div>
+
+      <div class="c-field">
+        <label class="c-field__label" for="email-ro">Correo electrónico</label>
+        <input
+          id="email-ro"
+          type="email"
+          class="c-input"
+          [value]="authStore.user()?.email ?? ''"
+          disabled
+          aria-describedby="email-hint"
+        />
+        <p id="email-hint" class="c-field__helper">El email no se puede cambiar desde aquí.</p>
+      </div>
+
+      <button
+        type="submit"
+        class="c-button c-button--primary profile-card__submit"
+        [disabled]="profileLoading()"
+      >
+        @if (profileLoading()) {
+          <span class="profile-card__spinner" aria-hidden="true"></span>
+          Guardando...
+        } @else {
+          Guardar cambios
+        }
+      </button>
+    </form>
+  </section>
+
+  <!-- ── Cambiar contraseña ──────────────────────────────────────────────────── -->
+  <section class="profile-card" aria-labelledby="section-password">
+    <header class="profile-card__header">
+      <lucide-icon [img]="KeyRoundIcon" size="18" aria-hidden="true" />
+      <h2 id="section-password" class="profile-card__title">Cambiar contraseña</h2>
+    </header>
+
+    @if (passwordError()) {
+      <div class="profile-card__alert" role="alert">{{ passwordError() }}</div>
+    }
+
+    @if (passwordSaved()) {
+      <div class="profile-card__success" role="status">
+        <lucide-icon [img]="CheckIcon" size="16" />
+        Contraseña actualizada correctamente
+      </div>
+    }
+
+    <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" novalidate>
+      <div class="c-field">
+        <label class="c-field__label" for="newPassword">Nueva contraseña</label>
+        <input
+          id="newPassword"
+          type="password"
+          class="c-input"
+          [class.c-input--invalid]="newPasswordError"
+          formControlName="newPassword"
+          placeholder="Mínimo 8 caracteres"
+          autocomplete="new-password"
+        />
+        @if (newPasswordError) {
+          <p class="c-field__error">{{ newPasswordError }}</p>
+        }
+      </div>
+
+      <div class="c-field">
+        <label class="c-field__label" for="confirmPassword">Confirmar contraseña</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          class="c-input"
+          [class.c-input--invalid]="confirmPasswordError"
+          formControlName="confirmPassword"
+          placeholder="Repite la contraseña"
+          autocomplete="new-password"
+        />
+        @if (confirmPasswordError) {
+          <p class="c-field__error">{{ confirmPasswordError }}</p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="c-button c-button--primary profile-card__submit"
+        [disabled]="passwordLoading()"
+      >
+        @if (passwordLoading()) {
+          <span class="profile-card__spinner" aria-hidden="true"></span>
+          Actualizando...
+        } @else {
+          Cambiar contraseña
+        }
+      </button>
+    </form>
+  </section>
+</div>

@@ -131,6 +131,21 @@ export class AuthStore {
     await this.resetPasswordUseCase.execute(newPassword);
   }
 
+  async updateProfile(displayName: string): Promise<void> {
+    const { data, error } = await this.supabase.auth.updateUser({
+      data: { display_name: displayName },
+    });
+    if (error) throw new Error(error.message);
+    if (data.user) {
+      this._user.update((u) => (u ? { ...u, displayName } : null));
+    }
+  }
+
+  async changePassword(newPassword: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({ password: newPassword });
+    if (error) throw new Error(error.message);
+  }
+
   clearError(): void {
     this._error.set(null);
   }
