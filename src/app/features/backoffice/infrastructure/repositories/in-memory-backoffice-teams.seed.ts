@@ -3,57 +3,57 @@ import { type BackofficeTeamDetail } from '@features/backoffice/domain/entities/
 export const IN_MEMORY_BACKOFFICE_TEAMS: readonly BackofficeTeamDetail[] = [
   {
     id: 'barbaridad',
-    name: 'Barbaridad',
+    name: 'Barbaridad Team',
     shortName: 'BAR',
     primaryColor: '#b53a1d',
     secondaryColor: '#f2a65a',
-    presidentName: 'Romero',
+    presidentName: 'Samu',
     activeRegularPlayersCount: 6,
     status: 'ACTIVE',
     seasonLabel: 'Temporada 2026',
     visualIdentityLabel: 'Color principal naranja quemado con acento cobre.',
-    roleAssignments: [
-      createRole('Presidente', 'Romero', 'Season activa · 2026'),
-      createRole('Delegado', 'Eloy Segura', 'Apoyo operativo en jornada'),
-    ],
+    roleAssignments: [createRole('Presidente', 'Samu', 'Season activa · 2026')],
     rosterMembers: [
-      createRosterMember('Ivan Soto', 'Regular activo'),
-      createRosterMember('Nico Prieto', 'Regular activo'),
-      createRosterMember('Carlos Mora', 'Regular activo'),
+      createRosterMember('Alex Pla', 'Regular activo'),
+      createRosterMember('Andreu Simo', 'Regular activo'),
+      createRosterMember('Gabi', 'Regular activo'),
+      createRosterMember('Javi Moya', 'Regular activo'),
+      createRosterMember('Alejandro', 'Regular activo'),
     ],
     fixtures: [
       createFixture('Barbaridad vs Kings of Favar', 'Convocatoria pendiente'),
       createFixture('Magic City vs Barbaridad', 'Programado'),
     ],
-    sanctions: [createSanction('Retraso en entrega de convocatoria', -1, 'Aplicada')],
-    mvpHistory: [createMvp('Jornada 3', 'Carlos Mora', 'Nominado interno')],
+    sanctions: [],
+    mvpHistory: [],
   },
   {
     id: 'kings-of-favar',
-    name: 'Kings of Favar',
+    name: 'Kings Of Favar',
     shortName: 'KOF',
     primaryColor: '#1b1f3b',
     secondaryColor: '#d4af37',
-    presidentName: 'Navarro',
+    presidentName: 'Vicent Ciscar',
     activeRegularPlayersCount: 6,
     status: 'ACTIVE',
     seasonLabel: 'Temporada 2026',
     visualIdentityLabel: 'Base azul noche con acento dorado de identidad principal.',
     roleAssignments: [
-      createRole('Presidente', 'Navarro', 'Season activa · 2026'),
-      createRole('Delegado', 'Iker Solis', 'Soporte de alineaciones'),
+      createRole('Presidente', 'Vicent Ciscar', 'Season activa · 2026'),
+      createRole('Presidente', 'Enric Bixquert', 'Season activa · 2026'),
     ],
     rosterMembers: [
-      createRosterMember('Alejandro Mena', 'Regular activo'),
-      createRosterMember('Raul Pizarro', 'Regular activo'),
-      createRosterMember('Sergio Vela', 'Regular activo'),
+      createRosterMember('Raul Bataller', 'Regular activo'),
+      createRosterMember('Tono', 'Regular activo'),
+      createRosterMember('Jose Sanfelix', 'Regular activo'),
+      createRosterMember('Damian Crespo', 'Regular activo'),
     ],
     fixtures: [
       createFixture('Kings of Favar vs Barbaridad', 'Convocatoria pendiente'),
-      createFixture('Titanics vs Kings of Favar', 'Cerrado'),
+      createFixture('Titanics vs Kings of Favar', 'Programado'),
     ],
     sanctions: [],
-    mvpHistory: [createMvp('Jornada 2', 'Alejandro Mena', 'Ganador MVP')],
+    mvpHistory: [],
   },
   {
     id: 'titanics',
@@ -61,26 +61,77 @@ export const IN_MEMORY_BACKOFFICE_TEAMS: readonly BackofficeTeamDetail[] = [
     shortName: 'TIT',
     primaryColor: '#1c355e',
     secondaryColor: '#8fd3ff',
-    presidentName: 'Torres',
+    presidentName: 'Adrian Asuncion',
     activeRegularPlayersCount: 6,
     status: 'ACTIVE',
     seasonLabel: 'Temporada 2026',
     visualIdentityLabel: 'Paleta fría con azul profundo y acento hielo.',
-    roleAssignments: [
-      createRole('Presidente', 'Torres', 'Season activa · 2026'),
-      createRole('Delegado', 'Gonzalo Riera', 'Control de convocatorias'),
-    ],
+    roleAssignments: [createRole('Presidente', 'Adrian Asuncion', 'Season activa · 2026')],
     rosterMembers: [
-      createRosterMember('Marco Vidal', 'Regular activo'),
-      createRosterMember('Diego Llorens', 'Regular activo'),
-      createRosterMember('Hugo Ferrer', 'Regular activo'),
+      createRosterMember('Javi Millet', 'Regular activo'),
+      createRosterMember('Carles Montilla', 'Regular activo'),
+      createRosterMember('Brigante', 'Regular activo'),
+      createRosterMember('Joan Meló', 'Regular activo'),
+      createRosterMember('Tomas', 'Regular activo'),
     ],
     fixtures: [
-      createFixture('Titanics vs House Perez', 'Resultado pendiente'),
-      createFixture('Titanics vs Kings of Favar', 'Cerrado'),
+      createFixture('Titanics vs Thormentadores', 'Programado'),
+      createFixture('Titanics vs Kings of Favar', 'Programado'),
     ],
-    sanctions: [createSanction('Corrección administrativa de acta', -2, 'Revertida')],
-    mvpHistory: [createMvp('Jornada 1', 'Marco Vidal', 'Nominado interno')],
+    sanctions: [],
+    mvpHistory: [],
+  },
+  {
+    id: 'thormentadores',
+    name: 'Thormentadores',
+    shortName: 'THO',
+    primaryColor: '#1a3a1a',
+    secondaryColor: '#4caf50',
+    presidentName: 'Borja Vercher',
+    activeRegularPlayersCount: 6,
+    status: 'ACTIVE',
+    seasonLabel: 'Temporada 2026',
+    visualIdentityLabel: 'Verde oscuro con acento verde brillante.',
+    roleAssignments: [createRole('Presidente', 'Borja Vercher', 'Season activa · 2026')],
+    rosterMembers: [
+      createRosterMember('Miguel Esteve', 'Regular activo'),
+      createRosterMember('Dani Manzano', 'Regular activo'),
+      createRosterMember('David Gregori', 'Regular activo'),
+      createRosterMember('Jordi Vitoria', 'Regular activo'),
+      createRosterMember('Marc Ripoll', 'Regular activo'),
+    ],
+    fixtures: [
+      createFixture('Thormentadores vs Magic City', 'Programado'),
+      createFixture('Titanics vs Thormentadores', 'Programado'),
+    ],
+    sanctions: [],
+    mvpHistory: [],
+  },
+  {
+    id: 'magic-city',
+    name: 'Magic City',
+    shortName: 'MAG',
+    primaryColor: '#2d0066',
+    secondaryColor: '#cc00ff',
+    presidentName: 'Adri Alvarez',
+    activeRegularPlayersCount: 6,
+    status: 'ACTIVE',
+    seasonLabel: 'Temporada 2026',
+    visualIdentityLabel: 'Morado oscuro con acento fucsia.',
+    roleAssignments: [createRole('Presidente', 'Adri Alvarez', 'Season activa · 2026')],
+    rosterMembers: [
+      createRosterMember('Ruben Marzal', 'Regular activo'),
+      createRosterMember('Dani Sanchez', 'Regular activo'),
+      createRosterMember('Josep Castello', 'Regular activo'),
+      createRosterMember('Emilio Esteve', 'Regular activo'),
+      createRosterMember('Artur Peris', 'Regular activo'),
+    ],
+    fixtures: [
+      createFixture('Magic City vs Barbaridad', 'Programado'),
+      createFixture('Thormentadores vs Magic City', 'Programado'),
+    ],
+    sanctions: [],
+    mvpHistory: [],
   },
 ] as const;
 
@@ -106,18 +157,18 @@ function createFixture(fixtureLabel: string, statusLabel: string) {
   };
 }
 
-function createSanction(reason: string, pointsDelta: number, statusLabel: string) {
-  return {
-    reason,
-    pointsDelta,
-    statusLabel,
-  };
-}
+// function createSanction(reason: string, pointsDelta: number, statusLabel: string) {
+//   return {
+//     reason,
+//     pointsDelta,
+//     statusLabel,
+//   };
+// }
 
-function createMvp(matchdayLabel: string, playerName: string, resultLabel: string) {
-  return {
-    matchdayLabel,
-    playerName,
-    resultLabel,
-  };
-}
+// function createMvp(matchdayLabel: string, playerName: string, resultLabel: string) {
+//   return {
+//     matchdayLabel,
+//     playerName,
+//     resultLabel,
+//   };
+// }
