@@ -65,6 +65,16 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
       contrast: '#140806',
     },
   },
+  'barbaridad-team': {
+    logoPath: '/teams_logos/barbarida_no_bg.png',
+    palette: {
+      primary: '#ff7848',
+      accent: '#ffd0b5',
+      surface: '#2a140f',
+      glow: 'rgb(255 120 72 / 0.38)',
+      contrast: '#140806',
+    },
+  },
   'magic-city': {
     logoPath: '/teams_logos/magic_ng_bg.png',
     palette: {

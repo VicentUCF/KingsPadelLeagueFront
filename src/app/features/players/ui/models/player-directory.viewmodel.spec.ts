@@ -36,6 +36,8 @@ describe('toPlayerDirectorySectionsViewModel', () => {
     ]);
 
     expect(section?.players[0]).toMatchObject({
+      teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+      avatarPath: null,
       wonMatchesLabel: '2',
       lostMatchesLabel: '3',
       playedMatchesCount: 5,

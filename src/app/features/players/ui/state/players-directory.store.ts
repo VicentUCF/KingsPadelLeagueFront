@@ -86,12 +86,12 @@ export class PlayersDirectoryStore {
     });
   }
 
-  async load(): Promise<void> {
+  async load(forceRefresh = false): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
-      const players = await this.loadPlayersUseCase.execute();
+      const players = await this.loadPlayersUseCase.execute(forceRefresh);
 
       this.rankedPlayers.set(toRankedPlayersViewModel(players));
       this.sections.set(toPlayerDirectorySectionsViewModel(players));

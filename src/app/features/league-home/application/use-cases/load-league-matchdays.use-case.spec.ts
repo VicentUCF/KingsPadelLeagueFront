@@ -5,11 +5,15 @@ import { LeagueHomeRepository } from '../ports/league-home.repository';
 import { LoadLeagueMatchdaysUseCase } from './load-league-matchdays.use-case';
 
 class LeagueHomeRepositoryStub extends LeagueHomeRepository {
-  override async loadSnapshot(): Promise<LeagueHomeSnapshot> {
+  readonly loadMatchdaysCalls: boolean[] = [];
+
+  override async loadSnapshot(_forceRefresh = false): Promise<LeagueHomeSnapshot> {
     throw new Error('Not implemented in this test.');
   }
 
-  override async loadMatchdays(): Promise<readonly LeagueMatchday[]> {
+  override async loadMatchdays(forceRefresh = false): Promise<readonly LeagueMatchday[]> {
+    this.loadMatchdaysCalls.push(forceRefresh);
+
     return [
       createMatchday('matchday-4', 4, 'upcoming', null),
       createMatchday('matchday-2', 2, 'completed', 'magic-city'),
@@ -32,6 +36,15 @@ describe('LoadLeagueMatchdaysUseCase', () => {
     expect(result[0]?.byeTeam?.teamId).toBe('magic-city');
     expect(result[1]?.byeTeam?.teamId).toBe('house-perez');
     expect(result[2]?.byeTeam).toBeNull();
+  });
+
+  it('passes forceRefresh to the repository', async () => {
+    const repository = new LeagueHomeRepositoryStub();
+    const useCase = new LoadLeagueMatchdaysUseCase(repository);
+
+    await useCase.execute(true);
+
+    expect(repository.loadMatchdaysCalls).toEqual([true]);
   });
 });
 

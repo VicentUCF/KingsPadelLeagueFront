@@ -2,6 +2,6 @@ import { type LeagueMatchday } from '@features/league-home/domain/entities/leagu
 import { type LeagueHomeSnapshot } from '@features/league-home/domain/entities/league-home-snapshot';
 
 export abstract class LeagueHomeRepository {
-  abstract loadSnapshot(): Promise<LeagueHomeSnapshot>;
-  abstract loadMatchdays(): Promise<readonly LeagueMatchday[]>;
+  abstract loadSnapshot(forceRefresh?: boolean): Promise<LeagueHomeSnapshot>;
+  abstract loadMatchdays(forceRefresh?: boolean): Promise<readonly LeagueMatchday[]>;
 }

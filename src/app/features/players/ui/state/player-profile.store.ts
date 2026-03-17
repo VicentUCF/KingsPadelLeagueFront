@@ -24,7 +24,7 @@ export class PlayerProfileStore {
     );
   });
 
-  async load(slug: string | null): Promise<void> {
+  async load(slug: string | null, forceRefresh = false): Promise<void> {
     this.currentSlug.set(slug);
     this.player.set(null);
     this.errorMessage.set(null);
@@ -36,7 +36,7 @@ export class PlayerProfileStore {
     this.isLoading.set(true);
 
     try {
-      const player = await this.loadPlayerProfileUseCase.execute(slug);
+      const player = await this.loadPlayerProfileUseCase.execute(slug, forceRefresh);
 
       this.player.set(player ? toPlayerProfileViewModel(player) : null);
     } catch {

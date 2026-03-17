@@ -89,6 +89,6 @@ export class LeagueHomePageComponent implements OnInit {
   }
 
   protected reloadSnapshot(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

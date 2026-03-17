@@ -20,14 +20,14 @@ export class LeagueCalendarStore {
   readonly hasSnapshot = computed(() => this.snapshot() !== null);
   readonly hasMatchdays = computed(() => this.matchdays().length > 0);
 
-  async load(): Promise<void> {
+  async load(forceRefresh = false): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       const [snapshot, matchdays] = await Promise.all([
-        this.loadLeagueHomeSnapshotUseCase.execute(),
-        this.loadLeagueMatchdaysUseCase.execute(),
+        this.loadLeagueHomeSnapshotUseCase.execute(forceRefresh),
+        this.loadLeagueMatchdaysUseCase.execute(forceRefresh),
       ]);
 
       this.snapshot.set(snapshot);

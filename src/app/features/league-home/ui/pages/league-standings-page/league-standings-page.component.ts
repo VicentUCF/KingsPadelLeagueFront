@@ -51,6 +51,6 @@ export class LeagueStandingsPageComponent implements OnInit {
   }
 
   protected reloadSnapshot(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

@@ -114,6 +114,6 @@ export class LeagueTeamProfilePageComponent implements OnDestroy, OnInit {
   }
 
   protected reloadSnapshot(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

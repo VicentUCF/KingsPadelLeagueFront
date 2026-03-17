@@ -17,15 +17,16 @@
   </div>
 
   <div class="player-profile-card__avatar">
-    @if (player().avatarPath) {
+    @if (avatarSrc(); as avatarSrc) {
       <img
-        [ngSrc]="player().avatarPath!"
+        [ngSrc]="avatarSrc"
         [alt]="player().displayName"
         class="player-profile-card__image"
         decoding="async"
         height="220"
         width="220"
         priority
+        (error)="useFallbackAvatar()"
       />
     } @else {
       <div aria-hidden="true" class="player-profile-card__avatar-fallback">

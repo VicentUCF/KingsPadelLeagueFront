@@ -2,6 +2,7 @@ import {
   isPlayerAssignedToTeam,
   type Player,
 } from '@features/players/domain/entities/player.entity';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { resolveTeamBranding, type TeamBrandingPalette } from '@shared/utils/team-branding';
 
 const SIDE_LABELS: Record<string, string> = {
@@ -42,7 +43,6 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
   const hasCompetitiveStats = player.playedMatchesCount > 0;
   const teamBranding = resolveTeamBranding({
     teamName: player.teamName,
-    teamSlug: hasAssignedTeam ? player.teamId : null,
     fallbackLogoPath: player.teamLogoPath,
   });
   const teamMonogram = hasAssignedTeam ? teamBranding.monogram : 'SE';
@@ -54,7 +54,7 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
     teamLogoPath: teamBranding.logoPath,
     teamMonogram,
     teamPalette: teamBranding.palette,
-    avatarPath: player.avatarPath,
+    avatarPath: resolvePlayerAvatarPath(player.avatarPath),
     wonMatchesCount: player.wonMatchesCount,
     lostMatchesCount: player.lostMatchesCount,
     wonMatchesLabel: `${player.wonMatchesCount}`,

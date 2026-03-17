@@ -35,6 +35,6 @@ export class PlayersDirectoryPageComponent implements OnInit {
   }
 
   protected reloadPlayers(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

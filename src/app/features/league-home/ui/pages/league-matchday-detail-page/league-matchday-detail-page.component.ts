@@ -112,6 +112,6 @@ export class LeagueMatchdayDetailPageComponent implements OnDestroy, OnInit {
   }
 
   protected reloadMatchdays(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

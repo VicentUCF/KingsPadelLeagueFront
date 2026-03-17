@@ -5,7 +5,7 @@ import { type PlayersRepository } from '../ports/players.repository';
 export class LoadPlayerProfileUseCase {
   constructor(private readonly playersRepository: PlayersRepository) {}
 
-  async execute(slug: string): Promise<Player | null> {
-    return this.playersRepository.findBySlug(slug);
+  async execute(slug: string, forceRefresh = false): Promise<Player | null> {
+    return this.playersRepository.findBySlug(slug, forceRefresh);
   }
 }

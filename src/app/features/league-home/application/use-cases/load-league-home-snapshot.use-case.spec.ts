@@ -8,7 +8,11 @@ import { LeagueHomeRepository } from '../ports/league-home.repository';
 import { LoadLeagueHomeSnapshotUseCase } from './load-league-home-snapshot.use-case';
 
 class LeagueHomeRepositoryStub extends LeagueHomeRepository {
-  override async loadSnapshot(): Promise<LeagueHomeSnapshot> {
+  readonly loadSnapshotCalls: boolean[] = [];
+
+  override async loadSnapshot(forceRefresh = false): Promise<LeagueHomeSnapshot> {
+    this.loadSnapshotCalls.push(forceRefresh);
+
     return {
       league: {
         name: 'KingsPadelLeague',
@@ -71,7 +75,7 @@ class LeagueHomeRepositoryStub extends LeagueHomeRepository {
     };
   }
 
-  override async loadMatchdays(): Promise<readonly LeagueMatchday[]> {
+  override async loadMatchdays(_forceRefresh = false): Promise<readonly LeagueMatchday[]> {
     return [];
   }
 }
@@ -98,6 +102,15 @@ describe('LoadLeagueHomeSnapshotUseCase', () => {
 
     expect(result.nextMatches.map((entry) => entry.id)).toEqual(['early-match', 'late-match']);
     expect(result.lastResults).toHaveLength(3);
+  });
+
+  it('passes forceRefresh to the repository', async () => {
+    const repository = new LeagueHomeRepositoryStub();
+    const useCase = new LoadLeagueHomeSnapshotUseCase(repository);
+
+    await useCase.execute(true);
+
+    expect(repository.loadSnapshotCalls).toEqual([true]);
   });
 });
 

@@ -114,7 +114,7 @@ function createFacts(
 ): readonly TeamFactViewModel[] {
   return [
     {
-      label: 'Presidente',
+      label: 'Presidencia',
       value: teamProfile.presidentName,
     },
     {

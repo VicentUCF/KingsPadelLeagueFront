@@ -22,6 +22,8 @@ describe('toPlayerProfileViewModel', () => {
       displayName: 'Alex Soler',
       teamName: 'Kings of Favar',
       teamMonogram: 'OF',
+      teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+      avatarPath: null,
       wonMatchesLabel: '4',
       lostMatchesLabel: '1',
       pageTitle: 'Alex Soler | Jugadores | KingsPadelLeague',
@@ -51,5 +53,41 @@ describe('toPlayerProfileViewModel', () => {
 
     expect(viewModel.teamName).toBe('Sin equipo todavía');
     expect(viewModel.metaDescription).toContain('todavía no tiene equipo asignado');
+  });
+
+  it('uses the local team crest for Barbaridad Team', () => {
+    const viewModel = toPlayerProfileViewModel(
+      new Player(
+        'samu',
+        'samuel-gutierrez',
+        'Samuel Gutierrez',
+        'team-barbaridad',
+        'Barbaridad Team',
+        'https://placeholder.com/logos/barbaridad.png',
+        null,
+        1,
+        0,
+      ),
+    );
+
+    expect(viewModel.teamLogoPath).toBe('/teams_logos/barbarida_no_bg.png');
+  });
+
+  it('drops placeholder avatars so the UI can render the icon fallback', () => {
+    const viewModel = toPlayerProfileViewModel(
+      new Player(
+        'alex-soler',
+        'alex-soler',
+        'Alex Soler',
+        'kings-of-favar',
+        'Kings of Favar',
+        null,
+        'https://placeholder.com/images/player.png',
+        0,
+        0,
+      ),
+    );
+
+    expect(viewModel.avatarPath).toBeNull();
   });
 });

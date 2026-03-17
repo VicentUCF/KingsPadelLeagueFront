@@ -1,4 +1,6 @@
 import { type Player } from '@features/players/domain/entities/player.entity';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
+import { resolveTeamBranding } from '@shared/utils/team-branding';
 
 export interface PlayerCardViewModel {
   readonly id: string;
@@ -84,13 +86,17 @@ export function toPlayerCardViewModel(player: Player, ranking = 0): PlayerCardVi
     player.playedMatchesCount > 0
       ? Math.round((player.wonMatchesCount / player.playedMatchesCount) * 100)
       : 0;
+  const teamBranding = resolveTeamBranding({
+    teamName: player.teamName,
+    fallbackLogoPath: player.teamLogoPath,
+  });
 
   return {
     id: player.id,
     displayName: player.displayName,
     teamName: player.teamName,
-    teamLogoPath: player.teamLogoPath,
-    avatarPath: player.avatarPath,
+    teamLogoPath: teamBranding.logoPath,
+    avatarPath: resolvePlayerAvatarPath(player.avatarPath),
     wonMatchesCount: player.wonMatchesCount,
     lostMatchesCount: player.lostMatchesCount,
     playedMatchesCount: player.playedMatchesCount,

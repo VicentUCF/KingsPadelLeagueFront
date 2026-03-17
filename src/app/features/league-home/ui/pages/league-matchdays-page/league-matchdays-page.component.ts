@@ -69,6 +69,6 @@ export class LeagueMatchdaysPageComponent implements OnInit {
   }
 
   protected reloadMatchdays(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

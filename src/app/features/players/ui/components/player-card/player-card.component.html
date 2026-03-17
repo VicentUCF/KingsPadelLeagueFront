@@ -10,14 +10,15 @@
   }
 
   <div class="player-card__avatar">
-    @if (player().avatarPath) {
+    @if (avatarSrc(); as avatarSrc) {
       <img
-        [ngSrc]="player().avatarPath!"
+        [ngSrc]="avatarSrc"
         [alt]="player().displayName"
         class="player-card__image"
         decoding="async"
         height="48"
         width="48"
+        (error)="useFallbackAvatar()"
       />
     } @else {
       <span aria-hidden="true" class="player-card__avatar-fallback">

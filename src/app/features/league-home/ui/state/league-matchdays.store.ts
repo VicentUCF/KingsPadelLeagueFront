@@ -13,12 +13,12 @@ export class LeagueMatchdaysStore {
 
   readonly hasMatchdays = computed(() => this.matchdays().length > 0);
 
-  async load(): Promise<void> {
+  async load(forceRefresh = false): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
-      this.matchdays.set(await this.loadLeagueMatchdaysUseCase.execute());
+      this.matchdays.set(await this.loadLeagueMatchdaysUseCase.execute(forceRefresh));
     } catch {
       this.errorMessage.set('No hemos podido cargar el panel de jornadas.');
     } finally {

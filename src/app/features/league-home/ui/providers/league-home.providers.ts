@@ -3,7 +3,7 @@ import { InjectionToken, makeEnvironmentProviders, type EnvironmentProviders } f
 import { LeagueHomeRepository } from '@features/league-home/application/ports/league-home.repository';
 import { LoadLeagueMatchdaysUseCase } from '@features/league-home/application/use-cases/load-league-matchdays.use-case';
 import { LoadLeagueHomeSnapshotUseCase } from '@features/league-home/application/use-cases/load-league-home-snapshot.use-case';
-import { InMemoryLeagueHomeRepository } from '@features/league-home/infrastructure/repositories/in-memory-league-home.repository';
+import { HttpLeagueHomeRepository } from '@features/league-home/infrastructure/repositories/http-league-home.repository';
 
 export const LOAD_LEAGUE_HOME_SNAPSHOT_USE_CASE = new InjectionToken<LoadLeagueHomeSnapshotUseCase>(
   'LOAD_LEAGUE_HOME_SNAPSHOT_USE_CASE',
@@ -14,10 +14,10 @@ export const LOAD_LEAGUE_MATCHDAYS_USE_CASE = new InjectionToken<LoadLeagueMatch
 
 export function provideLeagueHomeFeature(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    InMemoryLeagueHomeRepository,
+    HttpLeagueHomeRepository,
     {
       provide: LeagueHomeRepository,
-      useExisting: InMemoryLeagueHomeRepository,
+      useExisting: HttpLeagueHomeRepository,
     },
     {
       provide: LOAD_LEAGUE_HOME_SNAPSHOT_USE_CASE,

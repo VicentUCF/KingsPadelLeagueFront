@@ -9,8 +9,8 @@ import { type LeagueHomeRepository } from '../ports/league-home.repository';
 export class LoadLeagueHomeSnapshotUseCase {
   constructor(private readonly leagueHomeRepository: LeagueHomeRepository) {}
 
-  async execute(): Promise<LeagueHomeSnapshot> {
-    const snapshot = await this.leagueHomeRepository.loadSnapshot();
+  async execute(forceRefresh = false): Promise<LeagueHomeSnapshot> {
+    const snapshot = await this.leagueHomeRepository.loadSnapshot(forceRefresh);
 
     return {
       ...snapshot,

@@ -111,6 +111,6 @@ export class LeagueCalendarPageComponent implements OnInit {
   }
 
   protected reloadCalendar(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

@@ -4,6 +4,8 @@ import { PlayersRepository } from '../ports/players.repository';
 import { LoadPlayerProfileUseCase } from './load-player-profile.use-case';
 
 class PlayersRepositoryStub extends PlayersRepository {
+  readonly findBySlugCalls: { readonly slug: string; readonly forceRefresh: boolean }[] = [];
+
   constructor(
     private readonly players: readonly Player[],
     private readonly playersBySlug: Record<string, Player> = {},
@@ -11,11 +13,13 @@ class PlayersRepositoryStub extends PlayersRepository {
     super();
   }
 
-  override async findAll(): Promise<readonly Player[]> {
+  override async findAll(_forceRefresh = false): Promise<readonly Player[]> {
     return this.players;
   }
 
-  override async findBySlug(slug: string): Promise<Player | null> {
+  override async findBySlug(slug: string, forceRefresh = false): Promise<Player | null> {
+    this.findBySlugCalls.push({ slug, forceRefresh });
+
     return this.playersBySlug[slug] ?? null;
   }
 }
@@ -36,6 +40,15 @@ describe('LoadPlayerProfileUseCase', () => {
     );
 
     await expect(useCase.execute('alex-soler')).resolves.toBe(player);
+  });
+
+  it('passes forceRefresh to the repository', async () => {
+    const repository = new PlayersRepositoryStub([]);
+    const useCase = new LoadPlayerProfileUseCase(repository);
+
+    await useCase.execute('alex-soler', true);
+
+    expect(repository.findBySlugCalls).toEqual([{ slug: 'alex-soler', forceRefresh: true }]);
   });
 });
 

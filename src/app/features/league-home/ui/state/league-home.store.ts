@@ -22,12 +22,12 @@ export class LeagueHomeStore {
     return snapshot ? toLeagueHomeViewModel(snapshot) : null;
   });
 
-  async load(): Promise<void> {
+  async load(forceRefresh = false): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
-      this.snapshot.set(await this.loadLeagueHomeSnapshotUseCase.execute());
+      this.snapshot.set(await this.loadLeagueHomeSnapshotUseCase.execute(forceRefresh));
     } catch {
       this.errorMessage.set('No hemos podido cargar el estado actual de la liga.');
     } finally {

@@ -4,6 +4,8 @@ import { PlayersRepository } from '../ports/players.repository';
 import { LoadPlayersUseCase } from './load-players.use-case';
 
 class PlayersRepositoryStub extends PlayersRepository {
+  readonly findAllCalls: boolean[] = [];
+
   constructor(
     private readonly players: readonly Player[],
     private readonly playersBySlug: Record<string, Player> = {},
@@ -11,11 +13,13 @@ class PlayersRepositoryStub extends PlayersRepository {
     super();
   }
 
-  override async findAll(): Promise<readonly Player[]> {
+  override async findAll(forceRefresh = false): Promise<readonly Player[]> {
+    this.findAllCalls.push(forceRefresh);
+
     return this.players;
   }
 
-  override async findBySlug(slug: string): Promise<Player | null> {
+  override async findBySlug(slug: string, _forceRefresh = false): Promise<Player | null> {
     return this.playersBySlug[slug] ?? null;
   }
 }
@@ -31,6 +35,15 @@ describe('LoadPlayersUseCase', () => {
     const result = await useCase.execute();
 
     expect(result.map((player) => player.slug)).toEqual(['alex-soler', 'bruno-sanz']);
+  });
+
+  it('passes forceRefresh to the repository', async () => {
+    const repository = new PlayersRepositoryStub([createPlayer('alex-soler', 'Alex Soler')]);
+    const useCase = new LoadPlayersUseCase(repository);
+
+    await useCase.execute(true);
+
+    expect(repository.findAllCalls).toEqual([true]);
   });
 });
 

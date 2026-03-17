@@ -23,11 +23,11 @@ export class InMemoryPlayersRepository extends PlayersRepository {
       ),
   );
 
-  override async findAll(): Promise<readonly Player[]> {
+  override async findAll(_forceRefresh = false): Promise<readonly Player[]> {
     return this.players;
   }
 
-  override async findBySlug(slug: string): Promise<Player | null> {
+  override async findBySlug(slug: string, _forceRefresh = false): Promise<Player | null> {
     return this.players.find((player) => player.slug === slug) ?? null;
   }
 }

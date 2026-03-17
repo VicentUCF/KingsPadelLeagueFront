@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
-  override async loadSnapshot(): Promise<LeagueHomeSnapshot> {
+  override async loadSnapshot(_forceRefresh = false): Promise<LeagueHomeSnapshot> {
     return {
       league: {
         name: 'KingsPadelLeague',
@@ -122,7 +122,7 @@ export class InMemoryLeagueHomeRepository extends LeagueHomeRepository {
     };
   }
 
-  override async loadMatchdays(): Promise<readonly LeagueMatchday[]> {
+  override async loadMatchdays(_forceRefresh = false): Promise<readonly LeagueMatchday[]> {
     return MOCK_MATCHDAYS;
   }
 }
