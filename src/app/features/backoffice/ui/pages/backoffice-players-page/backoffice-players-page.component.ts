@@ -27,9 +27,14 @@ export class BackofficePlayersPageComponent implements OnInit {
   protected readonly sessionStore = inject(BackofficeSessionStore);
 
   protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
+  protected readonly canViewLinkedEmails = computed(
+    () => this.sessionStore.currentRole() !== 'PLAYER',
+  );
 
   protected readonly playerCards = computed(() =>
-    this.playersStore.buildCards(this.teamsStore.teams()),
+    this.playersStore.buildCards(this.teamsStore.teams(), {
+      showLinkedEmail: this.canViewLinkedEmails(),
+    }),
   );
 
   protected readonly searchTerm = signal('');

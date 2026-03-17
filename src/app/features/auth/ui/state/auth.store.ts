@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
+import { environment } from '../../../../../environments/environment';
 import type { AuthUser } from '../../domain/entities/auth-user';
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
 import { RegisterUseCase } from '../../application/use-cases/register.use-case';
@@ -9,11 +10,17 @@ import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { RequestPasswordResetUseCase } from '../../application/use-cases/request-password-reset.use-case';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.use-case';
 import { mapSupabaseUserToAuthUser } from '../../infrastructure/mappers/supabase-auth-user.mapper';
+import { applyAuthDevOverride } from './auth-dev-override';
 
 export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'unauthenticated';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
+  private readonly authDevOverride = {
+    enabled: !environment.production,
+    role: environment.authDevRoleOverride,
+    teamId: environment.authDevTeamIdOverride,
+  } as const;
   private readonly supabase: SupabaseClient = inject(SUPABASE_CLIENT);
   private readonly loginUseCase = inject(LoginUseCase);
   private readonly registerUseCase = inject(RegisterUseCase);
@@ -75,7 +82,9 @@ export class AuthStore {
         return;
       }
 
-      this._user.set(mapSupabaseUserToAuthUser(data.user));
+      this._user.set(
+        applyAuthDevOverride(mapSupabaseUserToAuthUser(data.user), this.authDevOverride),
+      );
       this._status.set('authenticated');
     } catch {
       this._status.set('unauthenticated');
@@ -87,7 +96,7 @@ export class AuthStore {
     this._status.set('loading');
     try {
       const user = await this.loginUseCase.execute({ email, password });
-      this._user.set(user);
+      this._user.set(applyAuthDevOverride(user, this.authDevOverride));
       this._status.set('authenticated');
     } catch (err) {
       this._status.set('unauthenticated');

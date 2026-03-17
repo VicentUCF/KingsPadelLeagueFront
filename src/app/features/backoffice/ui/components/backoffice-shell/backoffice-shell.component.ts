@@ -15,7 +15,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { ChevronRight, LogOut, LucideAngularModule, Menu, X } from 'lucide-angular';
+import { ChevronRight, House, LogOut, LucideAngularModule, Menu, X } from 'lucide-angular';
 import { filter } from 'rxjs';
 
 import { applicationMetadata } from '@core/config/application-metadata';
@@ -23,8 +23,6 @@ import { BACKOFFICE_ROOT_PATH } from '../../models/backoffice-navigation.model';
 import { type BackofficeRouteData } from '../../models/backoffice-route-data';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
-import { toBackofficeRoleLabel } from '../../../domain/entities/backoffice-role';
-import { RoleBadgeComponent } from '../role-badge/role-badge.component';
 
 interface BackofficePageContext {
   readonly title: string;
@@ -38,7 +36,7 @@ interface BackofficePageContext {
   host: {
     class: 'backoffice-shell',
   },
-  imports: [LucideAngularModule, RoleBadgeComponent, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [LucideAngularModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './backoffice-shell.component.html',
   styleUrl: './backoffice-shell.component.scss',
 })
@@ -51,14 +49,12 @@ export class BackofficeShellComponent {
   protected readonly sessionStore = inject(BackofficeSessionStore);
   protected readonly teamsStore = inject(BackofficeTeamsStore);
   protected readonly rootPath = BACKOFFICE_ROOT_PATH;
-  protected readonly sessionRoleLabel = computed(() =>
-    toBackofficeRoleLabel(this.sessionStore.currentRole()),
-  );
   protected readonly presidentTeamName = computed(() => {
     const id = this.sessionStore.currentPresidentTeamId();
     return this.teamsStore.teams().find((t) => t.id === id)?.name ?? null;
   });
   protected readonly chevronRightIcon = ChevronRight;
+  protected readonly homeIcon = House;
   protected readonly menuIcon = Menu;
   protected readonly closeIcon = X;
   protected readonly logoutIcon = LogOut;

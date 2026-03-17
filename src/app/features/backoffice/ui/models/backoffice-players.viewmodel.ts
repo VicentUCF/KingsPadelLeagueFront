@@ -18,9 +18,14 @@ export interface BackofficePlayerCardViewModel {
   readonly detailPath: string;
 }
 
+export interface BackofficePlayerCardPrivacy {
+  readonly showLinkedEmail: boolean;
+}
+
 export function toBackofficePlayerCardViewModel(
   player: BackofficePlayer,
   teamName?: string,
+  privacy: BackofficePlayerCardPrivacy = DEFAULT_BACKOFFICE_PLAYER_CARD_PRIVACY,
 ): BackofficePlayerCardViewModel {
   const fullName = [player.firstName, player.lastName].filter(Boolean).join(' ');
   const hasTeam = player.teamId !== undefined && player.teamId !== null;
@@ -36,9 +41,24 @@ export function toBackofficePlayerCardViewModel(
     statusTone: hasTeam ? 'success' : 'warning',
     derivedTeamLabel: teamName !== undefined ? `Equipo: ${teamName}` : 'Equipo: Sin asignar',
     historyLabel: `${player.wonGames}V · ${player.lostGames}D · Valor ${player.value}`,
-    userLinkageLabel: player.isPresident ? 'Rol: Presidente' : `Correo: ${player.email}`,
+    userLinkageLabel: toUserLinkageLabel(player, privacy),
     detailPath: `/backoffice/jugadores/${player.id}`,
   };
+}
+
+const DEFAULT_BACKOFFICE_PLAYER_CARD_PRIVACY: BackofficePlayerCardPrivacy = {
+  showLinkedEmail: true,
+};
+
+function toUserLinkageLabel(
+  player: BackofficePlayer,
+  privacy: BackofficePlayerCardPrivacy,
+): string {
+  if (player.isPresident) {
+    return 'Rol: Presidente';
+  }
+
+  return privacy.showLinkedEmail ? `Correo: ${player.email}` : 'Cuenta vinculada';
 }
 
 function toPositionLabel(position: BackofficePlayerPosition): string {

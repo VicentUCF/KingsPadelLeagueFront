@@ -85,9 +85,8 @@
   }
 
   &__session {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+    display: grid;
+    gap: var(--space-2);
     padding: var(--space-3) var(--space-4);
     border: 1px solid var(--color-border-subtle);
     border-radius: 1rem;
@@ -179,6 +178,36 @@
     padding: var(--space-5) var(--space-6);
     border-block-start: 1px solid var(--color-border-subtle);
     background: rgb(255 255 255 / 0.01);
+  }
+
+  &__return-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 0.75rem;
+    background: rgb(255 255 255 / 0.03);
+    color: var(--color-text-default);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+
+    &:hover {
+      border-color: var(--color-border-strong);
+      background: rgb(255 255 255 / 0.06);
+      color: var(--color-text-strong);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-brand);
+      outline-offset: 2px;
+    }
   }
 
   &__logout-btn {
@@ -400,11 +429,10 @@
       }
     }
 
-    // Session info (role badge + name/email)
+    // Session info
     &__session {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
+      display: grid;
+      gap: var(--space-2);
       padding: var(--space-3) var(--space-4);
       border-radius: 1rem;
       border: 1px solid rgb(255 255 255 / 0.07);
@@ -482,6 +510,7 @@
       background: none;
     }
 
+    &__return-link,
     &__logout-btn {
       display: inline-flex;
       width: 100%;
@@ -490,16 +519,33 @@
       min-height: 3.35rem;
       padding: var(--space-3) var(--space-4);
       border-radius: 1.15rem;
+      font-size: inherit;
+      font-weight: 600;
+      transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease;
+    }
+
+    &__return-link {
+      border: 1px solid rgb(255 255 255 / 0.07);
+      background: rgb(255 255 255 / 0.04);
+      color: var(--color-text-default);
+      text-decoration: none;
+
+      &:hover {
+        background: rgb(255 255 255 / 0.08);
+        border-color: var(--color-border-subtle);
+        color: var(--color-text-strong);
+      }
+    }
+
+    &__logout-btn {
       border: 1px solid rgb(248 113 113 / 20%);
       background: rgb(248 113 113 / 5%);
       color: #fca5a5;
       font: inherit;
-      font-size: inherit;
-      font-weight: 600;
       cursor: pointer;
-      transition:
-        background 180ms ease,
-        border-color 180ms ease;
 
       &:hover {
         background: rgb(248 113 113 / 12%);

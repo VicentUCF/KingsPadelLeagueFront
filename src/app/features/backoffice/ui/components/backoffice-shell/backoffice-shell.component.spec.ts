@@ -101,7 +101,8 @@ describe('BackofficeShellComponent', () => {
       '/backoffice',
     );
     expect(within(navigation).queryByText('Usuarios')).toBeNull();
-    expect(screen.getByText('Jugador')).toBeVisible();
+    expect(screen.queryByText('Rol activo')).toBeNull();
+    expect(screen.getByRole('link', { name: /Volver al inicio/i })).toHaveAttribute('href', '/');
   });
 
   it('has no accessibility violations in the backoffice shell', async () => {

@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import {
+  type BackofficePlayerCardPrivacy,
   toBackofficePlayerCardViewModel,
   type BackofficePlayerCardViewModel,
 } from '../models/backoffice-players.viewmodel';
@@ -18,10 +19,13 @@ export class BackofficePlayersStore {
 
   private _loaded = false;
 
-  buildCards(teams: readonly BackofficeTeam[]): readonly BackofficePlayerCardViewModel[] {
+  buildCards(
+    teams: readonly BackofficeTeam[],
+    privacy?: BackofficePlayerCardPrivacy,
+  ): readonly BackofficePlayerCardViewModel[] {
     return this.players().map((player) => {
       const team = teams.find((t) => t.id === player.teamId);
-      return toBackofficePlayerCardViewModel(player, team?.name);
+      return toBackofficePlayerCardViewModel(player, team?.name, privacy);
     });
   }
 
