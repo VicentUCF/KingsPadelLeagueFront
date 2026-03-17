@@ -44,4 +44,12 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
+<<<<<<< Updated upstream
 .husky/_/
+=======
+# Local env overrides
+.env
+.claude
+
+.husky/_/v
+>>>>>>> Stashed changes

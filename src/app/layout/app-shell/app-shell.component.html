@@ -67,6 +67,126 @@
           <span>{{ navigationItem.label }}</span>
         </a>
       }
+      <<<<<<< Updated upstream =======
+
+      <!-- Auth section -->
+      <div class="app-shell__nav-auth">
+        @if (authStore.isLoading()) {
+          <div class="app-shell__auth-skeleton" aria-hidden="true"></div>
+        } @else if (!authStore.isAuthenticated()) {
+          <a
+            class="app-shell__login-btn c-button c-button--pill c-button--primary"
+            routerLink="/auth/login"
+            (click)="closeNavigation()"
+          >
+            <lucide-angular [img]="logInIcon" [size]="15" aria-hidden="true" />
+            Iniciar sesión
+          </a>
+        } @else {
+          <div class="app-shell__user-wrap">
+            <!-- Desktop trigger -->
+            <button
+              class="app-shell__user-trigger"
+              type="button"
+              [attr.aria-expanded]="isUserMenuOpen()"
+              aria-haspopup="menu"
+              (click)="toggleUserMenu()"
+            >
+              <span class="app-shell__user-avatar" aria-hidden="true">{{ userInitials() }}</span>
+              <span class="app-shell__user-name">{{ authStore.user()?.displayName }}</span>
+              <lucide-angular
+                [img]="chevronDownIcon"
+                [size]="13"
+                aria-hidden="true"
+                class="app-shell__user-chevron"
+                [class.app-shell__user-chevron--open]="isUserMenuOpen()"
+              />
+            </button>
+
+            @if (isUserMenuOpen()) {
+              <div class="app-shell__user-menu" role="menu">
+                <div class="app-shell__user-menu-info">
+                  <span class="app-shell__user-menu-avatar" aria-hidden="true">{{
+                    userInitials()
+                  }}</span>
+                  <div class="app-shell__user-menu-copy">
+                    <span class="app-shell__user-menu-name">{{
+                      authStore.user()?.displayName
+                    }}</span>
+                    <span class="app-shell__user-menu-email">{{ authStore.user()?.email }}</span>
+                  </div>
+                </div>
+                <div class="app-shell__user-menu-divider" role="separator"></div>
+                <a
+                  class="app-shell__user-menu-item"
+                  routerLink="/perfil"
+                  role="menuitem"
+                  (click)="closeUserMenu()"
+                >
+                  Editar perfil
+                </a>
+                @if (authStore.currentRole() === 'ADMIN') {
+                  <a
+                    class="app-shell__user-menu-item"
+                    routerLink="/backoffice"
+                    role="menuitem"
+                    (click)="closeUserMenu()"
+                  >
+                    @if (authStore.currentRole() === 'ADMIN') {
+                      <lucide-angular [img]="dashboardIcon" [size]="14" aria-hidden="true" />
+                      Panel backoffice
+                    }
+                    @if (authStore.currentRole() === 'PRESIDENT') {
+                      <lucide-angular [img]="dashboardIcon" [size]="14" aria-hidden="true" />
+                      Mi equipo
+                    }
+                  </a>
+                }
+
+                <div class="app-shell__user-menu-divider" role="separator"></div>
+                <button
+                  class="app-shell__user-menu-item app-shell__user-menu-item--logout"
+                  type="button"
+                  role="menuitem"
+                  (click)="onLogout()"
+                >
+                  <lucide-angular [img]="logOutIcon" [size]="14" aria-hidden="true" />
+                  Cerrar sesión
+                </button>
+              </div>
+            }
+
+            <!-- Mobile flat items -->
+            <div class="app-shell__mobile-user-items">
+              <div class="app-shell__mobile-user-info">
+                <span class="app-shell__user-avatar" aria-hidden="true">{{ userInitials() }}</span>
+                <div>
+                  <p class="app-shell__mobile-user-name">{{ authStore.user()?.displayName }}</p>
+                  <p class="app-shell__mobile-user-email">{{ authStore.user()?.email }}</p>
+                </div>
+              </div>
+              <a class="app-shell__nav-link" routerLink="/perfil" (click)="closeNavigation()"
+                >Editar perfil</a
+              >
+              @if (authStore.currentRole() === 'ADMIN' || 'PRESIDENT') {
+                <a class="app-shell__nav-link" routerLink="/backoffice" (click)="closeNavigation()">
+                  <lucide-angular [img]="dashboardIcon" [size]="16" aria-hidden="true" />
+                  Panel backoffice
+                </a>
+              }
+              <button
+                class="app-shell__nav-link app-shell__nav-link--danger"
+                type="button"
+                (click)="onLogout()"
+              >
+                <lucide-angular [img]="logOutIcon" [size]="16" aria-hidden="true" />
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+      >>>>>>> Stashed changes
     </nav>
   </div>
 </header>
