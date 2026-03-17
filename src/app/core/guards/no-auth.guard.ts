@@ -11,9 +11,5 @@ export const noAuthGuard: CanMatchFn = () => {
     return true;
   }
 
-  if (authStore.currentRole() === 'USER') {
-    return router.createUrlTree(['/perfil']);
-  }
-
-  return router.createUrlTree(['/backoffice']);
+  return router.createUrlTree(['/']);
 };

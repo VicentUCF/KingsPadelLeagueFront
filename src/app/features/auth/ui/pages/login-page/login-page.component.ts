@@ -71,7 +71,7 @@ export class LoginPageComponent {
     const { email, password } = this.form.getRawValue();
     try {
       await this.authStore.login(email, password);
-      await this.router.navigate(['/backoffice']);
+      await this.router.navigate(['/']);
     } catch {
       // error is set in authStore.error signal
     }

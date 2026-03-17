@@ -46,18 +46,18 @@ describe('noAuthGuard', () => {
   it('redirects USER accounts to profile', () => {
     const { result, router } = runGuard(true, 'USER');
 
-    expectRedirect(result, router, '/perfil');
+    expectRedirect(result, router, '/');
   });
 
-  it('redirects PRESIDENT accounts to backoffice', () => {
+  it('redirects PRESIDENT accounts to home', () => {
     const { result, router } = runGuard(true, 'PRESIDENT');
 
-    expectRedirect(result, router, '/backoffice');
+    expectRedirect(result, router, '/');
   });
 
-  it('redirects ADMIN accounts to backoffice', () => {
+  it('redirects ADMIN accounts to home', () => {
     const { result, router } = runGuard(true, 'ADMIN');
 
-    expectRedirect(result, router, '/backoffice');
+    expectRedirect(result, router, '/');
   });
 });
