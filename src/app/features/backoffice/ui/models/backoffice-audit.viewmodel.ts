@@ -3,6 +3,7 @@ import type {
   BackofficeAuditEntry,
   BackofficeAuditEntityType,
 } from '@features/backoffice/domain/entities/backoffice-audit-entry';
+import { toBackofficeRoleLabel } from '@features/backoffice/domain/entities/backoffice-role';
 import type { StatusBadgeTone } from './status-badge-tone';
 
 export interface BackofficeAuditEntryViewModel {
@@ -83,7 +84,7 @@ export function toBackofficeAuditEntryViewModel(
     timestamp: formatTimestamp(entry.timestamp),
     timeAgo: formatTimeAgo(entry.timestamp, now),
     actorName: entry.actorName,
-    actorRoleLabel: entry.actorRole === 'ADMIN' ? 'Admin' : 'Presidente',
+    actorRoleLabel: toBackofficeRoleLabel(entry.actorRole),
     action: entry.action,
     actionLabel: ACTION_LABELS[entry.action],
     actionTone: ACTION_TONES[entry.action],

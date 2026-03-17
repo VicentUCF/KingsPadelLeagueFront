@@ -7,6 +7,7 @@ import type { PaginatedResponse, PlayerHttpV1 } from '@core/api/kings-padel-api.
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
 import { BackofficePlayersRepository } from '@features/backoffice/application/ports/backoffice-players.repository';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 
 @Injectable()
 export class HttpBackofficePlayersRepository extends BackofficePlayersRepository {
@@ -30,7 +31,7 @@ function mapPlayer(raw: PlayerHttpV1): BackofficePlayer {
     lastName: raw.lastName,
     ...(raw.alias != null ? { alias: raw.alias } : {}),
     email: raw.email,
-    profileImage: raw.profileImage,
+    profileImage: resolvePlayerAvatarPath(raw.profileImage),
     isPresident: raw.isPresident,
     ...(raw.teamId != null ? { teamId: raw.teamId } : {}),
     value: raw.value,

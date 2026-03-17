@@ -90,9 +90,16 @@
                     "
                   >
                     <div class="availability-row__info">
-                      <span class="availability-row__avatar">{{
-                        (player.firstName + player.lastName).slice(0, 2).toUpperCase()
-                      }}</span>
+                      <span class="availability-row__avatar">
+                        @if (playerAvatarPath(player); as avatarPath) {
+                          <img
+                            [src]="avatarPath"
+                            [alt]="player.firstName + ' ' + player.lastName"
+                          />
+                        } @else {
+                          {{ (player.firstName + player.lastName).slice(0, 2).toUpperCase() }}
+                        }
+                      </span>
                       <div>
                         <h4>{{ player.firstName }} {{ player.lastName }}</h4>
                         <p>{{ positionLabel(player.preferredPosition) }}</p>
@@ -177,9 +184,16 @@
                     (dragstart)="onDragStart($event, player.id)"
                   >
                     <div class="available-card__info">
-                      <span class="available-card__avatar"
-                        >{{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}</span
-                      >
+                      <span class="available-card__avatar">
+                        @if (playerAvatarPath(player); as avatarPath) {
+                          <img
+                            [src]="avatarPath"
+                            [alt]="player.firstName + ' ' + player.lastName"
+                          />
+                        } @else {
+                          {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                        }
+                      </span>
                       <div>
                         <h4>{{ player.firstName }} {{ player.lastName }}</h4>
                         <p>{{ positionLabel(player.preferredPosition) }}</p>
@@ -262,9 +276,13 @@
                       @if (pair.player1Id) {
                         @if (playerById(pair.player1Id); as p) {
                           <div class="pair-slot__player">
-                            <span class="pair-slot__avatar"
-                              >{{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}</span
-                            >
+                            <span class="pair-slot__avatar">
+                              @if (playerAvatarPath(p); as avatarPath) {
+                                <img [src]="avatarPath" [alt]="p.firstName + ' ' + p.lastName" />
+                              } @else {
+                                {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+                              }
+                            </span>
                             <div>
                               <p class="pair-slot__name">{{ p.firstName }} {{ p.lastName }}</p>
                               <p class="pair-slot__pos">{{ positionLabel(p.preferredPosition) }}</p>
@@ -303,9 +321,13 @@
                       @if (pair.player2Id) {
                         @if (playerById(pair.player2Id); as p) {
                           <div class="pair-slot__player">
-                            <span class="pair-slot__avatar"
-                              >{{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}</span
-                            >
+                            <span class="pair-slot__avatar">
+                              @if (playerAvatarPath(p); as avatarPath) {
+                                <img [src]="avatarPath" [alt]="p.firstName + ' ' + p.lastName" />
+                              } @else {
+                                {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+                              }
+                            </span>
                             <div>
                               <p class="pair-slot__name">{{ p.firstName }} {{ p.lastName }}</p>
                               <p class="pair-slot__pos">{{ positionLabel(p.preferredPosition) }}</p>

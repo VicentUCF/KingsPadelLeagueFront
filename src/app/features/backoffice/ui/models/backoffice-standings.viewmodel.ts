@@ -7,7 +7,7 @@ export interface BackofficeStandingRow {
   readonly rank: number;
   readonly teamId: string;
   readonly teamName: string;
-  readonly teamLogo: string;
+  readonly teamLogo: string | null;
   readonly played: number;
   readonly won: number;
   readonly drawn: number;

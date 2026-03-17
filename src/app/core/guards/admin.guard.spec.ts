@@ -49,6 +49,12 @@ describe('backofficeAdminGuard', () => {
     expectRedirect(result, router, '/perfil');
   });
 
+  it('redirects PLAYER accounts to the backoffice home', () => {
+    const { result, router } = runGuard(true, 'PLAYER');
+
+    expectRedirect(result, router, '/backoffice');
+  });
+
   it('redirects PRESIDENT accounts to the backoffice home', () => {
     const { result, router } = runGuard(true, 'PRESIDENT');
 

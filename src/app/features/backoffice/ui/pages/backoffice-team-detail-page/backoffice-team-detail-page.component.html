@@ -10,6 +10,11 @@
       [style.--team-secondary]="teamCard()!.secondaryColor"
     >
       <div class="team-detail__hero-swatch" aria-hidden="true"></div>
+      @if (teamCard()!.logoPath) {
+        <div class="team-detail__hero-logo" aria-hidden="true">
+          <img [src]="teamCard()!.logoPath!" [alt]="teamCard()!.title" />
+        </div>
+      }
       <div class="team-detail__hero-copy">
         <h1 class="team-detail__hero-name">{{ teamCard()!.title }}</h1>
         <p class="team-detail__hero-sub">{{ teamCard()!.subtitle }}</p>
@@ -59,7 +64,14 @@
             >
               <div class="roster-table__player" role="cell">
                 <span class="roster-table__avatar" aria-hidden="true">
-                  {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                  @if (player.profileImage) {
+                    <img
+                      [src]="player.profileImage"
+                      [alt]="player.firstName + ' ' + player.lastName"
+                    />
+                  } @else {
+                    {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                  }
                 </span>
                 <div class="roster-table__player-info">
                   <p class="roster-table__name">{{ player.firstName }} {{ player.lastName }}</p>

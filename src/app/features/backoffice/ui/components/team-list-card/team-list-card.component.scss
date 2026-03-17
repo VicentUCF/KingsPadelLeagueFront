@@ -18,12 +18,26 @@
   }
 
   &__swatch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 3rem;
     height: 3rem;
     border-radius: 0.9rem;
     border: 1px solid var(--color-border-subtle);
+    overflow: hidden;
     background:
       linear-gradient(135deg, var(--team-primary), var(--team-secondary)), var(--color-surface);
+    color: rgb(255 255 255 / 88%);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  &__logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   &__copy {

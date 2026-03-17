@@ -2,6 +2,7 @@ import type {
   BackofficePlayer,
   BackofficePlayerPosition,
 } from '@features/backoffice/domain/entities/backoffice-player';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import type { StatusBadgeTone } from './status-badge-tone';
 
 export interface BackofficePlayerCardViewModel {
@@ -23,11 +24,12 @@ export function toBackofficePlayerCardViewModel(
 ): BackofficePlayerCardViewModel {
   const fullName = [player.firstName, player.lastName].filter(Boolean).join(' ');
   const hasTeam = player.teamId !== undefined && player.teamId !== null;
+  const avatarPath = resolvePlayerAvatarPath(player.profileImage);
 
   return {
     id: player.id,
     title: fullName,
-    ...(player.profileImage !== '' ? { avatarPath: player.profileImage } : {}),
+    ...(avatarPath ? { avatarPath } : {}),
     nickLabel:
       player.alias !== undefined ? `"${player.alias}"` : toPositionLabel(player.preferredPosition),
     statusLabel: hasTeam ? 'Asignado' : 'Sin equipo',

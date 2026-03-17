@@ -1,5 +1,6 @@
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import type { StatusBadgeTone } from './status-badge-tone';
 
 export type BackofficeUserRole = 'president' | 'player' | 'unlinked';
@@ -33,6 +34,7 @@ export function toBackofficeUserCardViewModel(
   const fullName = `${player.firstName} ${player.lastName}`;
   const initials = (player.firstName.charAt(0) + player.lastName.charAt(0)).toUpperCase();
   const hasEmail = player.email.trim().length > 0;
+  const avatarPath = resolvePlayerAvatarPath(player.profileImage);
 
   let role: BackofficeUserRole;
   let roleLabel: string;
@@ -67,7 +69,7 @@ export function toBackofficeUserCardViewModel(
     email: player.email,
     hasEmail,
     initials,
-    ...(player.profileImage ? { avatarPath: player.profileImage } : {}),
+    ...(avatarPath ? { avatarPath } : {}),
     role,
     roleLabel,
     roleTone,

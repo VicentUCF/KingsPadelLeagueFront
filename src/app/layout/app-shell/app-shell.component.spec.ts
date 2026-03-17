@@ -39,7 +39,7 @@ function makeAuthStoreMock(
           email: 'ana@test.com',
           displayName: 'Ana Perez',
           role,
-          teamId: role === 'PRESIDENT' ? 'team-1' : null,
+          teamId: role === 'PRESIDENT' || role === 'PLAYER' ? 'team-1' : null,
         }
       : null;
 
@@ -152,6 +152,16 @@ describe('AppShellComponent', () => {
 
   it('shows the Mi equipo shortcut for PRESIDENT accounts', async () => {
     await renderAppShell(makeAuthStoreMock('PRESIDENT', true));
+
+    await fireEvent.click(screen.getByRole('button', { name: /Ana Perez/i }));
+
+    expect(
+      within(screen.getByRole('menu')).getByRole('menuitem', { name: /Mi equipo/i }),
+    ).toHaveAttribute('href', '/backoffice');
+  });
+
+  it('shows the Mi equipo shortcut for PLAYER accounts', async () => {
+    await renderAppShell(makeAuthStoreMock('PLAYER', true));
 
     await fireEvent.click(screen.getByRole('button', { name: /Ana Perez/i }));
 

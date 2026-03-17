@@ -145,6 +145,17 @@
   }
 }
 
+.availability-row__avatar,
+.available-card__avatar,
+.pair-slot__avatar {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+}
+
 // ── Lineup Planner ────────────────────────────────────────────────────────────
 
 .lineup-planner {

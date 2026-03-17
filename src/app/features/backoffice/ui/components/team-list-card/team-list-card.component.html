@@ -10,7 +10,13 @@
         class="team-list-card__swatch"
         [style.--team-primary]="team().primaryColor"
         [style.--team-secondary]="team().secondaryColor"
-      ></span>
+      >
+        @if (team().logoPath) {
+          <img [src]="team().logoPath!" alt="" class="team-list-card__logo" />
+        } @else {
+          {{ team().monogram }}
+        }
+      </span>
 
       <div class="team-list-card__copy">
         <h2 [id]="'team-card-title-' + team().id">{{ team().title }}</h2>

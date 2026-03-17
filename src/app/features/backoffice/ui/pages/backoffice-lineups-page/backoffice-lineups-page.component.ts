@@ -12,6 +12,7 @@ import { ChevronDown, LucideAngularModule } from 'lucide-angular';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import { ActionToastStore } from '@core/state/action-toast.store';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
@@ -143,14 +144,14 @@ export class BackofficeLineupsPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    void this.matchdaysStore.load();
-    void this.teamsStore.load();
-    void this.playersStore.load();
+    const matchdaysLoad = this.matchdaysStore.load();
+    const teamsLoad = this.teamsStore.load();
+    const playersLoad = this.playersStore.load();
 
     if (this.sessionStore.currentRole() === 'ADMIN') {
-      this.loadForCurrentMatchday();
+      void matchdaysLoad.then(() => this.loadForCurrentMatchday());
     } else {
-      this.loadForPresidentTeam();
+      void Promise.all([teamsLoad, playersLoad]).then(() => this.loadForPresidentTeam());
     }
   }
 
@@ -268,6 +269,10 @@ export class BackofficeLineupsPageComponent implements OnInit {
   protected playerById(playerId: string | null): BackofficePlayer | null {
     if (!playerId) return null;
     return this.playersStore.players().find((p) => p.id === playerId) ?? null;
+  }
+
+  protected playerAvatarPath(player: BackofficePlayer): string | null {
+    return resolvePlayerAvatarPath(player.profileImage);
   }
 
   protected positionLabel(pos: BackofficePlayer['preferredPosition']): string {

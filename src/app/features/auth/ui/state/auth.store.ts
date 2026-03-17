@@ -2,12 +2,13 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
-import { normalizeAuthRole, type AuthUser } from '../../domain/entities/auth-user';
+import type { AuthUser } from '../../domain/entities/auth-user';
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
 import { RegisterUseCase } from '../../application/use-cases/register.use-case';
 import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { RequestPasswordResetUseCase } from '../../application/use-cases/request-password-reset.use-case';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.use-case';
+import { mapSupabaseUserToAuthUser } from '../../infrastructure/mappers/supabase-auth-user.mapper';
 
 export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -74,16 +75,7 @@ export class AuthStore {
         return;
       }
 
-      const meta = data.user.user_metadata as Record<string, unknown>;
-      const user: AuthUser = {
-        id: data.user.id,
-        email: data.user.email ?? '',
-        displayName: (meta['display_name'] as string | undefined) ?? data.user.email ?? '',
-        role: normalizeAuthRole(meta['role']),
-        teamId: (meta['team_id'] as string | undefined) ?? null,
-      };
-
-      this._user.set(user);
+      this._user.set(mapSupabaseUserToAuthUser(data.user));
       this._status.set('authenticated');
     } catch {
       this._status.set('unauthenticated');

@@ -1,6 +1,9 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { type BackofficeRole } from '../../../domain/entities/backoffice-role';
+import {
+  toBackofficeRoleLabel,
+  type BackofficeRole,
+} from '../../../domain/entities/backoffice-role';
 
 @Component({
   selector: 'app-role-badge',
@@ -13,4 +16,6 @@ import { type BackofficeRole } from '../../../domain/entities/backoffice-role';
 })
 export class RoleBadgeComponent {
   readonly role = input.required<BackofficeRole>();
+
+  protected readonly roleLabel = () => toBackofficeRoleLabel(this.role());
 }

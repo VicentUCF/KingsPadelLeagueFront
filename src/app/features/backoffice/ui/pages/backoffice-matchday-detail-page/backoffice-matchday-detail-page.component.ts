@@ -14,6 +14,7 @@ import type {
 } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import { ActionToastStore } from '@core/state/action-toast.store';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
@@ -292,6 +293,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   protected playerById(playerId: string | null): BackofficePlayer | null {
     if (!playerId) return null;
     return this.playersStore.players().find((p) => p.id === playerId) ?? null;
+  }
+
+  protected playerAvatarPath(player: BackofficePlayer): string | null {
+    return resolvePlayerAvatarPath(player.profileImage);
   }
 
   protected pairsForMatchTeam(matchId: string, teamId: string) {

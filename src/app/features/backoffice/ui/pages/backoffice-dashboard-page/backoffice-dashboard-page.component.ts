@@ -5,6 +5,9 @@ import type {
   BackofficePlayer,
   BackofficePlayerPosition,
 } from '@features/backoffice/domain/entities/backoffice-player';
+import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
+import { resolveTeamBranding } from '@shared/utils/team-branding';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeSeasonsStore } from '../../state/backoffice-seasons.store';
@@ -13,7 +16,6 @@ import { BackofficeStandingsStore } from '../../state/backoffice-standings.store
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
 import { toBackofficeMatchdayRowViewModel } from '../../models/backoffice-matchdays.viewmodel';
-import { DEFAULT_PALETTE, TEAM_PALETTE } from '../../models/backoffice-teams.viewmodel';
 
 @Component({
   selector: 'app-backoffice-dashboard-page',
@@ -32,6 +34,13 @@ export class BackofficeDashboardPageComponent implements OnInit {
   protected readonly standingsStore = inject(BackofficeStandingsStore);
 
   protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
+  protected readonly isTeamDashboardLoading = computed(
+    () =>
+      this.teamsStore.isLoading() ||
+      this.playersStore.isLoading() ||
+      this.matchdaysStore.isLoading() ||
+      this.standingsStore.isLoading(),
+  );
 
   // ── Admin computeds ──────────────────────────────────────────────────────
   protected readonly teamCount = computed(() => this.teamsStore.teams().length);
@@ -57,11 +66,44 @@ export class BackofficeDashboardPageComponent implements OnInit {
     return this.teamsStore.teams().find((t) => t.id === teamId) ?? null;
   });
 
-  protected readonly presidentPlayerName = computed(() => {
+  protected readonly currentTeamBranding = computed(() =>
+    resolveTeamBranding({
+      teamName: this.presidentTeam()?.name ?? 'Mi equipo',
+      fallbackLogoPath: this.presidentTeam()?.logo ?? null,
+    }),
+  );
+
+  protected readonly managedPlayer = computed(() => {
+    const currentEmail = normalizeEmail(this.sessionStore.currentUser()?.email);
     const teamId = this.sessionStore.currentPresidentTeamId();
-    const player = this.playersStore.players().find((p) => p.isPresident && p.teamId === teamId);
-    if (!player) return null;
-    return [player.firstName, player.lastName].filter(Boolean).join(' ');
+
+    if (currentEmail) {
+      const currentPlayer = this.playersStore
+        .players()
+        .find((player) => normalizeEmail(player.email) === currentEmail);
+      if (currentPlayer) {
+        return currentPlayer;
+      }
+    }
+
+    if (!teamId) {
+      return null;
+    }
+
+    return (
+      this.playersStore
+        .players()
+        .find((player) => player.isPresident && player.teamId === teamId) ?? null
+    );
+  });
+
+  protected readonly presidentPlayerName = computed(() => {
+    const player = this.managedPlayer();
+    if (player) {
+      return [player.firstName, player.lastName].filter(Boolean).join(' ');
+    }
+
+    return this.sessionStore.currentUser()?.displayName ?? null;
   });
 
   protected readonly presidentTeamPlayers = computed(() => {
@@ -85,8 +127,10 @@ export class BackofficeDashboardPageComponent implements OnInit {
   });
 
   protected readonly presidentTeamPalette = computed(() => {
-    const teamId = this.sessionStore.currentPresidentTeamId() ?? 'defaultl';
-    return TEAM_PALETTE[teamId] ?? DEFAULT_PALETTE;
+    return {
+      primary: this.currentTeamBranding().palette.primary,
+      secondary: this.currentTeamBranding().palette.surface,
+    };
   });
 
   protected readonly nextMatchdayLinkForPresident = computed(() => {
@@ -121,4 +165,23 @@ export class BackofficeDashboardPageComponent implements OnInit {
     if (total === 0) return '—';
     return `${Math.round((player.wonGames / total) * 100)}%`;
   }
+
+  protected teamLogoPath(team: BackofficeTeam | null): string | null {
+    if (!team) {
+      return null;
+    }
+
+    return resolveTeamBranding({
+      teamName: team.name,
+      fallbackLogoPath: team.logo,
+    }).logoPath;
+  }
+
+  protected playerAvatarPath(player: BackofficePlayer): string | null {
+    return resolvePlayerAvatarPath(player.profileImage);
+  }
+}
+
+function normalizeEmail(value: string | null | undefined): string {
+  return value?.trim().toLowerCase() ?? '';
 }

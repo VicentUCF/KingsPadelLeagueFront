@@ -52,7 +52,7 @@
             <span class="backoffice-shell__session-name">Administrador</span>
             <span class="backoffice-shell__session-sub">Acceso total</span>
           } @else {
-            <span class="backoffice-shell__session-name">Presidente</span>
+            <span class="backoffice-shell__session-name">{{ sessionRoleLabel() }}</span>
             @if (presidentTeamName(); as teamName) {
               <span class="backoffice-shell__session-sub">{{ teamName }}</span>
             }

@@ -1,13 +1,14 @@
 import { inject, Injectable } from '@angular/core';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
-import { normalizeAuthRole, type AuthUser } from '../../domain/entities/auth-user';
+import type { AuthUser } from '../../domain/entities/auth-user';
 import type {
   AuthRepository,
   LoginCredentials,
   RegisterCredentials,
 } from '../../application/ports/auth.repository';
+import { mapSupabaseUserToAuthUser } from '../mappers/supabase-auth-user.mapper';
 
 @Injectable()
 export class SupabaseAuthRepository implements AuthRepository {
@@ -33,7 +34,7 @@ export class SupabaseAuthRepository implements AuthRepository {
       options: {
         data: {
           display_name: credentials.displayName,
-          role: 'USER',
+          role: 'user',
         },
       },
     });
@@ -73,20 +74,7 @@ export class SupabaseAuthRepository implements AuthRepository {
     return this.mapToAuthUser(data.user);
   }
 
-  private mapToAuthUser(
-    user: NonNullable<Awaited<ReturnType<SupabaseClient['auth']['getUser']>>['data']['user']>,
-  ): AuthUser {
-    const meta = user.user_metadata as Record<string, unknown>;
-    const role = normalizeAuthRole(meta['role']);
-    const teamId = (meta['team_id'] as string | undefined) ?? null;
-    const displayName = (meta['display_name'] as string | undefined) ?? user.email ?? '';
-
-    return {
-      id: user.id,
-      email: user.email ?? '',
-      displayName,
-      role,
-      teamId,
-    };
+  private mapToAuthUser(user: User): AuthUser {
+    return mapSupabaseUserToAuthUser(user);
   }
 }

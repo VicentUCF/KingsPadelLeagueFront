@@ -7,6 +7,7 @@ import type { PaginatedResponse, TeamHttpV1 } from '@core/api/kings-padel-api.ty
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
 import { BackofficeTeamsRepository } from '@features/backoffice/application/ports/backoffice-teams.repository';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import { resolveTeamBranding } from '@shared/utils/team-branding';
 
 @Injectable()
 export class HttpBackofficeTeamsRepository extends BackofficeTeamsRepository {
@@ -24,11 +25,24 @@ export class HttpBackofficeTeamsRepository extends BackofficeTeamsRepository {
 }
 
 function mapTeam(raw: TeamHttpV1): BackofficeTeam {
+  const branding = resolveTeamBranding({
+    teamName: raw.name,
+    fallbackLogoPath: sanitizeTeamLogoPath(raw.logo),
+  });
+
   return {
     id: raw.id,
     name: raw.name,
     description: raw.description,
     secondaryDescription: raw.secondaryDescription,
-    logo: raw.logo,
+    logo: branding.logoPath,
   };
+}
+
+function sanitizeTeamLogoPath(logoPath: string | null | undefined): string | null {
+  if (!logoPath) {
+    return null;
+  }
+
+  return logoPath.includes('placeholder.com') ? null : logoPath;
 }

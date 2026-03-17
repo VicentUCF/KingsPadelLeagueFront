@@ -16,7 +16,7 @@ export const backofficeAdminGuard: CanMatchFn = () => {
     return true;
   }
 
-  if (role === 'PRESIDENT') {
+  if (role === 'PRESIDENT' || role === 'PLAYER') {
     return router.createUrlTree(['/backoffice']);
   }
 

@@ -6,7 +6,7 @@ export interface BackofficePlayer {
   readonly lastName: string;
   readonly alias?: string;
   readonly email: string;
-  readonly profileImage: string;
+  readonly profileImage: string | null;
   readonly isPresident: boolean;
   readonly teamId?: string;
   readonly value: number;

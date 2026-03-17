@@ -6,15 +6,25 @@ import type { AuthRole } from '../../domain/entities/auth-user';
 import { SupabaseAuthRepository } from './supabase-auth.repository';
 
 interface SupabaseUserMock {
+  readonly app_metadata?: Record<string, unknown>;
   readonly email: string | null;
   readonly id: string;
+  readonly role?: string;
   readonly user_metadata: Record<string, unknown>;
 }
 
-function buildSupabaseUser(role: unknown): SupabaseUserMock {
+function buildSupabaseUser(role: unknown, appRole?: unknown): SupabaseUserMock {
   return {
+    app_metadata:
+      appRole === undefined
+        ? {}
+        : {
+            role: appRole,
+            team_id: 'team-1',
+          },
     email: 'user@test.com',
     id: 'user-1',
+    role: 'authenticated',
     user_metadata: {
       display_name: 'Ana Perez',
       role,
@@ -58,7 +68,7 @@ describe('SupabaseAuthRepository', () => {
     TestBed.resetTestingModule();
   });
 
-  it('registers new accounts with the USER role', async () => {
+  it('registers new accounts with the user role in lowercase', async () => {
     await repository.register({
       displayName: 'Ana Perez',
       email: 'ana@test.com',
@@ -71,24 +81,37 @@ describe('SupabaseAuthRepository', () => {
       options: {
         data: {
           display_name: 'Ana Perez',
-          role: 'USER',
+          role: 'user',
         },
       },
     });
   });
 
-  it.each<AuthRole>(['ADMIN', 'PRESIDENT', 'USER'])(
-    'preserves the %s role returned by Supabase metadata',
-    async (role) => {
-      supabaseAuth.getUser.mockResolvedValueOnce({ data: { user: buildSupabaseUser(role) } });
+  it.each<[unknown, AuthRole]>([
+    ['admin', 'ADMIN'],
+    ['president', 'PRESIDENT'],
+    ['user', 'USER'],
+    ['player', 'PLAYER'],
+  ])('normalizes the %s role returned by Supabase metadata into %s', async (role, expected) => {
+    supabaseAuth.getUser.mockResolvedValueOnce({ data: { user: buildSupabaseUser(role) } });
 
-      await expect(repository.getCurrentUser()).resolves.toMatchObject({ role });
-    },
-  );
+    await expect(repository.getCurrentUser()).resolves.toMatchObject({ role: expected });
+  });
 
-  it('falls back to PRESIDENT when Supabase metadata contains an unsupported role', async () => {
+  it('falls back to USER when Supabase metadata contains an unsupported role', async () => {
     supabaseAuth.getUser.mockResolvedValueOnce({ data: { user: buildSupabaseUser('UNKNOWN') } });
 
-    await expect(repository.getCurrentUser()).resolves.toMatchObject({ role: 'PRESIDENT' });
+    await expect(repository.getCurrentUser()).resolves.toMatchObject({ role: 'USER' });
+  });
+
+  it('prefers the role provided through app_metadata', async () => {
+    supabaseAuth.getUser.mockResolvedValueOnce({
+      data: { user: buildSupabaseUser('user', 'president') },
+    });
+
+    await expect(repository.getCurrentUser()).resolves.toMatchObject({
+      role: 'PRESIDENT',
+      teamId: 'team-1',
+    });
   });
 });

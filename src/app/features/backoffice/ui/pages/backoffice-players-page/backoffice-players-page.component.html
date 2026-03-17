@@ -71,9 +71,13 @@
         @for (player of filteredPlayerCards(); track player.id) {
           <li class="players-table__row">
             <div class="players-table__cell players-table__cell--identity">
-              <span class="players-table__avatar">{{
-                player.title.slice(0, 2).toUpperCase()
-              }}</span>
+              <span class="players-table__avatar">
+                @if (player.avatarPath) {
+                  <img [src]="player.avatarPath!" [alt]="player.title" />
+                } @else {
+                  {{ player.title.slice(0, 2).toUpperCase() }}
+                }
+              </span>
               <div>
                 <p class="players-table__name">{{ player.title }}</p>
                 <p class="players-table__sub">{{ player.nickLabel }}</p>

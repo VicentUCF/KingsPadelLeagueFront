@@ -118,7 +118,14 @@
                     >
                       <div class="availability-row__info">
                         <span class="availability-row__avatar" aria-hidden="true">
-                          {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                          @if (playerAvatarPath(player); as avatarPath) {
+                            <img
+                              [src]="avatarPath"
+                              [alt]="player.firstName + ' ' + player.lastName"
+                            />
+                          } @else {
+                            {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                          }
                         </span>
                         <div class="availability-row__copy">
                           <h4>{{ player.firstName }} {{ player.lastName }}</h4>
@@ -223,7 +230,14 @@
                     >
                       <div class="available-card__info">
                         <span class="available-card__avatar" aria-hidden="true">
-                          {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                          @if (playerAvatarPath(player); as avatarPath) {
+                            <img
+                              [src]="avatarPath"
+                              [alt]="player.firstName + ' ' + player.lastName"
+                            />
+                          } @else {
+                            {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                          }
                         </span>
                         <div class="available-card__copy">
                           <h4>{{ player.firstName }} {{ player.lastName }}</h4>
@@ -315,7 +329,11 @@
                           @if (playerById(pair.player1Id); as p) {
                             <div class="pair-slot__player">
                               <span class="pair-slot__avatar" aria-hidden="true">
-                                {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+                                @if (playerAvatarPath(p); as avatarPath) {
+                                  <img [src]="avatarPath" [alt]="p.firstName + ' ' + p.lastName" />
+                                } @else {
+                                  {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+                                }
                               </span>
                               <div>
                                 <p class="pair-slot__name">{{ p.firstName }} {{ p.lastName }}</p>
@@ -359,7 +377,11 @@
                           @if (playerById(pair.player2Id); as p) {
                             <div class="pair-slot__player">
                               <span class="pair-slot__avatar" aria-hidden="true">
-                                {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+                                @if (playerAvatarPath(p); as avatarPath) {
+                                  <img [src]="avatarPath" [alt]="p.firstName + ' ' + p.lastName" />
+                                } @else {
+                                  {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+                                }
                               </span>
                               <div>
                                 <p class="pair-slot__name">{{ p.firstName }} {{ p.lastName }}</p>

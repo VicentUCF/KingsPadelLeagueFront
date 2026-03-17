@@ -12,7 +12,7 @@ export const backofficeAccessGuard: CanMatchFn = () => {
   }
 
   const role = authStore.currentRole();
-  if (role === 'ADMIN' || role === 'PRESIDENT') {
+  if (role === 'ADMIN' || role === 'PRESIDENT' || role === 'PLAYER') {
     return true;
   }
 

@@ -118,7 +118,7 @@ export class AppShellComponent {
       return 'Panel backoffice';
     }
 
-    if (role === 'PRESIDENT') {
+    if (role === 'PRESIDENT' || role === 'PLAYER') {
       return 'Mi equipo';
     }
 
