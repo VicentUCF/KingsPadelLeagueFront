@@ -1,5 +1,6 @@
 import { type Routes } from '@angular/router';
 
+import { backofficeAdminGuard } from '@core/guards/admin.guard';
 import { BackofficeShellComponent } from './components/backoffice-shell/backoffice-shell.component';
 import { provideBackofficeFeature } from './providers/backoffice.providers';
 
@@ -119,6 +120,7 @@ export const BACKOFFICE_ROUTES: Routes = [
       },
       {
         path: 'usuarios',
+        canMatch: [backofficeAdminGuard],
         loadComponent: () =>
           import('./pages/backoffice-users-page/backoffice-users-page.component').then(
             (m) => m.BackofficeUsersPageComponent,

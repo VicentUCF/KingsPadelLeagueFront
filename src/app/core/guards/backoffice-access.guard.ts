@@ -3,17 +3,18 @@ import { type CanMatchFn, Router } from '@angular/router';
 
 import { AuthStore } from '@features/auth/ui/state/auth.store';
 
-export const noAuthGuard: CanMatchFn = () => {
+export const backofficeAccessGuard: CanMatchFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
   if (!authStore.isAuthenticated()) {
+    return router.createUrlTree(['/auth/login']);
+  }
+
+  const role = authStore.currentRole();
+  if (role === 'ADMIN' || role === 'PRESIDENT') {
     return true;
   }
 
-  if (authStore.currentRole() === 'USER') {
-    return router.createUrlTree(['/perfil']);
-  }
-
-  return router.createUrlTree(['/backoffice']);
+  return router.createUrlTree(['/perfil']);
 };

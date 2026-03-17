@@ -2,7 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
-import type { AuthUser } from '../../domain/entities/auth-user';
+import { normalizeAuthRole, type AuthUser } from '../../domain/entities/auth-user';
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
 import { RegisterUseCase } from '../../application/use-cases/register.use-case';
 import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
@@ -79,7 +79,7 @@ export class AuthStore {
         id: data.user.id,
         email: data.user.email ?? '',
         displayName: (meta['display_name'] as string | undefined) ?? data.user.email ?? '',
-        role: (meta['role'] as string | undefined) === 'ADMIN' ? 'ADMIN' : 'PRESIDENT',
+        role: normalizeAuthRole(meta['role']),
         teamId: (meta['team_id'] as string | undefined) ?? null,
       };
 

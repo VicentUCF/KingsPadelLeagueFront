@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
-import type { AuthUser, AuthRole } from '../../domain/entities/auth-user';
+import { normalizeAuthRole, type AuthUser } from '../../domain/entities/auth-user';
 import type {
   AuthRepository,
   LoginCredentials,
@@ -33,7 +33,7 @@ export class SupabaseAuthRepository implements AuthRepository {
       options: {
         data: {
           display_name: credentials.displayName,
-          role: 'PRESIDENT' as AuthRole,
+          role: 'USER',
         },
       },
     });
@@ -77,7 +77,7 @@ export class SupabaseAuthRepository implements AuthRepository {
     user: NonNullable<Awaited<ReturnType<SupabaseClient['auth']['getUser']>>['data']['user']>,
   ): AuthUser {
     const meta = user.user_metadata as Record<string, unknown>;
-    const role = (meta['role'] as AuthRole | undefined) ?? 'PRESIDENT';
+    const role = normalizeAuthRole(meta['role']);
     const teamId = (meta['team_id'] as string | undefined) ?? null;
     const displayName = (meta['display_name'] as string | undefined) ?? user.email ?? '';
 

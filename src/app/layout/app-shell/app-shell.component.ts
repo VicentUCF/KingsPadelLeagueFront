@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import {
   ArrowRight,
@@ -105,6 +112,18 @@ export class AppShellComponent {
   protected readonly footerNavigation: readonly NavigationItem[] = this.navGroups.flatMap(
     (g) => g.items,
   );
+  protected readonly backofficeLinkLabel = computed(() => {
+    const role = this.authStore.currentRole();
+    if (role === 'ADMIN') {
+      return 'Panel backoffice';
+    }
+
+    if (role === 'PRESIDENT') {
+      return 'Mi equipo';
+    }
+
+    return null;
+  });
 
   protected userInitials(): string {
     const name = this.authStore.user()?.displayName ?? '';
