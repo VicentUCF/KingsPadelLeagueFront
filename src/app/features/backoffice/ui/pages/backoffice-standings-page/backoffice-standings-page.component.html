@@ -69,16 +69,16 @@
             >J</span
           >
           <span role="columnheader" class="standings-table__col-num" title="Victorias">G</span>
-          <span role="columnheader" class="standings-table__col-num" title="Empates">E</span>
           <span role="columnheader" class="standings-table__col-num" title="Derrotas">P</span>
-          <span role="columnheader" class="standings-table__col-num" title="Puntos a favor"
-            >PF</span
+          <span role="columnheader" class="standings-table__col-num" title="Juegos ganados"
+            >JG</span
           >
-          <span role="columnheader" class="standings-table__col-num" title="Puntos en contra"
-            >PC</span
+          <span role="columnheader" class="standings-table__col-num" title="Juegos perdidos"
+            >JP</span
           >
-          <span role="columnheader" class="standings-table__col-num" title="Diferencia">DIF</span>
-          <span role="columnheader" class="standings-table__col-form">Forma</span>
+          <span role="columnheader" class="standings-table__col-num" title="Diferencia de juegos"
+            >DIF</span
+          >
           <span role="columnheader" class="standings-table__col-pts">PTS</span>
         </div>
 
@@ -116,33 +116,19 @@
               <span class="standings-table__num standings-table__num--won" role="cell">{{
                 row.won
               }}</span>
-              <span class="standings-table__num" role="cell">{{ row.drawn }}</span>
               <span class="standings-table__num standings-table__num--lost" role="cell">{{
                 row.lost
               }}</span>
-              <span class="standings-table__num" role="cell">{{ row.pointsFor }}</span>
-              <span class="standings-table__num" role="cell">{{ row.pointsAgainst }}</span>
+              <span class="standings-table__num" role="cell">{{ row.wonGames }}</span>
+              <span class="standings-table__num" role="cell">{{ row.lostGames }}</span>
               <span
                 class="standings-table__num standings-table__num--diff"
                 role="cell"
-                [class.standings-table__num--positive]="row.pointsDiff > 0"
-                [class.standings-table__num--negative]="row.pointsDiff < 0"
+                [class.standings-table__num--positive]="row.gamesDiff > 0"
+                [class.standings-table__num--negative]="row.gamesDiff < 0"
               >
-                {{ row.pointsDiff > 0 ? '+' : '' }}{{ row.pointsDiff }}
+                {{ row.gamesDiff > 0 ? '+' : '' }}{{ row.gamesDiff }}
               </span>
-
-              <div class="standings-table__form" role="cell" aria-label="Últimos resultados">
-                @for (result of row.form; track $index) {
-                  <span
-                    class="standings-table__form-badge standings-table__form-badge--{{ result }}"
-                    [attr.aria-label]="
-                      result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'
-                    "
-                  >
-                    {{ result === 'W' ? 'V' : result === 'D' ? 'E' : 'D' }}
-                  </span>
-                }
-              </div>
 
               <span class="standings-table__pts" role="cell">{{ row.points }}</span>
             </li>
@@ -153,11 +139,10 @@
       <p class="standings-legend">
         <span class="standings-legend__item">J — Jugados</span>
         <span class="standings-legend__item">G — Ganados</span>
-        <span class="standings-legend__item">E — Empatados</span>
         <span class="standings-legend__item">P — Perdidos</span>
-        <span class="standings-legend__item">PF — Puntos a favor</span>
-        <span class="standings-legend__item">PC — Puntos en contra</span>
-        <span class="standings-legend__item">DIF — Diferencia</span>
+        <span class="standings-legend__item">JG — Juegos ganados</span>
+        <span class="standings-legend__item">JP — Juegos perdidos</span>
+        <span class="standings-legend__item">DIF — Diferencia de juegos</span>
         <span class="standings-legend__item">PTS — Puntos de liga</span>
       </p>
     }

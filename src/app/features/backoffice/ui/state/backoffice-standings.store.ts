@@ -1,6 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
+import { LoadBackofficeLineupsUseCase } from '@features/backoffice/application/use-cases/load-backoffice-lineups.use-case';
 import { LoadBackofficeMatchesUseCase } from '@features/backoffice/application/use-cases/load-backoffice-matches.use-case';
+import type {
+  BackofficeLineup,
+  BackofficeLineupPair,
+} from '@features/backoffice/domain/entities/backoffice-lineup';
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
 import {
   toBackofficeStandingsViewModel,
@@ -12,10 +17,13 @@ import { BackofficeTeamsStore } from './backoffice-teams.store';
 @Injectable()
 export class BackofficeStandingsStore {
   private readonly loadMatchesUseCase = inject(LoadBackofficeMatchesUseCase);
+  private readonly loadLineupsUseCase = inject(LoadBackofficeLineupsUseCase);
   private readonly teamsStore = inject(BackofficeTeamsStore);
   private readonly matchdaysStore = inject(BackofficeMatchdaysStore);
 
   readonly matches = signal<readonly BackofficeMatch[]>([]);
+  readonly lineups = signal<readonly BackofficeLineup[]>([]);
+  readonly pairs = signal<readonly BackofficeLineupPair[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly hasContent = signal(false);
@@ -23,7 +31,12 @@ export class BackofficeStandingsStore {
   private _loaded = false;
 
   readonly rows = computed<readonly BackofficeStandingRow[]>(() =>
-    toBackofficeStandingsViewModel(this.teamsStore.teams(), this.matches()),
+    toBackofficeStandingsViewModel(
+      this.teamsStore.teams(),
+      this.matches(),
+      this.lineups(),
+      this.pairs(),
+    ),
   );
 
   readonly finishedMatchdayCount = computed(
@@ -50,8 +63,24 @@ export class BackofficeStandingsStore {
       const chunks = await Promise.all(
         finishedIds.map((id) => this.loadMatchesUseCase.byMatchday(id)),
       );
+      const matches = chunks.flat();
 
-      this.matches.set(chunks.flat());
+      this.matches.set(matches);
+
+      if (matches.length > 0) {
+        const lineups = await this.loadLineupsUseCase.byMatchIds(matches.map((match) => match.id));
+        this.lineups.set(lineups);
+
+        if (lineups.length > 0) {
+          this.pairs.set(await this.loadLineupsUseCase.pairsByLineupIds(lineups.map((l) => l.id)));
+        } else {
+          this.pairs.set([]);
+        }
+      } else {
+        this.lineups.set([]);
+        this.pairs.set([]);
+      }
+
       this._loaded = true;
       this.hasContent.set(true);
     } catch {

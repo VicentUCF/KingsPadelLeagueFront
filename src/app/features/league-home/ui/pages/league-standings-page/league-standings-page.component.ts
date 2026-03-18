@@ -7,12 +7,13 @@ import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.componen
 import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
 import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
-import { StandingsTableComponent } from '../../components/standings-table/standings-table.component';
+import { StandingsDetailTableComponent } from '../../components/standings-detail-table/standings-detail-table.component';
 import {
   toLeagueStandingsPageViewModel,
   type LeagueStandingsPageViewModel,
 } from '../../models/league-standings.viewmodel';
 import { LeagueHomeStore } from '../../state/league-home.store';
+import { LeagueMatchdaysStore } from '../../state/league-matchdays.store';
 
 @Component({
   selector: 'app-league-standings-page',
@@ -26,9 +27,9 @@ import { LeagueHomeStore } from '../../state/league-home.store';
     LucideAngularModule,
     LoadingStateComponent,
     RouterLink,
-    StandingsTableComponent,
+    StandingsDetailTableComponent,
   ],
-  providers: [LeagueHomeStore],
+  providers: [LeagueHomeStore, LeagueMatchdaysStore],
   templateUrl: './league-standings-page.component.html',
   styleUrl: './league-standings-page.component.scss',
 })
@@ -37,15 +38,30 @@ export class LeagueStandingsPageComponent implements OnInit {
   private readonly meta = inject(Meta);
 
   protected readonly store = inject(LeagueHomeStore);
+  protected readonly matchdaysStore = inject(LeagueMatchdaysStore);
 
   protected readonly standingsIcon = Table2;
   protected readonly matchdaysIcon = Swords;
   protected readonly calendarIcon = CalendarDays;
+  protected readonly isLoading = computed(
+    () => this.store.isLoading() || this.matchdaysStore.isLoading(),
+  );
+  protected readonly errorMessage = computed(
+    () => this.store.errorMessage() ?? this.matchdaysStore.errorMessage(),
+  );
 
   protected readonly viewModel = computed<LeagueStandingsPageViewModel | null>(() => {
     const snapshot = this.store.snapshot();
 
-    return snapshot ? toLeagueStandingsPageViewModel(snapshot) : null;
+    if (!snapshot) {
+      return null;
+    }
+
+    if (!this.matchdaysStore.hasContent() && !this.matchdaysStore.errorMessage()) {
+      return null;
+    }
+
+    return toLeagueStandingsPageViewModel(snapshot, this.matchdaysStore.matchdays());
   });
 
   ngOnInit(): void {
@@ -56,10 +72,10 @@ export class LeagueStandingsPageComponent implements OnInit {
         'Consulta la clasificación oficial de la KingsPadelLeague y sigue la evolución de los equipos durante la temporada.',
     });
 
-    void this.store.load();
+    void Promise.all([this.store.load(), this.matchdaysStore.load()]);
   }
 
   protected reloadSnapshot(): void {
-    void this.store.load(true);
+    void Promise.all([this.store.load(true), this.matchdaysStore.load(true)]);
   }
 }

@@ -1,5 +1,9 @@
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import type {
+  BackofficeLineup,
+  BackofficeLineupPair,
+} from '@features/backoffice/domain/entities/backoffice-lineup';
 
 export type BackofficeFormResult = 'W' | 'D' | 'L';
 
@@ -10,11 +14,10 @@ export interface BackofficeStandingRow {
   readonly teamLogo: string | null;
   readonly played: number;
   readonly won: number;
-  readonly drawn: number;
   readonly lost: number;
-  readonly pointsFor: number;
-  readonly pointsAgainst: number;
-  readonly pointsDiff: number;
+  readonly wonGames: number;
+  readonly lostGames: number;
+  readonly gamesDiff: number;
   readonly points: number;
   readonly form: readonly BackofficeFormResult[];
 }
@@ -22,24 +25,29 @@ export interface BackofficeStandingRow {
 export function toBackofficeStandingsViewModel(
   teams: readonly BackofficeTeam[],
   matches: readonly BackofficeMatch[],
+  lineups: readonly BackofficeLineup[],
+  pairs: readonly BackofficeLineupPair[],
 ): readonly BackofficeStandingRow[] {
   interface TeamStats {
     won: number;
-    drawn: number;
     lost: number;
-    pointsFor: number;
-    pointsAgainst: number;
+    wonGames: number;
+    lostGames: number;
     results: { scheduledAt: Date; result: BackofficeFormResult }[];
   }
 
+  const lineupByMatchTeamKey = new Map(
+    lineups.map((lineup) => [createMatchTeamKey(lineup.matchId, lineup.teamId), lineup]),
+  );
+  const pairsByLineupId = groupPairsByLineupId(pairs);
   const stats = new Map<string, TeamStats>();
+
   for (const team of teams) {
     stats.set(team.id, {
       won: 0,
-      drawn: 0,
       lost: 0,
-      pointsFor: 0,
-      pointsAgainst: 0,
+      wonGames: 0,
+      lostGames: 0,
       results: [],
     });
   }
@@ -51,43 +59,41 @@ export function toBackofficeStandingsViewModel(
     const away = stats.get(match.awayTeamId);
     if (!local || !away) continue;
 
-    const ls = match.localTeamScorePoints;
-    const as = match.awayTeamScorePoints;
+    const localLineup = lineupByMatchTeamKey.get(createMatchTeamKey(match.id, match.localTeamId));
+    const awayLineup = lineupByMatchTeamKey.get(createMatchTeamKey(match.id, match.awayTeamId));
+    const localGames = sumLineupGames(
+      localLineup ? (pairsByLineupId.get(localLineup.id) ?? []) : [],
+    );
+    const awayGames = sumLineupGames(awayLineup ? (pairsByLineupId.get(awayLineup.id) ?? []) : []);
 
-    local.pointsFor += ls;
-    local.pointsAgainst += as;
-    away.pointsFor += as;
-    away.pointsAgainst += ls;
+    local.wonGames += localGames.won;
+    local.lostGames += localGames.lost;
+    away.wonGames += awayGames.won;
+    away.lostGames += awayGames.lost;
 
-    if (ls > as) {
+    if (match.localTeamScorePoints > match.awayTeamScorePoints) {
       local.won++;
       local.results.push({ scheduledAt: match.scheduledAt, result: 'W' });
       away.lost++;
       away.results.push({ scheduledAt: match.scheduledAt, result: 'L' });
-    } else if (as > ls) {
+    } else if (match.awayTeamScorePoints > match.localTeamScorePoints) {
       away.won++;
       away.results.push({ scheduledAt: match.scheduledAt, result: 'W' });
       local.lost++;
       local.results.push({ scheduledAt: match.scheduledAt, result: 'L' });
-    } else {
-      local.drawn++;
-      local.results.push({ scheduledAt: match.scheduledAt, result: 'D' });
-      away.drawn++;
-      away.results.push({ scheduledAt: match.scheduledAt, result: 'D' });
     }
   }
 
   const rows: BackofficeStandingRow[] = teams.map((team) => {
     const s = stats.get(team.id) ?? {
       won: 0,
-      drawn: 0,
       lost: 0,
-      pointsFor: 0,
-      pointsAgainst: 0,
+      wonGames: 0,
+      lostGames: 0,
       results: [],
     };
-    const played = s.won + s.drawn + s.lost;
-    const points = s.won * 3 + s.drawn;
+    const played = s.won + s.lost;
+    const points = s.won * 3;
     const form = s.results.slice(-5).map((r) => r.result);
 
     return {
@@ -97,11 +103,10 @@ export function toBackofficeStandingsViewModel(
       teamLogo: team.logo,
       played,
       won: s.won,
-      drawn: s.drawn,
       lost: s.lost,
-      pointsFor: s.pointsFor,
-      pointsAgainst: s.pointsAgainst,
-      pointsDiff: s.pointsFor - s.pointsAgainst,
+      wonGames: s.wonGames,
+      lostGames: s.lostGames,
+      gamesDiff: s.wonGames - s.lostGames,
       points,
       form,
     };
@@ -109,10 +114,53 @@ export function toBackofficeStandingsViewModel(
 
   rows.sort((a, b) => {
     if (b.points !== a.points) return b.points - a.points;
-    if (b.pointsDiff !== a.pointsDiff) return b.pointsDiff - a.pointsDiff;
-    if (b.pointsFor !== a.pointsFor) return b.pointsFor - a.pointsFor;
+    if (b.gamesDiff !== a.gamesDiff) return b.gamesDiff - a.gamesDiff;
+    if (b.wonGames !== a.wonGames) return b.wonGames - a.wonGames;
     return a.teamName.localeCompare(b.teamName, 'es');
   });
 
   return rows.map((row, index) => ({ ...row, rank: index + 1 }));
+}
+
+function createMatchTeamKey(matchId: string, teamId: string): string {
+  return `${matchId}:${teamId}`;
+}
+
+function groupPairsByLineupId(
+  pairs: readonly BackofficeLineupPair[],
+): ReadonlyMap<string, readonly BackofficeLineupPair[]> {
+  const pairsByLineupId = new Map<string, BackofficeLineupPair[]>();
+
+  for (const pair of pairs) {
+    const lineupPairs = pairsByLineupId.get(pair.lineupId);
+    if (lineupPairs) {
+      lineupPairs.push(pair);
+      continue;
+    }
+
+    pairsByLineupId.set(pair.lineupId, [pair]);
+  }
+
+  return pairsByLineupId;
+}
+
+function sumLineupGames(pairs: readonly BackofficeLineupPair[]): {
+  readonly won: number;
+  readonly lost: number;
+} {
+  return pairs.reduce(
+    (totals, pair) => ({
+      won:
+        totals.won +
+        pair.sets.reduce((sum, setResult) => {
+          return sum + setResult.localScore;
+        }, 0),
+      lost:
+        totals.lost +
+        pair.sets.reduce((sum, setResult) => {
+          return sum + setResult.awayScore;
+        }, 0),
+    }),
+    { won: 0, lost: 0 },
+  );
 }

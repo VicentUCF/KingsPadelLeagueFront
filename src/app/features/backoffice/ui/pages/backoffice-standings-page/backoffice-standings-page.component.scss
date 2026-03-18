@@ -125,7 +125,7 @@
   border: 1px solid rgb(245 245 245 / 7%);
   overflow: hidden;
 
-  $cols: 2.5rem 1fr repeat(7, 2.5rem) 5rem 2.75rem;
+  $cols: 2.5rem 1fr repeat(6, 2.75rem) 2.75rem;
 
   &__header {
     display: grid;
@@ -287,37 +287,6 @@
     }
   }
 
-  &__form {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-  }
-
-  &__form-badge {
-    width: 1.3rem;
-    height: 1.3rem;
-    border-radius: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.62rem;
-    font-weight: 800;
-    text-transform: uppercase;
-
-    &--W {
-      background: rgb(16 185 129 / 20%);
-      color: #6ee7b7;
-    }
-    &--D {
-      background: rgb(245 245 245 / 8%);
-      color: var(--color-text-muted);
-    }
-    &--L {
-      background: rgb(248 113 113 / 15%);
-      color: #fca5a5;
-    }
-  }
-
   &__pts {
     font-size: 1rem;
     font-weight: 700;
@@ -330,8 +299,6 @@
   }
   &__col-num {
     text-align: center;
-  }
-  &__col-form {
   }
   &__col-pts {
     text-align: center;
@@ -362,11 +329,8 @@
     &__header {
       grid-template-columns: $cols-mobile;
 
-      .standings-table__col-num:nth-child(5),
       .standings-table__col-num:nth-child(6),
-      .standings-table__col-num:nth-child(7),
-      .standings-table__col-num:nth-child(8),
-      .standings-table__col-num:nth-child(9) {
+      .standings-table__col-num:nth-child(7) {
         display: none;
       }
     }
@@ -375,11 +339,9 @@
       grid-template-columns: $cols-mobile;
     }
 
-    // hide E, PF, PC, DIF columns on mobile — keep J, G, P, form, PTS
-    & .standings-table__num:nth-child(4),
+    // hide JG and JP on mobile — keep J, G, P, DIF, PTS
     & .standings-table__num:nth-child(6),
-    & .standings-table__num:nth-child(7),
-    & .standings-table__num:nth-child(8) {
+    & .standings-table__num:nth-child(7) {
       display: none;
     }
   }

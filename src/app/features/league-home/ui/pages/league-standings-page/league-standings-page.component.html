@@ -1,4 +1,4 @@
-@if (store.isLoading() && !store.hasContent()) {
+@if (!viewModel() && !errorMessage()) {
   <section class="o-container league-standings-page__status-panel">
     <app-loading-state
       [heading]="'Cargando clasificación actual'"
@@ -9,7 +9,7 @@
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="o-container league-standings-page__content">
-    @if (store.isLoading()) {
+    @if (isLoading()) {
       <app-loading-state
         [heading]="'Actualizando clasificación'"
         [hint]="'Seguimos mostrando la tabla actual mientras refrescamos la competición.'"
@@ -18,7 +18,7 @@
       />
     }
 
-    @if (store.errorMessage(); as error) {
+    @if (errorMessage(); as error) {
       <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadSnapshot()" />
     }
 
@@ -55,27 +55,15 @@
       </div>
     </header>
 
-    <app-standings-table [caption]="viewModel.tableCaption" [rows]="viewModel.standings" />
-
-    <section aria-labelledby="standings-tiebreaks-title" class="league-standings-page__tiebreaks">
-      <p class="league-standings-page__tiebreaks-kicker" id="standings-tiebreaks-title">
-        Criterios de desempate
-      </p>
-
-      <ol class="league-standings-page__tiebreaks-list">
-        @for (rule of viewModel.tieBreakRules; track rule) {
-          <li>{{ rule }}</li>
-        }
-      </ol>
-    </section>
+    <app-standings-detail-table [caption]="viewModel.tableCaption" [rows]="viewModel.standings" />
   </section>
-} @else if (store.errorMessage()) {
+} @else if (errorMessage()) {
   <section class="o-container league-standings-page__status-panel">
     <app-empty-state
       description="Inténtalo de nuevo en unos segundos."
       title="No hemos podido cargar la clasificación"
     />
-    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadSnapshot()" />
+    <app-load-feedback [message]="errorMessage()!" (retry)="reloadSnapshot()" />
   </section>
 } @else {
   <section class="o-container league-standings-page__status-panel">

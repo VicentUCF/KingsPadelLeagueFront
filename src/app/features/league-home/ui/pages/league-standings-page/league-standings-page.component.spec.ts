@@ -16,6 +16,10 @@ describe('LeagueStandingsPageComponent', () => {
     ).toBeVisible();
     expect(screen.getByRole('heading', { name: /^Clasificación$/i })).toBeVisible();
     expect(screen.getByRole('table', { name: /Clasificación de KingsPadelLeague/i })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'JG' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'JP' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'DIF' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'PTS' })).toBeVisible();
     expect(screen.getByText(/Criterios de desempate/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver jornadas/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver calendario/i })).toBeVisible();
