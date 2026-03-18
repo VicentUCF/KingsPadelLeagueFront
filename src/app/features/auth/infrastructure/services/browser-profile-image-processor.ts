@@ -5,9 +5,9 @@ import type { PlayerProfileImageProcessor } from '../../application/ports/player
 
 const PROFILE_IMAGE_COMPRESSION_OPTIONS: Options = {
   fileType: 'image/webp',
-  initialQuality: 0.7,
-  maxSizeMB: 0.2,
-  maxWidthOrHeight: 512,
+  initialQuality: 1,
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1920,
   useWebWorker: true,
 };
 
@@ -19,6 +19,9 @@ export class BrowserProfileImageProcessor implements PlayerProfileImageProcessor
     }
 
     try {
+      if (file.size < 150_000) {
+        return file;
+      }
       return await imageCompression(file, PROFILE_IMAGE_COMPRESSION_OPTIONS);
     } catch {
       return file;
