@@ -5,12 +5,14 @@ import {
   DestroyRef,
   effect,
   inject,
+  signal,
   type OnInit,
 } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ArrowLeft, LucideAngularModule } from 'lucide-angular';
 
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
+import { SeoService } from '@core/services/seo.service';
 import { UNASSIGNED_PLAYER_TEAM_NAME } from '@features/players/domain/entities/player.entity';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
 import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
@@ -43,62 +45,80 @@ export class PlayerProfilePageComponent implements OnInit {
   private readonly document = inject(DOCUMENT);
   private readonly location = inject(Location);
   private readonly router = inject(Router);
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
+  private readonly navHistory = inject(NavigationHistoryService);
 
   protected readonly store = inject(PlayerProfileStore);
   protected readonly arrowLeftIcon = ArrowLeft;
   protected readonly unassignedTeamName = UNASSIGNED_PLAYER_TEAM_NAME;
+  protected readonly playerSlug = signal('');
+
+  protected goBack(): void {
+    this.navHistory.goBack('/jugadores');
+  }
 
   constructor() {
     effect(() => {
       const player = this.store.player();
 
       if (player) {
-        this.title.setTitle(player.pageTitle);
-        this.meta.updateTag({
-          name: 'description',
-          content: player.metaDescription,
+        this.seo.setPage({
+          title: player.pageTitle,
+          description: player.metaDescription,
+          path: `/jugadores/${this.playerSlug()}`,
         });
+        this.seo.setJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'Person',
+          name: player.displayName,
+          description: player.metaDescription,
+          url: `https://kingspadelleague.com/jugadores/${this.playerSlug()}`,
+          affiliation: {
+            '@type': 'SportsTeam',
+            name: player.teamName,
+            memberOf: {
+              '@type': 'SportsOrganization',
+              name: 'KingsPadelLeague',
+              url: 'https://kingspadelleague.com/',
+            },
+          },
+        });
+
         return;
       }
+
+      this.seo.removeJsonLd();
 
       if (this.store.isNotFound()) {
-        this.title.setTitle('Jugador no encontrado | KingsPadelLeague');
-        this.meta.updateTag({
-          name: 'description',
-          content: 'El perfil solicitado no está disponible en el directorio de jugadores.',
+        this.seo.setPage({
+          title: 'Jugador no encontrado | KingsPadelLeague',
+          description: 'El perfil solicitado no está disponible en el directorio de jugadores.',
+          path: '/jugadores',
         });
+
         return;
       }
 
-      this.title.setTitle('Perfil de jugador | KingsPadelLeague');
-      this.meta.updateTag({
-        name: 'description',
-        content:
+      this.seo.setPage({
+        title: 'Perfil de jugador | KingsPadelLeague',
+        description:
           'Consulta el perfil individual de un jugador de KingsPadelLeague con estado de equipo y estadísticas.',
+        path: '/jugadores',
       });
     });
   }
 
   ngOnInit(): void {
     const routeParamMapSubscription = this.route.paramMap.subscribe((paramMap) => {
-      void this.store.load(paramMap.get('slug'));
+      const slug = paramMap.get('slug') ?? '';
+
+      this.playerSlug.set(slug);
+      void this.store.load(slug);
     });
 
     this.destroyRef.onDestroy(() => {
       routeParamMapSubscription.unsubscribe();
+      this.seo.removeJsonLd();
     });
-  }
-
-  protected goBack(): void {
-    const historyLength = this.document.defaultView?.history.length ?? 0;
-
-    if (historyLength > 1) {
-      this.location.back();
-      return;
-    }
-
-    void this.router.navigate(['/jugadores']);
   }
 }

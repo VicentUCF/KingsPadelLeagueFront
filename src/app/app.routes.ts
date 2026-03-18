@@ -50,7 +50,10 @@ const publicSiteRoutes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '',
+    loadComponent: () =>
+      import('@shared/ui/not-found-page/not-found-page.component').then(
+        (module) => module.NotFoundPageComponent,
+      ),
   },
 ];
 

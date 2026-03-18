@@ -11,7 +11,7 @@ describe('toPlayerProfileViewModel', () => {
         'Alex Soler',
         'kings-of-favar',
         'Kings of Favar',
-        '/teams_logos/Kings_of_Favar_no_bg.png',
+        '/teams_logos/Kings_of_Favar_no_bg.webp',
         null,
         4,
         1,

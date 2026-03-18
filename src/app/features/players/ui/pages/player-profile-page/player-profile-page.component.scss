@@ -17,6 +17,12 @@
     text-decoration: none;
     cursor: pointer;
     transition: color 160ms ease;
+    background-color: transparent;
+    border: none;
+  }
+
+  &__back-icon {
+    display: inline-flex;
   }
   &__back-link:hover {
     color: var(--color-text-strong);

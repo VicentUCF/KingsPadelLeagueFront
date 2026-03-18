@@ -1,0 +1,36 @@
+<div class="not-found-page o-container">
+  <div class="not-found-page__glow" aria-hidden="true"></div>
+
+  <p class="not-found-page__code" aria-hidden="true">404</p>
+
+  <div class="not-found-page__body">
+    <p class="not-found-page__eyebrow">
+      <lucide-angular [img]="alertIcon" [size]="14" aria-hidden="true" />
+      <span>Página no encontrada</span>
+    </p>
+
+    <h1 class="not-found-page__title">Esto no es lo que buscabas</h1>
+
+    <p class="not-found-page__description">
+      La URL que has introducido no existe o ha sido movida. Usa la navegación para volver a la
+      liga.
+    </p>
+  </div>
+
+  <nav aria-label="Volver a la liga" class="not-found-page__actions">
+    <a class="not-found-page__action not-found-page__action--primary" routerLink="/">
+      <lucide-angular [img]="homeIcon" [size]="16" aria-hidden="true" />
+      <span>Ir al inicio</span>
+    </a>
+
+    <a class="not-found-page__action" routerLink="/calendario">
+      <lucide-angular [img]="calendarIcon" [size]="16" aria-hidden="true" />
+      <span>Ver calendario</span>
+    </a>
+
+    <a class="not-found-page__action" routerLink="/equipos">
+      <lucide-angular [img]="teamsIcon" [size]="16" aria-hidden="true" />
+      <span>Ver equipos</span>
+    </a>
+  </nav>
+</div>

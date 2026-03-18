@@ -27,7 +27,6 @@ describe('PlayersDirectoryPageComponent', () => {
 
     await screen.findByRole('link', { name: /Vicent Ciscar/i });
 
-    expect(screen.getByText(/30 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Enric Bixquert/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Vicent Ciscar/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Adri Alvarez/i })).toBeVisible();

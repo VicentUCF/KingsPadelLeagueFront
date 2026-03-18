@@ -12,7 +12,7 @@ describe('PlayerCardComponent', () => {
           id: 'alex-soler',
           displayName: 'Alex Soler',
           teamName: 'Kings of Favar',
-          teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+          teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
           avatarPath: '/players/alex-soler.webp',
           wonMatchesCount: 4,
           lostMatchesCount: 1,
