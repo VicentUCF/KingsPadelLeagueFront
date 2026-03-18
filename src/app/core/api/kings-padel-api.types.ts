@@ -36,9 +36,9 @@ export interface PlayerHttpV1 {
   readonly isPresident: boolean;
   readonly teamId?: string;
   readonly role?: string;
-  readonly value: number;
-  readonly wonGames: number;
-  readonly lostGames: number;
+  readonly value?: number | null;
+  readonly wonGames?: number | null;
+  readonly lostGames?: number | null;
   readonly preferredPosition: 'both' | 'left' | 'right';
   readonly description: string;
   readonly instagramUrl?: string;

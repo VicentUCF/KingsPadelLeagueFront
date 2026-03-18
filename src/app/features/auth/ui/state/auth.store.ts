@@ -41,6 +41,8 @@ export class AuthStore {
   private readonly _user = signal<AuthUser | null>(null);
   private readonly _error = signal<string | null>(null);
   private readonly _accessToken = signal<string | null>(null);
+  private readonly initialSessionReady = createDeferred<void>();
+  private initialSessionResolved = false;
 
   readonly status = this._status.asReadonly();
   readonly user = this._user.asReadonly();
@@ -58,27 +60,52 @@ export class AuthStore {
   private initSession(): void {
     this._status.set('loading');
 
-    void this.supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        this._accessToken.set(data.session.access_token);
-        void this.loadCurrentUser();
-      } else {
+    void this.supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (data.session) {
+          this._accessToken.set(data.session.access_token);
+          return this.loadCurrentUser();
+        }
+
+        this.clearAuthenticatedState();
         this._status.set('unauthenticated');
-      }
-    });
+        return undefined;
+      })
+      .catch(() => {
+        this.clearAuthenticatedState();
+        this._status.set('unauthenticated');
+      })
+      .finally(() => {
+        this.resolveInitialSession();
+      });
 
     this.supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        this._user.set(null);
-        this._accessToken.set(null);
+      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_OUT') && !session) {
+        this.clearAuthenticatedState();
         this._status.set('unauthenticated');
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        this.resolveInitialSession();
+      } else if (
+        event === 'INITIAL_SESSION' ||
+        event === 'SIGNED_IN' ||
+        event === 'TOKEN_REFRESHED' ||
+        event === 'USER_UPDATED'
+      ) {
+        if (!session) {
+          this.clearAuthenticatedState();
+          this._status.set('unauthenticated');
+          this.resolveInitialSession();
+          return;
+        }
+
         this._accessToken.set(session.access_token);
         void this.loadCurrentUser();
+        this.resolveInitialSession();
       } else if (event === 'PASSWORD_RECOVERY') {
         // User arrived via password-reset link — keep unauthenticated state until they set a new password
-        this._accessToken.set(session.access_token);
+        this._accessToken.set(session?.access_token ?? null);
         this._status.set('unauthenticated');
+        this.resolveInitialSession();
       }
     });
   }
@@ -87,6 +114,7 @@ export class AuthStore {
     try {
       const { data } = await this.supabase.auth.getUser();
       if (!data.user) {
+        this.clearAuthenticatedState();
         this._status.set('unauthenticated');
         return;
       }
@@ -96,8 +124,13 @@ export class AuthStore {
       );
       this._status.set('authenticated');
     } catch {
+      this.clearAuthenticatedState();
       this._status.set('unauthenticated');
     }
+  }
+
+  async ensureInitialized(): Promise<void> {
+    await this.initialSessionReady.promise;
   }
 
   async login(email: string, password: string): Promise<void> {
@@ -105,9 +138,14 @@ export class AuthStore {
     this._status.set('loading');
     try {
       const user = await this.loginUseCase.execute({ email, password });
+      const { data } = await this.supabase.auth.getSession();
+
+      this._accessToken.set(data.session?.access_token ?? null);
       this._user.set(applyAuthDevOverride(user, this.authDevOverride));
       this._status.set('authenticated');
+      this.resolveInitialSession();
     } catch (err) {
+      this.clearAuthenticatedState();
       this._status.set('unauthenticated');
       this._error.set(err instanceof Error ? err.message : 'Error al iniciar sesión');
       throw err;
@@ -129,7 +167,7 @@ export class AuthStore {
 
   async logout(): Promise<void> {
     await this.logoutUseCase.execute();
-    this._user.set(null);
+    this.clearAuthenticatedState();
     this._status.set('unauthenticated');
   }
 
@@ -188,6 +226,20 @@ export class AuthStore {
     this._error.set(null);
   }
 
+  private clearAuthenticatedState(): void {
+    this._user.set(null);
+    this._accessToken.set(null);
+  }
+
+  private resolveInitialSession(): void {
+    if (this.initialSessionResolved) {
+      return;
+    }
+
+    this.initialSessionResolved = true;
+    this.initialSessionReady.resolve();
+  }
+
   private setLocalDisplayName(displayName: string): void {
     this._user.update((user) => (user ? { ...user, displayName } : null));
   }
@@ -201,4 +253,18 @@ export class AuthStore {
       throw new Error(error.message);
     }
   }
+}
+
+interface Deferred<T> {
+  readonly promise: Promise<T>;
+  readonly resolve: (value?: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+  let resolve: Deferred<T>['resolve'] = (_value) => undefined;
+  const promise = new Promise<T>((innerResolve) => {
+    resolve = innerResolve as Deferred<T>['resolve'];
+  });
+
+  return { promise, resolve };
 }

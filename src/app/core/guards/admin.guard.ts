@@ -7,18 +7,20 @@ export const backofficeAdminGuard: CanMatchFn = () => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
 
-  if (!authStore.isAuthenticated()) {
-    return router.createUrlTree(['/auth/login']);
-  }
+  return authStore.ensureInitialized().then(() => {
+    if (!authStore.isAuthenticated()) {
+      return router.createUrlTree(['/auth/login']);
+    }
 
-  const role = authStore.currentRole();
-  if (role === 'ADMIN') {
-    return true;
-  }
+    const role = authStore.currentRole();
+    if (role === 'ADMIN') {
+      return true;
+    }
 
-  if (role === 'PRESIDENT' || role === 'PLAYER') {
-    return router.createUrlTree(['/backoffice']);
-  }
+    if (role === 'PRESIDENT' || role === 'PLAYER') {
+      return router.createUrlTree(['/backoffice']);
+    }
 
-  return router.createUrlTree(['/perfil']);
+    return router.createUrlTree(['/perfil']);
+  });
 };

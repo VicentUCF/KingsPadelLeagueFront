@@ -23,6 +23,7 @@ import type {
   LeagueMatchdayStatus,
 } from '@features/league-home/domain/entities/league-matchday';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
+import { createPlayerSlugById } from '@shared/utils/player-slug';
 import { normalizeToSlug } from '@shared/utils/normalize-to-slug';
 
 export interface LeagueHomeHttpDataset {
@@ -49,6 +50,7 @@ interface LeagueHomeContext {
   readonly teamContexts: readonly TeamContext[];
   readonly teamById: ReadonlyMap<string, TeamContext>;
   readonly playerById: ReadonlyMap<string, PlayerHttpV1>;
+  readonly playerSlugById: ReadonlyMap<string, string>;
   readonly matchdaysById: ReadonlyMap<string, MatchdayHttpV1>;
   readonly matchesByMatchdayId: ReadonlyMap<string, readonly MatchHttpV1[]>;
   readonly lineupsByMatchId: ReadonlyMap<string, readonly MatchTeamLineUpHttpV1[]>;
@@ -105,7 +107,9 @@ export function mapLeagueHomeSnapshot(dataset: LeagueHomeHttpDataset): LeagueHom
       : null,
     lastResults: createLastResults(matchdays),
     teams: orderedTeamContexts.map(toTeamSummary),
-    teamProfiles: orderedTeamContexts.map(toTeamProfileSummary),
+    teamProfiles: orderedTeamContexts.map((team) =>
+      toTeamProfileSummary(team, context.playerSlugById),
+    ),
   };
 }
 
@@ -138,6 +142,12 @@ function mapLeagueMatchdaysFromContext(context: LeagueHomeContext): readonly Lea
 
 function createContext(dataset: LeagueHomeHttpDataset): LeagueHomeContext {
   const playerById = new Map(dataset.players.map((player) => [player.id, player]));
+  const playerSlugById = createPlayerSlugById(
+    dataset.players.map((player) => ({
+      id: player.id,
+      displayName: toPlayerDisplayName(player),
+    })),
+  );
   const playersByTeamId = groupPlayersByTeamId(dataset.players);
   const teamContexts = [...dataset.teams]
     .sort((leftTeam, rightTeam) => leftTeam.name.localeCompare(rightTeam.name, 'es'))
@@ -159,6 +169,7 @@ function createContext(dataset: LeagueHomeHttpDataset): LeagueHomeContext {
     teamContexts,
     teamById: new Map(teamContexts.map((team) => [team.id, team])),
     playerById,
+    playerSlugById,
     matchdaysById: new Map(dataset.matchdays.map((matchday) => [matchday.id, matchday])),
     matchesByMatchdayId: groupBy(dataset.matches, (match) => match.matchdayId),
     lineupsByMatchId: groupBy(dataset.lineups, (lineup) => lineup.matchId),
@@ -329,7 +340,10 @@ function toTeamSummary(team: TeamContext): TeamSummary {
   };
 }
 
-function toTeamProfileSummary(team: TeamContext): TeamProfileSummary {
+function toTeamProfileSummary(
+  team: TeamContext,
+  playerSlugById: ReadonlyMap<string, string>,
+): TeamProfileSummary {
   return {
     id: team.id,
     slug: team.slug,
@@ -337,13 +351,18 @@ function toTeamProfileSummary(team: TeamContext): TeamProfileSummary {
     presidentName: team.presidentLabel,
     tagline: team.tagline,
     identityDescription: team.identityDescription,
-    players: team.players.map(toTeamPlayerSummary),
+    players: team.players.map((player) => toTeamPlayerSummary(player, playerSlugById)),
   };
 }
 
-function toTeamPlayerSummary(player: PlayerHttpV1): TeamPlayerSummary {
+function toTeamPlayerSummary(
+  player: PlayerHttpV1,
+  playerSlugById: ReadonlyMap<string, string>,
+): TeamPlayerSummary {
   return {
     id: player.id,
+    slug:
+      playerSlugById.get(player.id) ?? (normalizeToSlug(toPlayerDisplayName(player)) || player.id),
     displayName: toPlayerDisplayName(player),
     roleLabel: toRoleLabel(player.preferredPosition),
     photoPath: resolvePlayerAvatarPath(player.profileImage),

@@ -572,6 +572,7 @@ function toTeamProfileSummary(team: PublicLeagueTeamCatalogEntry): TeamProfileSu
 function toTeamPlayerSummary(player: PublicLeaguePlayerCatalogEntry): TeamPlayerSummary {
   return {
     id: player.id,
+    slug: player.slug,
     displayName: player.displayName,
     roleLabel: player.roleLabel,
     photoPath: player.photoPath,

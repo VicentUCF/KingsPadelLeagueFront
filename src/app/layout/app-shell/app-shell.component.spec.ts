@@ -144,39 +144,63 @@ describe('AppShellComponent', () => {
 
     await fireEvent.click(screen.getByRole('button', { name: /Ana Perez/i }));
 
+    const navigation = screen.getByRole('navigation', { name: /Principal/i });
     const userMenu = screen.getByRole('menu');
 
-    expect(within(userMenu).queryByRole('menuitem', { name: /Panel backoffice/i })).toBeNull();
+    expect(within(navigation).queryByRole('link', { name: /Backoffice/i })).toBeNull();
+    expect(within(navigation).queryByRole('link', { name: /Mi equipo/i })).toBeNull();
+    expect(within(userMenu).queryByRole('menuitem', { name: /Backoffice/i })).toBeNull();
     expect(within(userMenu).queryByRole('menuitem', { name: /Mi equipo/i })).toBeNull();
   });
 
-  it('shows the Mi equipo shortcut for PRESIDENT accounts', async () => {
+  it('shows the Mi equipo shortcut in the primary navigation for PRESIDENT accounts', async () => {
     await renderAppShell(makeAuthStoreMock('PRESIDENT', true));
 
+    const navigation = screen.getByRole('navigation', { name: /Principal/i });
+
+    expect(within(navigation).getByRole('link', { name: /Mi equipo/i })).toHaveAttribute(
+      'href',
+      '/backoffice',
+    );
+
     await fireEvent.click(screen.getByRole('button', { name: /Ana Perez/i }));
 
     expect(
-      within(screen.getByRole('menu')).getByRole('menuitem', { name: /Mi equipo/i }),
-    ).toHaveAttribute('href', '/backoffice');
+      within(screen.getByRole('menu')).queryByRole('menuitem', { name: /Mi equipo/i }),
+    ).toBeNull();
   });
 
-  it('shows the Mi equipo shortcut for PLAYER accounts', async () => {
+  it('shows the Mi equipo shortcut in the primary navigation for PLAYER accounts', async () => {
     await renderAppShell(makeAuthStoreMock('PLAYER', true));
 
+    const navigation = screen.getByRole('navigation', { name: /Principal/i });
+
+    expect(within(navigation).getByRole('link', { name: /Mi equipo/i })).toHaveAttribute(
+      'href',
+      '/backoffice',
+    );
+
     await fireEvent.click(screen.getByRole('button', { name: /Ana Perez/i }));
 
     expect(
-      within(screen.getByRole('menu')).getByRole('menuitem', { name: /Mi equipo/i }),
-    ).toHaveAttribute('href', '/backoffice');
+      within(screen.getByRole('menu')).queryByRole('menuitem', { name: /Mi equipo/i }),
+    ).toBeNull();
   });
 
-  it('shows the Panel backoffice shortcut for ADMIN accounts', async () => {
+  it('shows the Panel backoffice shortcut in the primary navigation for ADMIN accounts', async () => {
     await renderAppShell(makeAuthStoreMock('ADMIN', true));
+
+    const navigation = screen.getByRole('navigation', { name: /Principal/i });
+
+    expect(within(navigation).getByRole('link', { name: /Backoffice/i })).toHaveAttribute(
+      'href',
+      '/backoffice',
+    );
 
     await fireEvent.click(screen.getByRole('button', { name: /Ana Perez/i }));
 
     expect(
-      within(screen.getByRole('menu')).getByRole('menuitem', { name: /Panel backoffice/i }),
-    ).toHaveAttribute('href', '/backoffice');
+      within(screen.getByRole('menu')).queryByRole('menuitem', { name: /Backoffice/i }),
+    ).toBeNull();
   });
 });

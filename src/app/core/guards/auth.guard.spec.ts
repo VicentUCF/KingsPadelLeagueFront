@@ -4,12 +4,16 @@ import { Router, type UrlTree, provideRouter } from '@angular/router';
 
 import type { AuthRole } from '@features/auth/domain/entities/auth-user';
 import { AuthStore } from '@features/auth/ui/state/auth.store';
-import { backofficeAdminGuard } from './admin.guard';
+import { authGuard } from './auth.guard';
 
-function makeAuthStoreMock(isAuthenticated: boolean, role: AuthRole | null) {
+function makeAuthStoreMock(
+  isAuthenticated: boolean,
+  role: AuthRole | null,
+  ensureInitialized: () => Promise<void> = async () => undefined,
+) {
   return {
     currentRole: signal<AuthRole | null>(role),
-    ensureInitialized: jest.fn().mockResolvedValue(undefined),
+    ensureInitialized,
     isAuthenticated: signal(isAuthenticated),
   } satisfies Pick<AuthStore, 'currentRole' | 'ensureInitialized' | 'isAuthenticated'>;
 }
@@ -17,23 +21,17 @@ function makeAuthStoreMock(isAuthenticated: boolean, role: AuthRole | null) {
 async function runGuard(
   isAuthenticated: boolean,
   role: AuthRole | null,
-  ensureInitialized: () => Promise<void> = async () => undefined,
+  ensureInitialized?: () => Promise<void>,
 ) {
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
-      {
-        provide: AuthStore,
-        useValue: {
-          ...makeAuthStoreMock(isAuthenticated, role),
-          ensureInitialized,
-        },
-      },
+      { provide: AuthStore, useValue: makeAuthStoreMock(isAuthenticated, role, ensureInitialized) },
     ],
   });
 
   const router = TestBed.inject(Router);
-  const result = await TestBed.runInInjectionContext(() => backofficeAdminGuard({} as never, []));
+  const result = await TestBed.runInInjectionContext(() => authGuard({} as never, []));
 
   return { result, router };
 }
@@ -43,7 +41,7 @@ function expectRedirect(result: unknown, router: Router, expectedUrl: string): v
   expect(router.serializeUrl(result as UrlTree)).toBe(expectedUrl);
 }
 
-describe('backofficeAdminGuard', () => {
+describe('authGuard', () => {
   afterEach(() => {
     TestBed.resetTestingModule();
   });
@@ -54,31 +52,13 @@ describe('backofficeAdminGuard', () => {
     expectRedirect(result, router, '/auth/login');
   });
 
-  it('redirects USER accounts to profile', async () => {
-    const { result, router } = await runGuard(true, 'USER');
-
-    expectRedirect(result, router, '/perfil');
-  });
-
-  it('redirects PLAYER accounts to the backoffice home', async () => {
-    const { result, router } = await runGuard(true, 'PLAYER');
-
-    expectRedirect(result, router, '/backoffice');
-  });
-
-  it('redirects PRESIDENT accounts to the backoffice home', async () => {
-    const { result, router } = await runGuard(true, 'PRESIDENT');
-
-    expectRedirect(result, router, '/backoffice');
-  });
-
-  it('allows ADMIN accounts into admin-only backoffice sections', async () => {
-    const { result } = await runGuard(true, 'ADMIN');
+  it('allows authenticated users to enter the profile area', async () => {
+    const { result } = await runGuard(true, 'USER');
 
     expect(result).toBe(true);
   });
 
-  it('waits for auth initialization before resolving the guard', async () => {
+  it('waits for the auth store initialization before deciding', async () => {
     let resolveInitialization: (() => void) | undefined;
     const ensureInitialized = jest.fn(
       () =>
@@ -87,7 +67,7 @@ describe('backofficeAdminGuard', () => {
         }),
     );
 
-    const resultPromise = runGuard(true, 'ADMIN', ensureInitialized);
+    const resultPromise = runGuard(true, 'USER', ensureInitialized);
     await Promise.resolve();
 
     expect(ensureInitialized).toHaveBeenCalledTimes(1);

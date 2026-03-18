@@ -40,6 +40,7 @@ describe('TeamShowcaseHeroComponent', () => {
               roleLabel: 'Drive',
               photoPath: null,
               photoAlt: '',
+              profileLink: '/jugadores/marco-vidal',
             },
             {
               id: 'tit-2',
@@ -47,6 +48,7 @@ describe('TeamShowcaseHeroComponent', () => {
               roleLabel: 'Revés',
               photoPath: null,
               photoAlt: '',
+              profileLink: '/jugadores/diego-llorens',
             },
             {
               id: 'tit-3',
@@ -54,6 +56,7 @@ describe('TeamShowcaseHeroComponent', () => {
               roleLabel: 'Finisher',
               photoPath: null,
               photoAlt: '',
+              profileLink: '/jugadores/hugo-ferrer',
             },
           ],
         },

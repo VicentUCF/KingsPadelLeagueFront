@@ -151,6 +151,24 @@
         </div>
       }
 
+      @if (backofficeNavigationItem(); as backofficeNavigationItem) {
+        <a
+          class="app-shell__nav-link"
+          [routerLink]="backofficeNavigationItem.path"
+          [routerLinkActiveOptions]="backofficeNavigationItem.matchOptions"
+          routerLinkActive="app-shell__nav-link--active"
+          (click)="closeUserMenu(); closeDropdowns(); closeNavigation()"
+        >
+          <lucide-angular
+            [img]="backofficeNavigationItem.icon"
+            [size]="16"
+            aria-hidden="true"
+            class="app-shell__nav-link-icon"
+          />
+          <span>{{ backofficeNavigationItem.label }}</span>
+        </a>
+      }
+
       <!-- Auth section -->
       <div class="app-shell__nav-auth">
         @if (authStore.isLoading()) {
@@ -207,17 +225,6 @@
                 >
                   Editar perfil
                 </a>
-                @if (backofficeLinkLabel(); as backofficeLinkLabel) {
-                  <a
-                    class="app-shell__user-menu-item"
-                    routerLink="/backoffice"
-                    role="menuitem"
-                    (click)="closeUserMenu()"
-                  >
-                    <lucide-angular [img]="dashboardIcon" [size]="14" aria-hidden="true" />
-                    {{ backofficeLinkLabel }}
-                  </a>
-                }
                 <div class="app-shell__user-menu-divider" role="separator"></div>
                 <button
                   class="app-shell__user-menu-item app-shell__user-menu-item--logout"
@@ -243,12 +250,6 @@
               <a class="app-shell__nav-link" routerLink="/perfil" (click)="closeNavigation()"
                 >Editar perfil</a
               >
-              @if (backofficeLinkLabel(); as backofficeLinkLabel) {
-                <a class="app-shell__nav-link" routerLink="/backoffice" (click)="closeNavigation()">
-                  <lucide-angular [img]="dashboardIcon" [size]="16" aria-hidden="true" />
-                  {{ backofficeLinkLabel }}
-                </a>
-              }
               <button
                 class="app-shell__nav-link app-shell__nav-link--danger"
                 type="button"

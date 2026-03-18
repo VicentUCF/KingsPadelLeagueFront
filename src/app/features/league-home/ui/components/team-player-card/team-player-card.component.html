@@ -1,4 +1,8 @@
-<article class="team-player-card__panel c-surface-card">
+<a
+  class="team-player-card__panel c-surface-card"
+  [routerLink]="player().profileLink"
+  [attr.aria-label]="'Ver perfil de ' + player().displayName"
+>
   @if (player().photoPath) {
     <img
       [ngSrc]="player().photoPath!"
@@ -18,4 +22,4 @@
     <p class="team-player-card__role">{{ player().roleLabel }}</p>
     <h3 class="team-player-card__name">{{ player().displayName }}</h3>
   </div>
-</article>
+</a>

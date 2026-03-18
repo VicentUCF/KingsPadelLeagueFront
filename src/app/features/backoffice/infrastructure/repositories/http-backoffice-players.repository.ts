@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
 import type { PaginatedResponse, PlayerHttpV1 } from '@core/api/kings-padel-api.types';
+import { resolvePlayerHttpCompetitiveStats } from '@core/api/player-http-competitive-stats';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
 import { BackofficePlayersRepository } from '@features/backoffice/application/ports/backoffice-players.repository';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
@@ -25,6 +26,8 @@ export class HttpBackofficePlayersRepository extends BackofficePlayersRepository
 }
 
 function mapPlayer(raw: PlayerHttpV1): BackofficePlayer {
+  const competitiveStats = resolvePlayerHttpCompetitiveStats(raw);
+
   return {
     id: raw.id,
     firstName: raw.firstName,
@@ -34,9 +37,9 @@ function mapPlayer(raw: PlayerHttpV1): BackofficePlayer {
     profileImage: resolvePlayerAvatarPath(raw.profileImage),
     isPresident: raw.isPresident,
     ...(raw.teamId != null ? { teamId: raw.teamId } : {}),
-    value: raw.value,
-    wonGames: raw.wonGames,
-    lostGames: raw.lostGames,
+    value: competitiveStats.marketValue,
+    wonGames: competitiveStats.wonMatchesCount,
+    lostGames: competitiveStats.lostMatchesCount,
     preferredPosition: raw.preferredPosition,
     description: raw.description,
     ...(raw.instagramUrl != null ? { instagramUrl: raw.instagramUrl } : {}),

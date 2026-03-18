@@ -21,8 +21,7 @@
   <div class="player-directory-card__body">
     <p class="player-directory-card__team">{{ player().derivedTeamLabel }}</p>
     <div class="player-directory-card__chips">
-      <span class="c-chip c-chip--xs c-chip--tone-brand">{{ player().historyLabel }}</span>
-      <span class="c-chip c-chip--xs c-chip--tone-neutral">{{ player().userLinkageLabel }}</span>
+      <span class="c-chip c-chip--xs c-chip--tone-brand">{{ player().matchRecordLabel }}</span>
     </div>
   </div>
 
@@ -84,33 +83,23 @@
           <p class="player-detail__section-title">Estadísticas</p>
           <div class="player-detail__stats">
             <div class="player-detail__stat player-detail__stat--brand">
-              <span class="player-detail__stat-value">{{ winsCount() }}</span>
+              <span class="player-detail__stat-value">{{ player().wonGames }}</span>
               <span class="player-detail__stat-label">Victorias</span>
             </div>
             <div class="player-detail__stat">
-              <span class="player-detail__stat-value">{{ lossesCount() }}</span>
+              <span class="player-detail__stat-value">{{ player().lostGames }}</span>
               <span class="player-detail__stat-label">Derrotas</span>
-            </div>
-            <div class="player-detail__stat player-detail__stat--warning">
-              <span class="player-detail__stat-value">{{
-                player().historyLabel.split(' · ')[2] ?? '—'
-              }}</span>
-              <span class="player-detail__stat-label">Valor</span>
             </div>
           </div>
         </div>
 
         <div class="player-detail__section">
-          <p class="player-detail__section-title">Equipo y rol</p>
+          <p class="player-detail__section-title">Equipo</p>
           <div class="player-detail__field">
             <span class="player-detail__field-label">Equipo</span>
             <span class="player-detail__field-value">{{
               player().derivedTeamLabel.replace('Equipo: ', '')
             }}</span>
-          </div>
-          <div class="player-detail__field">
-            <span class="player-detail__field-label">Vinculación</span>
-            <span class="player-detail__field-value">{{ player().userLinkageLabel }}</span>
           </div>
         </div>
       </div>

@@ -108,6 +108,36 @@ describe('HttpPlayersRepository', () => {
     await expect(refreshPromise).resolves.toHaveLength(1);
   });
 
+  it('normalizes missing competitive stats from the backend contract', async () => {
+    const playersPromise = repository.findAll();
+
+    expectTeamsRequest().flush({
+      items: [createTeamHttp({ id: 'team-kings', name: 'Kings Of Favar' })],
+      meta: createMeta(1),
+    });
+    expectPlayersRequest().flush({
+      items: [
+        createPlayerHttp({
+          id: 'player-ruben',
+          firstName: 'Ruben',
+          lastName: 'Marzal',
+          wonGames: undefined,
+          lostGames: undefined,
+        }),
+      ],
+      meta: createMeta(1),
+    });
+
+    await expect(playersPromise).resolves.toEqual([
+      expect.objectContaining({
+        id: 'player-ruben',
+        wonMatchesCount: 0,
+        lostMatchesCount: 0,
+        playedMatchesCount: 0,
+      }),
+    ]);
+  });
+
   function expectTeamsRequest() {
     return httpTestingController.expectOne((request) => {
       return request.url === 'http://api.test/v1/teams' && request.params.get('limit') === '100';

@@ -97,19 +97,41 @@
   }
 
   &__avatar {
+    position: relative;
     display: grid;
     place-items: center;
     min-height: 15rem;
     padding: var(--space-3) var(--space-8) 0;
+    isolation: isolate;
+  }
+  &__avatar::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: min(7rem, 42%);
+    background: linear-gradient(
+      180deg,
+      rgb(10 7 3 / 0) 0%,
+      color-mix(in srgb, var(--color-surface) 38%, transparent) 42%,
+      color-mix(in srgb, var(--color-surface) 86%, black 14%) 100%
+    );
+    pointer-events: none;
+    z-index: 2;
   }
   &__image {
+    position: relative;
+    z-index: 1;
     display: block;
     width: 100%;
     height: auto;
     filter: drop-shadow(0 1.4rem 2.8rem rgb(0 0 0 / 0.5));
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 18%, #000 100%);
+    mask-image: linear-gradient(to top, transparent 0%, #000 18%, #000 100%);
     object-fit: cover;
   }
   &__avatar-fallback {
+    position: relative;
+    z-index: 1;
     display: grid;
     place-items: center;
     width: min(100%, 15rem);

@@ -18,6 +18,7 @@ describe('toLeagueTeamProfilePageViewModel', () => {
             expect.objectContaining({
               displayName: 'Marco Vidal',
               photoAlt: '',
+              profileLink: '/jugadores/marco-vidal',
             }),
           ],
         }),
@@ -175,6 +176,7 @@ function createSnapshot(): LeagueHomeSnapshot {
         players: [
           {
             id: 'tit-1',
+            slug: 'marco-vidal',
             displayName: 'Marco Vidal',
             roleLabel: 'Drive',
             photoPath: null,
@@ -191,6 +193,7 @@ function createSnapshot(): LeagueHomeSnapshot {
         players: [
           {
             id: 'hp-1',
+            slug: 'samuel-costa',
             displayName: 'Samuel Costa',
             roleLabel: 'Drive',
             photoPath: null,

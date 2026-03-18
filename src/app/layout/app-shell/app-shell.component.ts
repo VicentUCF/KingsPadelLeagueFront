@@ -115,7 +115,7 @@ export class AppShellComponent {
   protected readonly backofficeLinkLabel = computed(() => {
     const role = this.authStore.currentRole();
     if (role === 'ADMIN') {
-      return 'Panel backoffice';
+      return 'Backoffice';
     }
 
     if (role === 'PRESIDENT' || role === 'PLAYER') {
@@ -123,6 +123,20 @@ export class AppShellComponent {
     }
 
     return null;
+  });
+  protected readonly backofficeNavigationItem = computed<NavigationItem | null>(() => {
+    const label = this.backofficeLinkLabel();
+
+    if (!label) {
+      return null;
+    }
+
+    return {
+      label,
+      path: '/backoffice',
+      icon: this.dashboardIcon,
+      matchOptions: { exact: false },
+    };
   });
 
   protected userInitials(): string {

@@ -69,6 +69,7 @@ function createSnapshot(): LeagueHomeSnapshot {
         players: [
           {
             id: 'kof-1',
+            slug: 'alejandro-mena',
             displayName: 'Alejandro Mena',
             roleLabel: 'Drive',
             photoPath: null,

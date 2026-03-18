@@ -13,7 +13,9 @@ export interface BackofficePlayerCardViewModel {
   readonly statusLabel: string;
   readonly statusTone: StatusBadgeTone;
   readonly derivedTeamLabel: string;
-  readonly historyLabel: string;
+  readonly matchRecordLabel: string;
+  readonly wonGames: number;
+  readonly lostGames: number;
   readonly userLinkageLabel: string;
   readonly detailPath: string;
 }
@@ -40,7 +42,9 @@ export function toBackofficePlayerCardViewModel(
     statusLabel: hasTeam ? 'Asignado' : 'Sin equipo',
     statusTone: hasTeam ? 'success' : 'warning',
     derivedTeamLabel: teamName !== undefined ? `Equipo: ${teamName}` : 'Equipo: Sin asignar',
-    historyLabel: `${player.wonGames}V · ${player.lostGames}D · Valor ${player.value}`,
+    matchRecordLabel: `${player.wonGames}V · ${player.lostGames}D`,
+    wonGames: player.wonGames,
+    lostGames: player.lostGames,
     userLinkageLabel: toUserLinkageLabel(player, privacy),
     detailPath: `/backoffice/jugadores/${player.id}`,
   };

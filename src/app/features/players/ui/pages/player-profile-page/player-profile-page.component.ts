@@ -1,4 +1,4 @@
-import { NgOptimizedImage } from '@angular/common';
+import { DOCUMENT, Location, NgOptimizedImage } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,7 +8,7 @@ import {
   type OnInit,
 } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ArrowLeft, LucideAngularModule } from 'lucide-angular';
 
 import { UNASSIGNED_PLAYER_TEAM_NAME } from '@features/players/domain/entities/player.entity';
@@ -32,7 +32,6 @@ import { PlayerProfileStore } from '../../state/player-profile.store';
     LoadingStateComponent,
     NgOptimizedImage,
     PlayerProfileCardComponent,
-    RouterLink,
   ],
   providers: [PlayerProfileStore],
   templateUrl: './player-profile-page.component.html',
@@ -41,6 +40,9 @@ import { PlayerProfileStore } from '../../state/player-profile.store';
 export class PlayerProfilePageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly location = inject(Location);
+  private readonly router = inject(Router);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
@@ -87,5 +89,16 @@ export class PlayerProfilePageComponent implements OnInit {
     this.destroyRef.onDestroy(() => {
       routeParamMapSubscription.unsubscribe();
     });
+  }
+
+  protected goBack(): void {
+    const historyLength = this.document.defaultView?.history.length ?? 0;
+
+    if (historyLength > 1) {
+      this.location.back();
+      return;
+    }
+
+    void this.router.navigate(['/jugadores']);
   }
 }

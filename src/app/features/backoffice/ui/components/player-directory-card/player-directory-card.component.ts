@@ -23,16 +23,6 @@ export class PlayerDirectoryCardComponent {
     return this.player().title.slice(0, 2).toUpperCase();
   });
 
-  protected readonly winsCount = computed(() => {
-    const match = /^(\d+)V/.exec(this.player().historyLabel);
-    return match?.[1] ?? '0';
-  });
-
-  protected readonly lossesCount = computed(() => {
-    const match = /(\d+)D/.exec(this.player().historyLabel);
-    return match?.[1] ?? '0';
-  });
-
   protected openDetail(): void {
     this.detailOpen.set(true);
   }

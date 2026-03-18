@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 import { Subject } from 'rxjs';
 
-import { provideLeagueHomeFeature } from '../../providers/league-home.providers';
+import { LoadLeagueHomeSnapshotUseCase } from '@features/league-home/application/use-cases/load-league-home-snapshot.use-case';
+import { InMemoryLeagueHomeRepository } from '@features/league-home/infrastructure/repositories/in-memory-league-home.repository';
+import { LOAD_LEAGUE_HOME_SNAPSHOT_USE_CASE } from '../../providers/league-home.providers';
 import { LeagueTeamProfilePageComponent } from './league-team-profile-page.component';
 
 describe('LeagueTeamProfilePageComponent', () => {
@@ -12,7 +14,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     await render(LeagueTeamProfilePageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        provideLeagueTeamProfilePageTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -25,7 +27,7 @@ describe('LeagueTeamProfilePageComponent', () => {
     expect(screen.getByRole('heading', { name: /Plantilla del equipo/i })).toBeVisible();
     expect(screen.getByText(/1 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /Adrian Asuncion/i, level: 3 })).toBeVisible();
-    expect(screen.getByText(/Calendario oficial próximamente · Pretemporada/i)).toBeVisible();
+    expect(screen.getByText(/Jornada 3 de 5 · Fase regular/i)).toBeVisible();
   });
 
   it('updates the rendered profile when the slug changes on the same component instance', async () => {
@@ -33,7 +35,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     await render(LeagueTeamProfilePageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        provideLeagueTeamProfilePageTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -56,7 +58,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     await render(LeagueTeamProfilePageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        provideLeagueTeamProfilePageTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -76,7 +78,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     await render(LeagueTeamProfilePageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        provideLeagueTeamProfilePageTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -97,7 +99,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     const { container } = await render(LeagueTeamProfilePageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        provideLeagueTeamProfilePageTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -124,4 +126,16 @@ function createActivatedRouteStub(initialSlug: string) {
       paramMap: paramMapSubject.asObservable(),
     },
   };
+}
+
+function provideLeagueTeamProfilePageTesting() {
+  return [
+    InMemoryLeagueHomeRepository,
+    {
+      provide: LOAD_LEAGUE_HOME_SNAPSHOT_USE_CASE,
+      useFactory: (leagueHomeRepository: InMemoryLeagueHomeRepository) =>
+        new LoadLeagueHomeSnapshotUseCase(leagueHomeRepository),
+      deps: [InMemoryLeagueHomeRepository],
+    },
+  ];
 }

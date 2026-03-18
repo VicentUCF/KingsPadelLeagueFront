@@ -22,6 +22,7 @@ describe('backoffice-players.viewmodel', () => {
     const viewModel = toBackofficePlayerCardViewModel(player, 'Kings Of Favar');
 
     expect(viewModel.avatarPath).toBeUndefined();
+    expect(viewModel.matchRecordLabel).toBe('2V · 1D');
   });
 
   it('hides linked player emails when the viewer is a player', () => {

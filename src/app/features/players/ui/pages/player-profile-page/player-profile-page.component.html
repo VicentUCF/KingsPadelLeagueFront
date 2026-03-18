@@ -1,7 +1,7 @@
-<a class="player-profile-page__back-link" routerLink="/jugadores">
+<button class="player-profile-page__back-link" type="button" (click)="goBack()">
   <lucide-angular [img]="arrowLeftIcon" [size]="18" aria-hidden="true" />
   <span>Volver a jugadores</span>
-</a>
+</button>
 
 @if (store.isLoading() && !store.hasContent()) {
   <app-loading-state
@@ -118,23 +118,6 @@
           </strong>
         </article>
       </section>
-
-      <div class="player-profile-page__win-bar-wrap">
-        <div class="player-profile-page__win-bar-label">
-          <span>Rendimiento</span>
-          <span>{{ player.winRateLabel }}</span>
-        </div>
-        <div
-          class="player-profile-page__win-bar"
-          role="progressbar"
-          [attr.aria-valuenow]="player.winRate"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          [attr.aria-label]="'Efectividad ' + player.winRateLabel"
-        >
-          <div class="player-profile-page__win-bar-fill" [style.width.%]="player.winRate"></div>
-        </div>
-      </div>
     </div>
   </div>
 } @else if (store.hasContent()) {

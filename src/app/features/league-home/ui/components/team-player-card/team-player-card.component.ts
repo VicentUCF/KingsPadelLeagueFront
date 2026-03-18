@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule, User } from 'lucide-angular';
 
 import { type TeamRosterPlayerViewModel } from '@features/league-home/ui/models/league-team-showcase.viewmodel';
@@ -10,7 +11,7 @@ import { type TeamRosterPlayerViewModel } from '@features/league-home/ui/models/
   host: {
     class: 'team-player-card',
   },
-  imports: [LucideAngularModule, NgOptimizedImage],
+  imports: [LucideAngularModule, NgOptimizedImage, RouterLink],
   templateUrl: './team-player-card.component.html',
   styleUrl: './team-player-card.component.scss',
 })

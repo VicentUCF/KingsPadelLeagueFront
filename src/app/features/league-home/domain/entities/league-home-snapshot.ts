@@ -71,6 +71,7 @@ export interface TeamSummary {
 
 export interface TeamPlayerSummary {
   readonly id: string;
+  readonly slug: string;
   readonly displayName: string;
   readonly roleLabel: string;
   readonly photoPath: string | null;

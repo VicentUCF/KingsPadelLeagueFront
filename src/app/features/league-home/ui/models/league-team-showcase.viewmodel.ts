@@ -21,6 +21,7 @@ export interface TeamRosterPlayerViewModel {
   readonly roleLabel: string;
   readonly photoPath: string | null;
   readonly photoAlt: string;
+  readonly profileLink: string;
 }
 
 export interface TeamShowcaseViewModel {
@@ -181,6 +182,7 @@ function toTeamRosterPlayerViewModel(player: TeamPlayerSummary): TeamRosterPlaye
     roleLabel: player.roleLabel,
     photoPath: player.photoPath,
     photoAlt: player.photoPath ? player.displayName : '',
+    profileLink: `/jugadores/${player.slug}`,
   };
 }
 
