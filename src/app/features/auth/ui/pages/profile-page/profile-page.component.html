@@ -167,19 +167,6 @@
             </div>
           </div>
 
-          <div class="c-field">
-            <label class="c-field__label" for="email-ro">Correo electrónico</label>
-            <input
-              id="email-ro"
-              type="email"
-              class="c-input"
-              [value]="authStore.user()?.email ?? ''"
-              disabled
-              aria-describedby="email-hint"
-            />
-            <p id="email-hint" class="c-field__helper">El email no se puede cambiar desde aquí.</p>
-          </div>
-
           <button
             type="submit"
             class="c-button c-button--primary profile-card__submit"
