@@ -2,13 +2,13 @@ import { provideRouter } from '@angular/router';
 import { fireEvent, render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
-import { provideLeagueHomeFeature } from '../../providers/league-home.providers';
+import { provideLeagueHomeFeatureTesting } from '../../testing/league-home-testing.providers';
 import { LeagueTeamsPageComponent } from './league-teams-page.component';
 
 describe('LeagueTeamsPageComponent', () => {
   it('renders the selector and updates the live preview when another team is chosen', async () => {
     await render(LeagueTeamsPageComponent, {
-      providers: [provideLeagueHomeFeature(), provideRouter([])],
+      providers: [...provideLeagueHomeFeatureTesting(), provideRouter([])],
     });
 
     expect(await screen.findByRole('heading', { name: /Equipos participantes/i })).toBeVisible();
@@ -28,7 +28,7 @@ describe('LeagueTeamsPageComponent', () => {
 
   it('has no accessibility violations in the interactive team selector page', async () => {
     const { container } = await render(LeagueTeamsPageComponent, {
-      providers: [provideLeagueHomeFeature(), provideRouter([])],
+      providers: [...provideLeagueHomeFeatureTesting(), provideRouter([])],
     });
 
     await screen.findByRole('heading', { name: /Equipos participantes/i });

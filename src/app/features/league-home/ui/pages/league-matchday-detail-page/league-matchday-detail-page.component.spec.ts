@@ -3,16 +3,16 @@ import { render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 import { Subject } from 'rxjs';
 
-import { provideLeagueHomeFeature } from '../../providers/league-home.providers';
+import { provideLeagueHomeFeatureTesting } from '../../testing/league-home-testing.providers';
 import { LeagueMatchdayDetailPageComponent } from './league-matchday-detail-page.component';
 
 describe('LeagueMatchdayDetailPageComponent', () => {
-  it('shows an empty state when no matchday data has been published', async () => {
-    const activatedRouteStub = createActivatedRouteStub('matchday-3');
+  it('shows the published detail for a current matchday', async () => {
+    const activatedRouteStub = createActivatedRouteStub('jornada-3');
 
     await render(LeagueMatchdayDetailPageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        ...provideLeagueHomeFeatureTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -21,10 +21,14 @@ describe('LeagueMatchdayDetailPageComponent', () => {
       ],
     });
 
-    expect(await screen.findByText(/No hay jornadas disponibles/i)).toBeVisible();
-    expect(
-      screen.getByText(/Todavía no hay jornadas publicadas para construir este detalle/i),
-    ).toBeVisible();
+    expect(await screen.findByRole('heading', { name: /Jornada 3/i })).toBeVisible();
+    expect(screen.getByRole('link', { name: /Volver a jornadas/i })).toHaveAttribute(
+      'href',
+      '/jornadas',
+    );
+    expect(screen.getByText(/Descanso de la jornada/i)).toBeVisible();
+    expect(screen.getByText(/Cruces de la jornada/i)).toBeVisible();
+    expect(screen.getAllByText(/Todavía no hay resultados publicados por pareja/i)).toHaveLength(2);
   });
 
   it('shows a not found state for an unknown matchday id', async () => {
@@ -32,7 +36,7 @@ describe('LeagueMatchdayDetailPageComponent', () => {
 
     await render(LeagueMatchdayDetailPageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        ...provideLeagueHomeFeatureTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -41,18 +45,18 @@ describe('LeagueMatchdayDetailPageComponent', () => {
       ],
     });
 
-    expect(await screen.findByText(/No hay jornadas disponibles/i)).toBeVisible();
+    expect(await screen.findByText(/Jornada no encontrada/i)).toBeVisible();
     expect(
-      screen.getByText(/Todavía no hay jornadas publicadas para construir este detalle/i),
+      screen.getByText(/Vuelve al listado de jornadas para abrir una jornada publicada/i),
     ).toBeVisible();
   });
 
   it('has no accessibility violations in the matchday detail snapshot', async () => {
-    const activatedRouteStub = createActivatedRouteStub('matchday-3');
+    const activatedRouteStub = createActivatedRouteStub('jornada-3');
 
     const { container } = await render(LeagueMatchdayDetailPageComponent, {
       providers: [
-        provideLeagueHomeFeature(),
+        ...provideLeagueHomeFeatureTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -61,7 +65,7 @@ describe('LeagueMatchdayDetailPageComponent', () => {
       ],
     });
 
-    await screen.findByText(/No hay jornadas disponibles/i);
+    await screen.findByRole('heading', { name: /Jornada 3/i });
 
     expect(await axe(container)).toHaveNoViolations();
   });

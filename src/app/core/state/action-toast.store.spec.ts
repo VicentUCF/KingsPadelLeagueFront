@@ -25,6 +25,13 @@ describe('ActionToastStore', () => {
 
     jest.advanceTimersByTime(4000);
 
+    expect(store.toasts().map((toast) => toast.message)).toEqual([
+      'Season guardada',
+      'No se ha podido archivar',
+    ]);
+
+    jest.advanceTimersByTime(3000);
+
     expect(store.toasts()).toHaveLength(0);
   });
 

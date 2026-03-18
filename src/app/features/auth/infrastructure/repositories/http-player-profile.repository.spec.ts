@@ -5,6 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
+import { environment } from '../../../../../environments/environment';
 
 import { HttpPlayerProfileRepository } from './http-player-profile.repository';
 
@@ -98,7 +99,7 @@ describe('HttpPlayerProfileRepository', () => {
       (httpRequest) => httpRequest.url === 'http://api.test/v1/players/player-1',
     );
 
-    expect(storageFrom).toHaveBeenCalledWith('player-profile-images');
+    expect(storageFrom).toHaveBeenCalledWith(environment.supabasePlayerProfileBucket);
     expect(upload).toHaveBeenCalledWith(
       expect.stringMatching(/^player-1\//),
       avatarFile,

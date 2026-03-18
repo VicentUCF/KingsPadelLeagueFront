@@ -2,13 +2,13 @@ import { provideRouter } from '@angular/router';
 import { render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 
-import { provideLeagueHomeFeature } from '../../providers/league-home.providers';
+import { provideLeagueHomeFeatureTesting } from '../../testing/league-home-testing.providers';
 import { LeagueStandingsPageComponent } from './league-standings-page.component';
 
 describe('LeagueStandingsPageComponent', () => {
   it('renders the standings view with hero, table and tiebreaks', async () => {
     await render(LeagueStandingsPageComponent, {
-      providers: [provideLeagueHomeFeature(), provideRouter([])],
+      providers: [...provideLeagueHomeFeatureTesting(), provideRouter([])],
     });
 
     expect(
@@ -23,7 +23,7 @@ describe('LeagueStandingsPageComponent', () => {
 
   it('has no accessibility violations in the standings snapshot', async () => {
     const { container } = await render(LeagueStandingsPageComponent, {
-      providers: [provideLeagueHomeFeature(), provideRouter([])],
+      providers: [...provideLeagueHomeFeatureTesting(), provideRouter([])],
     });
 
     await screen.findByRole('heading', { name: /Clasificación oficial de la temporada 2026/i });

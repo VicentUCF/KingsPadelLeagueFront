@@ -25,7 +25,7 @@ describe('TeamCardComponent', () => {
     const link = screen.getByRole('link', { name: /House Navarro/i });
 
     expect(link).toHaveAttribute('href', '/equipos/house-navarro');
-    expect(screen.getByText('Presidente: Navarro')).toBeVisible();
+    expect(screen.getByText('Presidencia: Navarro')).toBeVisible();
     expect(screen.getByText('Jugadores: 6')).toBeVisible();
   });
 });
