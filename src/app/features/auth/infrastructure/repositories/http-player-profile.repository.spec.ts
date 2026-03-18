@@ -101,7 +101,7 @@ describe('HttpPlayerProfileRepository', () => {
 
     expect(storageFrom).toHaveBeenCalledWith(environment.supabasePlayerProfileBucket);
     expect(upload).toHaveBeenCalledWith(
-      expect.stringMatching(/^player-1\//),
+      'player-1/avatar.webp',
       avatarFile,
       expect.objectContaining({
         cacheControl: '3600',

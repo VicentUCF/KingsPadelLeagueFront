@@ -31,6 +31,7 @@ import {
   type EditablePlayerPreferredPosition,
   type EditablePlayerProfile,
 } from '../../../domain/entities/editable-player-profile';
+import { ProcessPlayerProfileImageUseCase } from '../../../application/use-cases/process-player-profile-image.use-case';
 import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
 import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 import { AuthStore } from '../../state/auth.store';
@@ -71,6 +72,7 @@ function optionalUrlValidator(control: AbstractControl): ValidationErrors | null
 })
 export class ProfilePageComponent implements OnDestroy {
   protected readonly authStore = inject(AuthStore);
+  private readonly processPlayerProfileImageUseCase = inject(ProcessPlayerProfileImageUseCase);
   private readonly profileImageInput = viewChild<ElementRef<HTMLInputElement>>('profileImageInput');
 
   protected readonly UserIcon = UserIcon;
@@ -87,6 +89,7 @@ export class ProfilePageComponent implements OnDestroy {
   protected readonly editableProfileLoadError = signal<string | null>(null);
   protected readonly playerProfile = signal<EditablePlayerProfile | null>(null);
   protected readonly profileImagePreviewUrl = signal<string | null>(null);
+  protected readonly profileImageProcessing = signal(false);
   protected readonly selectedProfileImageFile = signal<File | null>(null);
 
   protected readonly profileLoading = signal(false);
@@ -263,22 +266,28 @@ export class ProfilePageComponent implements OnDestroy {
     await this.loadEditablePlayerProfile();
   }
 
-  protected onProfileImageSelected(event: Event): void {
+  protected async onProfileImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement | null;
     const file = input?.files?.[0] ?? null;
     if (!input || !file) {
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      this.profileError.set('Selecciona un archivo de imagen válido');
-      input.value = '';
-      return;
-    }
-
     this.profileError.set(null);
-    this.selectedProfileImageFile.set(file);
-    this.setLocalProfileImagePreview(file);
+    this.profileImageProcessing.set(true);
+
+    try {
+      const processedFile = await this.processPlayerProfileImageUseCase.execute(file);
+      this.selectedProfileImageFile.set(processedFile);
+      this.setLocalProfileImagePreview(processedFile);
+    } catch (err) {
+      this.profileError.set(
+        err instanceof Error ? err.message : 'No se pudo procesar la imagen seleccionada',
+      );
+      input.value = '';
+    } finally {
+      this.profileImageProcessing.set(false);
+    }
   }
 
   async onSaveProfile(): Promise<void> {
@@ -302,6 +311,10 @@ export class ProfilePageComponent implements OnDestroy {
   }
 
   async onSavePlayerProfile(): Promise<void> {
+    if (this.profileImageProcessing()) {
+      return;
+    }
+
     if (this.playerProfileForm.invalid) {
       this.playerProfileForm.markAllAsTouched();
       return;
@@ -408,6 +421,10 @@ export class ProfilePageComponent implements OnDestroy {
   private clearProfileImageSelection(): void {
     this.selectedProfileImageFile.set(null);
     this.profileImagePreviewUrl.set(null);
+    const profileImageInput = this.profileImageInput();
+    if (profileImageInput) {
+      profileImageInput.nativeElement.value = '';
+    }
     this.revokeLocalProfileImagePreview();
   }
 

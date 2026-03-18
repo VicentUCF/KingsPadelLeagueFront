@@ -60,7 +60,7 @@ export class HttpPlayerProfileRepository implements PlayerProfileRepository {
 
   private async uploadProfileImage(playerId: string, file: File): Promise<string> {
     const bucket = this.supabase.storage.from(environment.supabasePlayerProfileBucket);
-    const storagePath = buildProfileImagePath(playerId, file.name);
+    const storagePath = buildProfileImagePath(playerId, file);
     const { error } = await bucket.upload(storagePath, file, {
       cacheControl: '3600',
       contentType: file.type || 'application/octet-stream',
@@ -80,13 +80,27 @@ export class HttpPlayerProfileRepository implements PlayerProfileRepository {
   }
 }
 
-function buildProfileImagePath(playerId: string, fileName: string): string {
-  const safeName = fileName
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-zA-Z0-9._-]/g, '')
-    .toLowerCase();
-  const resolvedFileName = safeName.length > 0 ? safeName : 'profile-image';
+const PROFILE_IMAGE_EXTENSION_BY_MIME_TYPE = {
+  'image/avif': 'avif',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+} as const;
 
-  return `${playerId}/${Date.now()}-${resolvedFileName}`;
+function buildProfileImagePath(playerId: string, file: File): string {
+  return `${playerId}/avatar.${resolveProfileImageExtension(file)}`;
+}
+
+function resolveProfileImageExtension(file: File): string {
+  const mimeTypeExtension =
+    PROFILE_IMAGE_EXTENSION_BY_MIME_TYPE[
+      file.type as keyof typeof PROFILE_IMAGE_EXTENSION_BY_MIME_TYPE
+    ];
+
+  if (mimeTypeExtension) {
+    return mimeTypeExtension;
+  }
+
+  const extension = file.name.split('.').pop()?.trim().toLowerCase();
+  return extension && extension.length > 0 ? extension : 'bin';
 }

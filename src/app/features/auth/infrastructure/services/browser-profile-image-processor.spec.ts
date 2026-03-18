@@ -1,0 +1,53 @@
+import imageCompression from 'browser-image-compression';
+
+import { BrowserProfileImageProcessor } from './browser-profile-image-processor';
+
+jest.mock('browser-image-compression', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+describe('BrowserProfileImageProcessor', () => {
+  const imageCompressionMock = jest.mocked(imageCompression);
+  let processor: BrowserProfileImageProcessor;
+
+  beforeEach(() => {
+    processor = new BrowserProfileImageProcessor();
+    imageCompressionMock.mockReset();
+  });
+
+  it('compresses valid images with the configured storage-saving options', async () => {
+    const originalFile = new File(['avatar'], 'avatar.png', { type: 'image/png' });
+    const compressedFile = new File(['compressed-avatar'], 'avatar.webp', {
+      type: 'image/webp',
+    });
+    imageCompressionMock.mockResolvedValue(compressedFile);
+
+    await expect(processor.process(originalFile)).resolves.toBe(compressedFile);
+
+    expect(imageCompressionMock).toHaveBeenCalledWith(
+      originalFile,
+      expect.objectContaining({
+        fileType: 'image/webp',
+        initialQuality: 0.7,
+        maxSizeMB: 0.2,
+        maxWidthOrHeight: 512,
+        useWebWorker: true,
+      }),
+    );
+  });
+
+  it('falls back to the original image when compression fails', async () => {
+    const originalFile = new File(['avatar'], 'avatar.png', { type: 'image/png' });
+    imageCompressionMock.mockRejectedValue(new Error('Compression failed'));
+
+    await expect(processor.process(originalFile)).resolves.toBe(originalFile);
+  });
+
+  it('rejects files that are not images', async () => {
+    const invalidFile = new File(['document'], 'avatar.pdf', { type: 'application/pdf' });
+
+    await expect(processor.process(invalidFile)).rejects.toThrow('El archivo no es una imagen');
+    expect(imageCompressionMock).not.toHaveBeenCalled();
+  });
+});

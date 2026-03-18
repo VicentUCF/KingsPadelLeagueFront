@@ -86,7 +86,8 @@
                 (change)="onProfileImageSelected($event)"
               />
               <p class="c-field__helper">
-                La imagen se subirá a Supabase Storage cuando guardes los cambios.
+                La imagen se comprimirá antes del preview y se subirá a Supabase Storage cuando
+                guardes los cambios.
               </p>
               @if (selectedProfileImageFileName(); as selectedProfileImageFileName) {
                 <p class="profile-card__file-name">{{ selectedProfileImageFileName }}</p>
@@ -186,11 +187,11 @@
           <button
             type="submit"
             class="c-button c-button--primary profile-card__submit"
-            [disabled]="profileLoading()"
+            [disabled]="profileLoading() || profileImageProcessing()"
           >
-            @if (profileLoading()) {
+            @if (profileLoading() || profileImageProcessing()) {
               <span class="profile-card__spinner" aria-hidden="true"></span>
-              Guardando...
+              {{ profileImageProcessing() ? 'Preparando imagen...' : 'Guardando...' }}
             } @else {
               Guardar cambios
             }

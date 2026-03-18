@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/angular';
 
 import type { AuthRole, AuthUser } from '@features/auth/domain/entities/auth-user';
 import type { EditablePlayerProfile } from '@features/auth/domain/entities/editable-player-profile';
+import { ProcessPlayerProfileImageUseCase } from '@features/auth/application/use-cases/process-player-profile-image.use-case';
 
 import { AuthStore } from '../../state/auth.store';
 import { ProfilePageComponent } from './profile-page.component';
@@ -29,9 +30,17 @@ describe('ProfilePageComponent', () => {
 
   it('loads the editable fields for player accounts', async () => {
     const authStore = createAuthStoreMock();
+    const processPlayerProfileImageUseCase = createProcessPlayerProfileImageUseCaseMock();
 
     await render(ProfilePageComponent, {
-      providers: [provideRouter([]), { provide: AuthStore, useValue: authStore }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthStore, useValue: authStore },
+        {
+          provide: ProcessPlayerProfileImageUseCase,
+          useValue: processPlayerProfileImageUseCase,
+        },
+      ],
     });
 
     await waitFor(() => {
@@ -47,13 +56,25 @@ describe('ProfilePageComponent', () => {
 
   it('submits the editable player profile including the selected avatar file', async () => {
     const authStore = createAuthStoreMock();
+    const processPlayerProfileImageUseCase = createProcessPlayerProfileImageUseCaseMock();
+    const avatarFile = new File(['avatar'], 'avatar.png', { type: 'image/png' });
+    const processedAvatarFile = new File(['compressed-avatar'], 'avatar.webp', {
+      type: 'image/webp',
+    });
+    processPlayerProfileImageUseCase.execute.mockResolvedValue(processedAvatarFile);
 
     await render(ProfilePageComponent, {
-      providers: [provideRouter([]), { provide: AuthStore, useValue: authStore }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthStore, useValue: authStore },
+        {
+          provide: ProcessPlayerProfileImageUseCase,
+          useValue: processPlayerProfileImageUseCase,
+        },
+      ],
     });
 
     const avatarInput = (await screen.findByLabelText(/Imagen de perfil/i)) as HTMLInputElement;
-    const avatarFile = new File(['avatar'], 'avatar.webp', { type: 'image/webp' });
 
     await fireEvent.change(avatarInput, {
       target: { files: [avatarFile] },
@@ -77,12 +98,14 @@ describe('ProfilePageComponent', () => {
     await fireEvent.click(screen.getByRole('button', { name: /Guardar cambios/i }));
 
     await waitFor(() => {
+      expect(processPlayerProfileImageUseCase.execute).toHaveBeenCalledWith(avatarFile);
+      expect(createObjectUrlMock).toHaveBeenCalledWith(processedAvatarFile);
       expect(authStore.updateCurrentPlayerProfile).toHaveBeenCalledWith({
         alias: 'El Mago',
         firstName: 'Vicent',
         instagramUrl: 'https://instagram.com/el-mago',
         lastName: 'Ciscar',
-        newProfileImageFile: avatarFile,
+        newProfileImageFile: processedAvatarFile,
         preferredPosition: 'left',
         profileImageUrl: 'https://cdn.test/current-avatar.webp',
       });
@@ -93,13 +116,21 @@ describe('ProfilePageComponent', () => {
 
   it('keeps the editable profile visible when a refresh fails after the first load', async () => {
     const authStore = createAuthStoreMock();
+    const processPlayerProfileImageUseCase = createProcessPlayerProfileImageUseCaseMock();
     authStore.loadCurrentPlayerProfile.mockReset();
     authStore.loadCurrentPlayerProfile
       .mockResolvedValueOnce(createEditablePlayerProfile())
       .mockRejectedValueOnce(new Error('No se pudo recargar tu perfil'));
 
     const { fixture } = await render(ProfilePageComponent, {
-      providers: [provideRouter([]), { provide: AuthStore, useValue: authStore }],
+      providers: [
+        provideRouter([]),
+        { provide: AuthStore, useValue: authStore },
+        {
+          provide: ProcessPlayerProfileImageUseCase,
+          useValue: processPlayerProfileImageUseCase,
+        },
+      ],
     });
 
     expect(await screen.findByDisplayValue('Vicent')).toBeVisible();
@@ -144,6 +175,12 @@ function createAuthStoreMock(
     | 'updateProfile'
     | 'user'
   >;
+}
+
+function createProcessPlayerProfileImageUseCaseMock() {
+  return {
+    execute: jest.fn(async (file: File) => file),
+  } satisfies Pick<ProcessPlayerProfileImageUseCase, 'execute'>;
 }
 
 function createEditablePlayerProfile(): EditablePlayerProfile {
