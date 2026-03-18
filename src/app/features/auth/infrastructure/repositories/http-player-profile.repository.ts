@@ -37,7 +37,7 @@ export class HttpPlayerProfileRepository implements PlayerProfileRepository {
   async update(command: UpdateEditablePlayerProfileCommand): Promise<EditablePlayerProfile> {
     const profileImageUrl =
       command.newProfileImageFile !== null
-        ? await this.uploadProfileImage(command.id, command.newProfileImageFile)
+        ? await this.uploadProfileImage(command, command.newProfileImageFile)
         : command.profileImageUrl;
 
     await firstValueFrom(
@@ -58,9 +58,12 @@ export class HttpPlayerProfileRepository implements PlayerProfileRepository {
     };
   }
 
-  private async uploadProfileImage(playerId: string, file: File): Promise<string> {
+  private async uploadProfileImage(
+    command: UpdateEditablePlayerProfileCommand,
+    file: File,
+  ): Promise<string> {
     const bucket = this.supabase.storage.from(environment.supabasePlayerProfileBucket);
-    const storagePath = buildProfileImagePath(playerId, file);
+    const storagePath = buildProfileImagePath(command.id, command.firstName, command.lastName);
     const { error } = await bucket.upload(storagePath, file, {
       cacheControl: '3600',
       contentType: file.type || 'application/octet-stream',
@@ -80,27 +83,25 @@ export class HttpPlayerProfileRepository implements PlayerProfileRepository {
   }
 }
 
-const PROFILE_IMAGE_EXTENSION_BY_MIME_TYPE = {
-  'image/avif': 'avif',
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-} as const;
-
-function buildProfileImagePath(playerId: string, file: File): string {
-  return `${playerId}/avatar.${resolveProfileImageExtension(file)}`;
+function buildProfileImagePath(playerId: string, firstName: string, lastName: string): string {
+  return `${playerId}/${buildPlayerProfileImageFileName(firstName, lastName)}.png`;
 }
 
-function resolveProfileImageExtension(file: File): string {
-  const mimeTypeExtension =
-    PROFILE_IMAGE_EXTENSION_BY_MIME_TYPE[
-      file.type as keyof typeof PROFILE_IMAGE_EXTENSION_BY_MIME_TYPE
-    ];
+function buildPlayerProfileImageFileName(firstName: string, lastName: string): string {
+  const resolvedName = [firstName, lastName]
+    .map((value) => normalizeFileNameSegment(value))
+    .filter((value) => value.length > 0)
+    .join('-');
 
-  if (mimeTypeExtension) {
-    return mimeTypeExtension;
-  }
+  return resolvedName.length > 0 ? resolvedName : 'player';
+}
 
-  const extension = file.name.split('.').pop()?.trim().toLowerCase();
-  return extension && extension.length > 0 ? extension : 'bin';
+function normalizeFileNameSegment(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
 }

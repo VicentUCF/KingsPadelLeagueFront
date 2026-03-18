@@ -85,10 +85,6 @@
                 accept="image/png,image/jpeg,image/webp,image/avif"
                 (change)="onProfileImageSelected($event)"
               />
-              <p class="c-field__helper">
-                La imagen se comprimirá antes del preview y se subirá a Supabase Storage cuando
-                guardes los cambios.
-              </p>
               @if (selectedProfileImageFileName(); as selectedProfileImageFileName) {
                 <p class="profile-card__file-name">{{ selectedProfileImageFileName }}</p>
               }

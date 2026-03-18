@@ -101,7 +101,7 @@ describe('HttpPlayerProfileRepository', () => {
 
     expect(storageFrom).toHaveBeenCalledWith(environment.supabasePlayerProfileBucket);
     expect(upload).toHaveBeenCalledWith(
-      'player-1/avatar.webp',
+      'player-1/vicent-ciscar.png',
       avatarFile,
       expect.objectContaining({
         cacheControl: '3600',
@@ -117,7 +117,7 @@ describe('HttpPlayerProfileRepository', () => {
       instagramUrl: 'https://instagram.com/el-mago',
       lastName: 'Ciscar',
       preferredPosition: 'left',
-      profileImage: 'https://cdn.test/storage/player-1/avatar.webp',
+      profileImage: 'https://cdn.test/storage/player-1/vicent-ciscar.png',
     });
 
     request.flush(null, { status: 204, statusText: 'No Content' });
@@ -129,18 +129,18 @@ describe('HttpPlayerProfileRepository', () => {
       instagramUrl: 'https://instagram.com/el-mago',
       lastName: 'Ciscar',
       preferredPosition: 'left',
-      profileImageUrl: 'https://cdn.test/storage/player-1/avatar.webp',
+      profileImageUrl: 'https://cdn.test/storage/player-1/vicent-ciscar.png',
     });
   });
 });
 
 function createSupabaseClientMock() {
   const upload = jest.fn().mockResolvedValue({
-    data: { path: 'player-1/avatar.webp' },
+    data: { path: 'player-1/vicent-ciscar.png' },
     error: null,
   });
   const getPublicUrl = jest.fn().mockReturnValue({
-    data: { publicUrl: 'https://cdn.test/storage/player-1/avatar.webp' },
+    data: { publicUrl: 'https://cdn.test/storage/player-1/vicent-ciscar.png' },
   });
   const storageFrom = jest.fn().mockReturnValue({
     upload,
