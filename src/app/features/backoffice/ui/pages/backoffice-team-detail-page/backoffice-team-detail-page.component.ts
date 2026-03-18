@@ -12,6 +12,8 @@ import type {
   BackofficePlayer,
   BackofficePlayerPosition,
 } from '@features/backoffice/domain/entities/backoffice-player';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 
@@ -19,7 +21,7 @@ import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
   selector: 'app-backoffice-team-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-team-detail-page' },
-  imports: [RouterLink],
+  imports: [LoadFeedbackComponent, LoadingStateComponent, RouterLink],
   templateUrl: './backoffice-team-detail-page.component.html',
   styleUrl: './backoffice-team-detail-page.component.scss',
 })
@@ -29,6 +31,15 @@ export class BackofficeTeamDetailPageComponent implements OnInit {
   protected readonly playersStore = inject(BackofficePlayersStore);
 
   protected readonly teamId = signal('');
+  protected readonly isLoading = computed(
+    () => this.teamsStore.isLoading() || this.playersStore.isLoading(),
+  );
+  protected readonly hasContent = computed(
+    () => this.teamsStore.hasContent() && this.playersStore.hasContent(),
+  );
+  protected readonly errorMessage = computed(
+    () => this.teamsStore.errorMessage() ?? this.playersStore.errorMessage(),
+  );
 
   protected readonly teamCard = computed(
     () =>
@@ -57,6 +68,10 @@ export class BackofficeTeamDetailPageComponent implements OnInit {
     this.teamId.set(this.route.snapshot.paramMap.get('teamId') ?? '');
     void this.teamsStore.load();
     void this.playersStore.load();
+  }
+
+  protected reloadData(): void {
+    void Promise.all([this.teamsStore.load(true), this.playersStore.load(true)]);
   }
 
   protected positionLabel(pos: BackofficePlayerPosition): string {

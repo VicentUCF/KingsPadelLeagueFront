@@ -12,6 +12,8 @@ import { ChevronDown, LucideAngularModule } from 'lucide-angular';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import { ActionToastStore } from '@core/state/action-toast.store';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
@@ -34,7 +36,12 @@ interface PlannerPair {
   selector: 'app-backoffice-lineups-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-lineups-page' },
-  imports: [LucideAngularModule, StatusBadgeComponent],
+  imports: [
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+    LucideAngularModule,
+    StatusBadgeComponent,
+  ],
   templateUrl: './backoffice-lineups-page.component.html',
   styleUrl: './backoffice-lineups-page.component.scss',
 })
@@ -48,6 +55,20 @@ export class BackofficeLineupsPageComponent implements OnInit {
   private readonly toastStore = inject(ActionToastStore);
 
   protected readonly selectedMatchdayId = signal<string | null>(null);
+  protected readonly hasContent = computed(() => {
+    if (this.isAdmin()) {
+      return this.matchdaysStore.hasContent() && this.lineupsStore.hasContent();
+    }
+
+    return this.teamsStore.hasContent() && this.lineupsStore.hasContent();
+  });
+  protected readonly pageErrorMessage = computed(
+    () =>
+      this.lineupsStore.errorMessage() ??
+      this.matchdaysStore.errorMessage() ??
+      this.teamsStore.errorMessage() ??
+      this.playersStore.errorMessage(),
+  );
 
   // Planner signals
   protected readonly selectedMatchId = signal<string | null>(null);
@@ -162,6 +183,32 @@ export class BackofficeLineupsPageComponent implements OnInit {
     if (id) {
       void this.lineupsStore.loadForMatchday(id);
     }
+  }
+
+  protected reloadData(): void {
+    if (this.isAdmin()) {
+      const selectedMatchdayId = this.selectedMatchdayId();
+      void Promise.all([
+        this.matchdaysStore.load(true),
+        this.teamsStore.load(true),
+        this.playersStore.load(true),
+      ]).then(() => {
+        const matchdayId = selectedMatchdayId ?? this.selectedMatchdayId();
+        if (matchdayId) {
+          void this.lineupsStore.loadForMatchday(matchdayId, true);
+        } else {
+          this.loadForCurrentMatchday();
+        }
+      });
+      return;
+    }
+
+    void Promise.all([this.teamsStore.load(true), this.playersStore.load(true)]).then(() => {
+      const team = this.presidentTeam();
+      if (team) {
+        void this.lineupsStore.loadForTeam(team.id, true);
+      }
+    });
   }
 
   protected openPlanner(matchId: string, teamId: string): void {

@@ -14,6 +14,7 @@ export class BackofficeMatchdaysStore {
   readonly matchdays = signal<readonly BackofficeMatchday[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   private _loaded = false;
 
@@ -29,14 +30,15 @@ export class BackofficeMatchdaysStore {
     () => this.matchdays().find((m) => m.status === 'scheduled') ?? null,
   );
 
-  async load(): Promise<void> {
-    if (this._loaded) return;
+  async load(forceRefresh = false): Promise<void> {
+    if (this._loaded && !forceRefresh) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       this.matchdays.set(await this.loadMatchdaysUseCase.execute());
       this._loaded = true;
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No hemos podido cargar las jornadas.');
     } finally {

@@ -7,6 +7,8 @@ import {
   EmptyStateComponent,
   type EmptyStateAction,
 } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { MatchdayCardComponent } from '../../components/matchday-card/matchday-card.component';
 import {
@@ -22,7 +24,14 @@ import { RouterLink } from '@angular/router';
   host: {
     class: 'league-matchdays-page',
   },
-  imports: [EmptyStateComponent, LucideAngularModule, MatchdayCardComponent, RouterLink],
+  imports: [
+    EmptyStateComponent,
+    LoadFeedbackComponent,
+    LucideAngularModule,
+    LoadingStateComponent,
+    MatchdayCardComponent,
+    RouterLink,
+  ],
   providers: [LeagueMatchdaysStore],
   templateUrl: './league-matchdays-page.component.html',
   styleUrl: './league-matchdays-page.component.scss',

@@ -31,6 +31,7 @@ export class PlayersDirectoryStore {
   });
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   readonly sideFilterOptions = PLAYER_DIRECTORY_SIDE_OPTIONS;
 
@@ -95,6 +96,7 @@ export class PlayersDirectoryStore {
 
       this.rankedPlayers.set(toRankedPlayersViewModel(players));
       this.sections.set(toPlayerDirectorySectionsViewModel(players));
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No hemos podido cargar el directorio de jugadores.');
     } finally {

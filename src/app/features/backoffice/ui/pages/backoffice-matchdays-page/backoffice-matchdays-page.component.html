@@ -1,25 +1,45 @@
 <div class="backoffice-matchdays-page">
-  @if (matchdaysStore.isLoading()) {
-    <p class="backoffice-matchdays-page__loading">Cargando jornadas…</p>
-  } @else if (matchdaysStore.errorMessage(); as error) {
-    <p class="backoffice-matchdays-page__error">{{ error }}</p>
-  } @else if (matchdaysStore.rows().length === 0) {
-    <p class="backoffice-matchdays-page__empty">No hay jornadas registradas todavía.</p>
+  @if (matchdaysStore.isLoading() && !matchdaysStore.hasContent()) {
+    <app-loading-state
+      [heading]="'Cargando jornadas'"
+      [hint]="'Estamos preparando el calendario operativo del backoffice.'"
+      [lineCount]="5"
+      [variant]="'table'"
+    />
+  } @else if (!matchdaysStore.hasContent() && matchdaysStore.errorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadMatchdays()" />
   } @else {
-    <ol class="backoffice-matchdays-page__list" aria-label="Jornadas">
-      @for (row of matchdaysStore.rows(); track row.id) {
-        <li class="backoffice-matchdays-page__row c-surface-card">
-          <div class="backoffice-matchdays-page__row-main">
-            <p class="backoffice-matchdays-page__row-name">{{ row.name }}</p>
-            <p class="backoffice-matchdays-page__row-date">{{ row.dateLabel }}</p>
-          </div>
+    @if (matchdaysStore.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando jornadas'"
+        [hint]="'Conservamos el listado visible mientras refrescamos la información.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
 
-          <div class="backoffice-matchdays-page__row-end">
-            <app-status-badge [label]="row.statusLabel" [tone]="row.statusTone" />
-            <a class="backoffice-matchdays-page__row-link" [routerLink]="row.detailPath">Ver →</a>
-          </div>
-        </li>
-      }
-    </ol>
+    @if (matchdaysStore.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
+    }
+
+    @if (matchdaysStore.rows().length === 0) {
+      <p class="backoffice-matchdays-page__empty">No hay jornadas registradas todavía.</p>
+    } @else {
+      <ol class="backoffice-matchdays-page__list" aria-label="Jornadas">
+        @for (row of matchdaysStore.rows(); track row.id) {
+          <li class="backoffice-matchdays-page__row c-surface-card">
+            <div class="backoffice-matchdays-page__row-main">
+              <p class="backoffice-matchdays-page__row-name">{{ row.name }}</p>
+              <p class="backoffice-matchdays-page__row-date">{{ row.dateLabel }}</p>
+            </div>
+
+            <div class="backoffice-matchdays-page__row-end">
+              <app-status-badge [label]="row.statusLabel" [tone]="row.statusTone" />
+              <a class="backoffice-matchdays-page__row-link" [routerLink]="row.detailPath">Ver →</a>
+            </div>
+          </li>
+        }
+      </ol>
+    }
   }
 </div>

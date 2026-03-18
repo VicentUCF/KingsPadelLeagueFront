@@ -1,10 +1,28 @@
-@if (store.isLoading() && !store.hasSnapshot()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-team-profile-page__status-panel">
-    <p class="league-team-profile-page__status">Cargando el perfil del equipo...</p>
+    <app-loading-state
+      [heading]="'Cargando el perfil del equipo'"
+      [hint]="'Estamos preparando la identidad y la plantilla de este equipo.'"
+      [lineCount]="4"
+      [variant]="'page'"
+    />
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="league-team-profile-page__hero-shell">
     <div class="o-container league-team-profile-page__hero-content">
+      @if (store.isLoading()) {
+        <app-loading-state
+          [heading]="'Actualizando perfil de equipo'"
+          [hint]="'Mantenemos la ficha visible mientras refrescamos los datos.'"
+          [lineCount]="3"
+          [variant]="'panel'"
+        />
+      }
+
+      @if (store.errorMessage(); as error) {
+        <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadSnapshot()" />
+      }
+
       <a class="league-team-profile-page__back-link" routerLink="/equipos">
         <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
         <span>Volver al selector</span>
@@ -38,17 +56,14 @@
       description="Vuelve a intentarlo en unos segundos."
       title="No hemos podido cargar el perfil del equipo"
     />
-
-    <p class="league-team-profile-page__status league-team-profile-page__status--error">
-      {{ store.errorMessage() }}
-    </p>
-
-    <button class="league-team-profile-page__retry" type="button" (click)="reloadSnapshot()">
-      Reintentar
-    </button>
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadSnapshot()" />
   </section>
 } @else if (isTeamMissing()) {
   <section class="o-container league-team-profile-page__status-panel">
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadSnapshot()" />
+    }
+
     <app-empty-state
       [description]="'El slug solicitado no coincide con ningún equipo del catálogo actual.'"
       [title]="'Equipo no encontrado'"

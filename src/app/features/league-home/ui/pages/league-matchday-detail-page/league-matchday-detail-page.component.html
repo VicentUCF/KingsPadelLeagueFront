@@ -1,11 +1,27 @@
-@if (store.isLoading() && !store.hasMatchdays()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-matchday-detail-page__status-panel">
-    <p aria-live="polite" class="league-matchday-detail-page__status">
-      Cargando el detalle de la jornada...
-    </p>
+    <app-loading-state
+      [heading]="'Cargando el detalle de la jornada'"
+      [hint]="'Estamos preparando los cruces y el resumen oficial de esta jornada.'"
+      [lineCount]="4"
+      [variant]="'page'"
+    />
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="o-container league-matchday-detail-page__content">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando la jornada'"
+        [hint]="'Mostramos el último detalle válido mientras refrescamos los cruces.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
+    }
+
     <header class="league-matchday-detail-page__hero">
       <a class="league-matchday-detail-page__back" routerLink="/jornadas">
         <lucide-angular [img]="arrowLeftIcon" [size]="16" aria-hidden="true" />
@@ -69,17 +85,14 @@
       description="Inténtalo de nuevo en unos segundos."
       title="No hemos podido cargar la jornada"
     />
-
-    <p class="league-matchday-detail-page__status league-matchday-detail-page__status--error">
-      {{ store.errorMessage() }}
-    </p>
-
-    <button class="league-matchday-detail-page__retry" type="button" (click)="reloadMatchdays()">
-      Reintentar
-    </button>
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadMatchdays()" />
   </section>
 } @else if (isMatchdayMissing()) {
   <section class="o-container league-matchday-detail-page__status-panel">
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
+    }
+
     <app-empty-state
       [description]="'Vuelve al listado de jornadas para abrir una jornada publicada.'"
       [title]="'Jornada no encontrada'"
@@ -95,6 +108,10 @@
   </section>
 } @else {
   <section class="o-container league-matchday-detail-page__status-panel">
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
+    }
+
     <app-empty-state
       [description]="'Todavía no hay jornadas publicadas para construir este detalle.'"
       [title]="'No hay jornadas disponibles'"

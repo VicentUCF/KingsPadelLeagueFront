@@ -1,9 +1,27 @@
-@if (store.isLoading() && !store.hasMatchdays()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-calendar-page__status-panel">
-    <p aria-live="polite" class="league-calendar-page__status">Cargando agenda completa...</p>
+    <app-loading-state
+      [heading]="'Cargando agenda completa'"
+      [hint]="'Estamos preparando el calendario oficial con fechas, horarios y enfrentamientos.'"
+      [showToolbar]="true"
+      [variant]="'page'"
+    />
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="o-container league-calendar-page__content">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando calendario'"
+        [hint]="'Seguimos mostrando el último contenido válido mientras refrescamos la agenda.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadCalendar()" />
+    }
+
     <header class="league-calendar-page__hero">
       <p class="league-calendar-page__eyebrow">
         <lucide-angular [img]="calendarIcon" [size]="15" aria-hidden="true" />
@@ -70,20 +88,38 @@
       </section>
     }
   </section>
+} @else if (store.hasContent()) {
+  <section class="o-container league-calendar-page__status-panel">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando calendario'"
+        [hint]="'Mantenemos el último estado válido mientras refrescamos la agenda.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadCalendar()" />
+    }
+
+    <app-empty-state
+      [actions]="emptyActions"
+      [description]="'Aquí se publicarán las fechas, horarios y enfrentamientos oficiales de la KingsPadelLeague para seguir el calendario completo de la competición.'"
+      [eyebrow]="'Agenda oficial'"
+      [highlights]="['Fechas y horarios oficiales', 'Partidos por equipo', 'Detalle de jornada']"
+      [icon]="calendarIcon"
+      [layout]="'feature'"
+      [title]="'Calendario oficial de partidos'"
+    />
+  </section>
 } @else if (store.errorMessage()) {
   <section class="o-container league-calendar-page__status-panel">
     <app-empty-state
       description="Inténtalo de nuevo en unos segundos."
       title="No hemos podido cargar el calendario"
     />
-
-    <p class="league-calendar-page__status league-calendar-page__status--error">
-      {{ store.errorMessage() }}
-    </p>
-
-    <button class="league-calendar-page__retry" type="button" (click)="reloadCalendar()">
-      Reintentar
-    </button>
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadCalendar()" />
   </section>
 } @else {
   <section class="o-container league-calendar-page__status-panel">

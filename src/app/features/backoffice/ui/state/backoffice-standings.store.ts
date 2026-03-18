@@ -18,6 +18,7 @@ export class BackofficeStandingsStore {
   readonly matches = signal<readonly BackofficeMatch[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   private _loaded = false;
 
@@ -31,12 +32,15 @@ export class BackofficeStandingsStore {
 
   readonly currentMatchday = computed(() => this.matchdaysStore.currentMatchday());
 
-  async load(): Promise<void> {
-    if (this._loaded) return;
+  async load(forceRefresh = false): Promise<void> {
+    if (this._loaded && !forceRefresh) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
-      await Promise.all([this.teamsStore.load(), this.matchdaysStore.load()]);
+      await Promise.all([
+        this.teamsStore.load(forceRefresh),
+        this.matchdaysStore.load(forceRefresh),
+      ]);
 
       const finishedIds = this.matchdaysStore
         .matchdays()
@@ -49,6 +53,7 @@ export class BackofficeStandingsStore {
 
       this.matches.set(chunks.flat());
       this._loaded = true;
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No se pudo cargar la clasificación.');
     } finally {

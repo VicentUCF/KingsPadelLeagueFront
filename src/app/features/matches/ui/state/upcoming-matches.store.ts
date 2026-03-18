@@ -10,6 +10,7 @@ export class UpcomingMatchesStore {
   readonly matches = signal<readonly ReturnType<typeof toUpcomingMatchCardViewModel>[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   readonly hasMatches = computed(() => this.matches().length > 0);
   readonly readyMatchesCount = computed(() => {
@@ -19,7 +20,8 @@ export class UpcomingMatchesStore {
     return this.matches().length - this.readyMatchesCount();
   });
 
-  async load(): Promise<void> {
+  async load(forceRefresh = false): Promise<void> {
+    void forceRefresh;
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
@@ -27,6 +29,7 @@ export class UpcomingMatchesStore {
       const matches = await this.loadUpcomingMatchesUseCase.execute();
 
       this.matches.set(matches.map(toUpcomingMatchCardViewModel));
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('Unable to load the matches board right now.');
     } finally {

@@ -1,0 +1,16 @@
+<div class="load-feedback">
+  <div class="load-feedback__copy">
+    <p class="load-feedback__eyebrow">
+      @if (tone() === 'error') {
+        Error de carga
+      } @else {
+        Actualizacion pendiente
+      }
+    </p>
+    <p class="load-feedback__message">{{ message() }}</p>
+  </div>
+
+  <button class="load-feedback__retry" type="button" (click)="emitRetry()">
+    {{ retryLabel() }}
+  </button>
+</div>

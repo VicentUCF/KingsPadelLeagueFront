@@ -17,6 +17,7 @@ export class BackofficeAuditStore {
   readonly entries = signal<readonly BackofficeAuditEntryViewModel[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   readonly totalToday = computed(() => {
     const today = new Date();
@@ -50,13 +51,15 @@ export class BackofficeAuditStore {
     });
   }
 
-  async load(): Promise<void> {
+  async load(forceRefresh = false): Promise<void> {
+    void forceRefresh;
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
       const raw = await this.loadUseCase.execute();
       const now = new Date();
       this.entries.set(raw.map((e) => toBackofficeAuditEntryViewModel(e, now)));
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No se pudo cargar el registro de auditoría.');
     } finally {

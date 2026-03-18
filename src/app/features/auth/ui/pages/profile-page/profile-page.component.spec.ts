@@ -90,6 +90,32 @@ describe('ProfilePageComponent', () => {
 
     expect(await screen.findByText(/Cambios guardados correctamente/i)).toBeVisible();
   });
+
+  it('keeps the editable profile visible when a refresh fails after the first load', async () => {
+    const authStore = createAuthStoreMock();
+    authStore.loadCurrentPlayerProfile.mockReset();
+    authStore.loadCurrentPlayerProfile
+      .mockResolvedValueOnce(createEditablePlayerProfile())
+      .mockRejectedValueOnce(new Error('No se pudo recargar tu perfil'));
+
+    const { fixture } = await render(ProfilePageComponent, {
+      providers: [provideRouter([]), { provide: AuthStore, useValue: authStore }],
+    });
+
+    expect(await screen.findByDisplayValue('Vicent')).toBeVisible();
+
+    await fixture.componentInstance['retryLoadEditableProfile']();
+    fixture.detectChanges();
+
+    await waitFor(() => {
+      expect(screen.getByText(/No se pudo recargar tu perfil/i)).toBeVisible();
+    });
+
+    expect(screen.getByDisplayValue('Vicent')).toBeVisible();
+    expect(screen.getByDisplayValue('Ciscar')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Guardar cambios/i })).toBeVisible();
+    expect(authStore.loadCurrentPlayerProfile).toHaveBeenCalledTimes(2);
+  });
 });
 
 function createAuthStoreMock(

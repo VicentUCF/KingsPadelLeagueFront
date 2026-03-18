@@ -10,6 +10,7 @@ export class LeagueMatchdaysStore {
   readonly matchdays = signal<readonly LeagueMatchday[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   readonly hasMatchdays = computed(() => this.matchdays().length > 0);
 
@@ -19,6 +20,7 @@ export class LeagueMatchdaysStore {
 
     try {
       this.matchdays.set(await this.loadLeagueMatchdaysUseCase.execute(forceRefresh));
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No hemos podido cargar el panel de jornadas.');
     } finally {

@@ -14,6 +14,8 @@ import {
   EmptyStateComponent,
   type EmptyStateAction,
 } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { CalendarDayGroupComponent } from '../../components/calendar-day-group/calendar-day-group.component';
 import { CalendarFiltersPanelComponent } from '../../components/calendar-filters-panel/calendar-filters-panel.component';
@@ -37,7 +39,9 @@ import { LeagueCalendarStore } from '../../state/league-calendar.store';
     CalendarDayGroupComponent,
     CalendarFiltersPanelComponent,
     EmptyStateComponent,
+    LoadFeedbackComponent,
     LucideAngularModule,
+    LoadingStateComponent,
     RouterLink,
   ],
   providers: [LeagueCalendarStore],

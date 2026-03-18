@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChevronDown, LucideAngularModule } from 'lucide-angular';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
@@ -44,7 +46,13 @@ type RegisterFormGroup = PlayerFormGroup;
   selector: 'app-backoffice-users-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-users-page' },
-  imports: [LucideAngularModule, StatusBadgeComponent, ReactiveFormsModule],
+  imports: [
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+    LucideAngularModule,
+    StatusBadgeComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: './backoffice-users-page.component.html',
   styleUrl: './backoffice-users-page.component.scss',
 })
@@ -121,6 +129,9 @@ export class BackofficeUsersPageComponent implements OnInit {
   protected readonly isLoading = computed(
     () => this.playersStore.isLoading() || this.teamsStore.isLoading(),
   );
+  protected readonly hasContent = computed(
+    () => this.playersStore.hasContent() && this.teamsStore.hasContent(),
+  );
   protected readonly errorMessage = computed(
     () => this.playersStore.errorMessage() ?? this.teamsStore.errorMessage(),
   );
@@ -157,6 +168,10 @@ export class BackofficeUsersPageComponent implements OnInit {
   ngOnInit(): void {
     void this.playersStore.load();
     void this.teamsStore.load();
+  }
+
+  protected reloadUsers(): void {
+    void Promise.all([this.playersStore.load(true), this.teamsStore.load(true)]);
   }
 
   // ── Confirm ───────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 
-import { normalizeAuthRole, type AuthUser } from '../../domain/entities/auth-user';
+import { normalizeAuthRole, type AuthRole, type AuthUser } from '../../domain/entities/auth-user';
 
 type SupabaseMetadata = Record<string, unknown>;
 
@@ -24,7 +24,7 @@ function resolveAuthRole(
 ) {
   return normalizeAuthRole(
     readMetadataString(appMetadata, 'role', 'Role') ?? userMetadata['role'] ?? defaultRole,
-  );
+  ).toUpperCase() as AuthRole;
 }
 
 function resolveDisplayName(

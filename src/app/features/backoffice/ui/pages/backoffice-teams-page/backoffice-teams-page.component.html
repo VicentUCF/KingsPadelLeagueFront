@@ -5,19 +5,39 @@
     }
   </header>
 
-  @if (teamsStore.isLoading()) {
-    <p class="backoffice-teams-page__loading">Cargando equipos…</p>
-  } @else if (teamsStore.errorMessage(); as error) {
-    <p class="backoffice-teams-page__error">{{ error }}</p>
-  } @else if (teamCards().length === 0) {
-    <p class="backoffice-teams-page__empty">No hay equipos registrados todavía.</p>
+  @if (isLoading() && !hasContent()) {
+    <app-loading-state
+      [heading]="'Cargando equipos'"
+      [hint]="'Estamos preparando el directorio del backoffice.'"
+      [cardCount]="3"
+      [variant]="'cards'"
+    />
+  } @else if (!hasContent() && errorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadData()" />
   } @else {
-    <ul class="backoffice-teams-page__list" aria-label="Equipos">
-      @for (team of teamCards(); track team.id) {
-        <li>
-          <app-team-list-card [team]="team" />
-        </li>
-      }
-    </ul>
+    @if (isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando equipos'"
+        [hint]="'Mantenemos el listado visible mientras refrescamos los datos.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadData()" />
+    }
+
+    @if (teamCards().length === 0) {
+      <p class="backoffice-teams-page__empty">No hay equipos registrados todavía.</p>
+    } @else {
+      <ul class="backoffice-teams-page__list" aria-label="Equipos">
+        @for (team of teamCards(); track team.id) {
+          <li>
+            <app-team-list-card [team]="team" />
+          </li>
+        }
+      </ul>
+    }
   }
 </div>

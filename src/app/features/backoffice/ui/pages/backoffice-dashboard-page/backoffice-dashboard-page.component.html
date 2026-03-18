@@ -1,289 +1,349 @@
 <div class="dashboard">
   @if (isAdmin()) {
     <!-- ─── ADMIN VIEW ──────────────────────────────────────────────────────── -->
-    <section class="backoffice-dashboard-page__section">
-      <h2 class="backoffice-dashboard-page__section-title">Resumen de la liga</h2>
-
-      <div class="backoffice-dashboard-page__metrics">
-        <div class="c-metric">
-          <span class="c-metric__label">Equipos</span>
-          <span class="c-metric__value">{{ teamCount() }}</span>
-        </div>
-        <div class="c-metric">
-          <span class="c-metric__label">Jugadores</span>
-          <span class="c-metric__value">{{ playerCount() }}</span>
-        </div>
-        <div class="c-metric">
-          <span class="c-metric__label">Temporadas</span>
-          <span class="c-metric__value">{{ seasonCount() }}</span>
-        </div>
-        <div class="c-metric">
-          <span class="c-metric__label">Jornadas jugadas</span>
-          <span class="c-metric__value">{{ finishedMatchdayCount() }}</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="backoffice-dashboard-page__section">
-      <h2 class="backoffice-dashboard-page__section-title">Estado de la competición</h2>
-
-      <div class="backoffice-dashboard-page__matchday-grid">
-        @if (currentMatchdayRow(); as current) {
-          <div class="backoffice-dashboard-page__matchday-card c-surface-card">
-            <p class="backoffice-dashboard-page__matchday-eyebrow">Jornada en curso</p>
-            <p class="backoffice-dashboard-page__matchday-name">{{ current.name }}</p>
-            <p class="backoffice-dashboard-page__matchday-date">{{ current.dateLabel }}</p>
-            <app-status-badge [label]="current.statusLabel" [tone]="current.statusTone" />
-            <a class="backoffice-dashboard-page__matchday-link" [routerLink]="current.detailPath"
-              >Ver jornada →</a
-            >
-          </div>
-        }
-
-        @if (nextMatchdayRow(); as next) {
-          <div class="backoffice-dashboard-page__matchday-card c-surface-card">
-            <p class="backoffice-dashboard-page__matchday-eyebrow">Próxima jornada</p>
-            <p class="backoffice-dashboard-page__matchday-name">{{ next.name }}</p>
-            <p class="backoffice-dashboard-page__matchday-date">{{ next.dateLabel }}</p>
-            <app-status-badge [label]="next.statusLabel" [tone]="next.statusTone" />
-            <a class="backoffice-dashboard-page__matchday-link" [routerLink]="next.detailPath"
-              >Ver jornada →</a
-            >
-          </div>
-        }
-      </div>
-    </section>
-
-    <section class="backoffice-dashboard-page__section">
-      <h2 class="backoffice-dashboard-page__section-title">Accesos rápidos</h2>
-
-      <nav aria-label="Accesos rápidos" class="backoffice-dashboard-page__shortcuts">
-        <a
-          class="backoffice-dashboard-page__shortcut c-surface-card"
-          routerLink="/backoffice/equipos"
-        >
-          <span class="backoffice-dashboard-page__shortcut-label">Equipos</span>
-          <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar equipos →</span>
-        </a>
-        <a
-          class="backoffice-dashboard-page__shortcut c-surface-card"
-          routerLink="/backoffice/jugadores"
-        >
-          <span class="backoffice-dashboard-page__shortcut-label">Jugadores</span>
-          <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar jugadores →</span>
-        </a>
-        <a
-          class="backoffice-dashboard-page__shortcut c-surface-card"
-          routerLink="/backoffice/jornadas"
-        >
-          <span class="backoffice-dashboard-page__shortcut-label">Jornadas</span>
-          <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar jornadas →</span>
-        </a>
-      </nav>
-    </section>
-  } @else {
-    <!-- ─── PRESIDENT VIEW ─────────────────────────────────────────────────── -->
-    @if (isTeamDashboardLoading()) {
-      <section class="backoffice-dashboard-page__section">
-        <p class="backoffice-dashboard-page__matchday-empty">Cargando datos de tu equipo…</p>
-      </section>
-    } @else if (!presidentTeam()) {
-      <section class="backoffice-dashboard-page__section">
-        <div class="c-surface-card">
-          <h2 class="backoffice-dashboard-page__section-title">Mi equipo</h2>
-          <p>
-            No hemos podido vincular tu cuenta a un equipo del backoffice. Revisa el correo o el
-            `teamId` de la sesión para completar la asociación.
-          </p>
-        </div>
-      </section>
+    @if (isAdminDashboardLoading() && !hasAdminDashboardContent()) {
+      <app-loading-state
+        [heading]="'Cargando dashboard'"
+        [hint]="'Estamos reuniendo el resumen global de la liga para el backoffice.'"
+        [lineCount]="4"
+        [showMetrics]="true"
+        [variant]="'page'"
+      />
+    } @else if (!hasAdminDashboardContent() && adminDashboardErrorMessage(); as error) {
+      <app-empty-state
+        description="Vuelve a intentarlo dentro de unos segundos para recuperar el panel."
+        title="No hemos podido cargar el dashboard"
+      />
+      <app-load-feedback [message]="error" (retry)="reloadAdminDashboard()" />
     } @else {
-      <div
-        class="president-arena"
-        [style.--team-primary]="presidentTeamPalette().primary"
-        [style.--team-secondary]="presidentTeamPalette().secondary"
-      >
-        <!-- 1. HERO ──────────────────────────────────────────────────────────── -->
-        <section class="president-hero" aria-label="Mi equipo">
-          @if (teamLogoPath(presidentTeam()); as teamLogo) {
-            <div class="president-hero__watermark" aria-hidden="true">
-              <img [src]="teamLogo" alt="" class="president-hero__watermark-img" decoding="async" />
+      @if (isAdminDashboardLoading()) {
+        <app-loading-state
+          [heading]="'Actualizando dashboard'"
+          [hint]="'Mantenemos el panel visible mientras refrescamos las métricas.'"
+          [lineCount]="3"
+          [variant]="'panel'"
+        />
+      }
+
+      @if (adminDashboardErrorMessage(); as error) {
+        <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadAdminDashboard()" />
+      }
+
+      <section class="backoffice-dashboard-page__section">
+        <h2 class="backoffice-dashboard-page__section-title">Resumen de la liga</h2>
+
+        <div class="backoffice-dashboard-page__metrics">
+          <div class="c-metric">
+            <span class="c-metric__label">Equipos</span>
+            <span class="c-metric__value">{{ teamCount() }}</span>
+          </div>
+          <div class="c-metric">
+            <span class="c-metric__label">Jugadores</span>
+            <span class="c-metric__value">{{ playerCount() }}</span>
+          </div>
+          <div class="c-metric">
+            <span class="c-metric__label">Temporadas</span>
+            <span class="c-metric__value">{{ seasonCount() }}</span>
+          </div>
+          <div class="c-metric">
+            <span class="c-metric__label">Jornadas jugadas</span>
+            <span class="c-metric__value">{{ finishedMatchdayCount() }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="backoffice-dashboard-page__section">
+        <h2 class="backoffice-dashboard-page__section-title">Estado de la competición</h2>
+
+        <div class="backoffice-dashboard-page__matchday-grid">
+          @if (currentMatchdayRow(); as current) {
+            <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+              <p class="backoffice-dashboard-page__matchday-eyebrow">Jornada en curso</p>
+              <p class="backoffice-dashboard-page__matchday-name">{{ current.name }}</p>
+              <p class="backoffice-dashboard-page__matchday-date">{{ current.dateLabel }}</p>
+              <app-status-badge [label]="current.statusLabel" [tone]="current.statusTone" />
+              <a class="backoffice-dashboard-page__matchday-link" [routerLink]="current.detailPath"
+                >Ver jornada →</a
+              >
             </div>
           }
 
-          <div class="president-hero__content">
-            <p class="president-hero__eyebrow">Entrenador</p>
-
-            @if (presidentPlayerName(); as name) {
-              <h1 class="president-hero__name">{{ name }}</h1>
-            }
-
-            @if (presidentTeam(); as team) {
-              <p class="president-hero__team">{{ team.name }}</p>
-            }
-
-            <div class="president-hero__stats" aria-label="Estadísticas del equipo">
-              @if (presidentStanding(); as standing) {
-                <div class="president-hero__stat">
-                  <span class="president-hero__stat-value">#{{ standing.rank }}</span>
-                  <span class="president-hero__stat-label">Posición</span>
-                </div>
-                <div class="president-hero__stat-divider" aria-hidden="true"></div>
-                <div class="president-hero__stat">
-                  <span class="president-hero__stat-value">{{ standing.points }}</span>
-                  <span class="president-hero__stat-label">Puntos</span>
-                </div>
-                <div class="president-hero__stat-divider" aria-hidden="true"></div>
-                <div class="president-hero__stat">
-                  <span class="president-hero__stat-value">
-                    {{ standing.won }}<small> V </small> {{ standing.lost }}<small> D </small>
-                  </span>
-                  <span class="president-hero__stat-label">Historial</span>
-                </div>
-                <div class="president-hero__stat-divider" aria-hidden="true"></div>
-              }
-              <div class="president-hero__stat">
-                <span class="president-hero__stat-value">{{ presidentRoster().length }}</span>
-                <span class="president-hero__stat-label">Jugadores</span>
-              </div>
+          @if (nextMatchdayRow(); as next) {
+            <div class="backoffice-dashboard-page__matchday-card c-surface-card">
+              <p class="backoffice-dashboard-page__matchday-eyebrow">Próxima jornada</p>
+              <p class="backoffice-dashboard-page__matchday-name">{{ next.name }}</p>
+              <p class="backoffice-dashboard-page__matchday-date">{{ next.dateLabel }}</p>
+              <app-status-badge [label]="next.statusLabel" [tone]="next.statusTone" />
+              <a class="backoffice-dashboard-page__matchday-link" [routerLink]="next.detailPath"
+                >Ver jornada →</a
+              >
             </div>
+          }
+        </div>
+      </section>
 
-            @if (presidentStanding()?.form?.length) {
-              <div class="president-hero__form" aria-label="Últimos resultados">
-                @for (result of presidentStanding()!.form; track $index) {
-                  <span
-                    class="president-hero__form-badge"
-                    [class.president-hero__form-badge--w]="result === 'W'"
-                    [class.president-hero__form-badge--d]="result === 'D'"
-                    [class.president-hero__form-badge--l]="result === 'L'"
-                    [attr.aria-label]="
-                      result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'
-                    "
-                  >
-                    {{ result === 'W' ? 'V' : result === 'D' ? 'E' : 'D' }}
-                  </span>
-                }
-              </div>
-            }
+      <section class="backoffice-dashboard-page__section">
+        <h2 class="backoffice-dashboard-page__section-title">Accesos rápidos</h2>
+
+        <nav aria-label="Accesos rápidos" class="backoffice-dashboard-page__shortcuts">
+          <a
+            class="backoffice-dashboard-page__shortcut c-surface-card"
+            routerLink="/backoffice/equipos"
+          >
+            <span class="backoffice-dashboard-page__shortcut-label">Equipos</span>
+            <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar equipos →</span>
+          </a>
+          <a
+            class="backoffice-dashboard-page__shortcut c-surface-card"
+            routerLink="/backoffice/jugadores"
+          >
+            <span class="backoffice-dashboard-page__shortcut-label">Jugadores</span>
+            <span class="backoffice-dashboard-page__shortcut-hint"
+              >Ver y gestionar jugadores →</span
+            >
+          </a>
+          <a
+            class="backoffice-dashboard-page__shortcut c-surface-card"
+            routerLink="/backoffice/jornadas"
+          >
+            <span class="backoffice-dashboard-page__shortcut-label">Jornadas</span>
+            <span class="backoffice-dashboard-page__shortcut-hint">Ver y gestionar jornadas →</span>
+          </a>
+        </nav>
+      </section>
+    }
+  } @else {
+    <!-- ─── PRESIDENT VIEW ─────────────────────────────────────────────────── -->
+    @if (isTeamDashboardLoading() && !hasTeamDashboardContent()) {
+      <app-loading-state
+        [heading]="'Cargando tu equipo'"
+        [hint]="'Estamos preparando tu panel de plantilla, clasificación y próximas jornadas.'"
+        [lineCount]="4"
+        [variant]="'page'"
+      />
+    } @else if (!hasTeamDashboardContent() && teamDashboardErrorMessage(); as error) {
+      <app-empty-state
+        description="Intenta recargar el dashboard para restaurar el acceso a tu panel de equipo."
+        title="No hemos podido cargar tu dashboard"
+      />
+      <app-load-feedback [message]="error" (retry)="reloadTeamDashboard()" />
+    } @else {
+      @if (isTeamDashboardLoading()) {
+        <app-loading-state
+          [heading]="'Actualizando tu dashboard'"
+          [hint]="'Mantenemos el contenido visible mientras refrescamos los datos del equipo.'"
+          [lineCount]="3"
+          [variant]="'panel'"
+        />
+      }
+
+      @if (teamDashboardErrorMessage(); as error) {
+        <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadTeamDashboard()" />
+      }
+
+      @if (!presidentTeam()) {
+        <section class="backoffice-dashboard-page__section">
+          <div class="c-surface-card">
+            <h2 class="backoffice-dashboard-page__section-title">Mi equipo</h2>
+            <p>
+              No hemos podido vincular tu cuenta a un equipo del backoffice. Revisa el correo o el
+              `teamId` de la sesión para completar la asociación.
+            </p>
           </div>
         </section>
+      } @else {
+        <div
+          class="president-arena"
+          [style.--team-primary]="presidentTeamPalette().primary"
+          [style.--team-secondary]="presidentTeamPalette().secondary"
+        >
+          <!-- 1. HERO ──────────────────────────────────────────────────────────── -->
+          <section class="president-hero" aria-label="Mi equipo">
+            @if (teamLogoPath(presidentTeam()); as teamLogo) {
+              <div class="president-hero__watermark" aria-hidden="true">
+                <img
+                  [src]="teamLogo"
+                  alt=""
+                  class="president-hero__watermark-img"
+                  decoding="async"
+                />
+              </div>
+            }
 
-        <!-- 2. PLANTILLA ─────────────────────────────────────────────────────── -->
-        <section class="president-section">
-          <h2 class="president-section__title">Plantilla</h2>
-          <a
-            class="president-section__action"
-            [routerLink]="'/backoffice/equipos/' + presidentTeam()?.id"
-            >Ver ficha completa →</a
-          >
+            <div class="president-hero__content">
+              <p class="president-hero__eyebrow">Entrenador</p>
 
-          <div class="president-roster__grid">
-            @for (player of presidentRoster(); track player.id) {
-              <div
-                class="roster-player-card"
-                [class.roster-player-card--captain]="player.isPresident"
-              >
-                <div class="roster-player-card__avatar" aria-hidden="true">
-                  @if (playerAvatarPath(player); as avatarPath) {
-                    <img [src]="avatarPath" [alt]="player.firstName + ' ' + player.lastName" />
-                  } @else {
-                    {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+              @if (presidentPlayerName(); as name) {
+                <h1 class="president-hero__name">{{ name }}</h1>
+              }
+
+              @if (presidentTeam(); as team) {
+                <p class="president-hero__team">{{ team.name }}</p>
+              }
+
+              <div class="president-hero__stats" aria-label="Estadísticas del equipo">
+                @if (presidentStanding(); as standing) {
+                  <div class="president-hero__stat">
+                    <span class="president-hero__stat-value">#{{ standing.rank }}</span>
+                    <span class="president-hero__stat-label">Posición</span>
+                  </div>
+                  <div class="president-hero__stat-divider" aria-hidden="true"></div>
+                  <div class="president-hero__stat">
+                    <span class="president-hero__stat-value">{{ standing.points }}</span>
+                    <span class="president-hero__stat-label">Puntos</span>
+                  </div>
+                  <div class="president-hero__stat-divider" aria-hidden="true"></div>
+                  <div class="president-hero__stat">
+                    <span class="president-hero__stat-value">
+                      {{ standing.won }}<small> V </small> {{ standing.lost }}<small> D </small>
+                    </span>
+                    <span class="president-hero__stat-label">Historial</span>
+                  </div>
+                  <div class="president-hero__stat-divider" aria-hidden="true"></div>
+                }
+                <div class="president-hero__stat">
+                  <span class="president-hero__stat-value">{{ presidentRoster().length }}</span>
+                  <span class="president-hero__stat-label">Jugadores</span>
+                </div>
+              </div>
+
+              @if (presidentStanding()?.form?.length) {
+                <div class="president-hero__form" aria-label="Últimos resultados">
+                  @for (result of presidentStanding()!.form; track $index) {
+                    <span
+                      class="president-hero__form-badge"
+                      [class.president-hero__form-badge--w]="result === 'W'"
+                      [class.president-hero__form-badge--d]="result === 'D'"
+                      [class.president-hero__form-badge--l]="result === 'L'"
+                      [attr.aria-label]="
+                        result === 'W' ? 'Victoria' : result === 'D' ? 'Empate' : 'Derrota'
+                      "
+                    >
+                      {{ result === 'W' ? 'V' : result === 'D' ? 'E' : 'D' }}
+                    </span>
                   }
                 </div>
-                <div class="roster-player-card__info">
-                  <p class="roster-player-card__name">
-                    {{ player.firstName }} {{ player.lastName }}
-                  </p>
-                  <p class="roster-player-card__pos">
-                    {{ positionLabel(player.preferredPosition) }}
-                  </p>
-                </div>
-                <div class="roster-player-card__stats">
-                  <span class="roster-player-card__stat">
-                    <strong>{{ player.wonGames + player.lostGames }}</strong
-                    >PJ
-                  </span>
-                  <span class="roster-player-card__stat roster-player-card__stat--won">
-                    <strong>{{ player.wonGames }}</strong
-                    >PG
-                  </span>
-                  <span class="roster-player-card__stat roster-player-card__stat--value">
-                    ★ {{ player.value }}
-                  </span>
-                </div>
-              </div>
-            }
-          </div>
-        </section>
+              }
+            </div>
+          </section>
 
-        <!-- 3. COMPETICIÓN ───────────────────────────────────────────────────── -->
-        <section class="president-section">
-          <h2 class="president-section__title">Competición</h2>
-
-          <div class="president-competition">
-            @if (currentMatchdayRow(); as current) {
-              <div class="president-matchday-card c-surface-card">
-                <p class="president-matchday-card__eyebrow">Jornada en curso</p>
-                <p class="president-matchday-card__name">{{ current.name }}</p>
-                <p class="president-matchday-card__date">{{ current.dateLabel }}</p>
-                <app-status-badge [label]="current.statusLabel" [tone]="current.statusTone" />
-                <a
-                  class="president-matchday-card__cta c-button c-button--pill c-button--primary c-button--sm"
-                  [routerLink]="current.detailPath"
-                  >Gestionar alineación →</a
-                >
-              </div>
-            } @else {
-              <div class="president-matchday-card president-matchday-card--empty c-surface-card">
-                <p class="president-matchday-card__eyebrow">Jornada en curso</p>
-                <p class="president-matchday-card__empty">Ninguna jornada activa</p>
-              </div>
-            }
-
-            @if (nextMatchdayRow(); as next) {
-              <div class="president-matchday-card c-surface-card">
-                <p class="president-matchday-card__eyebrow">Próxima jornada</p>
-                <p class="president-matchday-card__name">{{ next.name }}</p>
-                <p class="president-matchday-card__date">{{ next.dateLabel }}</p>
-                <app-status-badge [label]="next.statusLabel" [tone]="next.statusTone" />
-                <a class="president-matchday-card__link" [routerLink]="next.detailPath"
-                  >Ver jornada →</a
-                >
-              </div>
-            }
-          </div>
-        </section>
-
-        <!-- 4. ACCESOS RÁPIDOS ───────────────────────────────────────────────── -->
-        <section class="president-section">
-          <h2 class="president-section__title">Accesos rápidos</h2>
-
-          <nav class="president-shortcuts" aria-label="Accesos rápidos del presidente">
+          <!-- 2. PLANTILLA ─────────────────────────────────────────────────────── -->
+          <section class="president-section">
+            <h2 class="president-section__title">Plantilla</h2>
             <a
-              class="president-shortcut c-surface-card"
-              [routerLink]="nextMatchdayLinkForPresident()"
-            >
-              <span class="president-shortcut__label">Alineaciones</span>
-              <span class="president-shortcut__hint">Gestiona tu próxima alineación →</span>
-            </a>
-            <a class="president-shortcut c-surface-card" routerLink="/backoffice/clasificacion">
-              <span class="president-shortcut__label">Clasificación</span>
-              <span class="president-shortcut__hint">Ver posición en la tabla →</span>
-            </a>
-            <a class="president-shortcut c-surface-card" routerLink="/backoffice/jugadores">
-              <span class="president-shortcut__label">Jugadores</span>
-              <span class="president-shortcut__hint">Directorio de jugadores →</span>
-            </a>
-            <a
-              class="president-shortcut c-surface-card"
+              class="president-section__action"
               [routerLink]="'/backoffice/equipos/' + presidentTeam()?.id"
+              >Ver ficha completa →</a
             >
-              <span class="president-shortcut__label">Mi equipo</span>
-              <span class="president-shortcut__hint">Ficha completa del equipo →</span>
-            </a>
-          </nav>
-        </section>
-      </div>
+
+            <div class="president-roster__grid">
+              @for (player of presidentRoster(); track player.id) {
+                <div
+                  class="roster-player-card"
+                  [class.roster-player-card--captain]="player.isPresident"
+                >
+                  <div class="roster-player-card__avatar" aria-hidden="true">
+                    @if (playerAvatarPath(player); as avatarPath) {
+                      <img [src]="avatarPath" [alt]="player.firstName + ' ' + player.lastName" />
+                    } @else {
+                      {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                    }
+                  </div>
+                  <div class="roster-player-card__info">
+                    <p class="roster-player-card__name">
+                      {{ player.firstName }} {{ player.lastName }}
+                    </p>
+                    <p class="roster-player-card__pos">
+                      {{ positionLabel(player.preferredPosition) }}
+                    </p>
+                  </div>
+                  <div class="roster-player-card__stats">
+                    <span class="roster-player-card__stat">
+                      <strong>{{ player.wonGames + player.lostGames }}</strong
+                      >PJ
+                    </span>
+                    <span class="roster-player-card__stat roster-player-card__stat--won">
+                      <strong>{{ player.wonGames }}</strong
+                      >PG
+                    </span>
+                    <span class="roster-player-card__stat roster-player-card__stat--value">
+                      ★ {{ player.value }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <!-- 3. COMPETICIÓN ───────────────────────────────────────────────────── -->
+          <section class="president-section">
+            <h2 class="president-section__title">Competición</h2>
+
+            <div class="president-competition">
+              @if (currentMatchdayRow(); as current) {
+                <div class="president-matchday-card c-surface-card">
+                  <p class="president-matchday-card__eyebrow">Jornada en curso</p>
+                  <p class="president-matchday-card__name">{{ current.name }}</p>
+                  <p class="president-matchday-card__date">{{ current.dateLabel }}</p>
+                  <app-status-badge [label]="current.statusLabel" [tone]="current.statusTone" />
+                  <a
+                    class="president-matchday-card__cta c-button c-button--pill c-button--primary c-button--sm"
+                    [routerLink]="current.detailPath"
+                    >Gestionar alineación →</a
+                  >
+                </div>
+              } @else {
+                <div class="president-matchday-card president-matchday-card--empty c-surface-card">
+                  <p class="president-matchday-card__eyebrow">Jornada en curso</p>
+                  <p class="president-matchday-card__empty">Ninguna jornada activa</p>
+                </div>
+              }
+
+              @if (nextMatchdayRow(); as next) {
+                <div class="president-matchday-card c-surface-card">
+                  <p class="president-matchday-card__eyebrow">Próxima jornada</p>
+                  <p class="president-matchday-card__name">{{ next.name }}</p>
+                  <p class="president-matchday-card__date">{{ next.dateLabel }}</p>
+                  <app-status-badge [label]="next.statusLabel" [tone]="next.statusTone" />
+                  <a class="president-matchday-card__link" [routerLink]="next.detailPath"
+                    >Ver jornada →</a
+                  >
+                </div>
+              }
+            </div>
+          </section>
+
+          <!-- 4. ACCESOS RÁPIDOS ───────────────────────────────────────────────── -->
+          <section class="president-section">
+            <h2 class="president-section__title">Accesos rápidos</h2>
+
+            <nav class="president-shortcuts" aria-label="Accesos rápidos del presidente">
+              <a
+                class="president-shortcut c-surface-card"
+                [routerLink]="nextMatchdayLinkForPresident()"
+              >
+                <span class="president-shortcut__label">Alineaciones</span>
+                <span class="president-shortcut__hint">Gestiona tu próxima alineación →</span>
+              </a>
+              <a class="president-shortcut c-surface-card" routerLink="/backoffice/clasificacion">
+                <span class="president-shortcut__label">Clasificación</span>
+                <span class="president-shortcut__hint">Ver posición en la tabla →</span>
+              </a>
+              <a class="president-shortcut c-surface-card" routerLink="/backoffice/jugadores">
+                <span class="president-shortcut__label">Jugadores</span>
+                <span class="president-shortcut__hint">Directorio de jugadores →</span>
+              </a>
+              <a
+                class="president-shortcut c-surface-card"
+                [routerLink]="'/backoffice/equipos/' + presidentTeam()?.id"
+              >
+                <span class="president-shortcut__label">Mi equipo</span>
+                <span class="president-shortcut__hint">Ficha completa del equipo →</span>
+              </a>
+            </nav>
+          </section>
+        </div>
+      }
     }
   }
 </div>

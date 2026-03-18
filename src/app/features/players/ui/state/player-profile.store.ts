@@ -12,25 +12,38 @@ export class PlayerProfileStore {
 
   readonly player = signal<PlayerProfileViewModel | null>(null);
   readonly currentSlug = signal<string | null>(null);
+  readonly resolvedSlug = signal<string | null>(null);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = computed(
+    () => this.currentSlug() !== null && this.currentSlug() === this.resolvedSlug(),
+  );
 
   readonly isNotFound = computed(() => {
     return (
       !this.isLoading() &&
-      this.currentSlug() !== null &&
+      this.hasContent() &&
       this.player() === null &&
       this.errorMessage() === null
     );
   });
 
   async load(slug: string | null, forceRefresh = false): Promise<void> {
+    const previousSlug = this.currentSlug();
+    const isSameSlug = previousSlug === slug;
+
     this.currentSlug.set(slug);
-    this.player.set(null);
     this.errorMessage.set(null);
 
     if (!slug) {
+      this.player.set(null);
+      this.resolvedSlug.set(null);
       return;
+    }
+
+    if (!isSameSlug) {
+      this.player.set(null);
+      this.resolvedSlug.set(null);
     }
 
     this.isLoading.set(true);
@@ -39,6 +52,7 @@ export class PlayerProfileStore {
       const player = await this.loadPlayerProfileUseCase.execute(slug, forceRefresh);
 
       this.player.set(player ? toPlayerProfileViewModel(player) : null);
+      this.resolvedSlug.set(slug);
     } catch {
       this.errorMessage.set('No hemos podido cargar el perfil del jugador.');
     } finally {

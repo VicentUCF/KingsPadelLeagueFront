@@ -33,18 +33,38 @@
     }
 
     @if (canEditPlayerProfile()) {
-      @if (editableProfileLoading()) {
-        <p class="profile-card__status" role="status">Cargando tus datos de jugador...</p>
-      } @else if (editableProfileLoadError()) {
-        <div class="profile-card__alert" role="alert">{{ editableProfileLoadError() }}</div>
-        <button
-          type="button"
-          class="c-button c-button--secondary profile-card__submit"
-          (click)="retryLoadEditableProfile()"
-        >
-          Reintentar
-        </button>
+      @if (editableProfileLoading() && !hasEditableProfile()) {
+        <app-loading-state
+          [heading]="'Cargando tus datos de jugador'"
+          [hint]="'Estamos preparando tu ficha editable y mantendremos el resto del perfil estable.'"
+          [lineCount]="5"
+          [variant]="'panel'"
+        />
+      } @else if (editableProfileLoadError() && !hasEditableProfile()) {
+        <app-load-feedback
+          [message]="editableProfileLoadError()!"
+          [retryLabel]="'Reintentar'"
+          (retry)="retryLoadEditableProfile()"
+        />
       } @else {
+        @if (editableProfileLoading() && hasEditableProfile()) {
+          <app-loading-state
+            [heading]="'Actualizando tu ficha'"
+            [hint]="'Mostramos el último contenido válido mientras refrescamos tus datos.'"
+            [lineCount]="3"
+            [variant]="'panel'"
+          />
+        }
+
+        @if (editableProfileLoadError() && hasEditableProfile()) {
+          <app-load-feedback
+            [message]="editableProfileLoadError()!"
+            [retryLabel]="'Reintentar'"
+            [tone]="'warning'"
+            (retry)="retryLoadEditableProfile()"
+          />
+        }
+
         <form [formGroup]="playerProfileForm" (ngSubmit)="onSavePlayerProfile()" novalidate>
           <div class="profile-card__avatar-editor">
             <div class="profile-card__avatar-preview">

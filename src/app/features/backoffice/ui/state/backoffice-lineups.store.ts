@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { LoadBackofficeLineupsUseCase } from '@features/backoffice/application/use-cases/load-backoffice-lineups.use-case';
 import { LoadBackofficeMatchesUseCase } from '@features/backoffice/application/use-cases/load-backoffice-matches.use-case';
@@ -18,12 +18,31 @@ export class BackofficeLineupsStore {
   readonly pairs = signal<readonly BackofficeLineupPair[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly currentContextKey = signal<string | null>(null);
+  readonly resolvedContextKey = signal<string | null>(null);
 
   private _loadedMatchdayId: string | null = null;
   private _loadedTeamId: string | null = null;
 
-  async loadForMatchday(matchdayId: string): Promise<void> {
-    if (this._loadedMatchdayId === matchdayId) return;
+  readonly hasContent = computed(
+    () =>
+      this.currentContextKey() !== null && this.currentContextKey() === this.resolvedContextKey(),
+  );
+
+  async loadForMatchday(matchdayId: string, forceRefresh = false): Promise<void> {
+    if (!forceRefresh && this._loadedMatchdayId === matchdayId) return;
+
+    const contextKey = `matchday:${matchdayId}`;
+    const isContextChange = this.currentContextKey() !== contextKey;
+
+    this.currentContextKey.set(contextKey);
+    if (isContextChange) {
+      this.matches.set([]);
+      this.lineups.set([]);
+      this.pairs.set([]);
+      this.resolvedContextKey.set(null);
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
@@ -46,6 +65,7 @@ export class BackofficeLineupsStore {
       }
       this._loadedMatchdayId = matchdayId;
       this._loadedTeamId = null;
+      this.resolvedContextKey.set(contextKey);
     } catch {
       this.errorMessage.set('No se pudieron cargar las alineaciones.');
     } finally {
@@ -53,8 +73,20 @@ export class BackofficeLineupsStore {
     }
   }
 
-  async loadForTeam(teamId: string): Promise<void> {
-    if (this._loadedTeamId === teamId) return;
+  async loadForTeam(teamId: string, forceRefresh = false): Promise<void> {
+    if (!forceRefresh && this._loadedTeamId === teamId) return;
+
+    const contextKey = `team:${teamId}`;
+    const isContextChange = this.currentContextKey() !== contextKey;
+
+    this.currentContextKey.set(contextKey);
+    if (isContextChange) {
+      this.matches.set([]);
+      this.lineups.set([]);
+      this.pairs.set([]);
+      this.resolvedContextKey.set(null);
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
@@ -77,6 +109,7 @@ export class BackofficeLineupsStore {
       }
       this._loadedTeamId = teamId;
       this._loadedMatchdayId = null;
+      this.resolvedContextKey.set(contextKey);
     } catch {
       this.errorMessage.set('No se pudieron cargar las alineaciones.');
     } finally {

@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, type OnInit } from '@angular/core';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { UpcomingMatchCardComponent } from '../../components/upcoming-match-card/upcoming-match-card.component';
 import { UpcomingMatchesStore } from '../../state/upcoming-matches.store';
@@ -11,7 +13,12 @@ import { UpcomingMatchesStore } from '../../state/upcoming-matches.store';
   host: {
     class: 'matches-page o-stack',
   },
-  imports: [EmptyStateComponent, UpcomingMatchCardComponent],
+  imports: [
+    EmptyStateComponent,
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+    UpcomingMatchCardComponent,
+  ],
   providers: [UpcomingMatchesStore],
   templateUrl: './upcoming-matches-page.component.html',
   styleUrl: './upcoming-matches-page.component.scss',
@@ -24,6 +31,6 @@ export class UpcomingMatchesPageComponent implements OnInit {
   }
 
   protected reloadMatches(): void {
-    void this.store.load();
+    void this.store.load(true);
   }
 }

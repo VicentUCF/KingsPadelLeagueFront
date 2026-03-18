@@ -5,19 +5,39 @@
     }
   </header>
 
-  @if (seasonsStore.isLoading()) {
-    <p class="backoffice-seasons-page__loading">Cargando temporadas…</p>
-  } @else if (seasonsStore.errorMessage(); as error) {
-    <p class="backoffice-seasons-page__error">{{ error }}</p>
-  } @else if (seasonCards().length === 0) {
-    <p class="backoffice-seasons-page__empty">No hay temporadas registradas todavía.</p>
+  @if (isLoading() && !hasContent()) {
+    <app-loading-state
+      [heading]="'Cargando temporadas'"
+      [hint]="'Estamos reuniendo las temporadas y sus jornadas asociadas.'"
+      [cardCount]="3"
+      [variant]="'cards'"
+    />
+  } @else if (!hasContent() && errorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadData()" />
   } @else {
-    <ul class="backoffice-seasons-page__list" aria-label="Temporadas">
-      @for (season of seasonCards(); track season.id) {
-        <li>
-          <app-season-card [season]="season" />
-        </li>
-      }
-    </ul>
+    @if (isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando temporadas'"
+        [hint]="'Seguimos mostrando las tarjetas mientras completamos la recarga.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadData()" />
+    }
+
+    @if (seasonCards().length === 0) {
+      <p class="backoffice-seasons-page__empty">No hay temporadas registradas todavía.</p>
+    } @else {
+      <ul class="backoffice-seasons-page__list" aria-label="Temporadas">
+        @for (season of seasonCards(); track season.id) {
+          <li>
+            <app-season-card [season]="season" />
+          </li>
+        }
+      </ul>
+    }
   }
 </div>

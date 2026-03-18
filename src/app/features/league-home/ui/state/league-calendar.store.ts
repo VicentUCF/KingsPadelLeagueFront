@@ -16,6 +16,7 @@ export class LeagueCalendarStore {
   readonly matchdays = signal<readonly LeagueMatchday[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   readonly hasSnapshot = computed(() => this.snapshot() !== null);
   readonly hasMatchdays = computed(() => this.matchdays().length > 0);
@@ -32,6 +33,7 @@ export class LeagueCalendarStore {
 
       this.snapshot.set(snapshot);
       this.matchdays.set(matchdays);
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No hemos podido cargar el calendario completo de la liga.');
     } finally {

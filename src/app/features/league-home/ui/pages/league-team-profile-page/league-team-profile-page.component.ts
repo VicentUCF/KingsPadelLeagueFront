@@ -14,6 +14,8 @@ import { ArrowLeft, LucideAngularModule, Users } from 'lucide-angular';
 import { Subscription } from 'rxjs';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { TeamPlayerCardComponent } from '../../components/team-player-card/team-player-card.component';
 import { TeamShowcaseHeroComponent } from '../../components/team-showcase-hero/team-showcase-hero.component';
@@ -31,7 +33,9 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   },
   imports: [
     EmptyStateComponent,
+    LoadFeedbackComponent,
     LucideAngularModule,
+    LoadingStateComponent,
     RouterLink,
     TeamPlayerCardComponent,
     TeamShowcaseHeroComponent,

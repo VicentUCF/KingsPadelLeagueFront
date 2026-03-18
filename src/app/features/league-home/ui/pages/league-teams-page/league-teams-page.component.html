@@ -1,9 +1,27 @@
-@if (store.isLoading() && !store.hasSnapshot()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-teams-page__status-panel">
-    <p class="league-teams-page__status">Cargando el universo de equipos...</p>
+    <app-loading-state
+      [heading]="'Cargando el universo de equipos'"
+      [hint]="'Estamos preparando el catálogo y la identidad visual de los equipos.'"
+      [cardCount]="3"
+      [variant]="'page'"
+    />
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="o-container league-teams-page__content">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando equipos'"
+        [hint]="'Mantenemos el catálogo visible mientras refrescamos la información.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadSnapshot()" />
+    }
+
     <header class="league-teams-page__hero">
       <p class="league-teams-page__eyebrow">
         <lucide-angular [img]="teamsIcon" [size]="16" aria-hidden="true" />
@@ -52,14 +70,7 @@
       description="Vuelve a intentarlo en unos segundos."
       title="No hemos podido cargar los equipos"
     />
-
-    <p class="league-teams-page__status league-teams-page__status--error">
-      {{ store.errorMessage() }}
-    </p>
-
-    <button class="league-teams-page__retry" type="button" (click)="reloadSnapshot()">
-      Reintentar
-    </button>
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadSnapshot()" />
   </section>
 } @else {
   <section class="o-container league-teams-page__status-panel">

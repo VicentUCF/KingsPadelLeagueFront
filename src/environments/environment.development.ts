@@ -4,6 +4,6 @@ export const environment = {
   supabaseAnonKey: 'sb_publishable_gGOwEf3arIBPNcbecB6Uug_N3xFRgoH',
   supabasePlayerProfileBucket: 'avatars',
   apiBaseUrl: 'http://localhost:3000',
-  authDevRoleOverride: 'PRESIDENT' as const,
+  authDevRoleOverride: 'ADMIN' as const,
   authDevTeamIdOverride: null,
 };

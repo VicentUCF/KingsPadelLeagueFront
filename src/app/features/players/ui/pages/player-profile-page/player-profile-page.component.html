@@ -3,15 +3,31 @@
   <span>Volver a jugadores</span>
 </a>
 
-@if (store.errorMessage()) {
-  <p class="player-profile-page__status player-profile-page__status--error" role="status">
-    {{ store.errorMessage() }}
-  </p>
-}
-
-@if (store.isLoading()) {
-  <p class="player-profile-page__status" role="status">Cargando perfil del jugador…</p>
+@if (store.isLoading() && !store.hasContent()) {
+  <app-loading-state
+    [heading]="'Cargando perfil del jugador'"
+    [hint]="'Estamos preparando la ficha completa con su equipo y estadísticas.'"
+    [lineCount]="4"
+    [variant]="'page'"
+  />
 } @else if (store.player(); as player) {
+  @if (store.isLoading()) {
+    <app-loading-state
+      [heading]="'Actualizando perfil del jugador'"
+      [hint]="'Mostramos el último contenido válido mientras refrescamos la ficha.'"
+      [lineCount]="3"
+      [variant]="'panel'"
+    />
+  }
+
+  @if (store.errorMessage(); as error) {
+    <app-load-feedback
+      [message]="error"
+      [tone]="'warning'"
+      (retry)="store.load(store.currentSlug(), true)"
+    />
+  }
+
   <div
     class="player-profile-page__layout"
     [style.--player-team-accent]="player.teamPalette.accent"
@@ -121,11 +137,24 @@
       </div>
     </div>
   </div>
-} @else if (store.isNotFound()) {
+} @else if (store.hasContent()) {
+  @if (store.errorMessage(); as error) {
+    <app-load-feedback
+      [message]="error"
+      [tone]="'warning'"
+      (retry)="store.load(store.currentSlug(), true)"
+    />
+  }
+
   <section class="player-profile-page__empty o-stack o-stack--compact">
     <app-empty-state
       [description]="'Revisa el listado general para acceder a otro jugador disponible.'"
       [title]="'No hemos encontrado este jugador'"
     />
   </section>
+} @else if (store.errorMessage()) {
+  <app-load-feedback
+    [message]="store.errorMessage()!"
+    (retry)="store.load(store.currentSlug(), true)"
+  />
 }

@@ -1,9 +1,27 @@
-@if (store.isLoading() && !store.hasMatchdays()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-matchdays-page__status-panel">
-    <p aria-live="polite" class="league-matchdays-page__status">Cargando jornadas publicadas...</p>
+    <app-loading-state
+      [cardCount]="3"
+      [heading]="'Cargando jornadas publicadas'"
+      [hint]="'Estamos preparando el panel de jornadas y cruces publicados.'"
+      [variant]="'page'"
+    />
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="o-container league-matchdays-page__content">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando jornadas'"
+        [hint]="'Mantenemos las jornadas visibles mientras refrescamos la información.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
+    }
+
     <header class="league-matchdays-page__hero">
       <p class="league-matchdays-page__eyebrow">
         <lucide-angular [img]="swordsIcon" [size]="15" aria-hidden="true" />
@@ -37,20 +55,38 @@
       }
     </div>
   </section>
+} @else if (store.hasContent()) {
+  <section class="o-container league-matchdays-page__status-panel">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando jornadas'"
+        [hint]="'Seguimos mostrando el último estado válido mientras refrescamos el panel.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
+    }
+
+    <app-empty-state
+      [actions]="emptyActions"
+      [description]="'Consulta aquí cada jornada oficial de la KingsPadelLeague con sus cruces, horarios, equipos participantes y resultados.'"
+      [eyebrow]="'Jornadas KingsPadelLeague'"
+      [highlights]="['Detalle de cada jornada', 'Cruces confirmados', 'Resultados oficiales']"
+      [icon]="swordsIcon"
+      [layout]="'feature'"
+      [title]="'Jornadas de la temporada'"
+    />
+  </section>
 } @else if (store.errorMessage()) {
   <section class="o-container league-matchdays-page__status-panel">
     <app-empty-state
       description="Inténtalo de nuevo en unos segundos."
       title="No hemos podido cargar las jornadas"
     />
-
-    <p class="league-matchdays-page__status league-matchdays-page__status--error">
-      {{ store.errorMessage() }}
-    </p>
-
-    <button class="league-matchdays-page__retry" type="button" (click)="reloadMatchdays()">
-      Reintentar
-    </button>
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadMatchdays()" />
   </section>
 } @else {
   <section class="o-container league-matchdays-page__status-panel">

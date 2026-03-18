@@ -6,6 +6,9 @@ import type {
   BackofficePlayerPosition,
 } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { resolveTeamBranding } from '@shared/utils/team-branding';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
@@ -21,7 +24,13 @@ import { toBackofficeMatchdayRowViewModel } from '../../models/backoffice-matchd
   selector: 'app-backoffice-dashboard-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-dashboard-page' },
-  imports: [RouterLink, StatusBadgeComponent],
+  imports: [
+    EmptyStateComponent,
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+    RouterLink,
+    StatusBadgeComponent,
+  ],
   templateUrl: './backoffice-dashboard-page.component.html',
   styleUrl: './backoffice-dashboard-page.component.scss',
 })
@@ -34,12 +43,50 @@ export class BackofficeDashboardPageComponent implements OnInit {
   protected readonly standingsStore = inject(BackofficeStandingsStore);
 
   protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
+  protected readonly isAdminDashboardLoading = computed(
+    () =>
+      this.teamsStore.isLoading() ||
+      this.playersStore.isLoading() ||
+      this.seasonsStore.isLoading() ||
+      this.matchdaysStore.isLoading() ||
+      this.standingsStore.isLoading(),
+  );
+  protected readonly hasAdminDashboardContent = computed(
+    () =>
+      this.teamsStore.hasContent() &&
+      this.playersStore.hasContent() &&
+      this.seasonsStore.hasContent() &&
+      this.matchdaysStore.hasContent() &&
+      this.standingsStore.hasContent(),
+  );
+  protected readonly adminDashboardErrorMessage = computed(
+    () =>
+      this.teamsStore.errorMessage() ??
+      this.playersStore.errorMessage() ??
+      this.seasonsStore.errorMessage() ??
+      this.matchdaysStore.errorMessage() ??
+      this.standingsStore.errorMessage(),
+  );
   protected readonly isTeamDashboardLoading = computed(
     () =>
       this.teamsStore.isLoading() ||
       this.playersStore.isLoading() ||
       this.matchdaysStore.isLoading() ||
       this.standingsStore.isLoading(),
+  );
+  protected readonly hasTeamDashboardContent = computed(
+    () =>
+      this.teamsStore.hasContent() &&
+      this.playersStore.hasContent() &&
+      this.matchdaysStore.hasContent() &&
+      this.standingsStore.hasContent(),
+  );
+  protected readonly teamDashboardErrorMessage = computed(
+    () =>
+      this.teamsStore.errorMessage() ??
+      this.playersStore.errorMessage() ??
+      this.matchdaysStore.errorMessage() ??
+      this.standingsStore.errorMessage(),
   );
 
   // ── Admin computeds ──────────────────────────────────────────────────────
@@ -147,6 +194,25 @@ export class BackofficeDashboardPageComponent implements OnInit {
     void this.seasonsStore.load();
     void this.matchdaysStore.load();
     void this.standingsStore.load();
+  }
+
+  protected reloadAdminDashboard(): void {
+    void Promise.all([
+      this.teamsStore.load(true),
+      this.playersStore.load(true),
+      this.seasonsStore.load(true),
+      this.matchdaysStore.load(true),
+      this.standingsStore.load(true),
+    ]);
+  }
+
+  protected reloadTeamDashboard(): void {
+    void Promise.all([
+      this.teamsStore.load(true),
+      this.playersStore.load(true),
+      this.matchdaysStore.load(true),
+      this.standingsStore.load(true),
+    ]);
   }
 
   protected positionLabel(pos: BackofficePlayerPosition): string {

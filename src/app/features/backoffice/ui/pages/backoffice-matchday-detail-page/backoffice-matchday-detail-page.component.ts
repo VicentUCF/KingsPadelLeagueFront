@@ -14,6 +14,8 @@ import type {
 } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import { ActionToastStore } from '@core/state/action-toast.store';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
@@ -37,7 +39,7 @@ interface PlannerPair {
   selector: 'app-backoffice-matchday-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-matchday-detail-page' },
-  imports: [RouterLink, StatusBadgeComponent],
+  imports: [LoadFeedbackComponent, LoadingStateComponent, RouterLink, StatusBadgeComponent],
   templateUrl: './backoffice-matchday-detail-page.component.html',
   styleUrl: './backoffice-matchday-detail-page.component.scss',
 })
@@ -51,6 +53,19 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   private readonly toastStore = inject(ActionToastStore);
 
   protected readonly matchdayId = signal('');
+  protected readonly hasContent = computed(
+    () =>
+      this.matchdaysStore.hasContent() &&
+      this.teamsStore.hasContent() &&
+      this.lineupsStore.hasContent(),
+  );
+  protected readonly pageErrorMessage = computed(
+    () =>
+      this.matchdaysStore.errorMessage() ??
+      this.teamsStore.errorMessage() ??
+      this.lineupsStore.errorMessage() ??
+      this.playersStore.errorMessage(),
+  );
 
   protected readonly matchday = computed(
     () => this.matchdaysStore.matchdays().find((m) => m.id === this.matchdayId()) ?? null,
@@ -171,6 +186,16 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     void this.teamsStore.load();
     void this.playersStore.load();
     void this.lineupsStore.loadForMatchday(id);
+  }
+
+  protected reloadPage(): void {
+    const id = this.matchdayId();
+    void Promise.all([
+      this.matchdaysStore.load(true),
+      this.teamsStore.load(true),
+      this.playersStore.load(true),
+      this.lineupsStore.loadForMatchday(id, true),
+    ]);
   }
 
   protected openPlanner(matchId: string, teamId: string): void {

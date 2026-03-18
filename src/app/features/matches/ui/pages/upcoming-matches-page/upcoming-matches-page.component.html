@@ -38,14 +38,30 @@
   </article>
 </section>
 
-@if (store.errorMessage()) {
-  <p class="matches-page__status matches-page__status--error" role="status">
-    {{ store.errorMessage() }}
-  </p>
+@if (store.isLoading() && store.hasContent()) {
+  <app-loading-state
+    [heading]="'Refreshing matches board'"
+    [hint]="'We keep the current board visible while refreshing the next matches.'"
+    [lineCount]="3"
+    [variant]="'panel'"
+  />
 }
 
-@if (store.isLoading()) {
-  <p class="matches-page__status" role="status">Loading upcoming matches…</p>
+@if (store.errorMessage(); as error) {
+  <app-load-feedback
+    [message]="error"
+    [tone]="store.hasContent() ? 'warning' : 'error'"
+    [retryLabel]="'Refresh board'"
+    (retry)="reloadMatches()"
+  />
+}
+
+@if (store.isLoading() && !store.hasContent()) {
+  <app-loading-state
+    [heading]="'Loading upcoming matches'"
+    [hint]="'Preparing the schedule board and player availability summary.'"
+    [variant]="'page'"
+  />
 } @else if (store.hasMatches()) {
   <section class="matches-page__list o-stack o-stack--compact">
     <div class="matches-page__section-heading">
@@ -61,7 +77,7 @@
       }
     </div>
   </section>
-} @else {
+} @else if (store.hasContent()) {
   <app-empty-state
     [description]="'Create or import matches and they will appear here.'"
     [title]="'No upcoming matches yet'"

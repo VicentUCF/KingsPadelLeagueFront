@@ -1,9 +1,29 @@
 <div class="team-detail">
-  @if (teamsStore.isLoading() || playersStore.isLoading()) {
-    <p class="team-detail__loading">Cargando equipo…</p>
+  @if (isLoading() && !hasContent()) {
+    <app-loading-state
+      [heading]="'Cargando equipo'"
+      [hint]="'Estamos preparando la ficha del equipo y su plantilla.'"
+      [lineCount]="4"
+      [variant]="'page'"
+    />
+  } @else if (!hasContent() && errorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadData()" />
   } @else if (!teamCard()) {
     <p class="team-detail__error">Equipo no encontrado.</p>
   } @else {
+    @if (isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando equipo'"
+        [hint]="'Mantenemos la ficha visible mientras refrescamos la plantilla.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadData()" />
+    }
+
     <header
       class="team-detail__hero"
       [style.--team-primary]="teamCard()!.primaryColor"

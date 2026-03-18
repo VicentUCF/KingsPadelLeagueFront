@@ -1,15 +1,12 @@
-@if (store.isLoading()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-home-page__status-panel">
-    <p aria-live="polite" class="league-home-page__status">Cargando el estado actual de la liga…</p>
-  </section>
-} @else if (store.errorMessage()) {
-  <section class="o-container league-home-page__status-panel">
-    <p class="league-home-page__status league-home-page__status--error" role="status">
-      {{ store.errorMessage() }}
-    </p>
-    <button class="league-home-page__retry" type="button" (click)="reloadSnapshot()">
-      Reintentar
-    </button>
+    <app-loading-state
+      [cardCount]="3"
+      [heading]="'Cargando el estado actual de la liga'"
+      [hint]="'Estamos preparando el panel principal con calendario, clasificación y resultados.'"
+      [showMetrics]="true"
+      [variant]="'page'"
+    />
   </section>
 } @else if (store.viewModel(); as viewModel) {
   <app-hero-league-status
@@ -21,6 +18,19 @@
   />
 
   <div class="o-container league-home-page__sections">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando el panel principal'"
+        [hint]="'Mantenemos el contenido visible mientras refrescamos la información.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadSnapshot()" />
+    }
+
     <section class="league-home-page__section" id="proxima-jornada">
       <div class="league-home-page__section-heading">
         <p class="league-home-page__section-kicker">
@@ -134,6 +144,19 @@
       </div>
     </section>
   </div>
+} @else if (store.errorMessage()) {
+  <section class="o-container league-home-page__status-panel">
+    <app-empty-state
+      [actions]="nextMatchdayEmptyActions"
+      [description]="'La KingsPadelLeague publicará aquí el seguimiento oficial de la temporada con calendario, resultados y clasificación.'"
+      [eyebrow]="'Temporada 2026'"
+      [highlights]="['Equipos participantes', 'Jugadores inscritos', 'Calendario oficial']"
+      [icon]="nextMatchdayIcon"
+      [layout]="'feature'"
+      [title]="'Seguimiento oficial de la KingsPadelLeague'"
+    />
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadSnapshot()" />
+  </section>
 } @else {
   <section class="o-container league-home-page__status-panel">
     <app-empty-state

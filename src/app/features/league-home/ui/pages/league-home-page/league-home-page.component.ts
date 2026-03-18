@@ -8,6 +8,8 @@ import {
   EmptyStateComponent,
   type EmptyStateAction,
 } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { ByeCardComponent } from '../../components/bye-card/bye-card.component';
 import { HeroLeagueStatusComponent } from '../../components/hero-league-status/hero-league-status.component';
@@ -27,7 +29,9 @@ import { LeagueHomeStore } from '../../state/league-home.store';
     ByeCardComponent,
     EmptyStateComponent,
     HeroLeagueStatusComponent,
+    LoadFeedbackComponent,
     LucideAngularModule,
+    LoadingStateComponent,
     MatchCardComponent,
     ResultCardComponent,
     RouterLink,

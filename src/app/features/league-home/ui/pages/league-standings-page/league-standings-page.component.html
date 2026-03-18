@@ -1,9 +1,27 @@
-@if (store.isLoading() && !store.hasSnapshot()) {
+@if (store.isLoading() && !store.hasContent()) {
   <section class="o-container league-standings-page__status-panel">
-    <p class="league-standings-page__status">Cargando clasificación actual...</p>
+    <app-loading-state
+      [heading]="'Cargando clasificación actual'"
+      [hint]="'Estamos preparando la tabla oficial con la última jornada disponible.'"
+      [lineCount]="4"
+      [variant]="'page'"
+    />
   </section>
 } @else if (viewModel(); as viewModel) {
   <section class="o-container league-standings-page__content">
+    @if (store.isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando clasificación'"
+        [hint]="'Seguimos mostrando la tabla actual mientras refrescamos la competición.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (store.errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadSnapshot()" />
+    }
+
     <header class="league-standings-page__hero">
       <p class="league-standings-page__eyebrow">
         <lucide-angular [img]="standingsIcon" [size]="15" aria-hidden="true" />
@@ -57,14 +75,7 @@
       description="Inténtalo de nuevo en unos segundos."
       title="No hemos podido cargar la clasificación"
     />
-
-    <p class="league-standings-page__status league-standings-page__status--error">
-      {{ store.errorMessage() }}
-    </p>
-
-    <button class="league-standings-page__retry" type="button" (click)="reloadSnapshot()">
-      Reintentar
-    </button>
+    <app-load-feedback [message]="store.errorMessage()!" (retry)="reloadSnapshot()" />
   </section>
 } @else {
   <section class="o-container league-standings-page__status-panel">

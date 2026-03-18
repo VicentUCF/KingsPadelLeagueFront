@@ -16,6 +16,7 @@ export class BackofficePlayersStore {
   readonly players = signal<readonly BackofficePlayer[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   private _loaded = false;
 
@@ -33,14 +34,15 @@ export class BackofficePlayersStore {
     this.players().map((p) => toBackofficePlayerCardViewModel(p)),
   );
 
-  async load(): Promise<void> {
-    if (this._loaded) return;
+  async load(forceRefresh = false): Promise<void> {
+    if (this._loaded && !forceRefresh) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       this.players.set(await this.loadPlayersUseCase.execute());
       this._loaded = true;
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No hemos podido cargar los jugadores.');
     } finally {

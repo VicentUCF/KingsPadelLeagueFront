@@ -39,69 +39,81 @@
     }
   </div>
 
-  @if (playersStore.isLoading()) {
-    <p class="backoffice-players-page__loading">Cargando jugadores…</p>
-  } @else if (playersStore.errorMessage(); as error) {
-    <div class="backoffice-players-page__error">
-      <p>{{ error }}</p>
-      <button
-        class="c-button c-button--pill c-button--outline c-button--md"
-        type="button"
-        (click)="playersStore.load()"
-      >
-        Reintentar
-      </button>
-    </div>
-  } @else if (playerCards().length === 0) {
-    <p class="backoffice-players-page__empty">No hay jugadores registrados todavía.</p>
-  } @else if (filteredPlayerCards().length === 0) {
-    <p class="backoffice-players-page__empty">
-      No hay jugadores que coincidan con <strong>"{{ searchTerm() }}"</strong>.
-    </p>
-  } @else if (viewMode() === 'table') {
-    <section class="players-table" aria-live="polite">
-      <div class="players-table__header">
-        <span>Jugador</span>
-        <span>Estado</span>
-        <span>Equipo</span>
-        <span>Estadísticas</span>
-        <span>Vinculación</span>
-      </div>
-      <ul class="players-table__body">
-        @for (player of filteredPlayerCards(); track player.id) {
-          <li class="players-table__row">
-            <div class="players-table__cell players-table__cell--identity">
-              <span class="players-table__avatar">
-                @if (player.avatarPath) {
-                  <img [src]="player.avatarPath!" [alt]="player.title" />
-                } @else {
-                  {{ player.title.slice(0, 2).toUpperCase() }}
-                }
-              </span>
-              <div>
-                <p class="players-table__name">{{ player.title }}</p>
-                <p class="players-table__sub">{{ player.nickLabel }}</p>
+  @if (isLoading() && !hasContent()) {
+    <app-loading-state
+      [heading]="'Cargando jugadores'"
+      [hint]="'Estamos reuniendo las fichas, los equipos y el estado de vinculación.'"
+      [cardCount]="4"
+      [lineCount]="6"
+      [variant]="viewMode() === 'table' ? 'table' : 'cards'"
+    />
+  } @else if (!hasContent() && errorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadData()" />
+  } @else {
+    @if (isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando jugadores'"
+        [hint]="'Mantenemos el directorio visible mientras refrescamos los datos.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadData()" />
+    }
+
+    @if (playerCards().length === 0) {
+      <p class="backoffice-players-page__empty">No hay jugadores registrados todavía.</p>
+    } @else if (filteredPlayerCards().length === 0) {
+      <p class="backoffice-players-page__empty">
+        No hay jugadores que coincidan con <strong>"{{ searchTerm() }}"</strong>.
+      </p>
+    } @else if (viewMode() === 'table') {
+      <section class="players-table" aria-live="polite">
+        <div class="players-table__header">
+          <span>Jugador</span>
+          <span>Estado</span>
+          <span>Equipo</span>
+          <span>Estadísticas</span>
+          <span>Vinculación</span>
+        </div>
+        <ul class="players-table__body">
+          @for (player of filteredPlayerCards(); track player.id) {
+            <li class="players-table__row">
+              <div class="players-table__cell players-table__cell--identity">
+                <span class="players-table__avatar">
+                  @if (player.avatarPath) {
+                    <img [src]="player.avatarPath!" [alt]="player.title" />
+                  } @else {
+                    {{ player.title.slice(0, 2).toUpperCase() }}
+                  }
+                </span>
+                <div>
+                  <p class="players-table__name">{{ player.title }}</p>
+                  <p class="players-table__sub">{{ player.nickLabel }}</p>
+                </div>
               </div>
-            </div>
-            <div class="players-table__cell">
-              <app-status-badge [label]="player.statusLabel" [tone]="player.statusTone" />
-            </div>
-            <div class="players-table__cell">
-              {{ player.derivedTeamLabel.replace('Equipo: ', '') }}
-            </div>
-            <div class="players-table__cell">{{ player.historyLabel }}</div>
-            <div class="players-table__cell">{{ player.userLinkageLabel }}</div>
+              <div class="players-table__cell">
+                <app-status-badge [label]="player.statusLabel" [tone]="player.statusTone" />
+              </div>
+              <div class="players-table__cell">
+                {{ player.derivedTeamLabel.replace('Equipo: ', '') }}
+              </div>
+              <div class="players-table__cell">{{ player.historyLabel }}</div>
+              <div class="players-table__cell">{{ player.userLinkageLabel }}</div>
+            </li>
+          }
+        </ul>
+      </section>
+    } @else {
+      <ul class="backoffice-players-page__grid" aria-label="Jugadores">
+        @for (player of filteredPlayerCards(); track player.id) {
+          <li>
+            <app-player-directory-card [player]="player" />
           </li>
         }
       </ul>
-    </section>
-  } @else {
-    <ul class="backoffice-players-page__grid" aria-label="Jugadores">
-      @for (player of filteredPlayerCards(); track player.id) {
-        <li>
-          <app-player-directory-card [player]="player" />
-        </li>
-      }
-    </ul>
+    }
   }
 </div>

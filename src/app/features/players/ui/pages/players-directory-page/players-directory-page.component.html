@@ -128,19 +128,33 @@
   </div>
 </section>
 
-@if (store.errorMessage()) {
-  <p
-    class="players-directory-page__status players-directory-page__status--error players-directory-page__section"
-    role="status"
-  >
-    {{ store.errorMessage() }}
-  </p>
+@if (store.isLoading() && store.hasContent()) {
+  <app-loading-state
+    class="players-directory-page__section"
+    [heading]="'Actualizando el directorio'"
+    [hint]="'Mantenemos la lista visible mientras refrescamos jugadores y estadísticas.'"
+    [lineCount]="3"
+    [variant]="'panel'"
+  />
 }
 
-@if (store.isLoading()) {
-  <p class="players-directory-page__status players-directory-page__section" role="status">
-    Cargando jugadores…
-  </p>
+@if (store.errorMessage(); as error) {
+  <app-load-feedback
+    class="players-directory-page__section"
+    [message]="error"
+    [tone]="store.hasContent() ? 'warning' : 'error'"
+    (retry)="reloadPlayers()"
+  />
+}
+
+@if (store.isLoading() && !store.hasContent()) {
+  <app-loading-state
+    class="players-directory-page__section"
+    [heading]="'Cargando jugadores'"
+    [hint]="'Estamos preparando el directorio completo y sus filtros.'"
+    [showToolbar]="true"
+    [variant]="'cards'"
+  />
 } @else if (store.hasPlayers()) {
   @if (store.filteredPlayers().length === 0) {
     <p class="players-directory-page__status players-directory-page__section" role="status">
@@ -173,7 +187,7 @@
       </ol>
     </section>
   }
-} @else {
+} @else if (store.hasContent()) {
   <app-empty-state
     [description]="'Cuando carguemos las plantillas, los perfiles aparecerán aquí.'"
     [title]="'Todavía no hay jugadores inscritos'"

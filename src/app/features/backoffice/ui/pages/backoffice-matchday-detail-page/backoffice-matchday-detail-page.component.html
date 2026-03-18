@@ -1,9 +1,37 @@
 <div class="matchday-detail">
-  @if (matchdaysStore.isLoading()) {
-    <p class="matchday-detail__loading">Cargando jornada…</p>
+  @if (
+    (matchdaysStore.isLoading() || teamsStore.isLoading() || lineupsStore.isLoading()) &&
+    !hasContent()
+  ) {
+    <app-loading-state
+      [heading]="'Cargando jornada'"
+      [hint]="'Estamos reuniendo la jornada, los partidos y las alineaciones disponibles.'"
+      [lineCount]="4"
+      [variant]="'page'"
+    />
+  } @else if (!hasContent() && pageErrorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadPage()" />
   } @else if (!matchday()) {
     <p class="matchday-detail__error">Jornada no encontrada.</p>
   } @else {
+    @if (
+      matchdaysStore.isLoading() ||
+      teamsStore.isLoading() ||
+      playersStore.isLoading() ||
+      lineupsStore.isLoading()
+    ) {
+      <app-loading-state
+        [heading]="'Actualizando jornada'"
+        [hint]="'Mantenemos el detalle visible mientras refrescamos los partidos.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
+
+    @if (pageErrorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadPage()" />
+    }
+
     <!-- ── Jornada header ──────────────────────────────────────────────── -->
     <header class="matchday-detail__header c-surface-card">
       <div class="matchday-detail__header-main">
@@ -433,11 +461,7 @@
       <section class="matchday-detail__matches">
         <h2 class="matchday-detail__section-title">Partidos de la jornada</h2>
 
-        @if (lineupsStore.isLoading()) {
-          <p class="matchday-detail__loading">Cargando partidos…</p>
-        } @else if (lineupsStore.errorMessage(); as error) {
-          <p class="matchday-detail__error">{{ error }}</p>
-        } @else if (matchCards().length === 0) {
+        @if (matchCards().length === 0) {
           <p class="matchday-detail__empty">No hay partidos programados para esta jornada.</p>
         } @else {
           <ol class="matchday-detail__match-list" aria-label="Partidos de la jornada">

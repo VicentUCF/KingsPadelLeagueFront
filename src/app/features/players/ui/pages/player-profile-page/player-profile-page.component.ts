@@ -13,6 +13,8 @@ import { ArrowLeft, LucideAngularModule } from 'lucide-angular';
 
 import { UNASSIGNED_PLAYER_TEAM_NAME } from '@features/players/domain/entities/player.entity';
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { PlayerProfileCardComponent } from '../../components/player-profile-card/player-profile-card.component';
 import { PlayerProfileStore } from '../../state/player-profile.store';
@@ -25,7 +27,9 @@ import { PlayerProfileStore } from '../../state/player-profile.store';
   },
   imports: [
     EmptyStateComponent,
+    LoadFeedbackComponent,
     LucideAngularModule,
+    LoadingStateComponent,
     NgOptimizedImage,
     PlayerProfileCardComponent,
     RouterLink,

@@ -14,6 +14,7 @@ export class BackofficeSeasonsStore {
   readonly seasons = signal<readonly BackofficeSeason[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly hasContent = signal(false);
 
   private _loaded = false;
 
@@ -21,14 +22,15 @@ export class BackofficeSeasonsStore {
     this.seasons().map((season, index) => toBackofficeSeasonCardViewModel(season, 5, index === 0)),
   );
 
-  async load(): Promise<void> {
-    if (this._loaded) return;
+  async load(forceRefresh = false): Promise<void> {
+    if (this._loaded && !forceRefresh) return;
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
     try {
       this.seasons.set(await this.loadSeasonsUseCase.execute());
       this._loaded = true;
+      this.hasContent.set(true);
     } catch {
       this.errorMessage.set('No hemos podido cargar las temporadas.');
     } finally {

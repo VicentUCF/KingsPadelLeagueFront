@@ -1,0 +1,87 @@
+<div class="loading-state__header">
+  <div class="loading-state__heading-skeleton loading-state__skeleton" aria-hidden="true"></div>
+  <div class="loading-state__copy">
+    <p class="loading-state__heading">{{ resolvedHeading() }}</p>
+    <p class="loading-state__hint">{{ resolvedHint() }}</p>
+  </div>
+  <span class="u-visually-hidden">{{ accessibleLabel() }}</span>
+</div>
+
+@if (metricPlaceholders().length) {
+  <div class="loading-state__metrics" aria-hidden="true">
+    @for (metric of metricPlaceholders(); track metric) {
+      <div class="loading-state__metric">
+        <span class="loading-state__metric-value loading-state__skeleton"></span>
+        <span class="loading-state__metric-label loading-state__skeleton"></span>
+      </div>
+    }
+  </div>
+}
+
+@if (toolbarPlaceholders().length) {
+  <div class="loading-state__toolbar" aria-hidden="true">
+    @for (toolbarItem of toolbarPlaceholders(); track toolbarItem) {
+      <span class="loading-state__toolbar-item loading-state__skeleton"></span>
+    }
+  </div>
+}
+
+@switch (variant()) {
+  @case ('table') {
+    <div class="loading-state__table" aria-hidden="true">
+      <div class="loading-state__table-header">
+        @for (column of [0, 1, 2, 3, 4]; track column) {
+          <span class="loading-state__table-cell loading-state__skeleton"></span>
+        }
+      </div>
+
+      <div class="loading-state__table-body">
+        @for (row of linePlaceholders(); track row) {
+          <div class="loading-state__table-row">
+            @for (cell of [0, 1, 2, 3, 4]; track cell) {
+              <span class="loading-state__table-cell loading-state__skeleton"></span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @case ('cards') {
+    <div class="loading-state__cards" aria-hidden="true">
+      @for (card of cardPlaceholders(); track card) {
+        <div class="loading-state__card">
+          <div class="loading-state__card-title loading-state__skeleton"></div>
+          <div class="loading-state__card-copy">
+            @for (line of [0, 1, 2]; track line) {
+              <span class="loading-state__line loading-state__skeleton"></span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @default {
+    <div class="loading-state__panel-content" aria-hidden="true">
+      @for (line of linePlaceholders(); track line) {
+        <span class="loading-state__line loading-state__skeleton"></span>
+      }
+
+      @if (variant() === 'page') {
+        <div class="loading-state__cards">
+          @for (card of cardPlaceholders(); track card) {
+            <div class="loading-state__card">
+              <div class="loading-state__card-title loading-state__skeleton"></div>
+              <div class="loading-state__card-copy">
+                @for (cardLine of [0, 1]; track cardLine) {
+                  <span class="loading-state__line loading-state__skeleton"></span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+}

@@ -5,12 +5,14 @@ import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { SeasonCardComponent } from '../../components/season-card/season-card.component';
 import { toBackofficeSeasonCardViewModel } from '../../models/backoffice-seasons.viewmodel';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 @Component({
   selector: 'app-backoffice-seasons-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-seasons-page' },
-  imports: [SeasonCardComponent],
+  imports: [LoadFeedbackComponent, LoadingStateComponent, SeasonCardComponent],
   templateUrl: './backoffice-seasons-page.component.html',
   styleUrl: './backoffice-seasons-page.component.scss',
 })
@@ -20,6 +22,15 @@ export class BackofficeSeasonsPageComponent implements OnInit {
   protected readonly sessionStore = inject(BackofficeSessionStore);
 
   protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
+  protected readonly isLoading = computed(
+    () => this.seasonsStore.isLoading() || this.matchdaysStore.isLoading(),
+  );
+  protected readonly hasContent = computed(
+    () => this.seasonsStore.hasContent() && this.matchdaysStore.hasContent(),
+  );
+  protected readonly errorMessage = computed(
+    () => this.seasonsStore.errorMessage() ?? this.matchdaysStore.errorMessage(),
+  );
 
   protected readonly seasonCards = computed(() =>
     this.seasonsStore.seasons().map((season) => {
@@ -36,5 +47,9 @@ export class BackofficeSeasonsPageComponent implements OnInit {
   ngOnInit(): void {
     void this.seasonsStore.load();
     void this.matchdaysStore.load();
+  }
+
+  protected reloadData(): void {
+    void Promise.all([this.seasonsStore.load(true), this.matchdaysStore.load(true)]);
   }
 }

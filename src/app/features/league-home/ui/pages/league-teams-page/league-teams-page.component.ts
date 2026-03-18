@@ -11,6 +11,8 @@ import { Meta, Title } from '@angular/platform-browser';
 import { LucideAngularModule, Shield } from 'lucide-angular';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { TeamSelectorComponent } from '../../components/team-selector/team-selector.component';
 import { TeamShowcaseHeroComponent } from '../../components/team-showcase-hero/team-showcase-hero.component';
@@ -28,7 +30,9 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   },
   imports: [
     EmptyStateComponent,
+    LoadFeedbackComponent,
     LucideAngularModule,
+    LoadingStateComponent,
     TeamSelectorComponent,
     TeamShowcaseHeroComponent,
   ],

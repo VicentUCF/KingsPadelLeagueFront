@@ -12,12 +12,19 @@ import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { PlayerDirectoryCardComponent } from '../../components/player-directory-card/player-directory-card.component';
 import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 @Component({
   selector: 'app-backoffice-players-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-players-page' },
-  imports: [PlayerDirectoryCardComponent, StatusBadgeComponent],
+  imports: [
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+    PlayerDirectoryCardComponent,
+    StatusBadgeComponent,
+  ],
   templateUrl: './backoffice-players-page.component.html',
   styleUrl: './backoffice-players-page.component.scss',
 })
@@ -29,6 +36,15 @@ export class BackofficePlayersPageComponent implements OnInit {
   protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
   protected readonly canViewLinkedEmails = computed(
     () => this.sessionStore.currentRole() !== 'PLAYER',
+  );
+  protected readonly isLoading = computed(
+    () => this.playersStore.isLoading() || this.teamsStore.isLoading(),
+  );
+  protected readonly hasContent = computed(
+    () => this.playersStore.hasContent() && this.teamsStore.hasContent(),
+  );
+  protected readonly errorMessage = computed(
+    () => this.playersStore.errorMessage() ?? this.teamsStore.errorMessage(),
   );
 
   protected readonly playerCards = computed(() =>
@@ -58,5 +74,9 @@ export class BackofficePlayersPageComponent implements OnInit {
   ngOnInit(): void {
     void this.playersStore.load();
     void this.teamsStore.load();
+  }
+
+  protected reloadData(): void {
+    void Promise.all([this.playersStore.load(true), this.teamsStore.load(true)]);
   }
 }

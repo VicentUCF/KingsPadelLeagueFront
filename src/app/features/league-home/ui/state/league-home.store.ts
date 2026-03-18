@@ -16,6 +16,7 @@ export class LeagueHomeStore {
   readonly errorMessage = signal<string | null>(null);
 
   readonly hasSnapshot = computed(() => this.snapshot() !== null);
+  readonly hasContent = computed(() => this.hasSnapshot());
   readonly viewModel = computed<LeagueHomeViewModel | null>(() => {
     const snapshot = this.snapshot();
 

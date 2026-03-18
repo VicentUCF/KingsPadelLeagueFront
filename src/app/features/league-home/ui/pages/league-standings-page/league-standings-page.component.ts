@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { CalendarDays, LucideAngularModule, Swords, Table2 } from 'lucide-angular';
 
 import { EmptyStateComponent } from '@shared/ui/empty-state/empty-state.component';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 
 import { StandingsTableComponent } from '../../components/standings-table/standings-table.component';
 import {
@@ -18,7 +20,14 @@ import { LeagueHomeStore } from '../../state/league-home.store';
   host: {
     class: 'league-standings-page',
   },
-  imports: [EmptyStateComponent, LucideAngularModule, RouterLink, StandingsTableComponent],
+  imports: [
+    EmptyStateComponent,
+    LoadFeedbackComponent,
+    LucideAngularModule,
+    LoadingStateComponent,
+    RouterLink,
+    StandingsTableComponent,
+  ],
   providers: [LeagueHomeStore],
   templateUrl: './league-standings-page.component.html',
   styleUrl: './league-standings-page.component.scss',

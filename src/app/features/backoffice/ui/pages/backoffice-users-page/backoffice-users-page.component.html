@@ -68,102 +68,123 @@
   </div>
 
   <!-- ── Table ─────────────────────────────────────────────────────────────────── -->
-  @if (isLoading()) {
-    <p class="users-state">Cargando usuarios…</p>
-  } @else if (errorMessage(); as error) {
-    <p class="users-state users-state--error">{{ error }}</p>
-  } @else if (filteredCards().length === 0) {
-    <div class="users-empty">
-      <p class="users-empty__title">
-        @if (searchTerm()) {
-          Sin resultados para "{{ searchTerm() }}"
-        } @else {
-          Sin usuarios en esta categoría
-        }
-      </p>
-      <p class="users-empty__sub">
-        @if (segment() === 'unlinked') {
-          Todos los jugadores tienen cuenta vinculada.
-        } @else {
-          Prueba a cambiar el filtro o ajustar la búsqueda.
-        }
-      </p>
-    </div>
+  @if (isLoading() && !hasContent()) {
+    <app-loading-state
+      [heading]="'Cargando usuarios'"
+      [hint]="'Estamos preparando el panel de cuentas, roles y vinculaciones.'"
+      [lineCount]="6"
+      [showMetrics]="true"
+      [variant]="'table'"
+    />
+  } @else if (!hasContent() && errorMessage(); as error) {
+    <app-load-feedback [message]="error" (retry)="reloadUsers()" />
   } @else {
-    <section class="users-table" aria-label="Tabla de usuarios" aria-live="polite">
-      <div class="users-table__header" role="row">
-        <span role="columnheader">Usuario</span>
-        <span role="columnheader">Rol</span>
-        <span role="columnheader">Estado</span>
-        <span role="columnheader">Equipo</span>
-        <span role="columnheader" class="users-table__col-actions">Acciones</span>
-      </div>
+    @if (isLoading()) {
+      <app-loading-state
+        [heading]="'Actualizando usuarios'"
+        [hint]="'Mantenemos el panel visible mientras refrescamos las cuentas.'"
+        [lineCount]="3"
+        [variant]="'panel'"
+      />
+    }
 
-      <ul class="users-table__body" role="rowgroup">
-        @for (user of filteredCards(); track user.playerId) {
-          <li class="users-table__row" role="row">
-            <div class="users-table__cell users-table__cell--identity" role="cell">
-              <span class="users-table__avatar" aria-hidden="true">
-                @if (user.avatarPath) {
-                  <img [src]="user.avatarPath" [alt]="user.fullName" />
-                } @else {
-                  {{ user.initials }}
-                }
-              </span>
-              <div class="users-table__meta">
-                <p class="users-table__name">{{ user.fullName }}</p>
+    @if (errorMessage(); as error) {
+      <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadUsers()" />
+    }
+
+    @if (filteredCards().length === 0) {
+      <div class="users-empty">
+        <p class="users-empty__title">
+          @if (searchTerm()) {
+            Sin resultados para "{{ searchTerm() }}"
+          } @else {
+            Sin usuarios en esta categoría
+          }
+        </p>
+        <p class="users-empty__sub">
+          @if (segment() === 'unlinked') {
+            Todos los jugadores tienen cuenta vinculada.
+          } @else {
+            Prueba a cambiar el filtro o ajustar la búsqueda.
+          }
+        </p>
+      </div>
+    } @else {
+      <section class="users-table" aria-label="Tabla de usuarios" aria-live="polite">
+        <div class="users-table__header" role="row">
+          <span role="columnheader">Usuario</span>
+          <span role="columnheader">Rol</span>
+          <span role="columnheader">Estado</span>
+          <span role="columnheader">Equipo</span>
+          <span role="columnheader" class="users-table__col-actions">Acciones</span>
+        </div>
+
+        <ul class="users-table__body" role="rowgroup">
+          @for (user of filteredCards(); track user.playerId) {
+            <li class="users-table__row" role="row">
+              <div class="users-table__cell users-table__cell--identity" role="cell">
+                <span class="users-table__avatar" aria-hidden="true">
+                  @if (user.avatarPath) {
+                    <img [src]="user.avatarPath" [alt]="user.fullName" />
+                  } @else {
+                    {{ user.initials }}
+                  }
+                </span>
+                <div class="users-table__meta">
+                  <p class="users-table__name">{{ user.fullName }}</p>
+                  @if (user.hasEmail) {
+                    <p class="users-table__email">{{ user.email }}</p>
+                  } @else {
+                    <p class="users-table__email users-table__email--none">Sin email registrado</p>
+                  }
+                </div>
+              </div>
+
+              <div class="users-table__cell" role="cell">
+                <app-status-badge [label]="user.roleLabel" [tone]="user.roleTone" />
+              </div>
+
+              <div class="users-table__cell" role="cell">
                 @if (user.hasEmail) {
-                  <p class="users-table__email">{{ user.email }}</p>
+                  <span class="users-table__account users-table__account--active">
+                    <span class="users-table__account-dot" aria-hidden="true"></span>
+                    Vinculada
+                  </span>
                 } @else {
-                  <p class="users-table__email users-table__email--none">Sin email registrado</p>
+                  <span class="users-table__account users-table__account--none">
+                    <span class="users-table__account-dot" aria-hidden="true"></span>
+                    Sin cuenta
+                  </span>
                 }
               </div>
-            </div>
 
-            <div class="users-table__cell" role="cell">
-              <app-status-badge [label]="user.roleLabel" [tone]="user.roleTone" />
-            </div>
+              <div class="users-table__cell" role="cell">
+                <span class="users-table__team">{{ user.teamName }}</span>
+              </div>
 
-            <div class="users-table__cell" role="cell">
-              @if (user.hasEmail) {
-                <span class="users-table__account users-table__account--active">
-                  <span class="users-table__account-dot" aria-hidden="true"></span>
-                  Vinculada
-                </span>
-              } @else {
-                <span class="users-table__account users-table__account--none">
-                  <span class="users-table__account-dot" aria-hidden="true"></span>
-                  Sin cuenta
-                </span>
-              }
-            </div>
-
-            <div class="users-table__cell" role="cell">
-              <span class="users-table__team">{{ user.teamName }}</span>
-            </div>
-
-            <div class="users-table__cell users-table__cell--actions" role="cell">
-              <button
-                type="button"
-                class="c-button c-button--pill c-button--outline c-button--sm"
-                (click)="openEditModal(user)"
-              >
-                Editar
-              </button>
-              @if (user.hasEmail) {
+              <div class="users-table__cell users-table__cell--actions" role="cell">
                 <button
                   type="button"
-                  class="users-table__danger-btn"
-                  (click)="openConfirm('unlink', user)"
+                  class="c-button c-button--pill c-button--outline c-button--sm"
+                  (click)="openEditModal(user)"
                 >
-                  Desvincular
+                  Editar
                 </button>
-              }
-            </div>
-          </li>
-        }
-      </ul>
-    </section>
+                @if (user.hasEmail) {
+                  <button
+                    type="button"
+                    class="users-table__danger-btn"
+                    (click)="openConfirm('unlink', user)"
+                  >
+                    Desvincular
+                  </button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
   }
 
   <!-- ── Confirm dialog ────────────────────────────────────────────────────────── -->

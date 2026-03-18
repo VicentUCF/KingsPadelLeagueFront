@@ -31,6 +31,8 @@ import {
   type EditablePlayerPreferredPosition,
   type EditablePlayerProfile,
 } from '../../../domain/entities/editable-player-profile';
+import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
+import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
 import { AuthStore } from '../../state/auth.store';
 
 function matchPasswords(control: AbstractControl): ValidationErrors | null {
@@ -56,8 +58,13 @@ function optionalUrlValidator(control: AbstractControl): ValidationErrors | null
 
 @Component({
   selector: 'app-profile-page',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, LucideAngularModule],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    LucideAngularModule,
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+  ],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -154,6 +161,7 @@ export class ProfilePageComponent implements OnDestroy {
   protected readonly selectedProfileImageFileName = computed(
     () => this.selectedProfileImageFile()?.name ?? null,
   );
+  protected readonly hasEditableProfile = computed(() => this.playerProfile() !== null);
 
   private loadedEditableProfileUserId: string | null = null;
   private localProfileImagePreviewUrl: string | null = null;
@@ -353,13 +361,17 @@ export class ProfilePageComponent implements OnDestroy {
   }
 
   private async loadEditablePlayerProfile(): Promise<void> {
+    const previousProfile = this.playerProfile();
+
     this.editableProfileLoadError.set(null);
     this.editableProfileLoading.set(true);
 
     try {
       const playerProfile = await this.authStore.loadCurrentPlayerProfile();
       if (!playerProfile) {
-        this.playerProfile.set(null);
+        if (!previousProfile) {
+          this.playerProfile.set(null);
+        }
         this.editableProfileLoadError.set('No se encontró el perfil del jugador');
         return;
       }
