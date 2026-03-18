@@ -9,7 +9,14 @@ import { RegisterUseCase } from '../../application/use-cases/register.use-case';
 import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { RequestPasswordResetUseCase } from '../../application/use-cases/request-password-reset.use-case';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.use-case';
+import {
+  resolveEditablePlayerProfileDisplayName,
+  type EditablePlayerProfile,
+} from '../../domain/entities/editable-player-profile';
 import { mapSupabaseUserToAuthUser } from '../../infrastructure/mappers/supabase-auth-user.mapper';
+import { LoadEditablePlayerProfileUseCase } from '../../application/use-cases/load-editable-player-profile.use-case';
+import { UpdateEditablePlayerProfileUseCase } from '../../application/use-cases/update-editable-player-profile.use-case';
+import type { UpdateEditablePlayerProfileCommand } from '../../application/ports/player-profile.repository';
 import { applyAuthDevOverride } from './auth-dev-override';
 
 export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'unauthenticated';
@@ -27,6 +34,8 @@ export class AuthStore {
   private readonly logoutUseCase = inject(LogoutUseCase);
   private readonly requestPasswordResetUseCase = inject(RequestPasswordResetUseCase);
   private readonly resetPasswordUseCase = inject(ResetPasswordUseCase);
+  private readonly loadEditablePlayerProfileUseCase = inject(LoadEditablePlayerProfileUseCase);
+  private readonly updateEditablePlayerProfileUseCase = inject(UpdateEditablePlayerProfileUseCase);
 
   private readonly _status = signal<AuthStatus>('idle');
   private readonly _user = signal<AuthUser | null>(null);
@@ -133,13 +142,41 @@ export class AuthStore {
   }
 
   async updateProfile(displayName: string): Promise<void> {
-    const { data, error } = await this.supabase.auth.updateUser({
-      data: { display_name: displayName },
-    });
-    if (error) throw new Error(error.message);
-    if (data.user) {
-      this._user.update((u) => (u ? { ...u, displayName } : null));
+    await this.persistDisplayName(displayName);
+    this.setLocalDisplayName(displayName);
+  }
+
+  async loadCurrentPlayerProfile(): Promise<EditablePlayerProfile | null> {
+    const currentUser = this._user();
+    if (!currentUser) {
+      return null;
     }
+
+    return this.loadEditablePlayerProfileUseCase.execute(currentUser.id);
+  }
+
+  async updateCurrentPlayerProfile(
+    command: Omit<UpdateEditablePlayerProfileCommand, 'id'>,
+  ): Promise<EditablePlayerProfile> {
+    const currentUser = this._user();
+    if (!currentUser) {
+      throw new Error('Debes iniciar sesión para editar tu perfil');
+    }
+
+    const updatedProfile = await this.updateEditablePlayerProfileUseCase.execute({
+      id: currentUser.id,
+      ...command,
+    });
+    const displayName = resolveEditablePlayerProfileDisplayName(updatedProfile);
+
+    this.setLocalDisplayName(displayName);
+    try {
+      await this.persistDisplayName(displayName);
+    } catch {
+      // The player profile is already updated in the backend; keep the UI in sync locally.
+    }
+
+    return updatedProfile;
   }
 
   async changePassword(newPassword: string): Promise<void> {
@@ -149,5 +186,19 @@ export class AuthStore {
 
   clearError(): void {
     this._error.set(null);
+  }
+
+  private setLocalDisplayName(displayName: string): void {
+    this._user.update((user) => (user ? { ...user, displayName } : null));
+  }
+
+  private async persistDisplayName(displayName: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({
+      data: { display_name: displayName },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
   }
 }

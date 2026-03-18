@@ -4,14 +4,17 @@
       <lucide-icon [img]="ArrowLeftIcon" size="16" />
       Volver a la web
     </a>
-    <div class="profile-page__avatar" aria-hidden="true">
-      {{ authStore.user()?.displayName?.[0]?.toUpperCase() ?? '?' }}
+    <div class="profile-page__avatar">
+      @if (profileAvatarUrl(); as profileAvatarUrl) {
+        <img [src]="profileAvatarUrl" [alt]="'Foto de perfil de ' + profileDisplayName()" />
+      } @else {
+        <span aria-hidden="true">{{ profileAvatarInitial() }}</span>
+      }
     </div>
     <h1 class="profile-page__title">Mi perfil</h1>
     <p class="profile-page__email">{{ authStore.user()?.email }}</p>
   </header>
 
-  <!-- ── Datos personales ─────────────────────────────────────────────────────── -->
   <section class="profile-card" aria-labelledby="section-profile">
     <header class="profile-card__header">
       <lucide-icon [img]="UserIcon" size="18" aria-hidden="true" />
@@ -29,52 +32,200 @@
       </div>
     }
 
-    <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" novalidate>
-      <div class="c-field">
-        <label class="c-field__label" for="displayName">Nombre</label>
-        <input
-          id="displayName"
-          type="text"
-          class="c-input"
-          [class.c-input--invalid]="displayNameError"
-          formControlName="displayName"
-          placeholder="Tu nombre o apodo"
-          autocomplete="name"
-        />
-        @if (displayNameError) {
-          <p class="c-field__error">{{ displayNameError }}</p>
-        }
-      </div>
+    @if (canEditPlayerProfile()) {
+      @if (editableProfileLoading()) {
+        <p class="profile-card__status" role="status">Cargando tus datos de jugador...</p>
+      } @else if (editableProfileLoadError()) {
+        <div class="profile-card__alert" role="alert">{{ editableProfileLoadError() }}</div>
+        <button
+          type="button"
+          class="c-button c-button--secondary profile-card__submit"
+          (click)="retryLoadEditableProfile()"
+        >
+          Reintentar
+        </button>
+      } @else {
+        <form [formGroup]="playerProfileForm" (ngSubmit)="onSavePlayerProfile()" novalidate>
+          <div class="profile-card__avatar-editor">
+            <div class="profile-card__avatar-preview">
+              @if (profileAvatarUrl(); as profileAvatarUrl) {
+                <img [src]="profileAvatarUrl" [alt]="'Foto de perfil de ' + profileDisplayName()" />
+              } @else {
+                <span aria-hidden="true">{{ profileAvatarInitial() }}</span>
+              }
+            </div>
 
-      <div class="c-field">
-        <label class="c-field__label" for="email-ro">Correo electrónico</label>
-        <input
-          id="email-ro"
-          type="email"
-          class="c-input"
-          [value]="authStore.user()?.email ?? ''"
-          disabled
-          aria-describedby="email-hint"
-        />
-        <p id="email-hint" class="c-field__helper">El email no se puede cambiar desde aquí.</p>
-      </div>
+            <div class="c-field">
+              <label class="c-field__label" for="profileImage">Imagen de perfil</label>
+              <input
+                #profileImageInput
+                id="profileImage"
+                type="file"
+                class="c-input"
+                accept="image/png,image/jpeg,image/webp,image/avif"
+                (change)="onProfileImageSelected($event)"
+              />
+              <p class="c-field__helper">
+                La imagen se subirá a Supabase Storage cuando guardes los cambios.
+              </p>
+              @if (selectedProfileImageFileName(); as selectedProfileImageFileName) {
+                <p class="profile-card__file-name">{{ selectedProfileImageFileName }}</p>
+              }
+            </div>
+          </div>
 
-      <button
-        type="submit"
-        class="c-button c-button--primary profile-card__submit"
-        [disabled]="profileLoading()"
-      >
-        @if (profileLoading()) {
-          <span class="profile-card__spinner" aria-hidden="true"></span>
-          Guardando...
-        } @else {
-          Guardar cambios
-        }
-      </button>
-    </form>
+          <div class="profile-card__grid">
+            <div class="c-field">
+              <label class="c-field__label" for="firstName">Nombre</label>
+              <input
+                id="firstName"
+                type="text"
+                class="c-input"
+                [class.c-input--invalid]="firstNameError"
+                formControlName="firstName"
+                autocomplete="given-name"
+              />
+              @if (firstNameError) {
+                <p class="c-field__error">{{ firstNameError }}</p>
+              }
+            </div>
+
+            <div class="c-field">
+              <label class="c-field__label" for="lastName">Apellidos</label>
+              <input
+                id="lastName"
+                type="text"
+                class="c-input"
+                [class.c-input--invalid]="lastNameError"
+                formControlName="lastName"
+                autocomplete="family-name"
+              />
+              @if (lastNameError) {
+                <p class="c-field__error">{{ lastNameError }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="profile-card__grid">
+            <div class="c-field">
+              <label class="c-field__label" for="alias">Alias</label>
+              <input
+                id="alias"
+                type="text"
+                class="c-input"
+                formControlName="alias"
+                autocomplete="nickname"
+              />
+            </div>
+
+            <div class="c-field">
+              <label class="c-field__label" for="preferredPosition">Posición preferida</label>
+              <select
+                id="preferredPosition"
+                class="c-select c-input"
+                formControlName="preferredPosition"
+              >
+                <option value="both">Ambas</option>
+                <option value="left">Revés</option>
+                <option value="right">Drive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="profile-card__grid profile-card__grid--single">
+            <div class="c-field">
+              <label class="c-field__label" for="instagramUrl">Instagram</label>
+              <input
+                id="instagramUrl"
+                type="url"
+                class="c-input"
+                [class.c-input--invalid]="instagramUrlError"
+                formControlName="instagramUrl"
+                autocomplete="url"
+                placeholder="https://instagram.com/tu-perfil"
+              />
+              @if (instagramUrlError) {
+                <p class="c-field__error">{{ instagramUrlError }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="c-field">
+            <label class="c-field__label" for="email-ro">Correo electrónico</label>
+            <input
+              id="email-ro"
+              type="email"
+              class="c-input"
+              [value]="authStore.user()?.email ?? ''"
+              disabled
+              aria-describedby="email-hint"
+            />
+            <p id="email-hint" class="c-field__helper">El email no se puede cambiar desde aquí.</p>
+          </div>
+
+          <button
+            type="submit"
+            class="c-button c-button--primary profile-card__submit"
+            [disabled]="profileLoading()"
+          >
+            @if (profileLoading()) {
+              <span class="profile-card__spinner" aria-hidden="true"></span>
+              Guardando...
+            } @else {
+              Guardar cambios
+            }
+          </button>
+        </form>
+      }
+    } @else {
+      <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" novalidate>
+        <div class="c-field">
+          <label class="c-field__label" for="displayName">Nombre</label>
+          <input
+            id="displayName"
+            type="text"
+            class="c-input"
+            [class.c-input--invalid]="displayNameError"
+            formControlName="displayName"
+            placeholder="Tu nombre o apodo"
+            autocomplete="name"
+          />
+          @if (displayNameError) {
+            <p class="c-field__error">{{ displayNameError }}</p>
+          }
+        </div>
+
+        <div class="c-field">
+          <label class="c-field__label" for="email-ro-fallback">Correo electrónico</label>
+          <input
+            id="email-ro-fallback"
+            type="email"
+            class="c-input"
+            [value]="authStore.user()?.email ?? ''"
+            disabled
+            aria-describedby="email-hint-fallback"
+          />
+          <p id="email-hint-fallback" class="c-field__helper">
+            El email no se puede cambiar desde aquí.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          class="c-button c-button--primary profile-card__submit"
+          [disabled]="profileLoading()"
+        >
+          @if (profileLoading()) {
+            <span class="profile-card__spinner" aria-hidden="true"></span>
+            Guardando...
+          } @else {
+            Guardar cambios
+          }
+        </button>
+      </form>
+    }
   </section>
 
-  <!-- ── Cambiar contraseña ──────────────────────────────────────────────────── -->
   <section class="profile-card" aria-labelledby="section-password">
     <header class="profile-card__header">
       <lucide-icon [img]="KeyRoundIcon" size="18" aria-hidden="true" />
