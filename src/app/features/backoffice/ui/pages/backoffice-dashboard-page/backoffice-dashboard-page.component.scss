@@ -13,7 +13,7 @@
     margin: 0;
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    font-size: clamp(1.1rem, 2dvw, 1.4rem);
     font-weight: 700;
     letter-spacing: -0.03em;
   }
@@ -50,7 +50,7 @@
     margin: 0;
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-size: clamp(1.3rem, 2.5dvw, 1.7rem);
     font-weight: 700;
     letter-spacing: -0.04em;
   }
@@ -130,7 +130,7 @@
     margin: 0;
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-size: clamp(1.8rem, 4dvw, 2.6rem);
     font-weight: 700;
     letter-spacing: -0.05em;
     line-height: 0.95;
@@ -312,7 +312,7 @@
     margin: 0;
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(2rem, 5dvw, 3.2rem);
     font-weight: 750;
     letter-spacing: -0.04em;
     line-height: 0.95;
@@ -348,7 +348,7 @@
   &__stat-value {
     color: color-mix(in srgb, var(--team-primary, #c9a227) 90%, white);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-size: clamp(1.2rem, 2.5dvw, 1.6rem);
     font-weight: 750;
     letter-spacing: -0.02em;
     line-height: 1;
@@ -423,7 +423,7 @@
     margin: 0;
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-size: clamp(1.1rem, 2dvw, 1.35rem);
     font-weight: 700;
     letter-spacing: -0.03em;
   }
@@ -574,7 +574,7 @@
     margin: 0;
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-size: clamp(1.2rem, 2.5dvw, 1.6rem);
     font-weight: 700;
     letter-spacing: -0.04em;
   }

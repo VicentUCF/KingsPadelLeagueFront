@@ -57,7 +57,7 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: clamp(5.8rem, 29vw, 6.8rem);
+    width: clamp(5.8rem, 29dvw, 6.8rem);
     aspect-ratio: 2.35;
     overflow: visible;
   }
@@ -79,7 +79,7 @@
   &__brand-title {
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.1rem, 5vw, 1.45rem);
+    font-size: clamp(1.1rem, 5dvw, 1.45rem);
     font-weight: 700;
     letter-spacing: -0.05em;
     line-height: 0.98;
@@ -142,7 +142,7 @@
     inset-block: 0;
     inset-inline: auto 0;
     z-index: var(--z-index-header);
-    width: min(19.5rem, 80vw);
+    width: min(19.5rem, 80dvw);
     padding: var(--space-4) var(--space-4) var(--space-5);
     border-inline-start: 1px solid var(--color-border-subtle);
     background:
@@ -389,7 +389,7 @@
   }
 
   &__content {
-    min-height: calc(100vh - 12rem);
+    min-height: calc(100dvh - 12rem);
     padding-block: 0 var(--space-12);
   }
 
@@ -453,7 +453,7 @@
     }
 
     &__brand-mark {
-      width: clamp(6.3rem, 18vw, 7.6rem);
+      width: clamp(6.3rem, 18dvw, 7.6rem);
     }
 
     &__menu-trigger {
@@ -462,7 +462,7 @@
     }
 
     &__nav {
-      width: min(21rem, 78vw);
+      width: min(21rem, 78dvw);
     }
 
     &__nav-drawer-mark {
@@ -484,7 +484,7 @@
     }
 
     &__brand-mark {
-      width: clamp(5.8rem, 8vw, 6.7rem);
+      width: clamp(5.8rem, 8dvw, 6.7rem);
     }
 
     &__brand-title {
@@ -803,11 +803,11 @@
 @media (min-width: 80rem) {
   .app-shell {
     &__brand-mark {
-      width: clamp(6rem, 9vw, 7.4rem);
+      width: clamp(6rem, 9dvw, 7.4rem);
     }
 
     &__brand-title {
-      font-size: clamp(1.28rem, 1.8vw, 1.8rem);
+      font-size: clamp(1.28rem, 1.8dvw, 1.8rem);
     }
 
     &__brand-tagline {

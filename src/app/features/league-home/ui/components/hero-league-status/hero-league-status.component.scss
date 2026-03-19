@@ -33,7 +33,7 @@
   &__tagline {
     margin: 0;
     color: var(--color-text-default);
-    font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+    font-size: clamp(1.05rem, 1.8dvw, 1.3rem);
   }
 
   &__meta {
@@ -100,7 +100,7 @@
   &__crest {
     display: grid;
     place-items: center;
-    width: clamp(15rem, 32vw, 23rem);
+    width: clamp(15rem, 32dvw, 23rem);
     aspect-ratio: 1.38;
     border: 1px solid var(--color-border-strong);
     border-radius: 2rem;
@@ -121,7 +121,7 @@
   }
 
   &__orb {
-    width: clamp(16rem, 34vw, 24rem);
+    width: clamp(16rem, 34dvw, 24rem);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(circle, rgb(201 162 39 / 12%), transparent 68%);
@@ -129,7 +129,7 @@
   }
 
   &__halo {
-    width: clamp(18rem, 38vw, 26rem);
+    width: clamp(18rem, 38dvw, 26rem);
     aspect-ratio: 1;
     border: 1px solid rgb(255 255 255 / 0.06);
     border-radius: 50%;

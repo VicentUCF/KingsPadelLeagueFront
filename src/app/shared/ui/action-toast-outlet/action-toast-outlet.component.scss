@@ -8,7 +8,7 @@
   &__stack {
     display: grid;
     gap: var(--space-3);
-    width: min(24rem, calc(100vw - (var(--space-5) * 2)));
+    width: min(24rem, calc(100dvw - (var(--space-5) * 2)));
   }
 
   &__toast {

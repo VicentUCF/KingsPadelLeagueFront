@@ -54,7 +54,7 @@ export class BackofficePlayersPageComponent implements OnInit {
   );
 
   protected readonly searchTerm = signal('');
-  protected readonly viewMode = signal<'cards' | 'table'>('cards');
+  protected readonly viewMode = signal<'cards' | 'table'>('table');
 
   protected readonly filteredPlayerCards = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();

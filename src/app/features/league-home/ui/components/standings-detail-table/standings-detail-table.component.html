@@ -1,57 +1,122 @@
-<div class="standings-detail-table__scroll">
-  <table class="standings-detail-table__table">
-    <caption class="u-visually-hidden">
-      {{
-        caption()
-      }}
-    </caption>
+@if (usesTableLayout()) {
+  <div class="standings-detail-table__scroll">
+    <table class="standings-detail-table__table">
+      <caption class="u-visually-hidden">
+        {{
+          caption()
+        }}
+      </caption>
 
-    <thead>
-      <tr class="standings-detail-table__header-row">
-        <th
-          class="standings-detail-table__header-cell standings-detail-table__header-cell--rank"
-          scope="col"
-        >
-          #
-        </th>
-        <th
-          class="standings-detail-table__header-cell standings-detail-table__header-cell--team"
-          scope="col"
-        >
-          Equipo
-        </th>
-        <th class="standings-detail-table__header-cell" scope="col">J</th>
-        <th class="standings-detail-table__header-cell" scope="col">G</th>
-        <th class="standings-detail-table__header-cell" scope="col">P</th>
-        <th class="standings-detail-table__header-cell" scope="col">JG</th>
-        <th class="standings-detail-table__header-cell" scope="col">JP</th>
-        <th class="standings-detail-table__header-cell" scope="col">DIF</th>
-        <th
-          class="standings-detail-table__header-cell standings-detail-table__header-cell--pts"
-          scope="col"
-        >
-          PTS
-        </th>
-      </tr>
-    </thead>
+      <thead>
+        <tr class="standings-detail-table__header-row">
+          <th
+            class="standings-detail-table__header-cell standings-detail-table__header-cell--rank"
+            scope="col"
+          >
+            #
+          </th>
+          <th
+            class="standings-detail-table__header-cell standings-detail-table__header-cell--team"
+            scope="col"
+          >
+            Equipo
+          </th>
+          <th class="standings-detail-table__header-cell" scope="col">J</th>
+          <th class="standings-detail-table__header-cell" scope="col">G</th>
+          <th class="standings-detail-table__header-cell" scope="col">P</th>
+          <th class="standings-detail-table__header-cell" scope="col">JG</th>
+          <th class="standings-detail-table__header-cell" scope="col">JP</th>
+          <th class="standings-detail-table__header-cell" scope="col">DIF</th>
+          <th
+            class="standings-detail-table__header-cell standings-detail-table__header-cell--pts"
+            scope="col"
+          >
+            PTS
+          </th>
+        </tr>
+      </thead>
 
-    <tbody>
-      @for (row of rows(); track row.teamId) {
-        <tr
-          class="standings-detail-table__row"
-          [class.standings-detail-table__row--leader]="row.isLeader"
-          [class.standings-detail-table__row--podium]="row.rankTone === 'podium'"
-        >
-          <td class="standings-detail-table__cell standings-detail-table__cell--rank">
+      <tbody>
+        @for (row of rows(); track row.teamId) {
+          <tr
+            class="standings-detail-table__row"
+            [class.standings-detail-table__row--leader]="row.isLeader"
+            [class.standings-detail-table__row--podium]="row.rankTone === 'podium'"
+          >
+            <td class="standings-detail-table__cell standings-detail-table__cell--rank">
+              <app-rank-indicator
+                [compact]="true"
+                [isLast]="row.isLast"
+                [isLeader]="row.isLeader"
+                [rank]="row.rank"
+              />
+            </td>
+
+            <th class="standings-detail-table__cell standings-detail-table__cell--team" scope="row">
+              <app-team-badge
+                [compact]="true"
+                [interactive]="true"
+                [logoPath]="row.logoPath"
+                [monogram]="row.monogram"
+                [teamLink]="row.teamLink"
+                [teamName]="row.teamName"
+              />
+            </th>
+
+            <td class="standings-detail-table__cell">{{ row.playedLabel }}</td>
+            <td class="standings-detail-table__cell standings-detail-table__cell--won">
+              {{ row.wonLabel }}
+            </td>
+            <td class="standings-detail-table__cell standings-detail-table__cell--lost">
+              {{ row.lostLabel }}
+            </td>
+            <td class="standings-detail-table__cell">{{ row.wonGamesLabel }}</td>
+            <td class="standings-detail-table__cell">{{ row.lostGamesLabel }}</td>
+            <td
+              class="standings-detail-table__cell standings-detail-table__cell--difference"
+              [class.standings-detail-table__cell--positive]="row.gameDifferenceTone === 'positive'"
+              [class.standings-detail-table__cell--negative]="row.gameDifferenceTone === 'negative'"
+            >
+              {{ row.gameDifferenceLabel }}
+            </td>
+            <td class="standings-detail-table__cell standings-detail-table__cell--pts">
+              {{ row.pointsLabel }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="standings-detail-table__legend">
+    <span class="standings-detail-table__legend-item">J — Jugados</span>
+    <span class="standings-detail-table__legend-item">G — Ganados</span>
+    <span class="standings-detail-table__legend-item">P — Perdidos</span>
+    <span class="standings-detail-table__legend-item">JG — Juegos ganados</span>
+    <span class="standings-detail-table__legend-item">JP — Juegos perdidos</span>
+    <span class="standings-detail-table__legend-item">DIF — Diferencia de juegos</span>
+    <span class="standings-detail-table__legend-item">PTS — Puntos de liga</span>
+  </p>
+} @else {
+  <ul [attr.aria-label]="caption()" class="standings-detail-table__cards">
+    @for (row of rows(); track row.teamId) {
+      <li
+        class="standings-detail-table__card"
+        [class.standings-detail-table__card--leader]="row.isLeader"
+        [class.standings-detail-table__card--podium]="row.rankTone === 'podium'"
+      >
+        <div class="standings-detail-table__card-header">
+          <div class="standings-detail-table__card-rank">
+            <span class="u-visually-hidden">Posición</span>
             <app-rank-indicator
               [compact]="true"
               [isLast]="row.isLast"
               [isLeader]="row.isLeader"
               [rank]="row.rank"
             />
-          </td>
+          </div>
 
-          <th class="standings-detail-table__cell standings-detail-table__cell--team" scope="row">
+          <div class="standings-detail-table__card-team">
             <app-team-badge
               [compact]="true"
               [interactive]="true"
@@ -60,39 +125,45 @@
               [teamLink]="row.teamLink"
               [teamName]="row.teamName"
             />
-          </th>
+          </div>
+        </div>
 
-          <td class="standings-detail-table__cell">{{ row.playedLabel }}</td>
-          <td class="standings-detail-table__cell standings-detail-table__cell--won">
-            {{ row.wonLabel }}
-          </td>
-          <td class="standings-detail-table__cell standings-detail-table__cell--lost">
-            {{ row.lostLabel }}
-          </td>
-          <td class="standings-detail-table__cell">{{ row.wonGamesLabel }}</td>
-          <td class="standings-detail-table__cell">{{ row.lostGamesLabel }}</td>
-          <td
-            class="standings-detail-table__cell standings-detail-table__cell--difference"
-            [class.standings-detail-table__cell--positive]="row.gameDifferenceTone === 'positive'"
-            [class.standings-detail-table__cell--negative]="row.gameDifferenceTone === 'negative'"
+        <dl class="standings-detail-table__card-metrics">
+          <div class="standings-detail-table__card-metric">
+            <dt class="standings-detail-table__card-metric-label">
+              <span aria-hidden="true">J</span>
+              <span class="u-visually-hidden">Jugados</span>
+            </dt>
+            <dd class="standings-detail-table__card-metric-value">{{ row.playedLabel }}</dd>
+          </div>
+
+          <div class="standings-detail-table__card-metric standings-detail-table__card-metric--won">
+            <dt class="standings-detail-table__card-metric-label">
+              <span aria-hidden="true">G</span>
+              <span class="u-visually-hidden">Ganados</span>
+            </dt>
+            <dd class="standings-detail-table__card-metric-value">{{ row.wonLabel }}</dd>
+          </div>
+
+          <div
+            class="standings-detail-table__card-metric standings-detail-table__card-metric--lost"
           >
-            {{ row.gameDifferenceLabel }}
-          </td>
-          <td class="standings-detail-table__cell standings-detail-table__cell--pts">
-            {{ row.pointsLabel }}
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
+            <dt class="standings-detail-table__card-metric-label">
+              <span aria-hidden="true">P</span>
+              <span class="u-visually-hidden">Perdidos</span>
+            </dt>
+            <dd class="standings-detail-table__card-metric-value">{{ row.lostLabel }}</dd>
+          </div>
 
-<p class="standings-detail-table__legend">
-  <span class="standings-detail-table__legend-item">J — Jugados</span>
-  <span class="standings-detail-table__legend-item">G — Ganados</span>
-  <span class="standings-detail-table__legend-item">P — Perdidos</span>
-  <span class="standings-detail-table__legend-item">JG — Juegos ganados</span>
-  <span class="standings-detail-table__legend-item">JP — Juegos perdidos</span>
-  <span class="standings-detail-table__legend-item">DIF — Diferencia de juegos</span>
-  <span class="standings-detail-table__legend-item">PTS — Puntos de liga</span>
-</p>
+          <div class="standings-detail-table__card-metric standings-detail-table__card-metric--pts">
+            <dt class="standings-detail-table__card-metric-label">
+              <span aria-hidden="true">PTS</span>
+              <span class="u-visually-hidden">Puntos</span>
+            </dt>
+            <dd class="standings-detail-table__card-metric-value">{{ row.pointsLabel }}</dd>
+          </div>
+        </dl>
+      </li>
+    }
+  </ul>
+}

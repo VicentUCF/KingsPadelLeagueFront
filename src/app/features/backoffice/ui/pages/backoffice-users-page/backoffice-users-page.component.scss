@@ -46,7 +46,7 @@
   }
 
   &__title {
-    font-size: clamp(1.4rem, 2vw + 1rem, 1.9rem);
+    font-size: clamp(1.4rem, 2dvw + 1rem, 1.9rem);
     font-weight: 750;
     color: var(--color-text-strong);
     letter-spacing: -0.02em;
@@ -544,7 +544,7 @@
   border: 1px solid rgb(245 245 245 / 12%);
   border-radius: 1.25rem;
   width: min(36rem, 100%);
-  max-height: min(90vh, 40rem);
+  max-height: min(90dvh, 40rem);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -624,7 +624,7 @@
   border: 1px solid rgb(245 245 245 / 12%);
   border-radius: 1.25rem;
   width: min(38rem, 100%);
-  max-height: min(90vh, 42rem);
+  max-height: min(90dvh, 42rem);
   display: flex;
   flex-direction: column;
   overflow: hidden;

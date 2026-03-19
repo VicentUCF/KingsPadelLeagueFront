@@ -50,7 +50,7 @@
   }
 
   &__title {
-    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-size: clamp(1.2rem, 2dvw, 1.6rem);
     line-height: 1.05;
   }
 
@@ -104,7 +104,7 @@
 
   &__score {
     color: var(--color-text-strong);
-    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-size: clamp(1.5rem, 4dvw, 2.1rem);
     font-weight: 800;
     line-height: 1;
   }

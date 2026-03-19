@@ -23,7 +23,7 @@
     grid-template-rows: auto minmax(0, 1fr) auto;
     gap: var(--space-6);
     width: min(100%, 38rem);
-    max-height: min(90vh, 44rem);
+    max-height: min(90dvh, 44rem);
     padding: var(--space-7);
     overflow: auto;
     border: 1px solid var(--color-border-subtle);
@@ -58,7 +58,7 @@
   h2 {
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.45rem, 3vw, 1.9rem);
+    font-size: clamp(1.45rem, 3dvw, 1.9rem);
     letter-spacing: -0.04em;
   }
 
@@ -116,7 +116,7 @@
 
     &__panel {
       width: 100%;
-      max-height: min(92vh, 48rem);
+      max-height: min(92dvh, 48rem);
       padding: var(--space-6);
       border-radius: 1.25rem;
     }
