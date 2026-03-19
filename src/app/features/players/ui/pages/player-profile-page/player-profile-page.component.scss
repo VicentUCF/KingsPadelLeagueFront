@@ -48,7 +48,7 @@
 
   &__brand-watermark {
     position: absolute;
-    inset: clamp(1rem, 3vw, 2rem) 0 0 24%;
+    inset: clamp(1rem, 3dvw, 2rem) 0 0 24%;
     display: grid;
     align-items: center;
     justify-items: end;
@@ -57,16 +57,16 @@
   }
   &__brand-watermark-image {
     display: block;
-    width: min(70rem, 82vw);
+    width: min(70rem, 82dvw);
     opacity: 0.08;
     object-fit: contain;
     filter: drop-shadow(0 1.5rem 3rem rgb(0 0 0 / 0.18));
   }
   &__brand-watermark-monogram {
-    margin-inline-end: clamp(1rem, 4vw, 3rem);
+    margin-inline-end: clamp(1rem, 4dvw, 3rem);
     color: var(--player-team-accent);
     font-family: var(--font-family-heading);
-    font-size: clamp(10rem, 30vw, 24rem);
+    font-size: clamp(10rem, 30dvw, 24rem);
     font-weight: 900;
     letter-spacing: 0.08em;
     line-height: 0.9;
@@ -79,7 +79,7 @@
   }
 
   &__team-showcase {
-    padding: clamp(1.5rem, 2vw + 1rem, 2.25rem);
+    padding: clamp(1.5rem, 2dvw + 1rem, 2.25rem);
     border: 1px solid var(--team-border);
     border-radius: 2rem;
     background:
@@ -104,7 +104,7 @@
   &__team-showcase-copy h1 {
     margin: 0;
     color: #fff;
-    font-size: clamp(2.2rem, 4vw, 4rem);
+    font-size: clamp(2.2rem, 4dvw, 4rem);
     line-height: 0.95;
     letter-spacing: -0.06em;
   }
@@ -126,7 +126,7 @@
     margin: 0;
     color: #fff;
     font-family: var(--font-family-heading);
-    font-size: clamp(1.75rem, 2vw + 1rem, 2.8rem);
+    font-size: clamp(1.75rem, 2dvw + 1rem, 2.8rem);
     font-weight: 900;
     letter-spacing: -0.05em;
     line-height: 0.95;
@@ -302,15 +302,15 @@
       inset: 0;
       justify-items: center;
       align-items: start;
-      padding-top: clamp(2.75rem, 8vw, 4.5rem);
+      padding-top: clamp(2.75rem, 8dvw, 4.5rem);
     }
     &__brand-watermark-image {
-      width: min(92vw, 30rem);
+      width: min(92dvw, 30rem);
       opacity: 0.1;
     }
     &__brand-watermark-monogram {
       margin-inline-end: 0;
-      font-size: clamp(7.5rem, 38vw, 13rem);
+      font-size: clamp(7.5rem, 38dvw, 13rem);
       opacity: 0.1;
     }
     &__detail {

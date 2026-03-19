@@ -30,7 +30,7 @@
   &__background {
     position: absolute;
     inset: auto -10% -22% auto;
-    width: min(34rem, 72vw);
+    width: min(34rem, 72dvw);
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(circle, var(--team-glow), transparent 62%);
@@ -73,7 +73,7 @@
     h2 {
       margin: 0;
       color: #fff;
-      font-size: clamp(2.2rem, 5vw, 4.6rem);
+      font-size: clamp(2.2rem, 5dvw, 4.6rem);
       line-height: 0.95;
       letter-spacing: -0.06em;
     }
@@ -97,7 +97,7 @@
   &__tagline {
     max-width: 36rem;
     color: #fff;
-    font-size: clamp(1.05rem, 1vw + 0.9rem, 1.4rem);
+    font-size: clamp(1.05rem, 1dvw + 0.9rem, 1.4rem);
     font-weight: 600;
     line-height: 1.25;
   }
@@ -212,7 +212,7 @@
   &__monogram {
     color: var(--team-accent);
     font-family: var(--font-family-heading);
-    font-size: clamp(4rem, 12vw, 7rem);
+    font-size: clamp(4rem, 12dvw, 7rem);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -256,7 +256,7 @@
   }
 
   &--page &__panel {
-    min-height: min(48rem, calc(100vh - 9rem));
+    min-height: min(48rem, calc(100dvh - 9rem));
     align-items: center;
   }
 }
@@ -277,7 +277,7 @@
     &__heading {
       h1,
       h2 {
-        font-size: clamp(1.8rem, 9vw, 2.6rem);
+        font-size: clamp(1.8rem, 9dvw, 2.6rem);
         line-height: 1;
         letter-spacing: -0.04em;
       }

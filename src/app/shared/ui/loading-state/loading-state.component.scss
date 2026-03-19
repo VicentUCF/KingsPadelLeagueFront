@@ -1,7 +1,7 @@
 .loading-state {
   display: grid;
   gap: var(--space-5);
-  padding: clamp(1.25rem, 1rem + 0.7vw, 1.9rem);
+  padding: clamp(1.25rem, 1rem + 0.7dvw, 1.9rem);
 
   &--page {
     min-height: 18rem;
@@ -34,7 +34,7 @@
   &__heading {
     color: var(--color-text-strong);
     font-family: var(--font-family-heading);
-    font-size: clamp(1.05rem, 1rem + 0.5vw, 1.35rem);
+    font-size: clamp(1.05rem, 1rem + 0.5dvw, 1.35rem);
     font-weight: 700;
     letter-spacing: -0.03em;
   }

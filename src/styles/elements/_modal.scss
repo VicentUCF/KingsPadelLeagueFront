@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
-  width: 100vw;
+  width: 100dvw;
   height: 100dvh;
   overflow: hidden;
   overscroll-behavior: contain;
@@ -15,10 +15,10 @@
 }
 
 .app-modal {
-  --app-modal-width: min(42rem, 94vw);
+  --app-modal-width: min(42rem, 94dvw);
   --app-modal-max-height: 90dvh;
-  --app-modal-padding-x: clamp(0.9rem, 2vw, 1.25rem);
-  --app-modal-padding-y: clamp(0.8rem, 1.8vw, 1rem);
+  --app-modal-padding-x: clamp(0.9rem, 2dvw, 1.25rem);
+  --app-modal-padding-y: clamp(0.8rem, 1.8dvw, 1rem);
   --app-modal-divider: rgb(245 245 245 / 8%);
   --app-modal-surface: var(--color-surface-raised, #161616);
 
@@ -37,19 +37,19 @@
     0 0 0 1px rgb(201 162 39 / 8%);
 
   &--sm {
-    --app-modal-width: min(30rem, 94vw);
+    --app-modal-width: min(30rem, 94dvw);
   }
   &--md {
-    --app-modal-width: min(42rem, 94vw);
+    --app-modal-width: min(42rem, 94dvw);
   }
   &--lg {
-    --app-modal-width: min(56rem, 94vw);
+    --app-modal-width: min(56rem, 94dvw);
   }
   &--xl {
-    --app-modal-width: min(68rem, 96vw);
+    --app-modal-width: min(68rem, 96dvw);
   }
   &--full {
-    --app-modal-width: min(96vw, 86rem);
+    --app-modal-width: min(96dvw, 86rem);
     --app-modal-max-height: 92dvh;
   }
 
