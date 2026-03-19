@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Session, SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_CLIENT } from '@core/tokens/supabase.token';
 import { environment } from '../../../../../environments/environment';
@@ -64,27 +64,21 @@ export class AuthStore {
       .getSession()
       .then(({ data }) => {
         if (data.session) {
-          this._accessToken.set(data.session.access_token);
-          return this.loadCurrentUser();
+          return this.hydrateAuthenticatedSession(data.session, {
+            resolveInitialSession: true,
+          });
         }
 
-        this.clearAuthenticatedState();
-        this._status.set('unauthenticated');
+        this.setUnauthenticatedState({ resolveInitialSession: true });
         return undefined;
       })
       .catch(() => {
-        this.clearAuthenticatedState();
-        this._status.set('unauthenticated');
-      })
-      .finally(() => {
-        this.resolveInitialSession();
+        this.setUnauthenticatedState({ resolveInitialSession: true });
       });
 
     this.supabase.auth.onAuthStateChange((event, session) => {
       if ((event === 'INITIAL_SESSION' || event === 'SIGNED_OUT') && !session) {
-        this.clearAuthenticatedState();
-        this._status.set('unauthenticated');
-        this.resolveInitialSession();
+        this.setUnauthenticatedState({ resolveInitialSession: true });
       } else if (
         event === 'INITIAL_SESSION' ||
         event === 'SIGNED_IN' ||
@@ -92,20 +86,18 @@ export class AuthStore {
         event === 'USER_UPDATED'
       ) {
         if (!session) {
-          this.clearAuthenticatedState();
-          this._status.set('unauthenticated');
-          this.resolveInitialSession();
+          this.setUnauthenticatedState({ resolveInitialSession: true });
           return;
         }
 
-        this._accessToken.set(session.access_token);
-        void this.loadCurrentUser();
-        this.resolveInitialSession();
+        void this.hydrateAuthenticatedSession(session, { resolveInitialSession: true });
       } else if (event === 'PASSWORD_RECOVERY') {
         // User arrived via password-reset link — keep unauthenticated state until they set a new password
         this._accessToken.set(session?.access_token ?? null);
-        this._status.set('unauthenticated');
-        this.resolveInitialSession();
+        this.setUnauthenticatedState({
+          keepAccessToken: true,
+          resolveInitialSession: true,
+        });
       }
     });
   }
@@ -114,8 +106,7 @@ export class AuthStore {
     try {
       const { data } = await this.supabase.auth.getUser();
       if (!data.user) {
-        this.clearAuthenticatedState();
-        this._status.set('unauthenticated');
+        this.setUnauthenticatedState();
         return;
       }
 
@@ -124,8 +115,7 @@ export class AuthStore {
       );
       this._status.set('authenticated');
     } catch {
-      this.clearAuthenticatedState();
-      this._status.set('unauthenticated');
+      this.setUnauthenticatedState();
     }
   }
 
@@ -145,8 +135,7 @@ export class AuthStore {
       this._status.set('authenticated');
       this.resolveInitialSession();
     } catch (err) {
-      this.clearAuthenticatedState();
-      this._status.set('unauthenticated');
+      this.setUnauthenticatedState();
       this._error.set(err instanceof Error ? err.message : 'Error al iniciar sesión');
       throw err;
     }
@@ -167,8 +156,7 @@ export class AuthStore {
 
   async logout(): Promise<void> {
     await this.logoutUseCase.execute();
-    this.clearAuthenticatedState();
-    this._status.set('unauthenticated');
+    this.setUnauthenticatedState();
   }
 
   async requestPasswordReset(email: string): Promise<void> {
@@ -226,9 +214,32 @@ export class AuthStore {
     this._error.set(null);
   }
 
-  private clearAuthenticatedState(): void {
+  private async hydrateAuthenticatedSession(
+    session: Pick<Session, 'access_token'>,
+    options: { resolveInitialSession?: boolean } = {},
+  ): Promise<void> {
+    this._accessToken.set(session.access_token);
+    await this.loadCurrentUser();
+
+    if (options.resolveInitialSession) {
+      this.resolveInitialSession();
+    }
+  }
+
+  private setUnauthenticatedState(
+    options: { keepAccessToken?: boolean; resolveInitialSession?: boolean } = {},
+  ): void {
     this._user.set(null);
-    this._accessToken.set(null);
+
+    if (!options.keepAccessToken) {
+      this._accessToken.set(null);
+    }
+
+    this._status.set('unauthenticated');
+
+    if (options.resolveInitialSession) {
+      this.resolveInitialSession();
+    }
   }
 
   private resolveInitialSession(): void {
