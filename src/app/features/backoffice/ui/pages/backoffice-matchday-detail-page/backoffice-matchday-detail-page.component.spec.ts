@@ -15,11 +15,16 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
   it('shows admin operational controls in the matchday detail', async () => {
     await renderComponentWithRole('ADMIN');
 
-    expect(screen.getByRole('button', { name: /Iniciar jornada/i })).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /Iniciar jornada/i })).toHaveLength(2);
     expect(screen.getByRole('button', { name: /Finalizar jornada/i })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Generar pair matches/i })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: /Generar enfrentamientos de parejas/i }),
+    ).toBeVisible();
     expect(screen.getByRole('button', { name: /Nuevo partido/i })).toBeVisible();
     expect(screen.getByRole('button', { name: /Editar MVP/i })).toBeVisible();
+    expect(screen.getByText('Resumen operativo')).toBeVisible();
+    expect(screen.getByText('2/2 enfrentamientos')).toBeVisible();
+    expect(screen.getByRole('button', { name: /Finalizar jornada/i })).toBeDisabled();
     expect(screen.getByText('Partido 1')).toBeVisible();
     expect(screen.getByText('Partido 2')).toBeVisible();
     expect(screen.getByText('3 puntos')).toBeVisible();

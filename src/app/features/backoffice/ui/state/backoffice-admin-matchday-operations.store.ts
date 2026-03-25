@@ -62,7 +62,7 @@ export class BackofficeAdminMatchdayOperationsStore {
       const pairMatches = await this.pairMatchesRepository.loadByLineupPairIds(lineupPairIds);
       this.pairMatches.set(pairMatches);
     } catch {
-      this.pairMatchesErrorMessage.set('No hemos podido cargar los pair matches.');
+      this.pairMatchesErrorMessage.set('No hemos podido cargar los enfrentamientos de parejas.');
     } finally {
       this.isLoadingPairMatches.set(false);
     }
@@ -119,11 +119,14 @@ export class BackofficeAdminMatchdayOperationsStore {
       await this.matchdaysRepository.createPairMatches(matchdayId);
       await this.refreshMatchdayContext(matchdayId);
       this.toastStore.success(
-        'Los pair matches se han generado correctamente.',
-        'Pair matches generados',
+        'Los enfrentamientos de parejas se han generado correctamente.',
+        'Enfrentamientos generados',
       );
     } catch {
-      this.toastStore.error('No hemos podido generar los pair matches.', 'Acción no completada');
+      this.toastStore.error(
+        'No hemos podido generar los enfrentamientos de parejas.',
+        'Acción no completada',
+      );
     } finally {
       this.isCreatingPairMatches.set(false);
     }
@@ -193,7 +196,7 @@ export class BackofficeAdminMatchdayOperationsStore {
       this.toastStore.success('El resultado se ha guardado correctamente.', 'Resultado registrado');
     } catch {
       this.toastStore.error(
-        'No hemos podido guardar el resultado del pair match.',
+        'No hemos podido guardar el resultado del enfrentamiento de parejas.',
         'Acción no completada',
       );
     } finally {

@@ -450,63 +450,142 @@
         }
       </div>
     } @else {
-      <section class="matchday-detail__matches">
+      @if (isAdmin()) {
+        <section class="matchday-detail__overview c-surface-card" aria-label="Estado de la jornada">
+          <div class="matchday-detail__overview-main">
+            <div>
+              <p class="matchday-detail__overview-eyebrow">Estado de la jornada</p>
+              <h2 class="matchday-detail__overview-title">Resumen operativo</h2>
+              <p class="matchday-detail__overview-copy">{{ primaryAction().description }}</p>
+            </div>
+
+            @if (primaryAction().kind !== 'none') {
+              <button
+                type="button"
+                class="c-button c-button--pill c-button--primary c-button--md"
+                [disabled]="
+                  (primaryAction().kind === 'start-matchday' &&
+                    (startMatchdayGuardrail().disabled ||
+                      adminOperationsStore.isStartingMatchday())) ||
+                  (primaryAction().kind === 'create-pair-matchups' &&
+                    (createPairMatchupsGuardrail().disabled ||
+                      adminOperationsStore.isCreatingPairMatches())) ||
+                  (primaryAction().kind === 'finish-matchday' &&
+                    (finishMatchdayGuardrail().disabled ||
+                      adminOperationsStore.isFinishingMatchday())) ||
+                  (primaryAction().kind === 'create-match' &&
+                    (createMatchGuardrail().disabled || adminOperationsStore.isCreatingMatch()))
+                "
+                (click)="runPrimaryAction()"
+              >
+                {{ primaryAction().label }}
+              </button>
+            }
+          </div>
+
+          <div class="matchday-detail__overview-chips">
+            <span class="c-chip c-chip--small c-chip--tone-neutral">
+              {{ matchdayOverview().totalMatches }}
+              {{ matchdayOverview().totalMatches === 1 ? 'partido' : 'partidos' }}
+            </span>
+            <span class="c-chip c-chip--small c-chip--tone-info">
+              {{ matchdayOverview().generatedPairMatches }}/{{
+                matchdayOverview().expectedPairMatches
+              }}
+              enfrentamientos
+            </span>
+            <span class="c-chip c-chip--small c-chip--tone-success">
+              {{ matchdayOverview().completedResults }}/{{
+                matchdayOverview().generatedPairMatches
+              }}
+              resultados
+            </span>
+            <span class="c-chip c-chip--small c-chip--tone-warning">
+              {{ matchdayOverview().pendingMatches }} pendientes de cierre
+            </span>
+          </div>
+        </section>
+      }
+
+      <section class="matchday-detail__matches" id="matchday-matches">
         <div class="matchday-detail__section-head">
           <h2 class="matchday-detail__section-title">Partidos de la jornada</h2>
           @if (isAdmin()) {
-            <div class="matchday-detail__admin-actions">
-              <button
-                type="button"
-                class="c-button c-button--pill c-button--outline c-button--sm"
-                [disabled]="adminOperationsStore.isStartingMatchday()"
-                (click)="
-                  openConfirmAction(
-                    'start-matchday',
-                    'Iniciar jornada',
-                    'La jornada pasará a estar en curso.',
-                    'Iniciar jornada'
-                  )
-                "
-              >
-                Iniciar jornada
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--pill c-button--outline c-button--sm"
-                [disabled]="adminOperationsStore.isFinishingMatchday()"
-                (click)="
-                  openConfirmAction(
-                    'finish-matchday',
-                    'Finalizar jornada',
-                    'La jornada pasará a estado finalizado.',
-                    'Finalizar jornada'
-                  )
-                "
-              >
-                Finalizar jornada
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--pill c-button--outline c-button--sm"
-                [disabled]="adminOperationsStore.isCreatingPairMatches()"
-                (click)="
-                  openConfirmAction(
-                    'create-pair-matches',
-                    'Generar pair matches',
-                    'Se crearán los enfrentamientos de parejas para la jornada.',
-                    'Generar pair matches'
-                  )
-                "
-              >
-                Generar pair matches
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--pill c-button--primary c-button--sm"
-                (click)="openCreateMatchDialog()"
-              >
-                Nuevo partido
-              </button>
+            <div class="matchday-detail__section-actions">
+              <div class="matchday-detail__admin-actions">
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--outline c-button--sm"
+                  [disabled]="
+                    startMatchdayGuardrail().disabled || adminOperationsStore.isStartingMatchday()
+                  "
+                  [title]="startMatchdayGuardrail().reason ?? ''"
+                  (click)="
+                    openConfirmAction(
+                      'start-matchday',
+                      'Iniciar jornada',
+                      'La jornada pasará a estar en curso.',
+                      'Iniciar jornada'
+                    )
+                  "
+                >
+                  Iniciar jornada
+                </button>
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--outline c-button--sm"
+                  [disabled]="
+                    finishMatchdayGuardrail().disabled || adminOperationsStore.isFinishingMatchday()
+                  "
+                  [title]="finishMatchdayGuardrail().reason ?? ''"
+                  (click)="
+                    openConfirmAction(
+                      'finish-matchday',
+                      'Finalizar jornada',
+                      'La jornada pasará a estado finalizado.',
+                      'Finalizar jornada'
+                    )
+                  "
+                >
+                  Finalizar jornada
+                </button>
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--outline c-button--sm"
+                  [disabled]="
+                    createPairMatchupsGuardrail().disabled ||
+                    adminOperationsStore.isCreatingPairMatches()
+                  "
+                  [title]="createPairMatchupsGuardrail().reason ?? ''"
+                  (click)="
+                    openConfirmAction(
+                      'create-pair-matches',
+                      'Generar enfrentamientos de parejas',
+                      'Se crearán los enfrentamientos de parejas para la jornada.',
+                      'Generar enfrentamientos'
+                    )
+                  "
+                >
+                  Generar enfrentamientos de parejas
+                </button>
+                <button
+                  type="button"
+                  class="c-button c-button--pill c-button--primary c-button--sm"
+                  [disabled]="
+                    createMatchGuardrail().disabled || adminOperationsStore.isCreatingMatch()
+                  "
+                  [title]="createMatchGuardrail().reason ?? ''"
+                  (click)="openCreateMatchDialog()"
+                >
+                  Nuevo partido
+                </button>
+              </div>
+
+              @if (disabledAdminActionMessages().length > 0) {
+                <p class="matchday-detail__guardrails" aria-live="polite">
+                  {{ disabledAdminActionMessages().join(' · ') }}
+                </p>
+              }
             </div>
           }
         </div>
@@ -566,6 +645,11 @@
                       <button
                         type="button"
                         class="c-button c-button--pill c-button--ghost c-button--sm"
+                        [disabled]="
+                          startMatchGuardrail(card.matchId).disabled ||
+                          adminOperationsStore.matchActionIds()[card.matchId] === 'starting'
+                        "
+                        [title]="startMatchGuardrail(card.matchId).reason ?? ''"
                         (click)="
                           openConfirmAction(
                             'start-match',
@@ -581,6 +665,11 @@
                       <button
                         type="button"
                         class="c-button c-button--pill c-button--ghost c-button--sm"
+                        [disabled]="
+                          finishMatchGuardrail(card.matchId).disabled ||
+                          adminOperationsStore.matchActionIds()[card.matchId] === 'finishing'
+                        "
+                        [title]="finishMatchGuardrail(card.matchId).reason ?? ''"
                         (click)="
                           openConfirmAction(
                             'finish-match',
@@ -596,11 +685,18 @@
                       <button
                         type="button"
                         class="c-button c-button--pill c-button--outline c-button--sm"
+                        [disabled]="
+                          adminOperationsStore.matchActionIds()[card.matchId] === 'updating-mvp'
+                        "
                         (click)="updateMvp(card.matchId, card.mvpId)"
                       >
                         Editar MVP
                       </button>
                     </div>
+
+                    @if (matchGuardrailMessage(card.matchId); as guardrailMessage) {
+                      <p class="matchday-detail__match-guardrail">{{ guardrailMessage }}</p>
+                    }
 
                     <div class="matchday-detail__pair-results">
                       @for (
@@ -679,7 +775,8 @@
                           } @else {
                             <div class="matchday-detail__pair-result-actions">
                               <span class="matchday-detail__pair-result-help">
-                                Genera los pair matches para registrar el resultado de este partido.
+                                Genera los enfrentamientos de parejas para registrar el resultado de
+                                este partido.
                               </span>
                             </div>
                           }

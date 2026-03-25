@@ -51,6 +51,51 @@
     flex-wrap: wrap;
   }
 
+  &__overview {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  &__overview-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__overview-eyebrow {
+    margin: 0 0 0.2rem;
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__overview-title {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  &__overview-copy {
+    margin: 0.35rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    max-width: 52rem;
+  }
+
+  &__overview-chips {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
   // ── Matches list ───────────────────────────────────────────────────────────
   &__section-head {
     display: flex;
@@ -60,11 +105,24 @@
     flex-wrap: wrap;
   }
 
+  &__section-actions {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: end;
+  }
+
   &__admin-actions {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
     justify-content: flex-end;
+  }
+
+  &__guardrails,
+  &__match-guardrail {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
   }
 
   &__matches {

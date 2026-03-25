@@ -6,6 +6,7 @@ import {
   signal,
   type OnInit,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import type {
@@ -53,6 +54,22 @@ interface MatchPairSlotViewModel {
   readonly pairMatch: BackofficePairMatch | null;
 }
 
+interface ActionGuardrailViewModel {
+  readonly disabled: boolean;
+  readonly reason: string | null;
+}
+
+interface MatchdayOverviewViewModel {
+  readonly totalMatches: number;
+  readonly finishedMatches: number;
+  readonly pendingMatches: number;
+  readonly expectedPairMatches: number;
+  readonly generatedPairMatches: number;
+  readonly pendingPairMatches: number;
+  readonly completedResults: number;
+  readonly pendingResults: number;
+}
+
 type ConfirmActionKind =
   | 'start-matchday'
   | 'finish-matchday'
@@ -83,6 +100,7 @@ const MATCH_PAIR_SLOT_CONFIG = [
 })
 export class BackofficeMatchdayDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly document = inject(DOCUMENT);
   protected readonly matchdaysStore = inject(BackofficeMatchdaysStore);
   protected readonly lineupsStore = inject(BackofficeLineupsStore);
   protected readonly teamsStore = inject(BackofficeTeamsStore);
@@ -149,6 +167,187 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
         return toBackofficeMatchCardViewModel(match, localTeam, awayTeam, lineup);
       })
       .filter((card): card is BackofficeMatchCardViewModel => card !== null);
+  });
+
+  protected readonly matchdayOverview = computed<MatchdayOverviewViewModel>(() => {
+    const matches = this.lineupsStore
+      .matches()
+      .filter((match) => match.matchdayId === this.matchdayId());
+    const finishedMatches = matches.filter((match) => match.status === 'finished').length;
+    const pairSlots = matches.flatMap((match) =>
+      this.pairMatchupsForMatch(match.id, match.localTeamId, match.awayTeamId),
+    );
+    const expectedPairMatches = pairSlots.filter((slot) => slot.localPair && slot.awayPair).length;
+    const generatedPairMatches = this.adminOperationsStore.pairMatches().length;
+    const completedResults = this.adminOperationsStore
+      .pairMatches()
+      .filter(
+        (pairMatch) => pairMatch.status === 'finished' || pairMatch.setsResult.length > 0,
+      ).length;
+
+    return {
+      totalMatches: matches.length,
+      finishedMatches,
+      pendingMatches: Math.max(matches.length - finishedMatches, 0),
+      expectedPairMatches,
+      generatedPairMatches,
+      pendingPairMatches: Math.max(expectedPairMatches - generatedPairMatches, 0),
+      completedResults,
+      pendingResults: Math.max(generatedPairMatches - completedResults, 0),
+    };
+  });
+
+  protected readonly startMatchdayGuardrail = computed(() => {
+    const matchday = this.matchday();
+    const overview = this.matchdayOverview();
+
+    if (!matchday || matchday.status !== 'scheduled') {
+      return this.createGuardrail(
+        true,
+        'La jornada solo se puede iniciar desde estado programado.',
+      );
+    }
+
+    if (overview.totalMatches === 0) {
+      return this.createGuardrail(
+        true,
+        'Necesitas al menos 1 partido creado para iniciar la jornada.',
+      );
+    }
+
+    return this.createGuardrail(false);
+  });
+
+  protected readonly finishMatchdayGuardrail = computed(() => {
+    const matchday = this.matchday();
+    const overview = this.matchdayOverview();
+
+    if (!matchday || matchday.status !== 'in_progress') {
+      return this.createGuardrail(true, 'La jornada debe estar en curso para poder finalizarla.');
+    }
+
+    if (overview.totalMatches === 0) {
+      return this.createGuardrail(true, 'Necesitas al menos 1 partido para finalizar la jornada.');
+    }
+
+    if (overview.pendingMatches > 0) {
+      return this.createGuardrail(true, 'Finaliza todos los partidos antes de cerrar la jornada.');
+    }
+
+    return this.createGuardrail(false);
+  });
+
+  protected readonly createPairMatchupsGuardrail = computed(() => {
+    const matchday = this.matchday();
+    const overview = this.matchdayOverview();
+
+    if (!matchday || matchday.status === 'finished') {
+      return this.createGuardrail(
+        true,
+        'La jornada ya está finalizada y no admite nuevos enfrentamientos.',
+      );
+    }
+
+    if (overview.totalMatches === 0) {
+      return this.createGuardrail(
+        true,
+        'Necesitas al menos 1 partido para generar enfrentamientos de parejas.',
+      );
+    }
+
+    if (overview.expectedPairMatches === 0) {
+      return this.createGuardrail(
+        true,
+        'Necesitas alineaciones en ambos equipos para generar enfrentamientos de parejas.',
+      );
+    }
+
+    if (overview.pendingPairMatches === 0) {
+      return this.createGuardrail(true, 'Los enfrentamientos de parejas ya están generados.');
+    }
+
+    return this.createGuardrail(false);
+  });
+
+  protected readonly createMatchGuardrail = computed(() => {
+    const matchday = this.matchday();
+
+    if (!matchday || matchday.status === 'finished') {
+      return this.createGuardrail(true, 'La jornada finalizada no permite crear más partidos.');
+    }
+
+    return this.createGuardrail(false);
+  });
+
+  protected readonly disabledAdminActionMessages = computed(() =>
+    [
+      this.startMatchdayGuardrail().reason,
+      this.finishMatchdayGuardrail().reason,
+      this.createPairMatchupsGuardrail().reason,
+      this.createMatchGuardrail().reason,
+    ].filter(
+      (message, index, messages): message is string =>
+        !!message && messages.indexOf(message) === index,
+    ),
+  );
+
+  protected readonly primaryAction = computed(() => {
+    const matchday = this.matchday();
+    const overview = this.matchdayOverview();
+
+    if (!this.isAdmin() || !matchday) {
+      return { kind: 'none' as const, label: '', description: '' };
+    }
+
+    if (matchday.status === 'scheduled') {
+      if (overview.totalMatches === 0) {
+        return {
+          kind: 'create-match' as const,
+          label: 'Crear primer partido',
+          description:
+            'Crea el primer partido para desbloquear el arranque operativo de la jornada.',
+        };
+      }
+
+      return {
+        kind: 'start-matchday' as const,
+        label: 'Iniciar jornada',
+        description:
+          'La jornada pasará a estar en curso y el equipo podrá empezar a operar sobre los partidos.',
+      };
+    }
+
+    if (matchday.status === 'in_progress' && overview.pendingPairMatches > 0) {
+      return {
+        kind: 'create-pair-matchups' as const,
+        label: 'Generar enfrentamientos de parejas',
+        description:
+          'Aún faltan enfrentamientos de parejas por crear para registrar los resultados.',
+      };
+    }
+
+    if (matchday.status === 'in_progress' && overview.pendingResults > 0) {
+      return {
+        kind: 'review-results' as const,
+        label: 'Registrar resultados pendientes',
+        description:
+          'Quedan resultados de enfrentamientos de parejas por completar antes de cerrar la jornada.',
+      };
+    }
+
+    if (matchday.status === 'in_progress' && overview.pendingMatches === 0) {
+      return {
+        kind: 'finish-matchday' as const,
+        label: 'Finalizar jornada',
+        description: 'Todos los partidos están cerrados. Puedes finalizar la jornada.',
+      };
+    }
+
+    return {
+      kind: 'create-match' as const,
+      label: 'Crear nuevo partido',
+      description: 'Añade un partido nuevo para completar la operativa de la jornada.',
+    };
   });
 
   protected readonly confirmAction = signal<{
@@ -232,6 +431,53 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     return this.teamsStore.teams().find((t) => t.id === teamId)?.name ?? '';
   });
 
+  protected runPrimaryAction(): void {
+    const action = this.primaryAction();
+
+    switch (action.kind) {
+      case 'start-matchday':
+        if (!this.startMatchdayGuardrail().disabled) {
+          this.openConfirmAction(
+            'start-matchday',
+            'Iniciar jornada',
+            'La jornada pasará a estar en curso.',
+            'Iniciar jornada',
+          );
+        }
+        break;
+      case 'create-pair-matchups':
+        if (!this.createPairMatchupsGuardrail().disabled) {
+          this.openConfirmAction(
+            'create-pair-matches',
+            'Generar enfrentamientos de parejas',
+            'Se crearán los enfrentamientos de parejas disponibles para la jornada.',
+            'Generar enfrentamientos',
+          );
+        }
+        break;
+      case 'review-results':
+        this.scrollToMatches();
+        break;
+      case 'finish-matchday':
+        if (!this.finishMatchdayGuardrail().disabled) {
+          this.openConfirmAction(
+            'finish-matchday',
+            'Finalizar jornada',
+            'La jornada pasará a estado finalizado.',
+            'Finalizar jornada',
+          );
+        }
+        break;
+      case 'create-match':
+        if (!this.createMatchGuardrail().disabled) {
+          this.openCreateMatchDialog();
+        }
+        break;
+      case 'none':
+        break;
+    }
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('matchdayId') ?? '';
     this.matchdayId.set(id);
@@ -304,6 +550,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   }
 
   protected openCreateMatchDialog(): void {
+    if (this.createMatchGuardrail().disabled) {
+      return;
+    }
+
     this.isCreateMatchDialogOpen.set(true);
   }
 
@@ -381,6 +631,52 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   protected pairMatchResultLabel(pairMatch: BackofficePairMatch | null): string {
     if (!pairMatch || pairMatch.setsResult.length === 0) return 'Sin resultado';
     return pairMatch.setsResult.map((set) => `${set.local}-${set.away}`).join(' · ');
+  }
+
+  protected startMatchGuardrail(matchId: string): ActionGuardrailViewModel {
+    const match = this.lineupsStore.matches().find((item) => item.id === matchId);
+    if (!match) {
+      return this.createGuardrail(true, 'No hemos encontrado el partido seleccionado.');
+    }
+
+    if (match.status !== 'scheduled') {
+      return this.createGuardrail(true, 'Solo puedes iniciar partidos programados.');
+    }
+
+    return this.createGuardrail(false);
+  }
+
+  protected finishMatchGuardrail(matchId: string): ActionGuardrailViewModel {
+    const match = this.lineupsStore.matches().find((item) => item.id === matchId);
+    if (!match) {
+      return this.createGuardrail(true, 'No hemos encontrado el partido seleccionado.');
+    }
+
+    if (match.status !== 'in_progress') {
+      return this.createGuardrail(true, 'Solo puedes finalizar partidos que estén en juego.');
+    }
+
+    return this.createGuardrail(false);
+  }
+
+  protected hasPendingResultActions(
+    matchId: string,
+    localTeamId: string,
+    awayTeamId: string,
+  ): boolean {
+    return this.pairMatchupsForMatch(matchId, localTeamId, awayTeamId).some(
+      (slot) => slot.pairMatch && slot.pairMatch.setsResult.length === 0,
+    );
+  }
+
+  protected matchGuardrailMessage(matchId: string): string | null {
+    const messages = [
+      this.startMatchGuardrail(matchId).reason,
+      this.finishMatchGuardrail(matchId).reason,
+    ].filter(
+      (message, index, all): message is string => !!message && all.indexOf(message) === index,
+    );
+    return messages.length > 0 ? messages.join(' · ') : null;
   }
 
   protected matchStatusLabel(
@@ -583,6 +879,19 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
       'El borrador de alineación se ha guardado correctamente.',
       'Borrador guardado',
     );
+  }
+
+  private createGuardrail(
+    disabled: boolean,
+    reason: string | null = null,
+  ): ActionGuardrailViewModel {
+    return { disabled, reason };
+  }
+
+  private scrollToMatches(): void {
+    this.document
+      .getElementById('matchday-matches')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   private assignPlayerToSlot(
