@@ -1,22 +1,30 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
 import type { MatchHttpV1, PaginatedResponse } from '@core/api/kings-padel-api.types';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
-import type { BackofficeMatchesRepository } from '@features/backoffice/application/ports/backoffice-matches.repository';
+import { AuthStore } from '@features/auth/ui/state/auth.store';
+import type {
+  BackofficeMatchesRepository,
+  CreateBackofficeMatchInput,
+} from '@features/backoffice/application/ports/backoffice-matches.repository';
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
 
 @Injectable()
 export class HttpBackofficeMatchesRepository implements BackofficeMatchesRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
+  private readonly authStore = inject(AuthStore);
+  private readonly matchesBasePath = computed(() =>
+    this.authStore.currentRole() === 'ADMIN' ? '/admin/v1/matches' : '/v1/matches',
+  );
 
   loadByMatchday(matchdayId: string): Promise<readonly BackofficeMatch[]> {
     const params = new HttpParams().append('matchdayIds[]', matchdayId).append('limit', '100');
     return firstValueFrom(
-      this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}/v1/matches`, {
+      this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}${this.matchesBasePath()}`, {
         params,
         context: withHttpErrorToast({ key: 'load-matches-matchday' }),
       }),
@@ -28,11 +36,51 @@ export class HttpBackofficeMatchesRepository implements BackofficeMatchesReposit
     params = params.append('localTeamIds[]', teamId);
     params = params.append('awayTeamIds[]', teamId);
     return firstValueFrom(
-      this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}/v1/matches`, {
+      this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}${this.matchesBasePath()}`, {
         params,
         context: withHttpErrorToast({ key: 'load-matches-team' }),
       }),
     ).then((res) => res.items.map(mapMatch));
+  }
+
+  create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch> {
+    const { mvpId, ...rest } = input;
+    const payload = {
+      ...rest,
+      ...(mvpId == null ? {} : { mvpId }),
+    };
+
+    return firstValueFrom(
+      this.http.post<MatchHttpV1>(`${this.baseUrl}/admin/v1/matches`, payload, {
+        context: withHttpErrorToast({ key: 'create-match' }),
+      }),
+    ).then(mapMatch);
+  }
+
+  start(matchId: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(`${this.baseUrl}/admin/v1/matches/${matchId}/starts`, null, {
+        context: withHttpErrorToast({ key: 'start-match' }),
+      }),
+    ).then(() => undefined);
+  }
+
+  finish(matchId: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(`${this.baseUrl}/admin/v1/matches/${matchId}/finishes`, null, {
+        context: withHttpErrorToast({ key: 'finish-match' }),
+      }),
+    ).then(() => undefined);
+  }
+
+  updateMvp(matchId: string, mvpId: string | null): Promise<void> {
+    const payload = mvpId == null ? {} : { mvpId };
+
+    return firstValueFrom(
+      this.http.patch<void>(`${this.baseUrl}/admin/v1/matches/${matchId}`, payload, {
+        context: withHttpErrorToast({ key: 'update-match-mvp' }),
+      }),
+    ).then(() => undefined);
   }
 }
 
@@ -45,6 +93,7 @@ function mapMatch(raw: MatchHttpV1): BackofficeMatch {
     localTeamScorePoints: raw.localTeamScorePoints,
     awayTeamScorePoints: raw.awayTeamScorePoints,
     scheduledAt: new Date(raw.scheduledAt),
+    status: raw.status,
     mvpId: raw.mvpId ?? null,
   };
 }

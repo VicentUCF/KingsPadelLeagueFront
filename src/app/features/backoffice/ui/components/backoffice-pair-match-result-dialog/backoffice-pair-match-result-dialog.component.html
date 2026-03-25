@@ -1,0 +1,64 @@
+<app-modal-shell
+  [isOpen]="isOpen()"
+  [title]="'Resultado del pair match'"
+  description="Registra o edita los sets del enfrentamiento."
+  size="default"
+  (closed)="close()"
+>
+  <div modalBody>
+    @if (submissionError()) {
+      <p class="backoffice-pair-match-result-dialog__error" role="alert">{{ submissionError() }}</p>
+    }
+
+    <div class="backoffice-pair-match-result-dialog__sets">
+      @for (setForm of sets(); track $index; let index = $index) {
+        <div class="backoffice-pair-match-result-dialog__set-row" [formGroup]="setForm">
+          <label class="c-field">
+            <span class="c-field__label">Local</span>
+            <input class="c-input c-input--md" formControlName="local" type="number" min="0" />
+          </label>
+
+          <label class="c-field">
+            <span class="c-field__label">Visitante</span>
+            <input class="c-input c-input--md" formControlName="away" type="number" min="0" />
+          </label>
+
+          <button
+            class="c-button c-button--pill c-button--ghost c-button--sm"
+            type="button"
+            [disabled]="sets().length === 1"
+            (click)="removeSet(index)"
+          >
+            Quitar set
+          </button>
+        </div>
+      }
+    </div>
+
+    <button
+      class="c-button c-button--pill c-button--ghost c-button--sm"
+      type="button"
+      (click)="addSet()"
+    >
+      + Añadir set
+    </button>
+  </div>
+
+  <div modalFooter class="backoffice-pair-match-result-dialog__actions">
+    <button
+      class="c-button c-button--pill c-button--ghost c-button--md"
+      type="button"
+      (click)="close()"
+    >
+      Cancelar
+    </button>
+    <button
+      class="c-button c-button--pill c-button--primary c-button--md"
+      [disabled]="isSubmitting()"
+      type="button"
+      (click)="submit()"
+    >
+      {{ isSubmitting() ? 'Guardando…' : 'Guardar resultado' }}
+    </button>
+  </div>
+</app-modal-shell>

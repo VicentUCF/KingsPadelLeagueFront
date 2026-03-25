@@ -13,21 +13,26 @@ import type {
   BackofficePlayerPosition,
 } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import type { BackofficePairMatch } from '@features/backoffice/domain/entities/backoffice-pair-match';
 import { ActionToastStore } from '@core/state/action-toast.store';
 import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
 import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
+import { ConfirmActionDialogComponent } from '@shared/ui/confirm-action-dialog/confirm-action-dialog.component';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
+import { BackofficeAdminMatchdayOperationsStore } from '../../state/backoffice-admin-matchday-operations.store';
 import {
   toBackofficeMatchCardViewModel,
   type BackofficeMatchCardViewModel,
 } from '../../models/backoffice-lineups.viewmodel';
 import { toBackofficeMatchdayRowViewModel } from '../../models/backoffice-matchdays.viewmodel';
 import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
+import { BackofficeMatchFormDialogComponent } from '../../components/backoffice-match-form-dialog/backoffice-match-form-dialog.component';
+import { BackofficePairMatchResultDialogComponent } from '../../components/backoffice-pair-match-result-dialog/backoffice-pair-match-result-dialog.component';
 
 interface PlannerPair {
   id: string;
@@ -35,11 +40,44 @@ interface PlannerPair {
   player2Id: string | null;
 }
 
+interface MatchPairSlotViewModel {
+  readonly order: 1 | 2;
+  readonly label: string;
+  readonly pointsLabel: string;
+  readonly localPair:
+    | ReturnType<BackofficeMatchdayDetailPageComponent['pairsForMatchTeam']>[number]
+    | null;
+  readonly awayPair:
+    | ReturnType<BackofficeMatchdayDetailPageComponent['pairsForMatchTeam']>[number]
+    | null;
+  readonly pairMatch: BackofficePairMatch | null;
+}
+
+type ConfirmActionKind =
+  | 'start-matchday'
+  | 'finish-matchday'
+  | 'create-pair-matches'
+  | 'start-match'
+  | 'finish-match';
+
+const MATCH_PAIR_SLOT_CONFIG = [
+  { order: 1 as const, label: 'Partido 1', pointsLabel: '3 puntos' },
+  { order: 2 as const, label: 'Partido 2', pointsLabel: '2 puntos' },
+] as const;
+
 @Component({
   selector: 'app-backoffice-matchday-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-matchday-detail-page' },
-  imports: [LoadFeedbackComponent, LoadingStateComponent, RouterLink, StatusBadgeComponent],
+  imports: [
+    LoadFeedbackComponent,
+    LoadingStateComponent,
+    RouterLink,
+    StatusBadgeComponent,
+    ConfirmActionDialogComponent,
+    BackofficeMatchFormDialogComponent,
+    BackofficePairMatchResultDialogComponent,
+  ],
   templateUrl: './backoffice-matchday-detail-page.component.html',
   styleUrl: './backoffice-matchday-detail-page.component.scss',
 })
@@ -50,6 +88,7 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   protected readonly teamsStore = inject(BackofficeTeamsStore);
   protected readonly playersStore = inject(BackofficePlayersStore);
   protected readonly sessionStore = inject(BackofficeSessionStore);
+  protected readonly adminOperationsStore = inject(BackofficeAdminMatchdayOperationsStore);
   private readonly toastStore = inject(ActionToastStore);
 
   protected readonly matchdayId = signal('');
@@ -64,7 +103,8 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
       this.matchdaysStore.errorMessage() ??
       this.teamsStore.errorMessage() ??
       this.lineupsStore.errorMessage() ??
-      this.playersStore.errorMessage(),
+      this.playersStore.errorMessage() ??
+      this.adminOperationsStore.pairMatchesErrorMessage(),
   );
 
   protected readonly matchday = computed(
@@ -86,7 +126,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   });
 
   protected readonly matchCards = computed<readonly BackofficeMatchCardViewModel[]>(() => {
-    const matches = this.lineupsStore.matches();
+    const currentMatchdayId = this.matchdayId();
+    const matches = this.lineupsStore
+      .matches()
+      .filter((match) => match.matchdayId === currentMatchdayId);
     const teams = this.teamsStore.teams();
     const lineups = this.lineupsStore.lineups();
 
@@ -107,6 +150,16 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
       })
       .filter((card): card is BackofficeMatchCardViewModel => card !== null);
   });
+
+  protected readonly confirmAction = signal<{
+    kind: ConfirmActionKind;
+    matchId?: string;
+    title: string;
+    description: string;
+    confirmLabel: string;
+  } | null>(null);
+  protected readonly isCreateMatchDialogOpen = signal(false);
+  protected readonly editingPairMatchId = signal<string | null>(null);
 
   // ── Planner state ────────────────────────────────────────────────────────
   protected readonly selectedMatchId = signal<string | null>(null);
@@ -138,7 +191,7 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   });
 
   protected readonly assignedCount = computed(() => this.assignedIds().size);
-  protected readonly requiredPlayers = computed(() => 4); // 2 pairs × 2
+  protected readonly requiredPlayers = computed(() => 4);
 
   protected readonly availablePlayers = computed(() => {
     const assigned = this.assignedIds();
@@ -185,7 +238,11 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     void this.matchdaysStore.load();
     void this.teamsStore.load();
     void this.playersStore.load();
-    void this.lineupsStore.loadForMatchday(id);
+    void this.lineupsStore.loadForMatchday(id).then(() => {
+      if (this.isAdmin()) {
+        void this.adminOperationsStore.loadPairMatches(true);
+      }
+    });
   }
 
   protected reloadPage(): void {
@@ -195,7 +252,167 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
       this.teamsStore.load(true),
       this.playersStore.load(true),
       this.lineupsStore.loadForMatchday(id, true),
-    ]);
+    ]).then(() => {
+      if (this.isAdmin()) {
+        void this.adminOperationsStore.loadPairMatches(true);
+      }
+    });
+  }
+
+  protected openConfirmAction(
+    kind: ConfirmActionKind,
+    title: string,
+    description: string,
+    confirmLabel: string,
+    matchId?: string,
+  ): void {
+    this.confirmAction.set(
+      matchId
+        ? { kind, title, description, confirmLabel, matchId }
+        : { kind, title, description, confirmLabel },
+    );
+  }
+
+  protected closeConfirmAction(): void {
+    this.confirmAction.set(null);
+  }
+
+  protected async executeConfirmAction(): Promise<void> {
+    const action = this.confirmAction();
+    if (!action) return;
+
+    const matchdayId = this.matchdayId();
+    switch (action.kind) {
+      case 'start-matchday':
+        await this.adminOperationsStore.startMatchday(matchdayId);
+        break;
+      case 'finish-matchday':
+        await this.adminOperationsStore.finishMatchday(matchdayId);
+        break;
+      case 'create-pair-matches':
+        await this.adminOperationsStore.createPairMatches(matchdayId);
+        break;
+      case 'start-match':
+        if (action.matchId) await this.adminOperationsStore.startMatch(matchdayId, action.matchId);
+        break;
+      case 'finish-match':
+        if (action.matchId) await this.adminOperationsStore.finishMatch(matchdayId, action.matchId);
+        break;
+    }
+
+    this.closeConfirmAction();
+  }
+
+  protected openCreateMatchDialog(): void {
+    this.isCreateMatchDialogOpen.set(true);
+  }
+
+  protected closeCreateMatchDialog(): void {
+    this.isCreateMatchDialogOpen.set(false);
+  }
+
+  protected async createMatch(input: {
+    readonly localTeamId: string;
+    readonly awayTeamId: string;
+    readonly scheduledAt: string;
+  }): Promise<void> {
+    await this.adminOperationsStore.createMatch({
+      matchdayId: this.matchdayId(),
+      localTeamId: input.localTeamId,
+      awayTeamId: input.awayTeamId,
+      scheduledAt: input.scheduledAt,
+      localTeamScorePoints: 0,
+      awayTeamScorePoints: 0,
+      mvpId: null,
+    });
+    this.closeCreateMatchDialog();
+  }
+
+  protected async updateMvp(matchId: string, currentMvpId: string | null): Promise<void> {
+    const playerId = globalThis.prompt('ID del MVP', currentMvpId ?? '')?.trim();
+    if (playerId === undefined) return;
+    await this.adminOperationsStore.updateMatchMvp(
+      this.matchdayId(),
+      matchId,
+      playerId.length > 0 ? playerId : null,
+    );
+  }
+
+  protected openPairMatchResultDialog(pairMatchId: string): void {
+    this.editingPairMatchId.set(pairMatchId);
+  }
+
+  protected closePairMatchResultDialog(): void {
+    this.editingPairMatchId.set(null);
+  }
+
+  protected async savePairMatchResult(input: {
+    readonly setsResult: readonly { readonly local: number; readonly away: number }[];
+  }): Promise<void> {
+    const pairMatchId = this.editingPairMatchId();
+    if (!pairMatchId) return;
+    await this.adminOperationsStore.finishPairMatch(this.matchdayId(), pairMatchId, input);
+    this.closePairMatchResultDialog();
+  }
+
+  protected readonly currentEditingPairMatch = computed<BackofficePairMatch | null>(
+    () =>
+      this.adminOperationsStore
+        .pairMatches()
+        .find((pairMatch) => pairMatch.id === this.editingPairMatchId()) ?? null,
+  );
+
+  protected pairMatchForPairIds(
+    localPairId: string | null | undefined,
+    awayPairId: string | null | undefined,
+  ): BackofficePairMatch | null {
+    if (!localPairId || !awayPairId) return null;
+    return (
+      this.adminOperationsStore
+        .pairMatches()
+        .find(
+          (pairMatch) =>
+            pairMatch.localLineUpPairId === localPairId &&
+            pairMatch.awayLineUpPairId === awayPairId,
+        ) ?? null
+    );
+  }
+
+  protected pairMatchResultLabel(pairMatch: BackofficePairMatch | null): string {
+    if (!pairMatch || pairMatch.setsResult.length === 0) return 'Sin resultado';
+    return pairMatch.setsResult.map((set) => `${set.local}-${set.away}`).join(' · ');
+  }
+
+  protected matchStatusLabel(
+    status: BackofficeMatchCardViewModel['lineupStatus'] | 'scheduled' | 'in_progress' | 'finished',
+  ): string {
+    switch (status) {
+      case 'scheduled':
+        return 'Programado';
+      case 'in_progress':
+        return 'En juego';
+      case 'finished':
+        return 'Finalizado';
+      case 'pending':
+        return 'Pendiente';
+      case 'submited':
+        return 'Enviada';
+      case 'no_lineup':
+        return 'Sin alineación';
+    }
+  }
+
+  protected matchStatusTone(
+    status: 'scheduled' | 'in_progress' | 'finished',
+  ): 'neutral' | 'warning' | 'success' {
+    switch (status) {
+      case 'scheduled':
+        return 'neutral';
+      case 'in_progress':
+        return 'warning';
+      case 'finished':
+        return 'success';
+    }
   }
 
   protected openPlanner(matchId: string, teamId: string): void {
@@ -204,7 +421,6 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     this.selectedPlayerId.set(null);
     this.playerSearch.set('');
 
-    // Pre-populate from existing lineup if already submitted
     const existingLineup = this.lineupsStore.lineupForMatch(matchId, teamId);
     const existingPairs = existingLineup ? this.lineupsStore.pairsForLineup(existingLineup.id) : [];
 
@@ -218,7 +434,6 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     this.availability.set(initAvail);
 
     if (existingPairs.length > 0) {
-      // Restore saved pairs (pad to 2 if needed)
       const pairs: PlannerPair[] = existingPairs.slice(0, 2).map((p, i) => ({
         id: `pair-${i + 1}`,
         player1Id: p.player1Id,
@@ -330,14 +545,21 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     return this.lineupsStore.pairsForLineup(lineup.id);
   }
 
-  protected pairMatchupsForMatch(matchId: string, localTeamId: string, awayTeamId: string) {
+  protected pairMatchupsForMatch(
+    matchId: string,
+    localTeamId: string,
+    awayTeamId: string,
+  ): readonly MatchPairSlotViewModel[] {
     const localPairs = this.pairsForMatchTeam(matchId, localTeamId);
     const awayPairs = this.pairsForMatchTeam(matchId, awayTeamId);
-    const count = Math.max(localPairs.length, awayPairs.length);
-    return Array.from({ length: count }, (_, i) => ({
-      index: i,
-      localPair: localPairs[i] ?? null,
-      awayPair: awayPairs[i] ?? null,
+
+    return MATCH_PAIR_SLOT_CONFIG.map((slotConfig, index) => ({
+      order: slotConfig.order,
+      label: slotConfig.label,
+      pointsLabel: slotConfig.pointsLabel,
+      localPair: localPairs[index] ?? null,
+      awayPair: awayPairs[index] ?? null,
+      pairMatch: this.pairMatchForPairIds(localPairs[index]?.id, awayPairs[index]?.id),
     }));
   }
 

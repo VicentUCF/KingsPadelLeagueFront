@@ -52,6 +52,21 @@
   }
 
   // ── Matches list ───────────────────────────────────────────────────────────
+  &__section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
   &__matches {
     display: flex;
     flex-direction: column;
@@ -81,6 +96,81 @@
     flex-direction: column;
     gap: 0.75rem;
     padding: 1rem 1.25rem;
+  }
+
+  &__admin-match-card {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &__admin-match-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__admin-match-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__pair-results {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  &__pair-result-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(245 245 245 / 7%);
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  &__pair-result-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__pair-result-title {
+    color: var(--color-text-strong);
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &__pair-result-points {
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    margin: 0.2rem 0 0;
+  }
+
+  &__pair-result-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__pair-result-label {
+    color: var(--color-text-strong);
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__pair-result-help {
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
   }
 
   &__match-header {

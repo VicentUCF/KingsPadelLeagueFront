@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
@@ -9,6 +9,7 @@ import type {
   PaginatedResponse,
 } from '@core/api/kings-padel-api.types';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
+import { AuthStore } from '@features/auth/ui/state/auth.store';
 import type { BackofficeLineupsRepository } from '@features/backoffice/application/ports/backoffice-lineups.repository';
 import type {
   BackofficeLineup,
@@ -19,6 +20,17 @@ import type {
 export class HttpBackofficeLineupsRepository implements BackofficeLineupsRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
+  private readonly authStore = inject(AuthStore);
+  private readonly lineupsBasePath = computed(() =>
+    this.authStore.currentRole() === 'ADMIN'
+      ? '/admin/v1/match-team-line-ups'
+      : '/v1/match-team-line-ups',
+  );
+  private readonly lineupPairsBasePath = computed(() =>
+    this.authStore.currentRole() === 'ADMIN'
+      ? '/admin/v1/match-team-line-up-pairs'
+      : '/v1/match-team-line-up-pairs',
+  );
 
   loadByMatchIds(matchIds: string[]): Promise<readonly BackofficeLineup[]> {
     let params = new HttpParams().append('limit', '200');
@@ -27,7 +39,7 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
     }
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpHttpV1>>(
-        `${this.baseUrl}/v1/match-team-line-ups`,
+        `${this.baseUrl}${this.lineupsBasePath()}`,
         {
           params,
           context: withHttpErrorToast({ key: 'load-lineups' }),
@@ -43,7 +55,7 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
     }
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpPairHttpV1>>(
-        `${this.baseUrl}/v1/match-team-line-up-pairs`,
+        `${this.baseUrl}${this.lineupPairsBasePath()}`,
         {
           params,
           context: withHttpErrorToast({ key: 'load-lineup-pairs' }),

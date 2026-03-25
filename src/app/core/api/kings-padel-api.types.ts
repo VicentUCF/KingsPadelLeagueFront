@@ -78,6 +78,7 @@ export interface MatchHttpV1 {
   readonly localTeamScorePoints: number;
   readonly awayTeamScorePoints: number;
   readonly scheduledAt: string;
+  readonly status: 'finished' | 'in_progress' | 'scheduled';
   readonly mvpId?: string | null;
   readonly createdAt: string;
   readonly updatedAt?: string;

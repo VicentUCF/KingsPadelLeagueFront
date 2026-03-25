@@ -7,6 +7,7 @@ import { BackofficeTeamsRepository } from '@features/backoffice/application/port
 import { BACKOFFICE_MATCHES_REPOSITORY } from '@features/backoffice/application/ports/backoffice-matches.repository';
 import { BACKOFFICE_LINEUPS_REPOSITORY } from '@features/backoffice/application/ports/backoffice-lineups.repository';
 import { BACKOFFICE_AUDIT_REPOSITORY } from '@features/backoffice/application/ports/backoffice-audit.repository';
+import { BACKOFFICE_PAIR_MATCHES_REPOSITORY } from '@features/backoffice/application/ports/backoffice-pair-matches.repository';
 import { LoadBackofficeMatchdaysUseCase } from '@features/backoffice/application/use-cases/load-backoffice-matchdays.use-case';
 import { LoadBackofficePlayersUseCase } from '@features/backoffice/application/use-cases/load-backoffice-players.use-case';
 import { LoadBackofficeSeasonsUseCase } from '@features/backoffice/application/use-cases/load-backoffice-seasons.use-case';
@@ -20,6 +21,7 @@ import { HttpBackofficeSeasonsRepository } from '@features/backoffice/infrastruc
 import { HttpBackofficeMatchdaysRepository } from '@features/backoffice/infrastructure/repositories/http-backoffice-matchdays.repository';
 import { HttpBackofficeMatchesRepository } from '@features/backoffice/infrastructure/repositories/http-backoffice-matches.repository';
 import { HttpBackofficeLineupsRepository } from '@features/backoffice/infrastructure/repositories/http-backoffice-lineups.repository';
+import { HttpBackofficePairMatchesRepository } from '@features/backoffice/infrastructure/repositories/http-backoffice-pair-matches.repository';
 import { BackofficeMatchdaysStore } from '../state/backoffice-matchdays.store';
 import { BackofficePlayersStore } from '../state/backoffice-players.store';
 import { BackofficeSeasonsStore } from '../state/backoffice-seasons.store';
@@ -28,6 +30,7 @@ import { BackofficeTeamsStore } from '../state/backoffice-teams.store';
 import { BackofficeLineupsStore } from '../state/backoffice-lineups.store';
 import { BackofficeStandingsStore } from '../state/backoffice-standings.store';
 import { BackofficeAuditStore } from '../state/backoffice-audit.store';
+import { BackofficeAdminMatchdayOperationsStore } from '../state/backoffice-admin-matchday-operations.store';
 
 export const LOAD_BACKOFFICE_TEAMS_USE_CASE = new InjectionToken<LoadBackofficeTeamsUseCase>(
   'LOAD_BACKOFFICE_TEAMS_USE_CASE',
@@ -56,6 +59,11 @@ export function provideBackofficeFeature(): EnvironmentProviders {
     { provide: BACKOFFICE_MATCHES_REPOSITORY, useExisting: HttpBackofficeMatchesRepository },
     HttpBackofficeLineupsRepository,
     { provide: BACKOFFICE_LINEUPS_REPOSITORY, useExisting: HttpBackofficeLineupsRepository },
+    HttpBackofficePairMatchesRepository,
+    {
+      provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY,
+      useExisting: HttpBackofficePairMatchesRepository,
+    },
     { provide: BACKOFFICE_AUDIT_REPOSITORY, useValue: { loadAll: () => Promise.resolve([]) } },
 
     // ── Use cases ─────────────────────────────────────────────────────────────
@@ -92,5 +100,6 @@ export function provideBackofficeFeature(): EnvironmentProviders {
     BackofficeLineupsStore,
     BackofficeStandingsStore,
     BackofficeAuditStore,
+    BackofficeAdminMatchdayOperationsStore,
   ]);
 }

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
-import type { BackofficeMatchesRepository } from '@features/backoffice/application/ports/backoffice-matches.repository';
+import type {
+  BackofficeMatchesRepository,
+  CreateBackofficeMatchInput,
+} from '@features/backoffice/application/ports/backoffice-matches.repository';
 
 const MOCK_MATCHES: readonly BackofficeMatch[] = [
   {
@@ -12,6 +15,7 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 0,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-15T16:00:00'),
+    status: 'in_progress',
     mvpId: null,
   },
   {
@@ -22,6 +26,7 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 0,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-15T18:00:00'),
+    status: 'scheduled',
     mvpId: null,
   },
   {
@@ -32,6 +37,7 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 0,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-15T20:00:00'),
+    status: 'scheduled',
     mvpId: null,
   },
   {
@@ -42,6 +48,7 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 2,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-01T16:00:00'),
+    status: 'finished',
     mvpId: null,
   },
   {
@@ -52,6 +59,7 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 0,
     awayTeamScorePoints: 2,
     scheduledAt: new Date('2026-03-08T18:00:00'),
+    status: 'finished',
     mvpId: null,
   },
   {
@@ -62,6 +70,7 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 0,
     awayTeamScorePoints: 2,
     scheduledAt: new Date('2026-03-01T18:00:00'),
+    status: 'finished',
     mvpId: null,
   },
   {
@@ -72,19 +81,59 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     localTeamScorePoints: 2,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-08T16:00:00'),
+    status: 'finished',
     mvpId: null,
   },
 ];
 
 @Injectable()
 export class InMemoryBackofficeMatchesRepository implements BackofficeMatchesRepository {
+  private matches: readonly BackofficeMatch[] = MOCK_MATCHES;
+
   loadByMatchday(matchdayId: string): Promise<readonly BackofficeMatch[]> {
-    return Promise.resolve(MOCK_MATCHES.filter((m) => m.matchdayId === matchdayId));
+    return Promise.resolve(this.matches.filter((match) => match.matchdayId === matchdayId));
   }
 
   loadByTeam(teamId: string): Promise<readonly BackofficeMatch[]> {
     return Promise.resolve(
-      MOCK_MATCHES.filter((m) => m.localTeamId === teamId || m.awayTeamId === teamId),
+      this.matches.filter((match) => match.localTeamId === teamId || match.awayTeamId === teamId),
     );
+  }
+
+  create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch> {
+    const match: BackofficeMatch = {
+      id: `match-${this.matches.length + 1}`,
+      matchdayId: input.matchdayId,
+      localTeamId: input.localTeamId,
+      awayTeamId: input.awayTeamId,
+      localTeamScorePoints: input.localTeamScorePoints,
+      awayTeamScorePoints: input.awayTeamScorePoints,
+      scheduledAt: new Date(input.scheduledAt),
+      status: 'scheduled',
+      mvpId: input.mvpId,
+    };
+    this.matches = [...this.matches, match];
+    return Promise.resolve(match);
+  }
+
+  start(matchId: string): Promise<void> {
+    this.matches = this.matches.map((match) =>
+      match.id === matchId ? { ...match, status: 'in_progress' } : match,
+    );
+    return Promise.resolve();
+  }
+
+  finish(matchId: string): Promise<void> {
+    this.matches = this.matches.map((match) =>
+      match.id === matchId ? { ...match, status: 'finished' } : match,
+    );
+    return Promise.resolve();
+  }
+
+  updateMvp(matchId: string, mvpId: string | null): Promise<void> {
+    this.matches = this.matches.map((match) =>
+      match.id === matchId ? { ...match, mvpId } : match,
+    );
+    return Promise.resolve();
   }
 }

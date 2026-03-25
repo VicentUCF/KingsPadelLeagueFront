@@ -8,9 +8,23 @@ export interface BackofficeMatchFilter {
   awayTeamIds?: string[];
 }
 
+export interface CreateBackofficeMatchInput {
+  readonly matchdayId: string;
+  readonly localTeamId: string;
+  readonly awayTeamId: string;
+  readonly scheduledAt: string;
+  readonly localTeamScorePoints: number;
+  readonly awayTeamScorePoints: number;
+  readonly mvpId: string | null;
+}
+
 export interface BackofficeMatchesRepository {
   loadByMatchday(matchdayId: string): Promise<readonly BackofficeMatch[]>;
   loadByTeam(teamId: string): Promise<readonly BackofficeMatch[]>;
+  create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch>;
+  start(matchId: string): Promise<void>;
+  finish(matchId: string): Promise<void>;
+  updateMvp(matchId: string, mvpId: string | null): Promise<void>;
 }
 
 export const BACKOFFICE_MATCHES_REPOSITORY = new InjectionToken<BackofficeMatchesRepository>(

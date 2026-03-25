@@ -1,21 +1,32 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
+import { AuthStore } from '@features/auth/ui/state/auth.store';
 
 import { HttpBackofficePlayersRepository } from './http-backoffice-players.repository';
 
 describe('HttpBackofficePlayersRepository', () => {
   let repository: HttpBackofficePlayersRepository;
   let httpTestingController: HttpTestingController;
+  let currentRole: ReturnType<typeof signal<'ADMIN' | 'PRESIDENT' | 'PLAYER'>>;
 
   beforeEach(() => {
+    currentRole = signal<'ADMIN' | 'PRESIDENT' | 'PLAYER'>('PLAYER');
+
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: 'http://api.test' },
+        {
+          provide: AuthStore,
+          useValue: {
+            currentRole: computed(() => currentRole()),
+          },
+        },
         HttpBackofficePlayersRepository,
       ],
     });
@@ -29,6 +40,8 @@ describe('HttpBackofficePlayersRepository', () => {
   });
 
   it('normalizes missing competitive stats from the backend contract', async () => {
+    currentRole.set('PLAYER');
+
     const playersPromise = repository.loadAll();
 
     httpTestingController.expectOne('http://api.test/v1/players?limit=200').flush({
@@ -53,6 +66,19 @@ describe('HttpBackofficePlayersRepository', () => {
         value: 0,
       }),
     ]);
+  });
+
+  it('uses /admin/v1 for admin reads', async () => {
+    currentRole.set('ADMIN');
+
+    const playersPromise = repository.loadAll();
+
+    httpTestingController.expectOne('http://api.test/admin/v1/players?limit=200').flush({
+      items: [createPlayerHttp({ id: 'player-admin' })],
+      meta: createMeta(1),
+    });
+
+    await expect(playersPromise).resolves.toHaveLength(1);
   });
 });
 

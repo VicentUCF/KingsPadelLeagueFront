@@ -7,6 +7,8 @@ import type { BackofficeRole } from '@features/backoffice/domain/entities/backof
 import type { BackofficeMatchdayRowViewModel } from '../../models/backoffice-matchdays.viewmodel';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
+import { BackofficeSeasonsStore } from '../../state/backoffice-seasons.store';
+import { BackofficeAdminMatchdayOperationsStore } from '../../state/backoffice-admin-matchday-operations.store';
 import { BackofficeMatchdaysPageComponent } from './backoffice-matchdays-page.component';
 
 function createMatchdayRow(
@@ -48,6 +50,28 @@ function createSessionStoreMock(role: BackofficeRole = 'ADMIN') {
   } satisfies Pick<BackofficeSessionStore, 'currentRole'>;
 }
 
+function createSeasonsStoreMock() {
+  return {
+    seasons: signal([
+      {
+        id: 'season-1',
+        name: 'Temporada 2026',
+        description: 'Season test',
+        startsAt: '2026-01-01T00:00:00.000Z',
+        endsAt: '2026-12-31T23:59:59.000Z',
+      },
+    ]),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<BackofficeSeasonsStore, 'load' | 'seasons'>;
+}
+
+function createAdminOperationsStoreMock() {
+  return {
+    isCreatingMatchday: signal(false),
+    createMatchday: jest.fn().mockResolvedValue('matchday-1'),
+  } satisfies Pick<BackofficeAdminMatchdayOperationsStore, 'isCreatingMatchday' | 'createMatchday'>;
+}
+
 describe('BackofficeMatchdaysPageComponent', () => {
   it('shows the shared loading state during the first blocking load', async () => {
     const matchdaysStore = createMatchdaysStoreMock({
@@ -60,6 +84,11 @@ describe('BackofficeMatchdaysPageComponent', () => {
         provideRouter([]),
         { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
         { provide: BackofficeSessionStore, useValue: createSessionStoreMock() },
+        { provide: BackofficeSeasonsStore, useValue: createSeasonsStoreMock() },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
       ],
     });
 
@@ -80,6 +109,11 @@ describe('BackofficeMatchdaysPageComponent', () => {
         provideRouter([]),
         { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
         { provide: BackofficeSessionStore, useValue: createSessionStoreMock() },
+        { provide: BackofficeSeasonsStore, useValue: createSeasonsStoreMock() },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
       ],
     });
 
@@ -88,6 +122,28 @@ describe('BackofficeMatchdaysPageComponent', () => {
       'href',
       '/backoffice/jornadas/matchday-1',
     );
+  });
+
+  it('hides the create matchday CTA for non-admin users', async () => {
+    const matchdaysStore = createMatchdaysStoreMock({
+      hasContent: true,
+      rows: [createMatchdayRow()],
+    });
+
+    await render(BackofficeMatchdaysPageComponent, {
+      providers: [
+        provideRouter([]),
+        { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
+        { provide: BackofficeSessionStore, useValue: createSessionStoreMock('PRESIDENT') },
+        { provide: BackofficeSeasonsStore, useValue: createSeasonsStoreMock() },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
+      ],
+    });
+
+    expect(screen.queryByRole('button', { name: /Nueva jornada/i })).not.toBeInTheDocument();
   });
 
   it('keeps the list visible and shows inline feedback when a refresh fails', async () => {
@@ -103,6 +159,11 @@ describe('BackofficeMatchdaysPageComponent', () => {
         provideRouter([]),
         { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
         { provide: BackofficeSessionStore, useValue: createSessionStoreMock() },
+        { provide: BackofficeSeasonsStore, useValue: createSeasonsStoreMock() },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
       ],
     });
 
@@ -124,6 +185,11 @@ describe('BackofficeMatchdaysPageComponent', () => {
         provideRouter([]),
         { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
         { provide: BackofficeSessionStore, useValue: createSessionStoreMock() },
+        { provide: BackofficeSeasonsStore, useValue: createSeasonsStoreMock() },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
       ],
     });
 
@@ -144,6 +210,11 @@ describe('BackofficeMatchdaysPageComponent', () => {
         provideRouter([]),
         { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
         { provide: BackofficeSessionStore, useValue: createSessionStoreMock() },
+        { provide: BackofficeSeasonsStore, useValue: createSeasonsStoreMock() },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
       ],
     });
 

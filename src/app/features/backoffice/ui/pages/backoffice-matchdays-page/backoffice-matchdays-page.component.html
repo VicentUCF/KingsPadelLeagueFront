@@ -22,6 +22,18 @@
       <app-load-feedback [message]="error" [tone]="'warning'" (retry)="reloadMatchdays()" />
     }
 
+    @if (sessionStore.currentRole() === 'ADMIN') {
+      <div class="backoffice-matchdays-page__toolbar">
+        <button
+          class="c-button c-button--pill c-button--primary c-button--md"
+          type="button"
+          (click)="openCreateDialog()"
+        >
+          Nueva jornada
+        </button>
+      </div>
+    }
+
     @if (matchdaysStore.rows().length === 0) {
       <p class="backoffice-matchdays-page__empty">No hay jornadas registradas todavía.</p>
     } @else {
@@ -42,4 +54,17 @@
       </ol>
     }
   }
+
+  <app-backoffice-matchday-form-dialog
+    [initialValue]="{
+      name: '',
+      scheduledAt: '',
+      seasonId: seasonsStore.seasons()[0]?.id ?? '',
+    }"
+    [isOpen]="isCreateDialogOpen()"
+    [isSubmitting]="adminOperationsStore.isCreatingMatchday()"
+    [submissionError]="null"
+    (cancelled)="closeCreateDialog()"
+    (submitted)="createMatchday($event)"
+  />
 </div>

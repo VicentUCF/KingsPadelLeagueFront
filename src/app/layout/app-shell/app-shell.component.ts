@@ -25,6 +25,7 @@ import {
   X,
 } from 'lucide-angular';
 
+import { hasBackofficeUiAdminOverride } from '@core/auth/backoffice-ui-admin-override';
 import { applicationMetadata } from '@core/config/application-metadata';
 import { AuthStore } from '@features/auth/ui/state/auth.store';
 
@@ -114,7 +115,7 @@ export class AppShellComponent {
   );
   protected readonly backofficeLinkLabel = computed(() => {
     const role = this.authStore.currentRole();
-    if (role === 'ADMIN') {
+    if (role === 'ADMIN' || hasBackofficeUiAdminOverride(role)) {
       return 'Backoffice';
     }
 

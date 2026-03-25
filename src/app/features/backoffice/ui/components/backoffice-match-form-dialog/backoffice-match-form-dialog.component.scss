@@ -1,0 +1,19 @@
+.backoffice-match-form-dialog {
+  &__form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__error {
+    margin: 0;
+    color: var(--color-danger, #f87171);
+    font-size: 0.9rem;
+  }
+}

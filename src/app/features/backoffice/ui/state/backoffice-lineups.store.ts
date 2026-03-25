@@ -46,7 +46,9 @@ export class BackofficeLineupsStore {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
-      const matches = await this.loadMatchesUseCase.byMatchday(matchdayId);
+      const matches = (await this.loadMatchesUseCase.byMatchday(matchdayId)).filter(
+        (match) => match.matchdayId === matchdayId,
+      );
       this.matches.set(matches);
       if (matches.length > 0) {
         const matchIds = matches.map((m) => m.id);

@@ -5,7 +5,8 @@ export const environment = {
   supabaseUrl: 'https://scoixrejbdmosrrjgtcv.supabase.co',
   supabaseAnonKey: 'sb_publishable_gGOwEf3arIBPNcbecB6Uug_N3xFRgoH',
   supabasePlayerProfileBucket: 'avatars',
-  apiBaseUrl: 'https://kings-league-api.esteveep.dev',
+  apiBaseUrl: 'http://100.109.201.58:3000',
   authDevRoleOverride: 'PRESIDENT' as AuthRole,
   authDevTeamIdOverride: null,
+  backofficeDevAdminUiOverride: true,
 };

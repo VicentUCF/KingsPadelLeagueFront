@@ -64,6 +64,7 @@ const matches: readonly BackofficeMatch[] = [
     localTeamScorePoints: 2,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-01T10:00:00.000Z'),
+    status: 'finished',
     mvpId: null,
   },
   {
@@ -74,6 +75,7 @@ const matches: readonly BackofficeMatch[] = [
     localTeamScorePoints: 2,
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-08T10:00:00.000Z'),
+    status: 'finished',
     mvpId: null,
   },
 ];

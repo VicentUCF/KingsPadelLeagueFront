@@ -1,0 +1,83 @@
+<app-modal-shell
+  [isOpen]="isOpen()"
+  [title]="'Nuevo partido'"
+  description="Programa un partido operativo dentro de la jornada actual."
+  size="default"
+  (closed)="close()"
+>
+  <div modalBody>
+    @if (submissionError()) {
+      <p class="backoffice-match-form-dialog__error" role="alert">{{ submissionError() }}</p>
+    }
+
+    <form
+      [formGroup]="form"
+      class="backoffice-match-form-dialog__form"
+      id="backoffice-match-form"
+      (ngSubmit)="submit()"
+    >
+      <label class="c-field">
+        <span class="c-field__label">Equipo local <span aria-hidden="true">*</span></span>
+        <select class="c-select c-input--md" formControlName="localTeamId">
+          <option value="">Selecciona un equipo</option>
+          @for (team of teams(); track team.id) {
+            <option [value]="team.id">{{ team.name }}</option>
+          }
+        </select>
+        @if (hasControlError('localTeamId')) {
+          <p class="c-field__error" role="alert">El equipo local es obligatorio.</p>
+        }
+      </label>
+
+      <label class="c-field">
+        <span class="c-field__label">Equipo visitante <span aria-hidden="true">*</span></span>
+        <select class="c-select c-input--md" formControlName="awayTeamId">
+          <option value="">Selecciona un equipo</option>
+          @for (team of teams(); track team.id) {
+            <option [value]="team.id">{{ team.name }}</option>
+          }
+        </select>
+        @if (hasControlError('awayTeamId')) {
+          <p class="c-field__error" role="alert">El equipo visitante es obligatorio.</p>
+        }
+      </label>
+
+      @if (teamsAreEqual()) {
+        <p class="backoffice-match-form-dialog__error" role="alert">
+          Local y visitante deben ser equipos distintos.
+        </p>
+      }
+
+      <label class="c-field">
+        <span class="c-field__label">Fecha y hora <span aria-hidden="true">*</span></span>
+        <input
+          class="c-input c-input--md"
+          [class.c-input--invalid]="hasControlError('scheduledAt')"
+          formControlName="scheduledAt"
+          type="datetime-local"
+        />
+        @if (hasControlError('scheduledAt')) {
+          <p class="c-field__error" role="alert">La fecha es obligatoria.</p>
+        }
+      </label>
+    </form>
+  </div>
+
+  <div modalFooter class="backoffice-match-form-dialog__actions">
+    <button
+      class="c-button c-button--pill c-button--ghost c-button--md"
+      type="button"
+      (click)="close()"
+    >
+      Cancelar
+    </button>
+    <button
+      class="c-button c-button--pill c-button--primary c-button--md"
+      form="backoffice-match-form"
+      [disabled]="isSubmitting() || teamsAreEqual()"
+      type="submit"
+    >
+      {{ isSubmitting() ? 'Creando…' : 'Crear partido' }}
+    </button>
+  </div>
+</app-modal-shell>

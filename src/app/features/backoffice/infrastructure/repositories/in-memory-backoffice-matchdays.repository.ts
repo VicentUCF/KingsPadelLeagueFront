@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 
-import { BackofficeMatchdaysRepository } from '@features/backoffice/application/ports/backoffice-matchdays.repository';
+import {
+  BackofficeMatchdaysRepository,
+  type CreateBackofficeMatchdayInput,
+} from '@features/backoffice/application/ports/backoffice-matchdays.repository';
 import type { BackofficeMatchday } from '@features/backoffice/domain/entities/backoffice-matchday';
 
 const MOCK_MATCHDAYS: readonly BackofficeMatchday[] = [
@@ -43,7 +46,37 @@ const MOCK_MATCHDAYS: readonly BackofficeMatchday[] = [
 
 @Injectable()
 export class InMemoryBackofficeMatchdaysRepository extends BackofficeMatchdaysRepository {
+  private matchdays: readonly BackofficeMatchday[] = MOCK_MATCHDAYS;
+
   override loadAll(): Promise<readonly BackofficeMatchday[]> {
-    return Promise.resolve(MOCK_MATCHDAYS);
+    return Promise.resolve(this.matchdays);
+  }
+
+  override create(input: CreateBackofficeMatchdayInput): Promise<BackofficeMatchday> {
+    const matchday: BackofficeMatchday = {
+      id: `matchday-${this.matchdays.length + 1}`,
+      ...input,
+      status: 'scheduled',
+    };
+    this.matchdays = [...this.matchdays, matchday];
+    return Promise.resolve(matchday);
+  }
+
+  override start(matchdayId: string): Promise<void> {
+    this.matchdays = this.matchdays.map((matchday) =>
+      matchday.id === matchdayId ? { ...matchday, status: 'in_progress' } : matchday,
+    );
+    return Promise.resolve();
+  }
+
+  override finish(matchdayId: string): Promise<void> {
+    this.matchdays = this.matchdays.map((matchday) =>
+      matchday.id === matchdayId ? { ...matchday, status: 'finished' } : matchday,
+    );
+    return Promise.resolve();
+  }
+
+  override createPairMatches(_matchdayId: string): Promise<void> {
+    return Promise.resolve();
   }
 }
