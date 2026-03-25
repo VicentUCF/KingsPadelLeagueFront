@@ -43,6 +43,9 @@
             <div class="backoffice-matchdays-page__row-main">
               <p class="backoffice-matchdays-page__row-name">{{ row.name }}</p>
               <p class="backoffice-matchdays-page__row-date">{{ row.dateLabel }}</p>
+              @if (row.summaryLabel) {
+                <p class="backoffice-matchdays-page__row-summary">{{ row.summaryLabel }}</p>
+              }
             </div>
 
             <div class="backoffice-matchdays-page__row-end">

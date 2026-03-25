@@ -8,6 +8,7 @@ export interface BackofficeMatchdayRowViewModel {
   readonly id: string;
   readonly name: string;
   readonly dateLabel: string;
+  readonly summaryLabel: string | null;
   readonly statusLabel: string;
   readonly statusTone: StatusBadgeTone;
   readonly seasonId: string;
@@ -16,11 +17,19 @@ export interface BackofficeMatchdayRowViewModel {
 
 export function toBackofficeMatchdayRowViewModel(
   matchday: BackofficeMatchday,
+  summary?: {
+    readonly matchCount: number;
+    readonly completedResultsCount: number;
+    readonly totalResultsCount: number;
+  },
 ): BackofficeMatchdayRowViewModel {
   return {
     id: matchday.id,
     name: matchday.name,
     dateLabel: formatMatchdayDate(matchday.scheduledAt),
+    summaryLabel: summary
+      ? `${summary.matchCount} ${summary.matchCount === 1 ? 'partido' : 'partidos'} · ${summary.completedResultsCount}/${summary.totalResultsCount} resultados`
+      : null,
     statusLabel: toStatusLabel(matchday.status),
     statusTone: toStatusTone(matchday.status),
     seasonId: matchday.seasonId,

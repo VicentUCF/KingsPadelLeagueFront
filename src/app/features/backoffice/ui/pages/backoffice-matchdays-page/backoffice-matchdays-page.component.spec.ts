@@ -18,6 +18,7 @@ function createMatchdayRow(
     id: 'matchday-1',
     name: 'Jornada 1',
     dateLabel: 'dom, 18 mar 2026',
+    summaryLabel: '1 partido · 0/1 resultados',
     statusLabel: 'En curso',
     statusTone: 'success',
     seasonId: 'season-1',
@@ -118,6 +119,7 @@ describe('BackofficeMatchdaysPageComponent', () => {
     });
 
     expect(screen.getByText('Jornada 1')).toBeVisible();
+    expect(screen.getByText('1 partido · 0/1 resultados')).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver/i })).toHaveAttribute(
       'href',
       '/backoffice/jornadas/matchday-1',
