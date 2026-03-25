@@ -1,10 +1,13 @@
-.action-toast-outlet {
+:host {
+  display: block;
   position: fixed;
-  inset-block-end: var(--space-5);
+  inset-block-start: var(--space-5);
   inset-inline-end: var(--space-5);
   z-index: calc(var(--z-index-overlay) + 20);
   pointer-events: none;
+}
 
+.action-toast-outlet {
   &__stack {
     display: grid;
     gap: var(--space-3);
@@ -69,10 +72,12 @@
 }
 
 @media (max-width: 40rem) {
-  .action-toast-outlet {
+  :host {
     inset-inline: var(--space-4);
-    inset-block-end: var(--space-4);
+    inset-block-start: var(--space-4);
+  }
 
+  .action-toast-outlet {
     &__stack {
       width: 100%;
     }
