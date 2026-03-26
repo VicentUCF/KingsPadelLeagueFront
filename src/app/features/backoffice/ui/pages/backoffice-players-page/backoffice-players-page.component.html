@@ -34,10 +34,21 @@
 
     @if (isAdmin()) {
       <button type="button" class="c-button c-button--pill c-button--primary c-button--md" disabled>
-        + Nuevo jugador
+        Alta no disponible
       </button>
     }
   </div>
+
+  <section class="backoffice-players-page__notice c-surface-card" aria-label="Estado del modulo">
+    <p class="backoffice-players-page__notice-title">Estado actual del modulo</p>
+    <p class="backoffice-players-page__notice-copy">{{ editingCapabilityLabel() }}</p>
+    @if (isAdmin()) {
+      <p class="backoffice-players-page__notice-meta">
+        El email y el equipo se muestran como referencia, pero no se pueden modificar con el
+        contrato actual.
+      </p>
+    }
+  </section>
 
   @if (isLoading() && !hasContent()) {
     <app-loading-state
@@ -70,13 +81,16 @@
         No hay jugadores que coincidan con <strong>"{{ searchTerm() }}"</strong>.
       </p>
     } @else if (viewMode() === 'table') {
-      <section class="players-table" aria-live="polite">
+      <section class="players-table" [class.players-table--admin]="isAdmin()" aria-live="polite">
         <div class="players-table__header">
           <span>Jugador</span>
           <span>Estado</span>
           <span>Equipo</span>
           <span>Estadísticas</span>
           <span>Vinculación</span>
+          @if (isAdmin()) {
+            <span>Acciones</span>
+          }
         </div>
         <ul class="players-table__body">
           @for (player of filteredPlayerCards(); track player.id) {
@@ -102,6 +116,17 @@
               </div>
               <div class="players-table__cell">{{ player.matchRecordLabel }}</div>
               <div class="players-table__cell">{{ player.userLinkageLabel }}</div>
+              @if (isAdmin()) {
+                <div class="players-table__cell">
+                  <button
+                    type="button"
+                    class="c-button c-button--pill c-button--outline c-button--sm"
+                    (click)="openEditDialog(player.id)"
+                  >
+                    Editar ficha
+                  </button>
+                </div>
+              }
             </li>
           }
         </ul>
@@ -116,4 +141,14 @@
       </ul>
     }
   }
+
+  <app-player-form-dialog
+    [initialValue]="editDialogValue()"
+    [isOpen]="isEditDialogOpen()"
+    [isSubmitting]="playersStore.isSaving()"
+    [mode]="'edit'"
+    [submissionError]="submissionError()"
+    (cancelled)="closeEditDialog()"
+    (submitted)="savePlayer($event)"
+  />
 </div>

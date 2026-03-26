@@ -91,7 +91,7 @@ describe('HttpBackofficeMatchdaysRepository', () => {
 
     const pairMatchesPromise = repository.createPairMatches('jornada-1');
     httpTestingController
-      .expectOne('http://api.test/admin/v1/matchdays/jornada-1/pair-matches')
+      .expectOne('http://api.test/admin/v1/matchdays/jornada-1/create-pair-matches')
       .flush({});
     await expect(pairMatchesPromise).resolves.toBeUndefined();
   });

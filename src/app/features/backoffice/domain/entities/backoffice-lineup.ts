@@ -15,8 +15,8 @@ export interface BackofficeSetResult {
 export interface BackofficeLineupPair {
   readonly id: string;
   readonly lineupId: string;
-  readonly player1Id: string;
-  readonly player2Id: string;
+  readonly player1Id: string | null;
+  readonly player2Id: string | null;
   readonly totalPlayersValue: number;
   readonly wonGame: boolean | null;
   readonly sets: readonly BackofficeSetResult[];

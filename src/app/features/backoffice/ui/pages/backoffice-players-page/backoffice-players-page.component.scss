@@ -15,6 +15,28 @@
     min-width: min(100%, 20rem);
   }
 
+  &__notice {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 1.15rem;
+  }
+
+  &__notice-title {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__notice-copy,
+  &__notice-meta {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
   &__view-toggle {
     display: flex;
     gap: 0.25rem;
@@ -70,6 +92,13 @@
 
 // Table view
 .players-table {
+  &--admin {
+    .players-table__header,
+    .players-table__row {
+      grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr 1fr;
+    }
+  }
+
   &__header {
     display: grid;
     grid-template-columns: 2fr 1fr 1.5fr 1.5fr 1.5fr;

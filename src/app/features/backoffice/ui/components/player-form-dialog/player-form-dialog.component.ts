@@ -7,17 +7,15 @@ import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.componen
 import {
   type BackofficeCrudFormMode,
   type BackofficePlayerFormValue,
-  type BackofficeTeamOption,
 } from '../../models/backoffice-crud.model';
 
 type PlayerFormGroup = FormGroup<{
-  fullName: FormControl<string>;
-  nickName: FormControl<string>;
-  avatarPath: FormControl<string>;
-  preferredSideLabel: FormControl<string>;
-  currentTeamId: FormControl<string>;
-  linkedUserEmail: FormControl<string>;
-  status: FormControl<'ACTIVE' | 'INACTIVE'>;
+  firstName: FormControl<string>;
+  lastName: FormControl<string>;
+  alias: FormControl<string>;
+  profileImage: FormControl<string>;
+  preferredPosition: FormControl<'both' | 'left' | 'right'>;
+  instagramUrl: FormControl<string>;
 }>;
 
 @Component({
@@ -34,7 +32,6 @@ export class PlayerFormDialogComponent {
   readonly isOpen = input(false);
   readonly mode = input<BackofficeCrudFormMode>('create');
   readonly initialValue = input.required<BackofficePlayerFormValue>();
-  readonly teamOptions = input<readonly BackofficeTeamOption[]>([]);
   readonly submissionError = input<string | null>(null);
   readonly isSubmitting = input(false);
 
@@ -44,32 +41,22 @@ export class PlayerFormDialogComponent {
   protected readonly chevronDownIcon = ChevronDown;
   protected readonly currentStep = signal(0);
   protected readonly form: PlayerFormGroup = new FormGroup({
-    fullName: new FormControl('', {
+    firstName: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    nickName: new FormControl('', {
+    lastName: new FormControl('', {
+      nonNullable: true,
+    }),
+    alias: new FormControl('', {
+      nonNullable: true,
+    }),
+    profileImage: new FormControl('', { nonNullable: true }),
+    preferredPosition: new FormControl<'both' | 'left' | 'right'>('both', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    avatarPath: new FormControl('', {
-      nonNullable: true,
-    }),
-    preferredSideLabel: new FormControl('Revés', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    currentTeamId: new FormControl('', {
-      nonNullable: true,
-    }),
-    linkedUserEmail: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.email],
-    }),
-    status: new FormControl<'ACTIVE' | 'INACTIVE'>('ACTIVE', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
+    instagramUrl: new FormControl('', { nonNullable: true }),
   });
 
   constructor() {
@@ -81,13 +68,12 @@ export class PlayerFormDialogComponent {
       const initialValue = this.initialValue();
 
       this.form.reset({
-        fullName: initialValue.fullName,
-        nickName: initialValue.nickName,
-        avatarPath: initialValue.avatarPath ?? '',
-        preferredSideLabel: initialValue.preferredSideLabel,
-        currentTeamId: initialValue.currentTeamId ?? '',
-        linkedUserEmail: initialValue.linkedUserEmail ?? '',
-        status: initialValue.status,
+        firstName: initialValue.firstName,
+        lastName: initialValue.lastName,
+        alias: initialValue.alias ?? '',
+        profileImage: initialValue.profileImage ?? '',
+        preferredPosition: initialValue.preferredPosition,
+        instagramUrl: initialValue.instagramUrl ?? '',
       });
       this.currentStep.set(0);
     });
@@ -98,9 +84,8 @@ export class PlayerFormDialogComponent {
   }
 
   protected nextStep(): void {
-    if (!this.form.controls.fullName.valid || !this.form.controls.nickName.valid) {
-      this.form.controls.fullName.markAsTouched();
-      this.form.controls.nickName.markAsTouched();
+    if (!this.form.controls.firstName.valid) {
+      this.form.controls.firstName.markAsTouched();
       return;
     }
 
@@ -135,13 +120,14 @@ export class PlayerFormDialogComponent {
     const rawValue = this.form.getRawValue();
 
     this.submitted.emit({
-      fullName: rawValue.fullName.trim(),
-      nickName: rawValue.nickName.trim(),
-      avatarPath: normalizeOptionalValue(rawValue.avatarPath),
-      preferredSideLabel: rawValue.preferredSideLabel,
-      linkedUserEmail: normalizeOptionalValue(rawValue.linkedUserEmail),
-      status: rawValue.status,
-      currentTeamId: normalizeOptionalValue(rawValue.currentTeamId),
+      firstName: rawValue.firstName.trim(),
+      lastName: rawValue.lastName.trim(),
+      alias: normalizeOptionalValue(rawValue.alias),
+      profileImage: normalizeOptionalValue(rawValue.profileImage),
+      preferredPosition: rawValue.preferredPosition,
+      instagramUrl: normalizeOptionalValue(rawValue.instagramUrl),
+      email: this.initialValue().email,
+      teamLabel: this.initialValue().teamLabel,
     });
   }
 }

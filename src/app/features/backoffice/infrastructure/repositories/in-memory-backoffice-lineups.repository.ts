@@ -6,7 +6,7 @@ import type {
 } from '@features/backoffice/domain/entities/backoffice-lineup';
 import type { BackofficeLineupsRepository } from '@features/backoffice/application/ports/backoffice-lineups.repository';
 
-const MOCK_LINEUPS: readonly BackofficeLineup[] = [
+const MOCK_LINEUPS: BackofficeLineup[] = [
   // match-4 (jornada-1): kings-of-favar vs titanics
   { id: 'lineup-1', matchId: 'match-4', teamId: 'kings-of-favar', status: 'submited' },
   { id: 'lineup-2', matchId: 'match-4', teamId: 'titanics', status: 'submited' },
@@ -21,7 +21,7 @@ const MOCK_LINEUPS: readonly BackofficeLineup[] = [
   { id: 'lineup-8', matchId: 'match-7', teamId: 'barbaridad', status: 'submited' },
 ];
 
-const MOCK_PAIRS: readonly BackofficeLineupPair[] = [
+const MOCK_PAIRS: BackofficeLineupPair[] = [
   // ── match-4: kings-of-favar (2) vs titanics (0) ──────────────────────────
   // kings pair 1 won 6-3, 6-4
   {
@@ -249,5 +249,77 @@ export class InMemoryBackofficeLineupsRepository implements BackofficeLineupsRep
 
   loadPairsByLineupIds(lineupIds: string[]): Promise<readonly BackofficeLineupPair[]> {
     return Promise.resolve(MOCK_PAIRS.filter((p) => lineupIds.includes(p.lineupId)));
+  }
+
+  create(matchId: string, teamId: string): Promise<BackofficeLineup> {
+    const lineup: BackofficeLineup = {
+      id: `lineup-${MOCK_LINEUPS.length + 1}`,
+      matchId,
+      teamId,
+      status: 'pending',
+    };
+    MOCK_LINEUPS.push(lineup);
+    return Promise.resolve(lineup);
+  }
+
+  createPair(
+    lineupId: string,
+    player1Id: string,
+    player2Id: string,
+  ): Promise<BackofficeLineupPair> {
+    const pair: BackofficeLineupPair = {
+      id: `pair-${MOCK_PAIRS.length + 1}`,
+      lineupId,
+      player1Id,
+      player2Id,
+      totalPlayersValue: 0,
+      wonGame: null,
+      sets: [],
+    };
+    MOCK_PAIRS.push(pair);
+    return Promise.resolve(pair);
+  }
+
+  updatePair(pairId: string, player1Id: string | null, player2Id: string | null): Promise<void> {
+    const pairIndex = MOCK_PAIRS.findIndex((pair) => pair.id === pairId);
+
+    if (pairIndex === -1) {
+      return Promise.resolve();
+    }
+
+    const pair = MOCK_PAIRS[pairIndex];
+
+    if (!pair) {
+      return Promise.resolve();
+    }
+
+    MOCK_PAIRS[pairIndex] = {
+      ...pair,
+      player1Id,
+      player2Id,
+    };
+
+    return Promise.resolve();
+  }
+
+  submit(lineupId: string): Promise<void> {
+    const lineupIndex = MOCK_LINEUPS.findIndex((lineup) => lineup.id === lineupId);
+
+    if (lineupIndex === -1) {
+      return Promise.resolve();
+    }
+
+    const lineup = MOCK_LINEUPS[lineupIndex];
+
+    if (!lineup) {
+      return Promise.resolve();
+    }
+
+    MOCK_LINEUPS[lineupIndex] = {
+      ...lineup,
+      status: 'submited',
+    };
+
+    return Promise.resolve();
   }
 }

@@ -1,11 +1,11 @@
 <app-modal-shell
   [description]="
     mode() === 'create'
-      ? 'La ficha define el perfil base del jugador y su equipo actual derivado.'
-      : 'Actualiza la ficha del jugador sin tocar participaciones ni nominaciones históricas.'
+      ? 'La ficha define el perfil base del jugador.'
+      : 'Actualiza solo los campos que el backend permite persistir hoy.'
   "
   [isOpen]="isOpen()"
-  [title]="mode() === 'create' ? 'Crear ficha' : 'Editar ficha'"
+  [title]="mode() === 'create' ? 'Crear ficha' : 'Editar jugador'"
   size="wide"
   (closed)="close()"
 >
@@ -20,7 +20,7 @@
         <span class="player-form-dialog__step-num">1</span>
         <div class="player-form-dialog__step-info">
           <strong>Identidad</strong>
-          <small>Nombre y avatar</small>
+          <small>Nombre, alias y avatar</small>
         </div>
       </button>
       <div class="player-form-dialog__step-divider" aria-hidden="true"></div>
@@ -33,13 +33,19 @@
         <span class="player-form-dialog__step-num">2</span>
         <div class="player-form-dialog__step-info">
           <strong>Perfil</strong>
-          <small>Posición y equipo</small>
+          <small>Posición y redes</small>
         </div>
       </button>
     </nav>
 
     @if (submissionError()) {
       <p class="player-form-dialog__error" role="alert">{{ submissionError() }}</p>
+    }
+
+    @if (mode() === 'edit') {
+      <p class="player-form-dialog__hint">
+        Solo se guardan alias, nombre, apellidos, posicion preferida, Instagram e imagen.
+      </p>
     }
 
     <form
@@ -52,38 +58,47 @@
         @case (0) {
           <div class="player-form-dialog__grid">
             <label class="c-field">
-              <span class="c-field__label">Nombre completo <span aria-hidden="true">*</span></span>
+              <span class="c-field__label">Nombre <span aria-hidden="true">*</span></span>
               <input
                 class="c-input c-input--md"
-                [class.c-input--invalid]="hasControlError('fullName')"
-                formControlName="fullName"
+                [class.c-input--invalid]="hasControlError('firstName')"
+                formControlName="firstName"
                 type="text"
                 autocomplete="off"
               />
-              @if (hasControlError('fullName')) {
-                <p class="c-field__error" role="alert">El nombre completo es obligatorio.</p>
+              @if (hasControlError('firstName')) {
+                <p class="c-field__error" role="alert">El nombre es obligatorio.</p>
               }
             </label>
 
             <label class="c-field">
-              <span class="c-field__label">Nick <span aria-hidden="true">*</span></span>
+              <span class="c-field__label">Apellidos</span>
               <input
                 class="c-input c-input--md"
-                [class.c-input--invalid]="hasControlError('nickName')"
-                formControlName="nickName"
+                formControlName="lastName"
                 type="text"
                 autocomplete="off"
               />
-              @if (hasControlError('nickName')) {
-                <p class="c-field__error" role="alert">El nick es obligatorio.</p>
-              }
+            </label>
+
+            <label class="c-field">
+              <span class="c-field__label">Alias</span>
+              <input
+                class="c-input c-input--md"
+                formControlName="alias"
+                type="text"
+                autocomplete="off"
+              />
+              <p class="c-field__helper">
+                Si se deja vacío, el directorio mostrará la posición preferida.
+              </p>
             </label>
 
             <label class="c-field c-field--full">
-              <span class="c-field__label">Avatar</span>
+              <span class="c-field__label">Imagen de perfil</span>
               <input
                 class="c-input c-input--md"
-                formControlName="avatarPath"
+                formControlName="profileImage"
                 type="text"
                 placeholder="Ruta o URL de imagen (opcional)"
               />
@@ -96,59 +111,49 @@
             <label class="c-field">
               <span class="c-field__label">Perfil de pista</span>
               <div class="c-select-wrap">
-                <select class="c-select c-input--md" formControlName="preferredSideLabel">
-                  <option value="Revés">Revés</option>
-                  <option value="Derecha">Derecha</option>
-                  <option value="Ambas">Ambas</option>
+                <select class="c-select c-input--md" formControlName="preferredPosition">
+                  <option value="left">Revés</option>
+                  <option value="right">Derecha</option>
+                  <option value="both">Ambas</option>
                 </select>
                 <span class="c-select-wrap__icon">
                   <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
                 </span>
               </div>
+            </label>
+
+            <label class="c-field">
+              <span class="c-field__label">Instagram</span>
+              <input
+                class="c-input c-input--md"
+                formControlName="instagramUrl"
+                type="text"
+                placeholder="https://instagram.com/usuario"
+              />
+            </label>
+
+            <label class="c-field">
+              <span class="c-field__label">Email</span>
+              <input
+                class="c-input c-input--md"
+                [value]="initialValue().email"
+                type="text"
+                readonly
+              />
+              <p class="c-field__helper">Campo informativo. No editable con el contrato actual.</p>
             </label>
 
             <label class="c-field">
               <span class="c-field__label">Equipo actual</span>
-              <div class="c-select-wrap">
-                <select class="c-select c-input--md" formControlName="currentTeamId">
-                  <option value="">Sin equipo activo</option>
-                  @for (team of teamOptions(); track team.id) {
-                    <option [value]="team.id">{{ team.label }}</option>
-                  }
-                </select>
-                <span class="c-select-wrap__icon">
-                  <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
-                </span>
-              </div>
-            </label>
-
-            <label class="c-field">
-              <span class="c-field__label">Email vinculado</span>
               <input
                 class="c-input c-input--md"
-                [class.c-input--invalid]="hasControlError('linkedUserEmail')"
-                formControlName="linkedUserEmail"
-                type="email"
-                placeholder="usuario@ejemplo.com"
+                [value]="initialValue().teamLabel"
+                type="text"
+                readonly
               />
-              @if (hasControlError('linkedUserEmail')) {
-                <p class="c-field__error" role="alert">
-                  Introduce un email válido o deja el campo vacío.
-                </p>
-              }
-            </label>
-
-            <label class="c-field">
-              <span class="c-field__label">Estado</span>
-              <div class="c-select-wrap">
-                <select class="c-select c-input--md" formControlName="status">
-                  <option value="ACTIVE">Activo</option>
-                  <option value="INACTIVE">Inactivo</option>
-                </select>
-                <span class="c-select-wrap__icon">
-                  <lucide-angular [img]="chevronDownIcon" [size]="16" aria-hidden="true" />
-                </span>
-              </div>
+              <p class="c-field__helper">
+                Campo informativo. La reasignación de equipo no está disponible aún.
+              </p>
             </label>
           </div>
         }

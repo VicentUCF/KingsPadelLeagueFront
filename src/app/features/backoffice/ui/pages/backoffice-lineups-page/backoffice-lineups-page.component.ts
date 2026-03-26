@@ -83,7 +83,9 @@ export class BackofficeLineupsPageComponent implements OnInit {
   protected readonly matchCards = computed<readonly BackofficeMatchCardViewModel[]>(() => {
     const matches = this.lineupsStore.matches();
     const teams = this.teamsStore.teams();
-    const lineups = this.lineupsStore.lineups();
+    const managedTeamId = this.isAdmin()
+      ? null
+      : (this.sessionStore.currentPresidentTeamId() ?? this.presidentTeam()?.id);
 
     return matches
       .map((match) => {
@@ -91,8 +93,13 @@ export class BackofficeLineupsPageComponent implements OnInit {
         const awayTeam = teams.find((t) => t.id === match.awayTeamId);
         if (!localTeam || !awayTeam) return null;
 
-        const lineup = lineups.find((l) => l.matchId === match.id);
-        return toBackofficeMatchCardViewModel(match, localTeam, awayTeam, lineup);
+        const lineupTeamId = this.isAdmin() ? match.localTeamId : managedTeamId;
+        const lineup = lineupTeamId
+          ? this.lineupsStore.lineupForMatch(match.id, lineupTeamId)
+          : undefined;
+        const pairCount = lineup ? this.lineupsStore.pairsForLineup(lineup.id).length : 0;
+
+        return toBackofficeMatchCardViewModel(match, localTeam, awayTeam, lineup, pairCount);
       })
       .filter((card): card is BackofficeMatchCardViewModel => card !== null);
   });
@@ -108,6 +115,16 @@ export class BackofficeLineupsPageComponent implements OnInit {
   protected readonly plannerMatch = computed(
     () => this.lineupsStore.matches().find((m) => m.id === this.selectedMatchId()) ?? null,
   );
+  protected readonly plannerLineup = computed(() => {
+    const matchId = this.selectedMatchId();
+    const teamId = this.plannerTeamId();
+
+    if (!matchId || !teamId) {
+      return null;
+    }
+
+    return this.lineupsStore.lineupForMatch(matchId, teamId) ?? null;
+  });
 
   protected readonly plannerPlayers = computed(() => {
     const teamId = this.plannerTeamId();
@@ -131,6 +148,12 @@ export class BackofficeLineupsPageComponent implements OnInit {
   protected readonly assignedCount = computed(() => this.assignedIds().size);
   protected readonly pairsCount = computed(() => 3);
   protected readonly requiredPlayers = computed(() => this.pairsCount() * 2);
+  protected readonly isPlannerComplete = computed(() =>
+    this.plannerPairs().every((pair) => !!pair.player1Id && !!pair.player2Id),
+  );
+  protected readonly isPlannerSubmitted = computed(
+    () => this.plannerLineup()?.status === 'submited',
+  );
 
   protected readonly availablePlayers = computed(() => {
     const assigned = this.assignedIds();
@@ -214,12 +237,12 @@ export class BackofficeLineupsPageComponent implements OnInit {
   protected openPlanner(matchId: string, teamId: string): void {
     this.selectedMatchId.set(matchId);
     this.plannerTeamId.set(teamId);
-    this.plannerStep.set(1);
-    this.plannerPairs.set([
-      { id: 'pair-1', player1Id: null, player2Id: null },
-      { id: 'pair-2', player1Id: null, player2Id: null },
-      { id: 'pair-3', player1Id: null, player2Id: null },
-    ]);
+    this.selectedPlayerId.set(null);
+    this.playerSearch.set('');
+
+    const existingLineup = this.lineupsStore.lineupForMatch(matchId, teamId);
+    const existingPairs = existingLineup ? this.lineupsStore.pairsForLineup(existingLineup.id) : [];
+
     const initAvail: Record<string, 'available'> = {};
     this.playersStore
       .players()
@@ -228,8 +251,29 @@ export class BackofficeLineupsPageComponent implements OnInit {
         initAvail[p.id] = 'available';
       });
     this.availability.set(initAvail);
-    this.selectedPlayerId.set(null);
-    this.playerSearch.set('');
+
+    if (existingPairs.length > 0) {
+      const pairs: PlannerPair[] = existingPairs.slice(0, 3).map((pair, index) => ({
+        id: `pair-${index + 1}`,
+        player1Id: pair.player1Id,
+        player2Id: pair.player2Id,
+      }));
+
+      while (pairs.length < 3) {
+        pairs.push({ id: `pair-${pairs.length + 1}`, player1Id: null, player2Id: null });
+      }
+
+      this.plannerPairs.set(pairs);
+      this.plannerStep.set(2);
+      return;
+    }
+
+    this.plannerStep.set(1);
+    this.plannerPairs.set([
+      { id: 'pair-1', player1Id: null, player2Id: null },
+      { id: 'pair-2', player1Id: null, player2Id: null },
+      { id: 'pair-3', player1Id: null, player2Id: null },
+    ]);
   }
 
   protected closePlanner(): void {
@@ -241,6 +285,10 @@ export class BackofficeLineupsPageComponent implements OnInit {
   }
 
   protected setAvailability(playerId: string, state: 'available' | 'unavailable'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.availability.update((a) => ({ ...a, [playerId]: state }));
     if (state === 'unavailable' && this.selectedPlayerId() === playerId) {
       this.selectedPlayerId.set(null);
@@ -252,10 +300,18 @@ export class BackofficeLineupsPageComponent implements OnInit {
   }
 
   protected selectPlayerMobile(playerId: string): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.selectedPlayerId.update((current) => (current === playerId ? null : playerId));
   }
 
   protected assignSelectedToSlot(pairIndex: number, slot: 'player1' | 'player2'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     const playerId = this.selectedPlayerId();
     if (!playerId) return;
     this.assignPlayerToSlot(playerId, pairIndex, slot);
@@ -267,6 +323,10 @@ export class BackofficeLineupsPageComponent implements OnInit {
   }
 
   protected onDrop(event: DragEvent, pairIndex: number, slot: 'player1' | 'player2'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     event.preventDefault();
     const data = event.dataTransfer?.getData('text/plain') ?? '';
     if (!data.startsWith('player:')) return;
@@ -276,18 +336,30 @@ export class BackofficeLineupsPageComponent implements OnInit {
   }
 
   protected clearSlot(pairIndex: number, slot: 'player1' | 'player2'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p, i) => (i === pairIndex ? { ...p, [`${slot}Id`]: null } : p)),
     );
   }
 
   protected clearPair(pairIndex: number): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p, i) => (i === pairIndex ? { ...p, player1Id: null, player2Id: null } : p)),
     );
   }
 
   protected swapPair(pairIndex: number): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p, i) =>
         i === pairIndex ? { ...p, player1Id: p.player2Id, player2Id: p.player1Id } : p,
@@ -296,6 +368,10 @@ export class BackofficeLineupsPageComponent implements OnInit {
   }
 
   protected autoAssign(): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     const available = this.availablePlayers();
     if (!available.length) return;
     let avIdx = 0;
@@ -333,11 +409,64 @@ export class BackofficeLineupsPageComponent implements OnInit {
     }
   }
 
-  protected saveDraft(): void {
-    this.toastStore.success(
-      'El borrador de alineación se ha guardado correctamente.',
-      'Borrador guardado',
-    );
+  protected async saveDraft(): Promise<void> {
+    const matchId = this.selectedMatchId();
+    const teamId = this.plannerTeamId();
+
+    if (!matchId || !teamId) {
+      return;
+    }
+
+    try {
+      await this.lineupsStore.saveDraft(matchId, teamId, this.plannerPairs(), {
+        canCreateLineup: this.isAdmin(),
+      });
+      this.closePlanner();
+      this.toastStore.success(
+        'El borrador de alineación se ha guardado correctamente.',
+        'Borrador guardado',
+      );
+    } catch (error) {
+      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
+        this.toastStore.error(
+          'La alineación todavía no existe. Un administrador debe crearla antes de poder guardar parejas.',
+          'Alineación no disponible',
+        );
+        return;
+      }
+
+      this.toastStore.error(
+        'No hemos podido guardar el borrador de alineación.',
+        'No se ha podido guardar',
+      );
+    }
+  }
+
+  protected async submitLineup(): Promise<void> {
+    const matchId = this.selectedMatchId();
+    const teamId = this.plannerTeamId();
+
+    if (!matchId || !teamId || !this.isPlannerComplete() || this.isPlannerSubmitted()) {
+      return;
+    }
+
+    try {
+      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs(), {
+        canCreateLineup: this.isAdmin(),
+      });
+      this.closePlanner();
+      this.toastStore.success('La alineación se ha enviado correctamente.', 'Alineación enviada');
+    } catch (error) {
+      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
+        this.toastStore.error(
+          'La alineación todavía no existe. Un administrador debe crearla antes de poder enviarla.',
+          'Alineación no disponible',
+        );
+        return;
+      }
+
+      this.toastStore.error('No hemos podido enviar la alineación.', 'No se ha podido enviar');
+    }
   }
 
   private assignPlayerToSlot(
@@ -345,6 +474,10 @@ export class BackofficeLineupsPageComponent implements OnInit {
     pairIndex: number,
     slot: 'player1' | 'player2',
   ): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     // Remove the player from any existing slot first
     this.plannerPairs.update((pairs) =>
       pairs.map((p) => ({

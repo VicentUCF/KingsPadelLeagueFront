@@ -758,6 +758,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   }
 
   protected setAvailability(playerId: string, state: 'available' | 'unavailable'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.availability.update((a) => ({ ...a, [playerId]: state }));
     if (state === 'unavailable' && this.selectedPlayerId() === playerId) {
       this.selectedPlayerId.set(null);
@@ -769,10 +773,18 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   }
 
   protected selectPlayerMobile(playerId: string): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.selectedPlayerId.update((current) => (current === playerId ? null : playerId));
   }
 
   protected assignSelectedToSlot(pairIndex: number, slot: 'player1' | 'player2'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     const playerId = this.selectedPlayerId();
     if (!playerId) return;
     this.assignPlayerToSlot(playerId, pairIndex, slot);
@@ -784,6 +796,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   }
 
   protected onDrop(event: DragEvent, pairIndex: number, slot: 'player1' | 'player2'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     event.preventDefault();
     const data = event.dataTransfer?.getData('text/plain') ?? '';
     if (!data.startsWith('player:')) return;
@@ -793,18 +809,30 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   }
 
   protected clearSlot(pairIndex: number, slot: 'player1' | 'player2'): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p, i) => (i === pairIndex ? { ...p, [`${slot}Id`]: null } : p)),
     );
   }
 
   protected clearPair(pairIndex: number): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p, i) => (i === pairIndex ? { ...p, player1Id: null, player2Id: null } : p)),
     );
   }
 
   protected swapPair(pairIndex: number): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p, i) =>
         i === pairIndex ? { ...p, player1Id: p.player2Id, player2Id: p.player1Id } : p,
@@ -813,6 +841,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   }
 
   protected autoAssign(): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     const available = this.availablePlayers();
     if (!available.length) return;
     let avIdx = 0;
@@ -874,11 +906,81 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     return player.wonGames + player.lostGames;
   }
 
-  protected saveDraft(): void {
-    this.toastStore.success(
-      'El borrador de alineación se ha guardado correctamente.',
-      'Borrador guardado',
-    );
+  protected isPlannerComplete(): boolean {
+    return this.plannerPairs().every((pair) => !!pair.player1Id && !!pair.player2Id);
+  }
+
+  protected isPlannerSubmitted(): boolean {
+    const matchId = this.selectedMatchId();
+    const teamId = this.plannerTeamId();
+
+    if (!matchId || !teamId) {
+      return false;
+    }
+
+    return this.lineupsStore.lineupForMatch(matchId, teamId)?.status === 'submited';
+  }
+
+  protected async saveDraft(): Promise<void> {
+    const matchId = this.selectedMatchId();
+    const teamId = this.plannerTeamId();
+
+    if (!matchId || !teamId) {
+      return;
+    }
+
+    try {
+      await this.lineupsStore.saveDraft(matchId, teamId, this.plannerPairs(), {
+        canCreateLineup: this.sessionStore.currentRole() === 'ADMIN',
+      });
+      this.closePlanner();
+      this.toastStore.success(
+        'El borrador de alineación se ha guardado correctamente.',
+        'Borrador guardado',
+      );
+    } catch (error) {
+      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
+        this.toastStore.error(
+          'La alineación todavía no existe. Un administrador debe crearla antes de poder guardar parejas.',
+          'Alineación no disponible',
+        );
+        return;
+      }
+
+      this.toastStore.error(
+        'No hemos podido guardar el borrador de alineación.',
+        'No se ha podido guardar',
+      );
+    }
+  }
+
+  protected async submitLineup(): Promise<void> {
+    const matchId = this.selectedMatchId();
+    const teamId = this.plannerTeamId();
+    const plannerReady = this.isPlannerComplete();
+    const plannerSubmitted = this.isPlannerSubmitted();
+
+    if (!matchId || !teamId || !plannerReady || plannerSubmitted) {
+      return;
+    }
+
+    try {
+      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs(), {
+        canCreateLineup: this.sessionStore.currentRole() === 'ADMIN',
+      });
+      this.closePlanner();
+      this.toastStore.success('La alineación se ha enviado correctamente.', 'Alineación enviada');
+    } catch (error) {
+      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
+        this.toastStore.error(
+          'La alineación todavía no existe. Un administrador debe crearla antes de poder enviarla.',
+          'Alineación no disponible',
+        );
+        return;
+      }
+
+      this.toastStore.error('No hemos podido enviar la alineación.', 'No se ha podido enviar');
+    }
   }
 
   private createGuardrail(
@@ -899,6 +1001,10 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     pairIndex: number,
     slot: 'player1' | 'player2',
   ): void {
+    if (this.isPlannerSubmitted()) {
+      return;
+    }
+
     this.plannerPairs.update((pairs) =>
       pairs.map((p) => ({
         ...p,

@@ -41,6 +41,13 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
     expect(screen.queryByRole('button', { name: /Iniciar jornada/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Nuevo partido/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Editar MVP/i })).not.toBeInTheDocument();
+
+    screen.getByRole('button', { name: /Gestionar alineación/i }).click();
+
+    expect(
+      await screen.findByText('Esta alineación ya está enviada y se muestra en modo lectura.'),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Alineación enviada' })).toBeDisabled();
   });
 });
 
@@ -121,9 +128,13 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     lineups: signal([localLineup, awayLineup]),
     pairs: signal([localPair, awayPair, localPairTwo, awayPairTwo]),
     isLoading: signal(false),
+    isSavingDraft: signal(false),
+    isSubmittingLineup: signal(false),
     errorMessage: signal<string | null>(null),
     hasContent: signal(true),
     loadForMatchday: jest.fn().mockResolvedValue(undefined),
+    saveDraft: jest.fn().mockResolvedValue(undefined),
+    submitDraft: jest.fn().mockResolvedValue(undefined),
     lineupForMatch: jest.fn((matchId: string, teamId: string) =>
       [localLineup, awayLineup].find(
         (lineup) => lineup.matchId === matchId && lineup.teamId === teamId,
@@ -137,12 +148,16 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     | 'errorMessage'
     | 'hasContent'
     | 'isLoading'
+    | 'isSavingDraft'
+    | 'isSubmittingLineup'
     | 'lineupForMatch'
     | 'lineups'
     | 'loadForMatchday'
     | 'matches'
     | 'pairs'
     | 'pairsForLineup'
+    | 'saveDraft'
+    | 'submitDraft'
   >;
 
   await render(BackofficeMatchdayDetailPageComponent, {

@@ -44,12 +44,56 @@ export interface PlayerHttpV1 {
   readonly instagramUrl?: string;
 }
 
+export interface UpdateOnePlayerHttpV1 {
+  readonly alias?: string;
+  readonly firstName?: string;
+  readonly instagramUrl?: string;
+  readonly lastName?: string;
+  readonly preferredPosition?: 'both' | 'left' | 'right';
+  readonly profileImage?: string;
+}
+
 export interface SeasonHttpV1 {
   readonly id: string;
   readonly name: string;
   readonly description: string;
   readonly startsAt: string;
   readonly endsAt: string;
+  readonly createdAt: string;
+  readonly updatedAt?: string;
+  readonly createdById?: string;
+  readonly updatedById?: string;
+  readonly version?: number;
+}
+
+export interface SeasonPlayerScoreHttpV1 {
+  readonly id: string;
+  readonly playerId: string;
+  readonly seasonId: string;
+  readonly wonGames: number;
+  readonly lostGames: number;
+  readonly wonPairMatches: number;
+  readonly lostPairMatches: number;
+  readonly wonSets: number;
+  readonly lostSets: number;
+  readonly createdAt: string;
+  readonly updatedAt?: string;
+  readonly createdById?: string;
+  readonly updatedById?: string;
+  readonly version?: number;
+}
+
+export interface SeasonTeamScoreHttpV1 {
+  readonly id: string;
+  readonly seasonId: string;
+  readonly teamId: string;
+  readonly totalPoints: number;
+  readonly wonMatches: number;
+  readonly lostMatches: number;
+  readonly wonGames: number;
+  readonly lostGames: number;
+  readonly wonSets: number;
+  readonly lostSets: number;
   readonly createdAt: string;
   readonly updatedAt?: string;
   readonly createdById?: string;

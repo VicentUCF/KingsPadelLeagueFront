@@ -1,6 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { LayoutDashboard, Shield, Swords, Trophy, UserCog, Users } from 'lucide-angular';
+import { LayoutDashboard, Shield, Swords, Trophy, Users } from 'lucide-angular';
 
 import { hasBackofficeUiAdminOverride } from '@core/auth/backoffice-ui-admin-override';
 import type { AuthRole } from '@features/auth/domain/entities/auth-user';
@@ -90,13 +90,6 @@ export class BackofficeSessionStore {
         label: 'Clasificación',
         icon: Trophy,
         isAccessible: true,
-        isImplemented: true,
-      },
-      {
-        path: `${BACKOFFICE_ROOT_PATH}/usuarios`,
-        label: 'Usuarios',
-        icon: UserCog,
-        isAccessible: isAdmin,
         isImplemented: true,
       },
     ];

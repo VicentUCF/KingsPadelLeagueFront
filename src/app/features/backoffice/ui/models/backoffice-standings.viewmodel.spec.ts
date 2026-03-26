@@ -1,15 +1,12 @@
-import type {
-  BackofficeLineup,
-  BackofficeLineupPair,
-} from '@features/backoffice/domain/entities/backoffice-lineup';
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
+import type { BackofficeSeasonTeamScore } from '@features/backoffice/domain/entities/backoffice-season-team-score';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 
 import { toBackofficeStandingsViewModel } from './backoffice-standings.viewmodel';
 
 describe('toBackofficeStandingsViewModel', () => {
-  it('calculates won and lost games from lineup sets and ranks by that difference', () => {
-    const rows = toBackofficeStandingsViewModel(teams, matches, lineups, pairs);
+  it('ranks teams from official season scores and keeps recent form from finished matches', () => {
+    const rows = toBackofficeStandingsViewModel(teams, scores, matches);
 
     expect(rows).toEqual([
       expect.objectContaining({
@@ -22,6 +19,7 @@ describe('toBackofficeStandingsViewModel', () => {
         lostGames: 14,
         gamesDiff: 10,
         points: 3,
+        form: ['W'],
       }),
       expect.objectContaining({
         rank: 2,
@@ -33,6 +31,7 @@ describe('toBackofficeStandingsViewModel', () => {
         lostGames: 21,
         gamesDiff: 8,
         points: 3,
+        form: ['W'],
       }),
       expect.objectContaining({
         rank: 3,
@@ -44,6 +43,7 @@ describe('toBackofficeStandingsViewModel', () => {
         lostGames: 53,
         gamesDiff: -18,
         points: 0,
+        form: ['L', 'L'],
       }),
     ]);
   });
@@ -53,6 +53,12 @@ const teams: readonly BackofficeTeam[] = [
   createTeam('alpha', 'Alpha'),
   createTeam('beta', 'Beta'),
   createTeam('gamma', 'Gamma'),
+];
+
+const scores: readonly BackofficeSeasonTeamScore[] = [
+  createScore('alpha', 3, 1, 0, 29, 21),
+  createScore('beta', 0, 0, 2, 35, 53),
+  createScore('gamma', 3, 1, 0, 24, 14),
 ];
 
 const matches: readonly BackofficeMatch[] = [
@@ -80,50 +86,6 @@ const matches: readonly BackofficeMatch[] = [
   },
 ];
 
-const lineups: readonly BackofficeLineup[] = [
-  createLineup('lineup-alpha', 'match-1', 'alpha'),
-  createLineup('lineup-beta-1', 'match-1', 'beta'),
-  createLineup('lineup-gamma', 'match-2', 'gamma'),
-  createLineup('lineup-beta-2', 'match-2', 'beta'),
-];
-
-const pairs: readonly BackofficeLineupPair[] = [
-  createPair('pair-alpha-1', 'lineup-alpha', true, [
-    [6, 3],
-    [6, 4],
-  ]),
-  createPair('pair-alpha-2', 'lineup-alpha', true, [
-    [4, 6],
-    [7, 5],
-    [6, 3],
-  ]),
-  createPair('pair-beta-1', 'lineup-beta-1', false, [
-    [3, 6],
-    [4, 6],
-  ]),
-  createPair('pair-beta-2', 'lineup-beta-1', false, [
-    [6, 4],
-    [5, 7],
-    [3, 6],
-  ]),
-  createPair('pair-gamma-1', 'lineup-gamma', true, [
-    [6, 2],
-    [6, 3],
-  ]),
-  createPair('pair-gamma-2', 'lineup-gamma', true, [
-    [6, 4],
-    [6, 5],
-  ]),
-  createPair('pair-beta-3', 'lineup-beta-2', false, [
-    [2, 6],
-    [3, 6],
-  ]),
-  createPair('pair-beta-4', 'lineup-beta-2', false, [
-    [4, 6],
-    [5, 6],
-  ]),
-];
-
 function createTeam(id: string, name: string): BackofficeTeam {
   return {
     id,
@@ -134,31 +96,24 @@ function createTeam(id: string, name: string): BackofficeTeam {
   };
 }
 
-function createLineup(id: string, matchId: string, teamId: string): BackofficeLineup {
+function createScore(
+  teamId: string,
+  totalPoints: number,
+  wonMatches: number,
+  lostMatches: number,
+  wonGames: number,
+  lostGames: number,
+): BackofficeSeasonTeamScore {
   return {
-    id,
-    matchId,
+    id: `score-${teamId}`,
+    seasonId: 'season-1',
     teamId,
-    status: 'submited',
-  };
-}
-
-function createPair(
-  id: string,
-  lineupId: string,
-  wonGame: boolean,
-  sets: readonly (readonly [number, number])[],
-): BackofficeLineupPair {
-  return {
-    id,
-    lineupId,
-    player1Id: `${id}-player-1`,
-    player2Id: `${id}-player-2`,
-    totalPlayersValue: 100,
-    wonGame,
-    sets: sets.map(([localScore, awayScore]) => ({
-      localScore,
-      awayScore,
-    })),
+    totalPoints,
+    wonMatches,
+    lostMatches,
+    wonGames,
+    lostGames,
+    wonSets: 0,
+    lostSets: 0,
   };
 }

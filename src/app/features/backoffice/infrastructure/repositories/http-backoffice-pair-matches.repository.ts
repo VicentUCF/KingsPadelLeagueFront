@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { withJsonArrayParam } from '@core/api/http-query-params';
 import { API_BASE_URL } from '@core/api/api-base-url.token';
 import type { PaginatedResponse, PairMatchHttpV1 } from '@core/api/kings-padel-api.types';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
@@ -17,10 +18,9 @@ export class HttpBackofficePairMatchesRepository implements BackofficePairMatche
   private readonly baseUrl = inject(API_BASE_URL);
 
   loadByLineupPairIds(lineupPairIds: readonly string[]): Promise<readonly BackofficePairMatch[]> {
-    let params = new HttpParams().append('limit', '200');
-    for (const id of lineupPairIds) {
-      params = params.append('lineupPairIds[]', id);
-    }
+    let params = new HttpParams().set('limit', '200');
+    params = withJsonArrayParam(params, 'localLineUpPairIds', lineupPairIds);
+    params = withJsonArrayParam(params, 'awayLineUpPairIds', lineupPairIds);
 
     return firstValueFrom(
       this.http.get<PaginatedResponse<PairMatchHttpV1>>(`${this.baseUrl}/admin/v1/pair-matches`, {
@@ -44,7 +44,7 @@ function mapPairMatch(raw: PairMatchHttpV1): BackofficePairMatch {
     id: raw.id,
     localLineUpPairId: raw.localLineUpPairId,
     awayLineUpPairId: raw.awayLineUpPairId,
-    status: raw.status,
+    status: raw.setsResult && raw.setsResult.length > 0 ? 'finished' : 'scheduled',
     setsResult: raw.setsResult ?? [],
   };
 }

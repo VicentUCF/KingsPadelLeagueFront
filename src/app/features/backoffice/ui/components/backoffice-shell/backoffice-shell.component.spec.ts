@@ -62,7 +62,7 @@ describe('BackofficeShellComponent', () => {
     expect(within(navigation).getByText('Jugadores')).toBeVisible();
     expect(within(navigation).getByText('Jornadas')).toBeVisible();
     expect(within(navigation).getByText('Clasificación')).toBeVisible();
-    expect(within(navigation).getByText('Usuarios')).toBeVisible();
+    expect(within(navigation).queryByText('Usuarios')).toBeNull();
   });
 
   it('shows logout button in the sidebar', async () => {

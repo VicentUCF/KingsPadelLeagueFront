@@ -47,7 +47,8 @@ describe('HttpBackofficeMatchesRepository', () => {
     httpTestingController
       .expectOne(
         (req) =>
-          req.urlWithParams === 'http://api.test/v1/matches?matchdayIds%5B%5D=jornada-1&limit=100',
+          req.urlWithParams ===
+          'http://api.test/v1/matches?limit=100&matchdayIds=%5B%22jornada-1%22%5D',
       )
       .flush({ items: [createMatchHttp()], meta: createMeta(1) });
 
@@ -65,7 +66,7 @@ describe('HttpBackofficeMatchesRepository', () => {
       .expectOne(
         (req) =>
           req.urlWithParams ===
-          'http://api.test/admin/v1/matches?limit=100&localTeamIds%5B%5D=team-1&awayTeamIds%5B%5D=team-1',
+          'http://api.test/admin/v1/matches?limit=100&localTeamIds=%5B%22team-1%22%5D&awayTeamIds=%5B%22team-1%22%5D',
       )
       .flush({ items: [createMatchHttp()], meta: createMeta(1) });
 

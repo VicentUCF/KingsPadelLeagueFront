@@ -80,6 +80,31 @@ describe('HttpBackofficePlayersRepository', () => {
 
     await expect(playersPromise).resolves.toHaveLength(1);
   });
+
+  it('updates a player through the writable v1 endpoint', async () => {
+    const promise = repository.update('player-7', {
+      alias: 'Briga',
+      firstName: 'Brigante',
+      lastName: 'Demo',
+      preferredPosition: 'both',
+      instagramUrl: 'https://instagram.com/briga',
+      profileImage: 'https://cdn.test/briga.png',
+    });
+
+    const request = httpTestingController.expectOne('http://api.test/v1/players/player-7');
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({
+      alias: 'Briga',
+      firstName: 'Brigante',
+      lastName: 'Demo',
+      preferredPosition: 'both',
+      instagramUrl: 'https://instagram.com/briga',
+      profileImage: 'https://cdn.test/briga.png',
+    });
+    request.flush(null);
+
+    await expect(promise).resolves.toBeUndefined();
+  });
 });
 
 function createMeta(itemCount: number) {

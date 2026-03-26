@@ -33,7 +33,7 @@ describe('HttpBackofficePairMatchesRepository', () => {
 
     httpTestingController
       .expectOne(
-        'http://api.test/admin/v1/pair-matches?limit=200&lineupPairIds%5B%5D=lineup-pair-1',
+        'http://api.test/admin/v1/pair-matches?limit=200&localLineUpPairIds=%5B%22lineup-pair-1%22%5D&awayLineUpPairIds=%5B%22lineup-pair-1%22%5D',
       )
       .flush({ items: [createPairMatchHttp()], meta: createMeta(1) });
 
@@ -90,7 +90,7 @@ function createPairMatchHttp() {
     id: 'pair-match-1',
     localLineUpPairId: 'lineup-pair-1',
     awayLineUpPairId: 'lineup-pair-2',
-    status: 'finished',
+    order: 1,
     setsResult: [
       { local: 6, away: 4 },
       { local: 4, away: 6 },

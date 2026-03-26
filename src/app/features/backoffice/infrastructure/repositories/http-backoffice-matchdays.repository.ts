@@ -59,9 +59,13 @@ export class HttpBackofficeMatchdaysRepository extends BackofficeMatchdaysReposi
 
   override createPairMatches(matchdayId: string): Promise<void> {
     return firstValueFrom(
-      this.http.post<void>(`${this.baseUrl}/admin/v1/matchdays/${matchdayId}/pair-matches`, null, {
-        context: withHttpErrorToast({ key: 'create-pair-matches' }),
-      }),
+      this.http.post<void>(
+        `${this.baseUrl}/admin/v1/matchdays/${matchdayId}/create-pair-matches`,
+        null,
+        {
+          context: withHttpErrorToast({ key: 'create-pair-matches' }),
+        },
+      ),
     ).then(() => undefined);
   }
 }

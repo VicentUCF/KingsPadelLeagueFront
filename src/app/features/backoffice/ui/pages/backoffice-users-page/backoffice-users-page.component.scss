@@ -4,6 +4,37 @@
   gap: 1.75rem;
 }
 
+.users-unavailable {
+  display: grid;
+  gap: 0.9rem;
+  padding: 2rem;
+  border: 1px solid rgb(201 162 39 / 14%);
+  background: linear-gradient(135deg, rgb(201 162 39 / 7%), rgb(255 255 255 / 0.02));
+
+  &__eyebrow {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-brand-strong);
+  }
+
+  &__title {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.4rem, 1rem + 1.2vw, 2rem);
+  }
+
+  &__description {
+    margin: 0;
+    max-width: 44rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+}
+
 // ── Header ───────────────────────────────────────────────────────────────────
 
 .users-header {

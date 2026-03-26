@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { withJsonArrayParam } from '@core/api/http-query-params';
 import { API_BASE_URL } from '@core/api/api-base-url.token';
 import type { MatchHttpV1, PaginatedResponse } from '@core/api/kings-padel-api.types';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
@@ -22,7 +23,9 @@ export class HttpBackofficeMatchesRepository implements BackofficeMatchesReposit
   );
 
   loadByMatchday(matchdayId: string): Promise<readonly BackofficeMatch[]> {
-    const params = new HttpParams().append('matchdayIds[]', matchdayId).append('limit', '100');
+    const params = withJsonArrayParam(new HttpParams().set('limit', '100'), 'matchdayIds', [
+      matchdayId,
+    ]);
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}${this.matchesBasePath()}`, {
         params,
@@ -32,9 +35,9 @@ export class HttpBackofficeMatchesRepository implements BackofficeMatchesReposit
   }
 
   loadByTeam(teamId: string): Promise<readonly BackofficeMatch[]> {
-    let params = new HttpParams().append('limit', '100');
-    params = params.append('localTeamIds[]', teamId);
-    params = params.append('awayTeamIds[]', teamId);
+    let params = new HttpParams().set('limit', '100');
+    params = withJsonArrayParam(params, 'localTeamIds', [teamId]);
+    params = withJsonArrayParam(params, 'awayTeamIds', [teamId]);
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}${this.matchesBasePath()}`, {
         params,

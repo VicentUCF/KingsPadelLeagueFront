@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { withJsonArrayParam } from '@core/api/http-query-params';
 import { API_BASE_URL } from '@core/api/api-base-url.token';
 import type {
   MatchTeamLineUpHttpV1,
@@ -33,10 +34,7 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
   );
 
   loadByMatchIds(matchIds: string[]): Promise<readonly BackofficeLineup[]> {
-    let params = new HttpParams().append('limit', '200');
-    for (const id of matchIds) {
-      params = params.append('matchIds[]', id);
-    }
+    const params = withJsonArrayParam(new HttpParams().set('limit', '200'), 'matchIds', matchIds);
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpHttpV1>>(
         `${this.baseUrl}${this.lineupsBasePath()}`,
@@ -49,10 +47,11 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
   }
 
   loadPairsByLineupIds(lineupIds: string[]): Promise<readonly BackofficeLineupPair[]> {
-    let params = new HttpParams().append('limit', '200');
-    for (const id of lineupIds) {
-      params = params.append('matchTeamLineUpIds[]', id);
-    }
+    const params = withJsonArrayParam(
+      new HttpParams().set('limit', '200').set('sortBy', JSON.stringify([{ createdAt: 'ASC' }])),
+      'matchTeamLineUpIds',
+      lineupIds,
+    );
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpPairHttpV1>>(
         `${this.baseUrl}${this.lineupPairsBasePath()}`,
@@ -62,6 +61,44 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
         },
       ),
     ).then((res) => res.items.map(mapPair));
+  }
+
+  create(matchId: string, teamId: string): Promise<BackofficeLineup> {
+    return firstValueFrom(
+      this.http.post<MatchTeamLineUpHttpV1>(`${this.baseUrl}/admin/v1/match-team-line-ups`, {
+        matchId,
+        teamId,
+      }),
+    ).then(mapLineup);
+  }
+
+  createPair(
+    lineupId: string,
+    player1Id: string,
+    player2Id: string,
+  ): Promise<BackofficeLineupPair> {
+    return firstValueFrom(
+      this.http.post<MatchTeamLineUpPairHttpV1>(`${this.baseUrl}/v1/match-team-line-up-pairs`, {
+        matchTeamLineUpId: lineupId,
+        player1Id,
+        player2Id,
+      }),
+    ).then(mapPair);
+  }
+
+  updatePair(pairId: string, player1Id: string | null, player2Id: string | null): Promise<void> {
+    return firstValueFrom(
+      this.http.patch<void>(`${this.baseUrl}/v1/match-team-line-up-pairs/${pairId}`, {
+        player1Id,
+        player2Id,
+      }),
+    ).then(() => undefined);
+  }
+
+  submit(lineupId: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(`${this.baseUrl}/v1/match-team-line-ups/${lineupId}/submits`, null),
+    ).then(() => undefined);
   }
 }
 
@@ -81,7 +118,7 @@ function mapPair(raw: MatchTeamLineUpPairHttpV1): BackofficeLineupPair {
     player1Id: raw.player1Id,
     player2Id: raw.player2Id,
     totalPlayersValue: raw.totalPlayersValue,
-    wonGame: raw.wonGame ?? null,
-    sets: raw.sets ?? [],
+    wonGame: null,
+    sets: [],
   };
 }

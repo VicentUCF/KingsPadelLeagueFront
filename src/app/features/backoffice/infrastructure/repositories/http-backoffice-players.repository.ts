@@ -3,11 +3,18 @@ import { computed, inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
-import type { PaginatedResponse, PlayerHttpV1 } from '@core/api/kings-padel-api.types';
+import type {
+  PaginatedResponse,
+  PlayerHttpV1,
+  UpdateOnePlayerHttpV1,
+} from '@core/api/kings-padel-api.types';
 import { resolvePlayerHttpCompetitiveStats } from '@core/api/player-http-competitive-stats';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
 import { AuthStore } from '@features/auth/ui/state/auth.store';
-import { BackofficePlayersRepository } from '@features/backoffice/application/ports/backoffice-players.repository';
+import {
+  BackofficePlayersRepository,
+  type BackofficePlayerUpdate,
+} from '@features/backoffice/application/ports/backoffice-players.repository';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 
@@ -27,6 +34,25 @@ export class HttpBackofficePlayersRepository extends BackofficePlayersRepository
         context: withHttpErrorToast({ key: 'load-players' }),
       }),
     ).then((res) => res.items.map(mapPlayer));
+  }
+
+  override update(id: string, input: BackofficePlayerUpdate): Promise<void> {
+    const body: UpdateOnePlayerHttpV1 = {
+      ...(input.alias !== undefined ? { alias: input.alias } : {}),
+      ...(input.firstName !== undefined ? { firstName: input.firstName } : {}),
+      ...(input.instagramUrl !== undefined ? { instagramUrl: input.instagramUrl } : {}),
+      ...(input.lastName !== undefined ? { lastName: input.lastName } : {}),
+      ...(input.preferredPosition !== undefined
+        ? { preferredPosition: input.preferredPosition }
+        : {}),
+      ...(input.profileImage !== undefined ? { profileImage: input.profileImage } : {}),
+    };
+
+    return firstValueFrom(
+      this.http.patch<void>(`${this.baseUrl}/v1/players/${id}`, body, {
+        context: withHttpErrorToast({ key: 'update-player' }),
+      }),
+    ).then(() => undefined);
   }
 }
 

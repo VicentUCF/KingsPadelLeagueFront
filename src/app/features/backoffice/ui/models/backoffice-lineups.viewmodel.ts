@@ -25,6 +25,7 @@ export function toBackofficeMatchCardViewModel(
   localTeam: BackofficeTeam,
   awayTeam: BackofficeTeam,
   lineup?: BackofficeLineup,
+  pairCount = 0,
 ): BackofficeMatchCardViewModel {
   const lineupStatus = lineup?.status ?? 'no_lineup';
   return {
@@ -38,7 +39,7 @@ export function toBackofficeMatchCardViewModel(
     lineupStatus,
     lineupStatusLabel: toLineupStatusLabel(lineupStatus),
     lineupStatusTone: toLineupStatusTone(lineupStatus),
-    pairCount: 0,
+    pairCount,
     localScore: match.localTeamScorePoints,
     awayScore: match.awayTeamScorePoints,
     mvpId: match.mvpId,

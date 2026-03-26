@@ -2,19 +2,25 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
+import type { BackofficePlayerUpdate } from '@features/backoffice/application/ports/backoffice-players.repository';
 import {
   type BackofficePlayerCardPrivacy,
   toBackofficePlayerCardViewModel,
   type BackofficePlayerCardViewModel,
 } from '../models/backoffice-players.viewmodel';
-import { LOAD_BACKOFFICE_PLAYERS_USE_CASE } from '../providers/backoffice.providers';
+import {
+  LOAD_BACKOFFICE_PLAYERS_USE_CASE,
+  UPDATE_BACKOFFICE_PLAYER_USE_CASE,
+} from '../providers/backoffice.providers';
 
 @Injectable()
 export class BackofficePlayersStore {
   private readonly loadPlayersUseCase = inject(LOAD_BACKOFFICE_PLAYERS_USE_CASE);
+  private readonly updatePlayerUseCase = inject(UPDATE_BACKOFFICE_PLAYER_USE_CASE);
 
   readonly players = signal<readonly BackofficePlayer[]>([]);
   readonly isLoading = signal(false);
+  readonly isSaving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly hasContent = signal(false);
 
@@ -47,6 +53,25 @@ export class BackofficePlayersStore {
       this.errorMessage.set('No hemos podido cargar los jugadores.');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  playerById(playerId: string): BackofficePlayer | null {
+    return this.players().find((player) => player.id === playerId) ?? null;
+  }
+
+  async update(playerId: string, input: BackofficePlayerUpdate): Promise<void> {
+    this.isSaving.set(true);
+    this.errorMessage.set(null);
+
+    try {
+      await this.updatePlayerUseCase.execute(playerId, input);
+      await this.load(true);
+    } catch {
+      this.errorMessage.set('No hemos podido guardar los cambios del jugador.');
+      throw new Error('player_update_failed');
+    } finally {
+      this.isSaving.set(false);
     }
   }
 }

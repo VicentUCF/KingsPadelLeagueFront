@@ -17,4 +17,24 @@ export class LoadBackofficeLineupsUseCase {
   pairsByLineupIds(lineupIds: string[]): Promise<readonly BackofficeLineupPair[]> {
     return this.repo.loadPairsByLineupIds(lineupIds);
   }
+
+  create(matchId: string, teamId: string): Promise<BackofficeLineup> {
+    return this.repo.create(matchId, teamId);
+  }
+
+  createPair(
+    lineupId: string,
+    player1Id: string,
+    player2Id: string,
+  ): Promise<BackofficeLineupPair> {
+    return this.repo.createPair(lineupId, player1Id, player2Id);
+  }
+
+  updatePair(pairId: string, player1Id: string | null, player2Id: string | null): Promise<void> {
+    return this.repo.updatePair(pairId, player1Id, player2Id);
+  }
+
+  submit(lineupId: string): Promise<void> {
+    return this.repo.submit(lineupId);
+  }
 }

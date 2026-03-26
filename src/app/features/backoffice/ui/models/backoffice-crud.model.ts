@@ -9,13 +9,14 @@ export interface BackofficeTeamFormValue {
 }
 
 export interface BackofficePlayerFormValue {
-  readonly fullName: string;
-  readonly nickName: string;
-  readonly avatarPath: string | null;
-  readonly preferredSideLabel: string;
-  readonly currentTeamId: string | null;
-  readonly linkedUserEmail: string | null;
-  readonly status: 'ACTIVE' | 'INACTIVE';
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly alias: string | null;
+  readonly profileImage: string | null;
+  readonly preferredPosition: 'both' | 'left' | 'right';
+  readonly instagramUrl: string | null;
+  readonly email: string;
+  readonly teamLabel: string;
 }
 
 export interface BackofficeSeasonFormValue {

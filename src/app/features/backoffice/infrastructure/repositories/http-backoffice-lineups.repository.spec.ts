@@ -45,7 +45,7 @@ describe('HttpBackofficeLineupsRepository', () => {
     const promise = repository.loadByMatchIds(['match-1']);
 
     httpTestingController
-      .expectOne('http://api.test/v1/match-team-line-ups?limit=200&matchIds%5B%5D=match-1')
+      .expectOne('http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D')
       .flush({ items: [createLineupHttp()], meta: createMeta(1) });
 
     await expect(promise).resolves.toHaveLength(1);
@@ -58,13 +58,39 @@ describe('HttpBackofficeLineupsRepository', () => {
 
     httpTestingController
       .expectOne(
-        'http://api.test/admin/v1/match-team-line-up-pairs?limit=200&matchTeamLineUpIds%5B%5D=lineup-1',
+        'http://api.test/admin/v1/match-team-line-up-pairs?limit=200&sortBy=%5B%7B%22createdAt%22:%22ASC%22%7D%5D&matchTeamLineUpIds=%5B%22lineup-1%22%5D',
       )
       .flush({ items: [createPairHttp()], meta: createMeta(1) });
 
     await expect(promise).resolves.toEqual([
       expect.objectContaining({ id: 'pair-1', lineupId: 'lineup-1' }),
     ]);
+  });
+
+  it('creates a lineup through the admin endpoint', async () => {
+    const promise = repository.create('match-1', 'team-1');
+
+    const request = httpTestingController.expectOne('http://api.test/admin/v1/match-team-line-ups');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ matchId: 'match-1', teamId: 'team-1' });
+    request.flush(createLineupHttp());
+
+    await expect(promise).resolves.toEqual(
+      expect.objectContaining({ id: 'lineup-1', matchId: 'match-1', teamId: 'team-1' }),
+    );
+  });
+
+  it('updates a lineup pair allowing nullable slots', async () => {
+    const promise = repository.updatePair('pair-1', 'player-1', null);
+
+    const request = httpTestingController.expectOne(
+      'http://api.test/v1/match-team-line-up-pairs/pair-1',
+    );
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ player1Id: 'player-1', player2Id: null });
+    request.flush(null);
+
+    await expect(promise).resolves.toBeUndefined();
   });
 });
 
@@ -95,8 +121,6 @@ function createPairHttp() {
     player1Id: 'player-1',
     player2Id: 'player-2',
     totalPlayersValue: 120,
-    wonGame: null,
-    sets: [],
     createdAt: '2026-03-17T10:00:00.000Z',
   } as const;
 }

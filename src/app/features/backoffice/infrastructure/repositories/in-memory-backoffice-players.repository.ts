@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { BackofficePlayersRepository } from '@features/backoffice/application/ports/backoffice-players.repository';
+import {
+  BackofficePlayersRepository,
+  type BackofficePlayerUpdate,
+} from '@features/backoffice/application/ports/backoffice-players.repository';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 
-const MOCK_PLAYERS: readonly BackofficePlayer[] = [
+let MOCK_PLAYERS: BackofficePlayer[] = [
   // ── Kings Of Favar ────────────────────────────────────────────────────────
   {
     id: 'kings-of-favar-player-1',
@@ -306,5 +309,25 @@ const MOCK_PLAYERS: readonly BackofficePlayer[] = [
 export class InMemoryBackofficePlayersRepository extends BackofficePlayersRepository {
   override loadAll(): Promise<readonly BackofficePlayer[]> {
     return Promise.resolve(MOCK_PLAYERS);
+  }
+
+  override update(id: string, input: BackofficePlayerUpdate): Promise<void> {
+    MOCK_PLAYERS = MOCK_PLAYERS.map((player) =>
+      player.id === id
+        ? {
+            ...player,
+            ...(input.alias !== undefined ? { alias: input.alias } : {}),
+            ...(input.firstName !== undefined ? { firstName: input.firstName } : {}),
+            ...(input.instagramUrl !== undefined ? { instagramUrl: input.instagramUrl } : {}),
+            ...(input.lastName !== undefined ? { lastName: input.lastName } : {}),
+            ...(input.preferredPosition !== undefined
+              ? { preferredPosition: input.preferredPosition }
+              : {}),
+            ...(input.profileImage !== undefined ? { profileImage: input.profileImage } : {}),
+          }
+        : player,
+    );
+
+    return Promise.resolve();
   }
 }
