@@ -31,9 +31,27 @@ function createMatchdaysStoreMock(options: {
   readonly errorMessage?: string | null;
   readonly hasContent?: boolean;
   readonly isLoading?: boolean;
+  readonly matchdays?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly scheduledAt: string;
+    readonly seasonId: string;
+    readonly status: 'finished' | 'in_progress' | 'scheduled';
+  }[];
   readonly rows?: readonly BackofficeMatchdayRowViewModel[];
 }) {
   return {
+    matchdays: signal(
+      options.matchdays ?? [
+        {
+          id: 'matchday-1',
+          name: 'Jornada 1',
+          scheduledAt: '2026-03-18T18:00:00.000Z',
+          seasonId: 'season-1',
+          status: 'scheduled',
+        },
+      ],
+    ),
     rows: signal(options.rows ?? []),
     isLoading: signal(options.isLoading ?? false),
     errorMessage: signal(options.errorMessage ?? null),
@@ -41,7 +59,7 @@ function createMatchdaysStoreMock(options: {
     load: jest.fn().mockResolvedValue(undefined),
   } satisfies Pick<
     BackofficeMatchdaysStore,
-    'errorMessage' | 'hasContent' | 'isLoading' | 'load' | 'rows'
+    'errorMessage' | 'hasContent' | 'isLoading' | 'load' | 'matchdays' | 'rows'
   >;
 }
 
@@ -51,19 +69,31 @@ function createSessionStoreMock(role: BackofficeRole = 'ADMIN') {
   } satisfies Pick<BackofficeSessionStore, 'currentRole'>;
 }
 
-function createSeasonsStoreMock() {
+function createSeasonsStoreMock(options?: {
+  readonly isLoading?: boolean;
+  readonly seasons?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly description: string;
+    readonly startsAt: string;
+    readonly endsAt: string;
+  }[];
+}) {
   return {
-    seasons: signal([
-      {
-        id: 'season-1',
-        name: 'Temporada 2026',
-        description: 'Season test',
-        startsAt: '2026-01-01T00:00:00.000Z',
-        endsAt: '2026-12-31T23:59:59.000Z',
-      },
-    ]),
+    seasons: signal(
+      options?.seasons ?? [
+        {
+          id: 'season-1',
+          name: 'Temporada 2026',
+          description: 'Season test',
+          startsAt: '2026-01-01T00:00:00.000Z',
+          endsAt: '2026-12-31T23:59:59.000Z',
+        },
+      ],
+    ),
+    isLoading: signal(options?.isLoading ?? false),
     load: jest.fn().mockResolvedValue(undefined),
-  } satisfies Pick<BackofficeSeasonsStore, 'load' | 'seasons'>;
+  } satisfies Pick<BackofficeSeasonsStore, 'isLoading' | 'load' | 'seasons'>;
 }
 
 function createAdminOperationsStoreMock() {
@@ -146,6 +176,35 @@ describe('BackofficeMatchdaysPageComponent', () => {
     });
 
     expect(screen.queryByRole('button', { name: /Nueva jornada/i })).not.toBeInTheDocument();
+  });
+
+  it('disables the create matchday CTA when no active season can be resolved', async () => {
+    const matchdaysStore = createMatchdaysStoreMock({
+      hasContent: true,
+      matchdays: [],
+      rows: [createMatchdayRow()],
+    });
+
+    await render(BackofficeMatchdaysPageComponent, {
+      providers: [
+        provideRouter([]),
+        { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
+        { provide: BackofficeSessionStore, useValue: createSessionStoreMock() },
+        {
+          provide: BackofficeSeasonsStore,
+          useValue: createSeasonsStoreMock({ seasons: [] }),
+        },
+        {
+          provide: BackofficeAdminMatchdayOperationsStore,
+          useValue: createAdminOperationsStoreMock(),
+        },
+      ],
+    });
+
+    expect(screen.getByRole('button', { name: /Nueva jornada/i })).toBeDisabled();
+    expect(
+      screen.getByText(/Necesitas una temporada activa o una jornada vinculada a temporada/i),
+    ).toBeVisible();
   });
 
   it('keeps the list visible and shows inline feedback when a refresh fails', async () => {

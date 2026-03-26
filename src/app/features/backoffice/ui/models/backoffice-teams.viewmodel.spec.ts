@@ -14,7 +14,7 @@ describe('backoffice-teams.viewmodel', () => {
 
     const viewModel = toBackofficeTeamCardViewModel(team, 4, 'Vicent Ciscar');
 
-    expect(viewModel.logoPath).toBe('/teams_logos/Kings_of_Favar_no_bg.png');
+    expect(viewModel.logoPath).toBe('/teams_logos/Kings_of_Favar_no_bg.webp');
     expect(viewModel.primaryColor).toBe('#f3c84b');
     expect(viewModel.secondaryColor).toBe('#24150b');
   });

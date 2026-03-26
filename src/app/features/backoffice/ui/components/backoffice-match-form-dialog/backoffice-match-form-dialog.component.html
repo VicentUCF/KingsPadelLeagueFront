@@ -20,7 +20,7 @@
         <span class="c-field__label">Equipo local <span aria-hidden="true">*</span></span>
         <select class="c-select c-input--md" formControlName="localTeamId">
           <option value="">Selecciona un equipo</option>
-          @for (team of teams(); track team.id) {
+          @for (team of localTeamOptions(); track team.id) {
             <option [value]="team.id">{{ team.name }}</option>
           }
         </select>
@@ -33,7 +33,7 @@
         <span class="c-field__label">Equipo visitante <span aria-hidden="true">*</span></span>
         <select class="c-select c-input--md" formControlName="awayTeamId">
           <option value="">Selecciona un equipo</option>
-          @for (team of teams(); track team.id) {
+          @for (team of awayTeamOptions(); track team.id) {
             <option [value]="team.id">{{ team.name }}</option>
           }
         </select>
@@ -45,6 +45,12 @@
       @if (teamsAreEqual()) {
         <p class="backoffice-match-form-dialog__error" role="alert">
           Local y visitante deben ser equipos distintos.
+        </p>
+      }
+
+      @if (duplicateEncounterExists()) {
+        <p class="backoffice-match-form-dialog__error" role="alert">
+          Ese enfrentamiento ya existe en esta jornada.
         </p>
       }
 
@@ -74,7 +80,7 @@
     <button
       class="c-button c-button--pill c-button--primary c-button--md"
       form="backoffice-match-form"
-      [disabled]="isSubmitting() || teamsAreEqual()"
+      [disabled]="isSubmitting() || teamsAreEqual() || duplicateEncounterExists()"
       type="submit"
     >
       {{ isSubmitting() ? 'Creando…' : 'Crear partido' }}

@@ -9,6 +9,21 @@ import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { BackofficeLineupsPageComponent } from './backoffice-lineups-page.component';
 
+interface LineupSubmissionTestApi {
+  readonly selectedMatchId: { set(value: string | null): void };
+  readonly plannerTeamId: { set(value: string | null): void };
+  readonly plannerPairs: {
+    set(
+      value: readonly {
+        readonly id: string;
+        readonly player1Id: string;
+        readonly player2Id: string;
+      }[],
+    ): void;
+  };
+  submitLineup(): Promise<void>;
+}
+
 function createLineupsStoreMock() {
   const matches = signal([
     {
@@ -20,7 +35,6 @@ function createLineupsStoreMock() {
       awayTeamScorePoints: 0,
       scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
       status: 'scheduled' as const,
-      mvpId: null,
     },
   ]);
   const lineups = signal([
@@ -58,13 +72,11 @@ function createLineupsStoreMock() {
     lineups,
     pairs,
     isLoading: signal(false),
-    isSavingDraft: signal(false),
     isSubmittingLineup: signal(false),
     errorMessage: signal<string | null>(null),
     hasContent: signal(true),
     loadForTeam: jest.fn().mockResolvedValue(undefined),
     loadForMatchday: jest.fn().mockResolvedValue(undefined),
-    saveDraft: jest.fn().mockResolvedValue(undefined),
     submitDraft: jest.fn().mockResolvedValue(undefined),
     lineupForMatch: jest.fn((matchId: string, teamId: string) =>
       lineups().find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId),
@@ -78,13 +90,11 @@ function createLineupsStoreMock() {
     | 'lineups'
     | 'pairs'
     | 'isLoading'
-    | 'isSavingDraft'
     | 'isSubmittingLineup'
     | 'errorMessage'
     | 'hasContent'
     | 'loadForTeam'
     | 'loadForMatchday'
-    | 'saveDraft'
     | 'submitDraft'
     | 'lineupForMatch'
     | 'pairsForLineup'
@@ -296,5 +306,91 @@ describe('BackofficeLineupsPageComponent', () => {
       screen.getByText('Esta alineación ya está enviada y se muestra en modo lectura.'),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Alineación enviada' })).toBeDisabled();
+  });
+
+  it('shows an admin-preparation error when the president submits without an initialized lineup', async () => {
+    const lineupsStore = createLineupsStoreMock();
+    lineupsStore.submitDraft.mockRejectedValue(new Error('lineup_not_initialized'));
+    lineupsStore.lineups.set([
+      { id: 'lineup-local', matchId: 'match-1', teamId: 'team-local', status: 'pending' },
+      { id: 'lineup-away', matchId: 'match-1', teamId: 'team-away', status: 'pending' },
+    ]);
+    const toastStore = { success: jest.fn(), error: jest.fn() };
+
+    const view = await render(BackofficeLineupsPageComponent, {
+      providers: [
+        { provide: BackofficeLineupsStore, useValue: lineupsStore },
+        {
+          provide: BackofficeMatchdaysStore,
+          useValue: {
+            isLoading: signal(false),
+            hasContent: signal(false),
+            errorMessage: signal<string | null>(null),
+            matchdays: signal([]),
+            currentMatchday: signal(null),
+            load: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: BackofficeTeamsStore,
+          useValue: {
+            isLoading: signal(false),
+            hasContent: signal(true),
+            errorMessage: signal<string | null>(null),
+            teams: signal([
+              {
+                id: 'team-local',
+                name: 'Locales',
+                description: '',
+                secondaryDescription: '',
+                logo: null,
+              },
+              {
+                id: 'team-away',
+                name: 'Visitantes',
+                description: '',
+                secondaryDescription: '',
+                logo: null,
+              },
+            ]),
+            load: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: BackofficePlayersStore,
+          useValue: {
+            isLoading: signal(false),
+            hasContent: signal(true),
+            errorMessage: signal<string | null>(null),
+            players: signal([]),
+            load: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: BackofficeSessionStore,
+          useValue: {
+            currentRole: signal('PRESIDENT'),
+            currentPresidentTeamId: signal('team-away'),
+          },
+        },
+        { provide: ActionToastStore, useValue: toastStore },
+      ],
+    });
+
+    const component = view.fixture.componentInstance as unknown as LineupSubmissionTestApi;
+    component.selectedMatchId.set('match-1');
+    component.plannerTeamId.set('team-away');
+    component.plannerPairs.set([
+      { id: 'pair-1', player1Id: 'player-1', player2Id: 'player-2' },
+      { id: 'pair-2', player1Id: 'player-3', player2Id: 'player-4' },
+      { id: 'pair-3', player1Id: 'player-5', player2Id: 'player-6' },
+    ]);
+
+    await component.submitLineup();
+
+    expect(toastStore.error).toHaveBeenCalledWith(
+      'La alineación aún no ha sido preparada por administración.',
+      'Alineación no disponible',
+    );
   });
 });

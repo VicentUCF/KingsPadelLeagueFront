@@ -43,21 +43,6 @@
           <p class="c-field__error" role="alert">La fecha es obligatoria.</p>
         }
       </label>
-
-      <label class="c-field">
-        <span class="c-field__label">Temporada <span aria-hidden="true">*</span></span>
-        <input
-          class="c-input c-input--md"
-          [class.c-input--invalid]="hasControlError('seasonId')"
-          formControlName="seasonId"
-          type="text"
-          autocomplete="off"
-          placeholder="season-2026"
-        />
-        @if (hasControlError('seasonId')) {
-          <p class="c-field__error" role="alert">La temporada es obligatoria.</p>
-        }
-      </label>
     </form>
   </div>
 

@@ -101,4 +101,31 @@ describe('BackofficeSessionStore', () => {
 
     expect(store.currentPresidentTeamId()).toBe('team-1');
   });
+
+  it('keeps PRESIDENT accounts in the president backoffice role', () => {
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeSessionStore,
+        {
+          provide: AuthStore,
+          useValue: createAuthStoreMock({
+            id: 'user-1',
+            email: 'president@example.com',
+            displayName: 'President',
+            role: 'PRESIDENT',
+            teamId: 'team-1',
+          }),
+        },
+        {
+          provide: BackofficePlayersStore,
+          useValue: createPlayersStoreMock([createPlayer()]),
+        },
+        { provide: Router, useValue: { navigate: jest.fn() } },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeSessionStore);
+
+    expect(store.currentRole()).toBe('PRESIDENT');
+  });
 });

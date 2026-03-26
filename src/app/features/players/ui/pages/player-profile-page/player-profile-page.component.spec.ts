@@ -1,10 +1,10 @@
-import { Location } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { fireEvent, render, screen } from '@testing-library/angular';
 import { axe } from 'jest-axe';
 import { of } from 'rxjs';
 
+import { NavigationHistoryService } from '@core/services/navigation-history.service';
 import { LoadPlayerProfileUseCase } from '@features/players/application/use-cases/load-player-profile.use-case';
 import { InMemoryPlayersRepository } from '@features/players/infrastructure/repositories/in-memory-players.repository';
 import { LOAD_PLAYER_PROFILE_USE_CASE } from '../../providers/players.providers';
@@ -36,7 +36,7 @@ describe('PlayerProfilePageComponent', () => {
     expect(screen.getByRole('button', { name: /Volver a jugadores/i })).toBeVisible();
   });
 
-  it('renders the pending assignment state for players without a team yet', async () => {
+  it('renders the current team assignment for players in the confirmed roster', async () => {
     const { container } = await render(PlayerProfilePageComponent, {
       providers: [
         providePlayerProfilePageTesting(),
@@ -46,12 +46,9 @@ describe('PlayerProfilePageComponent', () => {
     });
 
     expect(await screen.findByRole('heading', { name: /Alex Pla/i })).toBeVisible();
-    expect(screen.getAllByText('Sin equipo todavía').length).toBeGreaterThan(0);
-    expect(screen.getByRole('region', { name: /Estado del jugador/i })).toBeVisible();
-    expect(container.querySelector('.player-profile-page__brand-watermark-image')).toBeNull();
-    expect(
-      container.querySelector('.player-profile-page__brand-watermark-monogram'),
-    ).not.toBeNull();
+    expect(screen.getAllByText('Barbaridad Team').length).toBeGreaterThan(0);
+    expect(screen.getByRole('region', { name: /Equipo Barbaridad Team/i })).toBeVisible();
+    expect(container.querySelector('.player-profile-page__brand-watermark-image')).not.toBeNull();
   });
 
   it('renders the not found state for an invalid player slug', async () => {
@@ -67,9 +64,7 @@ describe('PlayerProfilePageComponent', () => {
     expect(screen.getByRole('button', { name: /Volver a jugadores/i })).toBeVisible();
   });
 
-  it('returns to the previous view when browser history is available', async () => {
-    const historyLengthSpy = jest.spyOn(window.history, 'length', 'get').mockReturnValue(2);
-
+  it('delegates the back action to the navigation history service with the directory fallback', async () => {
     await render(PlayerProfilePageComponent, {
       providers: [
         providePlayerProfilePageTesting(),
@@ -80,35 +75,12 @@ describe('PlayerProfilePageComponent', () => {
 
     await screen.findByRole('heading', { name: /Vicent Ciscar/i });
 
-    const location = TestBed.inject(Location);
-    const backSpy = jest.spyOn(location, 'back').mockImplementation();
+    const navigationHistory = TestBed.inject(NavigationHistoryService);
+    const goBackSpy = jest.spyOn(navigationHistory, 'goBack').mockImplementation();
 
     await fireEvent.click(screen.getByRole('button', { name: /Volver a jugadores/i }));
 
-    expect(backSpy).toHaveBeenCalledTimes(1);
-    historyLengthSpy.mockRestore();
-  });
-
-  it('falls back to the directory when there is no previous history entry', async () => {
-    const historyLengthSpy = jest.spyOn(window.history, 'length', 'get').mockReturnValue(1);
-
-    await render(PlayerProfilePageComponent, {
-      providers: [
-        providePlayerProfilePageTesting(),
-        provideRouter([]),
-        createActivatedRouteProvider('vicent-ciscar'),
-      ],
-    });
-
-    await screen.findByRole('heading', { name: /Vicent Ciscar/i });
-
-    const router = TestBed.inject(Router);
-    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
-
-    await fireEvent.click(screen.getByRole('button', { name: /Volver a jugadores/i }));
-
-    expect(navigateSpy).toHaveBeenCalledWith(['/jugadores']);
-    historyLengthSpy.mockRestore();
+    expect(goBackSpy).toHaveBeenCalledWith('/jugadores');
   });
 
   it('has no accessibility violations in the player profile', async () => {

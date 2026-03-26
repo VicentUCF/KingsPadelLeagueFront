@@ -13,6 +13,8 @@ export interface BackofficeLineupDraftPairInput {
   readonly player2Id: string | null;
 }
 
+const LINEUP_NOT_INITIALIZED_ERROR = 'lineup_not_initialized';
+
 @Injectable()
 export class BackofficeLineupsStore {
   private readonly loadMatchesUseCase = inject(LoadBackofficeMatchesUseCase);
@@ -22,7 +24,6 @@ export class BackofficeLineupsStore {
   readonly lineups = signal<readonly BackofficeLineup[]>([]);
   readonly pairs = signal<readonly BackofficeLineupPair[]>([]);
   readonly isLoading = signal(false);
-  readonly isSavingDraft = signal(false);
   readonly isSubmittingLineup = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly currentContextKey = signal<string | null>(null);
@@ -134,32 +135,15 @@ export class BackofficeLineupsStore {
     return this.pairs().filter((p) => p.lineupId === lineupId);
   }
 
-  async saveDraft(
-    matchId: string,
-    teamId: string,
-    draftPairs: readonly BackofficeLineupDraftPairInput[],
-    options: { readonly canCreateLineup: boolean },
-  ): Promise<void> {
-    this.isSavingDraft.set(true);
-
-    try {
-      await this.persistDraft(matchId, teamId, draftPairs, options);
-      await this.refreshCurrentContext();
-    } finally {
-      this.isSavingDraft.set(false);
-    }
-  }
-
   async submitDraft(
     matchId: string,
     teamId: string,
     draftPairs: readonly BackofficeLineupDraftPairInput[],
-    options: { readonly canCreateLineup: boolean },
   ): Promise<void> {
     this.isSubmittingLineup.set(true);
 
     try {
-      const lineup = await this.persistDraft(matchId, teamId, draftPairs, options);
+      const lineup = await this.persistDraft(matchId, teamId, draftPairs);
       await this.loadLineupsUseCase.submit(lineup.id);
       await this.refreshCurrentContext();
     } finally {
@@ -171,19 +155,14 @@ export class BackofficeLineupsStore {
     matchId: string,
     teamId: string,
     draftPairs: readonly BackofficeLineupDraftPairInput[],
-    options: { readonly canCreateLineup: boolean },
   ): Promise<BackofficeLineup> {
-    let lineup = this.lineupForMatch(matchId, teamId);
+    const lineup = await this.loadLineupsUseCase.findByMatchAndTeam(matchId, teamId);
 
     if (!lineup) {
-      if (!options.canCreateLineup) {
-        throw new Error('lineup_creation_not_allowed');
-      }
-
-      lineup = await this.loadLineupsUseCase.create(matchId, teamId);
+      throw new Error(LINEUP_NOT_INITIALIZED_ERROR);
     }
 
-    const existingPairs = this.pairsForLineup(lineup.id);
+    const existingPairs = await this.loadLineupsUseCase.pairsByLineupIds([lineup.id]);
 
     for (const [index, draftPair] of draftPairs.entries()) {
       const existingPair = existingPairs[index];

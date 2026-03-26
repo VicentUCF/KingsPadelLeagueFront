@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ActionToastStore } from '@core/state/action-toast.store';
 import { BackofficeMatchdaysRepository } from '@features/backoffice/application/ports/backoffice-matchdays.repository';
+import { type BackofficeLineupsRepository } from '@features/backoffice/application/ports/backoffice-lineups.repository';
 import {
   BACKOFFICE_MATCHES_REPOSITORY,
   type BackofficeMatchesRepository,
@@ -11,6 +12,8 @@ import {
   BACKOFFICE_PAIR_MATCHES_REPOSITORY,
   type BackofficePairMatchesRepository,
 } from '@features/backoffice/application/ports/backoffice-pair-matches.repository';
+import { LoadBackofficeLineupsUseCase } from '@features/backoffice/application/use-cases/load-backoffice-lineups.use-case';
+import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
 import { BackofficeLineupsStore } from './backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from './backoffice-matchdays.store';
 import { BackofficePlayersStore } from './backoffice-players.store';
@@ -56,6 +59,7 @@ describe('BackofficeAdminMatchdayOperationsStore', () => {
       providers: [
         BackofficeAdminMatchdayOperationsStore,
         { provide: BackofficeMatchdaysRepository, useValue: matchdaysRepository },
+        { provide: LoadBackofficeLineupsUseCase, useValue: createLineupsRepositoryMock() },
         {
           provide: BACKOFFICE_MATCHES_REPOSITORY,
           useValue: createMatchesRepositoryMock(),
@@ -130,6 +134,7 @@ describe('BackofficeAdminMatchdayOperationsStore', () => {
       providers: [
         BackofficeAdminMatchdayOperationsStore,
         { provide: BackofficeMatchdaysRepository, useValue: createMatchdaysRepositoryMock() },
+        { provide: LoadBackofficeLineupsUseCase, useValue: createLineupsRepositoryMock() },
         { provide: BACKOFFICE_MATCHES_REPOSITORY, useValue: createMatchesRepositoryMock() },
         { provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY, useValue: pairMatchesRepository },
         { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
@@ -172,6 +177,7 @@ describe('BackofficeAdminMatchdayOperationsStore', () => {
       providers: [
         BackofficeAdminMatchdayOperationsStore,
         { provide: BackofficeMatchdaysRepository, useValue: createMatchdaysRepositoryMock() },
+        { provide: LoadBackofficeLineupsUseCase, useValue: createLineupsRepositoryMock() },
         { provide: BACKOFFICE_MATCHES_REPOSITORY, useValue: matchesRepository },
         {
           provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY,
@@ -208,7 +214,215 @@ describe('BackofficeAdminMatchdayOperationsStore', () => {
 
     expect(store.matchActionIds()).toEqual({});
   });
+
+  it('blocks duplicate encounters within the same matchday before calling the repository', async () => {
+    const matchesRepository = createMatchesRepositoryMock();
+    const toastStore = {
+      success: jest.fn(),
+      error: jest.fn(),
+    } satisfies Pick<ActionToastStore, 'error' | 'success'>;
+
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeAdminMatchdayOperationsStore,
+        { provide: BackofficeMatchdaysRepository, useValue: createMatchdaysRepositoryMock() },
+        { provide: LoadBackofficeLineupsUseCase, useValue: createLineupsRepositoryMock() },
+        { provide: BACKOFFICE_MATCHES_REPOSITORY, useValue: matchesRepository },
+        {
+          provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY,
+          useValue: createPairMatchesRepositoryMock(),
+        },
+        {
+          provide: BackofficeMatchdaysStore,
+          useValue: { load: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: BackofficeLineupsStore,
+          useValue: createLineupsStoreMock([
+            {
+              id: 'match-1',
+              matchdayId: 'matchday-1',
+              localTeamId: 'team-1',
+              awayTeamId: 'team-2',
+              localTeamScorePoints: 0,
+              awayTeamScorePoints: 0,
+              scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
+              status: 'scheduled',
+            },
+          ]),
+        },
+        {
+          provide: BackofficeTeamsStore,
+          useValue: { load: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: BackofficePlayersStore,
+          useValue: { load: jest.fn().mockResolvedValue(undefined) },
+        },
+        { provide: ActionToastStore, useValue: toastStore },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeAdminMatchdayOperationsStore);
+
+    await expect(
+      store.createMatch({
+        matchdayId: 'matchday-1',
+        localTeamId: 'team-2',
+        awayTeamId: 'team-1',
+        scheduledAt: '2026-03-25T18:00:00.000Z',
+        localTeamScorePoints: 0,
+        awayTeamScorePoints: 0,
+      }),
+    ).resolves.toBe(false);
+
+    expect(matchesRepository.create).not.toHaveBeenCalled();
+    expect(toastStore.error).toHaveBeenCalledWith(
+      'Ese enfrentamiento ya existe en esta jornada.',
+      'Partido duplicado',
+    );
+  });
+
+  it('creates both team lineups after a successful match creation', async () => {
+    const matchesRepository = createMatchesRepositoryMock();
+    matchesRepository.create.mockResolvedValue(createBackofficeMatch());
+    const lineupsRepository = createLineupsRepositoryMock();
+    const matchdaysStore = { load: jest.fn().mockResolvedValue(undefined) };
+    const teamsStore = { load: jest.fn().mockResolvedValue(undefined) };
+    const playersStore = { load: jest.fn().mockResolvedValue(undefined) };
+    const lineupsStore = createLineupsStoreMock();
+    const toastStore = {
+      success: jest.fn(),
+      error: jest.fn(),
+    } satisfies Pick<ActionToastStore, 'error' | 'success'>;
+
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeAdminMatchdayOperationsStore,
+        { provide: BackofficeMatchdaysRepository, useValue: createMatchdaysRepositoryMock() },
+        { provide: BACKOFFICE_MATCHES_REPOSITORY, useValue: matchesRepository },
+        {
+          provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY,
+          useValue: createPairMatchesRepositoryMock(),
+        },
+        { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
+        { provide: BackofficeLineupsStore, useValue: lineupsStore },
+        { provide: BackofficeTeamsStore, useValue: teamsStore },
+        { provide: BackofficePlayersStore, useValue: playersStore },
+        { provide: ActionToastStore, useValue: toastStore },
+        {
+          provide: LoadBackofficeLineupsUseCase,
+          useValue: lineupsRepository,
+        },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeAdminMatchdayOperationsStore);
+
+    await expect(
+      store.createMatch({
+        matchdayId: 'matchday-1',
+        localTeamId: 'team-1',
+        awayTeamId: 'team-2',
+        scheduledAt: '2026-03-25T18:00:00.000Z',
+        localTeamScorePoints: 0,
+        awayTeamScorePoints: 0,
+      }),
+    ).resolves.toBe(true);
+
+    expect(matchesRepository.create).toHaveBeenCalled();
+    expect(lineupsRepository.create).toHaveBeenNthCalledWith(1, 'match-1', 'team-1');
+    expect(lineupsRepository.create).toHaveBeenNthCalledWith(2, 'match-1', 'team-2');
+    expect(matchdaysStore.load).toHaveBeenCalledWith(true);
+    expect(teamsStore.load).toHaveBeenCalledWith(true);
+    expect(playersStore.load).toHaveBeenCalledWith(true);
+    expect(lineupsStore.loadForMatchday).toHaveBeenCalledWith('matchday-1', true);
+    expect(toastStore.success).toHaveBeenCalledWith(
+      'El partido se ha creado correctamente.',
+      'Partido creado',
+    );
+  });
+
+  it('keeps the match created and shows a warning when lineup bootstrap fails', async () => {
+    const matchesRepository = createMatchesRepositoryMock();
+    matchesRepository.create.mockResolvedValue(createBackofficeMatch());
+    const lineupsRepository = createLineupsRepositoryMock();
+    lineupsRepository.create
+      .mockResolvedValueOnce({
+        id: 'lineup-1',
+        matchId: 'match-1',
+        teamId: 'team-1',
+        status: 'pending',
+      })
+      .mockRejectedValueOnce(new Error('bootstrap_failed'));
+    const toastStore = {
+      success: jest.fn(),
+      error: jest.fn(),
+    } satisfies Pick<ActionToastStore, 'error' | 'success'>;
+
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeAdminMatchdayOperationsStore,
+        { provide: BackofficeMatchdaysRepository, useValue: createMatchdaysRepositoryMock() },
+        { provide: BACKOFFICE_MATCHES_REPOSITORY, useValue: matchesRepository },
+        {
+          provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY,
+          useValue: createPairMatchesRepositoryMock(),
+        },
+        {
+          provide: BackofficeMatchdaysStore,
+          useValue: { load: jest.fn().mockResolvedValue(undefined) },
+        },
+        { provide: BackofficeLineupsStore, useValue: createLineupsStoreMock() },
+        {
+          provide: BackofficeTeamsStore,
+          useValue: { load: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: BackofficePlayersStore,
+          useValue: { load: jest.fn().mockResolvedValue(undefined) },
+        },
+        { provide: ActionToastStore, useValue: toastStore },
+        {
+          provide: LoadBackofficeLineupsUseCase,
+          useValue: lineupsRepository,
+        },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeAdminMatchdayOperationsStore);
+
+    await expect(
+      store.createMatch({
+        matchdayId: 'matchday-1',
+        localTeamId: 'team-1',
+        awayTeamId: 'team-2',
+        scheduledAt: '2026-03-25T18:00:00.000Z',
+        localTeamScorePoints: 0,
+        awayTeamScorePoints: 0,
+      }),
+    ).resolves.toBe(true);
+
+    expect(toastStore.error).toHaveBeenCalledWith(
+      'El partido se ha creado, pero no hemos podido preparar las alineaciones automáticamente.',
+      'Revisión pendiente',
+    );
+    expect(toastStore.success).not.toHaveBeenCalled();
+  });
 });
+
+function createLineupsRepositoryMock() {
+  return {
+    create: jest.fn().mockResolvedValue({
+      id: 'lineup-1',
+      matchId: 'match-1',
+      teamId: 'team-1',
+      status: 'pending',
+    }),
+  } as {
+    create: jest.MockedFunction<BackofficeLineupsRepository['create']>;
+  };
+}
 
 function createMatchdaysRepositoryMock() {
   return {
@@ -220,6 +434,20 @@ function createMatchdaysRepositoryMock() {
   } satisfies BackofficeMatchdaysRepository;
 }
 
+function createBackofficeMatch(overrides: Partial<BackofficeMatch> = {}): BackofficeMatch {
+  return {
+    id: 'match-1',
+    matchdayId: 'matchday-1',
+    localTeamId: 'team-1',
+    awayTeamId: 'team-2',
+    localTeamScorePoints: 0,
+    awayTeamScorePoints: 0,
+    scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
+    status: 'scheduled',
+    ...overrides,
+  };
+}
+
 function createMatchesRepositoryMock() {
   return {
     loadByMatchday: jest.fn(),
@@ -227,7 +455,6 @@ function createMatchesRepositoryMock() {
     create: jest.fn(),
     start: jest.fn().mockResolvedValue(undefined),
     finish: jest.fn().mockResolvedValue(undefined),
-    updateMvp: jest.fn().mockResolvedValue(undefined),
   } satisfies BackofficeMatchesRepository;
 }
 
@@ -238,8 +465,9 @@ function createPairMatchesRepositoryMock() {
   } satisfies BackofficePairMatchesRepository;
 }
 
-function createLineupsStoreMock() {
+function createLineupsStoreMock(matches: readonly BackofficeMatch[] = []) {
   return {
+    matches: signal(matches),
     pairs: signal([
       {
         id: 'pair-1',
@@ -252,5 +480,5 @@ function createLineupsStoreMock() {
       },
     ]),
     loadForMatchday: jest.fn().mockResolvedValue(undefined),
-  } satisfies Pick<BackofficeLineupsStore, 'loadForMatchday' | 'pairs'>;
+  } satisfies Pick<BackofficeLineupsStore, 'loadForMatchday' | 'matches' | 'pairs'>;
 }

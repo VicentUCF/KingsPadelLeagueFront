@@ -17,7 +17,6 @@ export interface BackofficeMatchCardViewModel {
   readonly pairCount: number;
   readonly localScore: number;
   readonly awayScore: number;
-  readonly mvpId: string | null;
 }
 
 export function toBackofficeMatchCardViewModel(
@@ -42,7 +41,6 @@ export function toBackofficeMatchCardViewModel(
     pairCount,
     localScore: match.localTeamScorePoints,
     awayScore: match.awayTeamScorePoints,
-    mvpId: match.mvpId,
   };
 }
 

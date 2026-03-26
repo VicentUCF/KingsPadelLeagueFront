@@ -36,7 +36,7 @@ describe('toPlayerDirectorySectionsViewModel', () => {
     ]);
 
     expect(section?.players[0]).toMatchObject({
-      teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+      teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
       avatarPath: null,
       wonMatchesLabel: '2',
       lostMatchesLabel: '3',

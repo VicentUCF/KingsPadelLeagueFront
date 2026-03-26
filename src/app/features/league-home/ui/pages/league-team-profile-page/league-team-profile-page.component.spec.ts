@@ -25,7 +25,7 @@ describe('LeagueTeamProfilePageComponent', () => {
 
     expect(await screen.findByRole('heading', { name: /^Titanics$/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Plantilla del equipo/i })).toBeVisible();
-    expect(screen.getByText(/1 jugadores inscritos/i)).toBeVisible();
+    expect(screen.getByText(/6 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /Adrian Asuncion/i, level: 3 })).toBeVisible();
     expect(screen.getByText(/Jornada 3 de 5 · Fase regular/i)).toBeVisible();
   });
@@ -49,7 +49,7 @@ describe('LeagueTeamProfilePageComponent', () => {
     activatedRouteStub.paramMapSubject.next(convertToParamMap({ slug: 'magic-city' }));
 
     expect(await screen.findByRole('heading', { name: /^Magic City$/i })).toBeVisible();
-    expect(screen.getByText(/1 jugadores inscritos/i)).toBeVisible();
+    expect(screen.getByText(/6 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /Adri Alvarez/i, level: 3 })).toBeVisible();
   });
 
@@ -68,7 +68,7 @@ describe('LeagueTeamProfilePageComponent', () => {
     });
 
     expect(await screen.findByRole('heading', { name: /^Kings Of Favar$/i })).toBeVisible();
-    expect(screen.getByText(/2 jugadores inscritos/i)).toBeVisible();
+    expect(screen.getByText(/6 jugadores inscritos/i)).toBeVisible();
     expect(screen.getByRole('heading', { name: /Vicent Ciscar/i, level: 3 })).toBeVisible();
     expect(screen.getByRole('heading', { name: /Enric Bixquert/i, level: 3 })).toBeVisible();
   });

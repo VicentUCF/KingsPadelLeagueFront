@@ -1,6 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, signal, type OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  type OnInit,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
+import { resolveBackofficeMatchdayCreationSeasonId } from '../../models/backoffice-season-resolution';
 import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeSeasonsStore } from '../../state/backoffice-seasons.store';
@@ -32,6 +40,28 @@ export class BackofficeMatchdaysPageComponent implements OnInit {
   protected readonly adminOperationsStore = inject(BackofficeAdminMatchdayOperationsStore);
 
   protected readonly isCreateDialogOpen = signal(false);
+  protected readonly createDialogErrorMessage = signal<string | null>(null);
+  protected readonly resolvedSeasonId = computed(() =>
+    resolveBackofficeMatchdayCreationSeasonId(
+      this.seasonsStore.seasons(),
+      this.matchdaysStore.matchdays(),
+    ),
+  );
+  protected readonly createMatchdayGuardrailMessage = computed(() => {
+    if (this.sessionStore.currentRole() !== 'ADMIN') {
+      return null;
+    }
+
+    if (this.seasonsStore.isLoading()) {
+      return 'Estamos cargando la temporada activa para habilitar nuevas jornadas.';
+    }
+
+    if (this.resolvedSeasonId()) {
+      return null;
+    }
+
+    return 'Necesitas una temporada activa o una jornada vinculada a temporada para crear nuevas jornadas.';
+  });
 
   ngOnInit(): void {
     void this.matchdaysStore.load();
@@ -45,19 +75,37 @@ export class BackofficeMatchdaysPageComponent implements OnInit {
   }
 
   protected openCreateDialog(): void {
+    if (this.createMatchdayGuardrailMessage()) {
+      return;
+    }
+
+    this.createDialogErrorMessage.set(null);
     this.isCreateDialogOpen.set(true);
   }
 
   protected closeCreateDialog(): void {
     this.isCreateDialogOpen.set(false);
+    this.createDialogErrorMessage.set(null);
   }
 
   protected async createMatchday(input: {
     readonly name: string;
     readonly scheduledAt: string;
-    readonly seasonId: string;
   }): Promise<void> {
-    const matchdayId = await this.adminOperationsStore.createMatchday(input);
+    const seasonId = this.resolvedSeasonId();
+    if (!seasonId) {
+      this.createDialogErrorMessage.set(
+        'No hemos podido resolver una temporada activa para la nueva jornada.',
+      );
+      return;
+    }
+
+    this.createDialogErrorMessage.set(null);
+
+    const matchdayId = await this.adminOperationsStore.createMatchday({
+      ...input,
+      seasonId,
+    });
     if (!matchdayId) return;
     this.closeCreateDialog();
     await this.router.navigate(['/backoffice/jornadas', matchdayId]);

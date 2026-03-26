@@ -39,7 +39,8 @@ describe('PlayersDirectoryPageComponent', () => {
     expect(screen.getByRole('link', { name: /Artur Peris/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Damian Crespo/i })).toBeVisible();
     expect(screen.getByRole('option', { name: /Titanics/i })).toBeVisible();
-    expect(screen.getByRole('option', { name: /Sin equipo todavía/i })).toBeVisible();
+    expect(screen.getByRole('option', { name: /Barbaridad Team/i })).toBeVisible();
+    expect(screen.queryByRole('option', { name: /Sin equipo todavía/i })).not.toBeInTheDocument();
   });
 
   it('renders all players in a ranked list', async () => {
@@ -54,7 +55,7 @@ describe('PlayersDirectoryPageComponent', () => {
     expect(list).toBeVisible();
   });
 
-  it('filters the directory by assignment state and side while keeping the search global', async () => {
+  it('filters the directory by team and side while keeping the search global', async () => {
     await render(PlayersDirectoryPageComponent, {
       providers: [providePlayersDirectoryPageTesting(), provideRouter([])],
     });
@@ -65,11 +66,12 @@ describe('PlayersDirectoryPageComponent', () => {
       target: { value: 'reves' },
     });
     fireEvent.change(screen.getByLabelText(/^Equipo$/i), {
-      target: { value: 'Sin equipo todavía' },
+      target: { value: 'Titanics' },
     });
 
     expect(screen.getByRole('link', { name: /Carles Montilla/i })).toBeVisible();
-    expect(screen.queryByRole('link', { name: /Adrian Asuncion/i })).toBeNull();
+    expect(screen.getByRole('link', { name: /Adrian Asuncion/i })).toBeVisible();
+    expect(screen.queryByRole('link', { name: /Brigante/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /Vicent Ciscar/i })).toBeNull();
   });
 

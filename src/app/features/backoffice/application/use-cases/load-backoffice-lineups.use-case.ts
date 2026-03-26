@@ -14,6 +14,10 @@ export class LoadBackofficeLineupsUseCase {
     return this.repo.loadByMatchIds(matchIds);
   }
 
+  findByMatchAndTeam(matchId: string, teamId: string): Promise<BackofficeLineup | null> {
+    return this.repo.findByMatchAndTeam(matchId, teamId);
+  }
+
   pairsByLineupIds(lineupIds: string[]): Promise<readonly BackofficeLineupPair[]> {
     return this.repo.loadPairsByLineupIds(lineupIds);
   }

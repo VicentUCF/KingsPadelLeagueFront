@@ -26,12 +26,18 @@
       <div class="backoffice-matchdays-page__toolbar">
         <button
           class="c-button c-button--pill c-button--primary c-button--md"
+          [disabled]="createMatchdayGuardrailMessage() !== null"
+          [title]="createMatchdayGuardrailMessage() ?? ''"
           type="button"
           (click)="openCreateDialog()"
         >
           Nueva jornada
         </button>
       </div>
+
+      @if (createMatchdayGuardrailMessage(); as guardrailMessage) {
+        <p class="backoffice-matchdays-page__toolbar-hint" role="status">{{ guardrailMessage }}</p>
+      }
     }
 
     @if (matchdaysStore.rows().length === 0) {
@@ -62,11 +68,10 @@
     [initialValue]="{
       name: '',
       scheduledAt: '',
-      seasonId: seasonsStore.seasons()[0]?.id ?? '',
     }"
     [isOpen]="isCreateDialogOpen()"
     [isSubmitting]="adminOperationsStore.isCreatingMatchday()"
-    [submissionError]="null"
+    [submissionError]="createDialogErrorMessage()"
     (cancelled)="closeCreateDialog()"
     (submitted)="createMatchday($event)"
   />

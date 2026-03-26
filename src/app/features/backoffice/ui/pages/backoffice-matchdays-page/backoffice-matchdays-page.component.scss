@@ -7,6 +7,12 @@
     justify-content: flex-end;
   }
 
+  &__toolbar-hint {
+    margin: calc(var(--space-2) * -1) 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
   &__list {
     display: grid;
     gap: var(--space-3);

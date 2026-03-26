@@ -6,5 +6,4 @@ export const environment = {
   apiBaseUrl: 'https://kings-league-api.esteveep.dev',
   authDevRoleOverride: null,
   authDevTeamIdOverride: null,
-  backofficeDevAdminUiOverride: false,
 };

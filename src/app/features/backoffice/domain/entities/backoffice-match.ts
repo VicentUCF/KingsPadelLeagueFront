@@ -9,5 +9,4 @@ export interface BackofficeMatch {
   readonly awayTeamScorePoints: number;
   readonly scheduledAt: Date;
   readonly status: BackofficeMatchStatus;
-  readonly mvpId: string | null;
 }

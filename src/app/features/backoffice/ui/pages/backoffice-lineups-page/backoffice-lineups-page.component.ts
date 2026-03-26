@@ -409,39 +409,6 @@ export class BackofficeLineupsPageComponent implements OnInit {
     }
   }
 
-  protected async saveDraft(): Promise<void> {
-    const matchId = this.selectedMatchId();
-    const teamId = this.plannerTeamId();
-
-    if (!matchId || !teamId) {
-      return;
-    }
-
-    try {
-      await this.lineupsStore.saveDraft(matchId, teamId, this.plannerPairs(), {
-        canCreateLineup: this.isAdmin(),
-      });
-      this.closePlanner();
-      this.toastStore.success(
-        'El borrador de alineación se ha guardado correctamente.',
-        'Borrador guardado',
-      );
-    } catch (error) {
-      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
-        this.toastStore.error(
-          'La alineación todavía no existe. Un administrador debe crearla antes de poder guardar parejas.',
-          'Alineación no disponible',
-        );
-        return;
-      }
-
-      this.toastStore.error(
-        'No hemos podido guardar el borrador de alineación.',
-        'No se ha podido guardar',
-      );
-    }
-  }
-
   protected async submitLineup(): Promise<void> {
     const matchId = this.selectedMatchId();
     const teamId = this.plannerTeamId();
@@ -451,15 +418,13 @@ export class BackofficeLineupsPageComponent implements OnInit {
     }
 
     try {
-      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs(), {
-        canCreateLineup: this.isAdmin(),
-      });
+      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs());
       this.closePlanner();
       this.toastStore.success('La alineación se ha enviado correctamente.', 'Alineación enviada');
     } catch (error) {
-      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
+      if (error instanceof Error && error.message === 'lineup_not_initialized') {
         this.toastStore.error(
-          'La alineación todavía no existe. Un administrador debe crearla antes de poder enviarla.',
+          'La alineación aún no ha sido preparada por administración.',
           'Alineación no disponible',
         );
         return;

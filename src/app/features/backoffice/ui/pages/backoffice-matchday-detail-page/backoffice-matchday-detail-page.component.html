@@ -457,25 +457,17 @@
             <button
               type="button"
               class="c-button c-button--pill c-button--primary c-button--md"
-              [disabled]="lineupsStore.isSavingDraft() || lineupsStore.isSubmittingLineup()"
-              (click)="saveDraft()"
-            >
-              {{ lineupsStore.isSavingDraft() ? 'Guardando…' : 'Guardar borrador' }}
-            </button>
-            <button
-              type="button"
-              class="c-button c-button--pill c-button--outline c-button--md"
               [disabled]="
                 !isPlannerComplete() || isPlannerSubmitted() || lineupsStore.isSubmittingLineup()
               "
               (click)="submitLineup()"
             >
               @if (lineupsStore.isSubmittingLineup()) {
-                Guardando y enviando…
+                Enviando…
               } @else if (isPlannerSubmitted()) {
                 Alineación enviada
               } @else {
-                Guardar y enviar
+                Enviar alineación
               }
             </button>
           </div>
@@ -714,16 +706,6 @@
                       >
                         Finalizar
                       </button>
-                      <button
-                        type="button"
-                        class="c-button c-button--pill c-button--outline c-button--sm"
-                        [disabled]="
-                          adminOperationsStore.matchActionIds()[card.matchId] === 'updating-mvp'
-                        "
-                        (click)="updateMvp(card.matchId, card.mvpId)"
-                      >
-                        Editar MVP
-                      </button>
                     </div>
 
                     @if (matchGuardrailMessage(card.matchId); as guardrailMessage) {
@@ -878,7 +860,8 @@
   }
 
   <app-backoffice-match-form-dialog
-    [initialValue]="{ localTeamId: '', awayTeamId: '', scheduledAt: '' }"
+    [existingMatches]="existingMatchEncounters()"
+    [initialValue]="createMatchInitialValue()"
     [isOpen]="isCreateMatchDialogOpen()"
     [isSubmitting]="adminOperationsStore.isCreatingMatch()"
     [submissionError]="null"

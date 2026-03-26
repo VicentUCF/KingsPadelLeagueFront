@@ -2,7 +2,6 @@ import { computed, inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { LayoutDashboard, Shield, Swords, Trophy, Users } from 'lucide-angular';
 
-import { hasBackofficeUiAdminOverride } from '@core/auth/backoffice-ui-admin-override';
 import type { AuthRole } from '@features/auth/domain/entities/auth-user';
 import { AuthStore } from '@features/auth/ui/state/auth.store';
 import type { BackofficeRole } from '@features/backoffice/domain/entities/backoffice-role';
@@ -97,10 +96,6 @@ export class BackofficeSessionStore {
 }
 
 function toBackofficeRole(role: AuthRole | null): BackofficeRole {
-  if (hasBackofficeUiAdminOverride(role)) {
-    return 'ADMIN';
-  }
-
   if (role === 'ADMIN' || role === 'PRESIDENT' || role === 'PLAYER') {
     return role;
   }

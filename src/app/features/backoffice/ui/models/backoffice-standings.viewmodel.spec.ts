@@ -71,7 +71,6 @@ const matches: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-01T10:00:00.000Z'),
     status: 'finished',
-    mvpId: null,
   },
   {
     id: 'match-2',
@@ -82,7 +81,6 @@ const matches: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-08T10:00:00.000Z'),
     status: 'finished',
-    mvpId: null,
   },
 ];
 

@@ -73,7 +73,7 @@ describe('HttpBackofficeMatchesRepository', () => {
     await expect(promise).resolves.toHaveLength(1);
   });
 
-  it('posts admin mutations and omits null mvpId on create', async () => {
+  it('posts admin create/start/finish mutations and ignores mvpId in responses', async () => {
     const createPromise = repository.create({
       matchdayId: 'jornada-1',
       localTeamId: 'team-1',
@@ -81,7 +81,6 @@ describe('HttpBackofficeMatchesRepository', () => {
       scheduledAt: '2026-03-17T10:00:00.000Z',
       localTeamScorePoints: 0,
       awayTeamScorePoints: 0,
-      mvpId: null,
     });
 
     const createReq = httpTestingController.expectOne('http://api.test/admin/v1/matches');
@@ -94,7 +93,9 @@ describe('HttpBackofficeMatchesRepository', () => {
       awayTeamScorePoints: 0,
     });
     createReq.flush(createMatchHttp());
-    await expect(createPromise).resolves.toEqual(expect.objectContaining({ id: 'match-1' }));
+    const createdMatch = await createPromise;
+    expect(createdMatch).toEqual(expect.objectContaining({ id: 'match-1' }));
+    expect(createdMatch).not.toHaveProperty('mvpId');
 
     const startPromise = repository.start('match-1');
     httpTestingController.expectOne('http://api.test/admin/v1/matches/match-1/starts').flush({});
@@ -103,12 +104,6 @@ describe('HttpBackofficeMatchesRepository', () => {
     const finishPromise = repository.finish('match-1');
     httpTestingController.expectOne('http://api.test/admin/v1/matches/match-1/finishes').flush({});
     await expect(finishPromise).resolves.toBeUndefined();
-
-    const updateMvpPromise = repository.updateMvp('match-1', 'player-9');
-    const patchReq = httpTestingController.expectOne('http://api.test/admin/v1/matches/match-1');
-    expect(patchReq.request.body).toEqual({ mvpId: 'player-9' });
-    patchReq.flush({});
-    await expect(updateMvpPromise).resolves.toBeUndefined();
   });
 });
 

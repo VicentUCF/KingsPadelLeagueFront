@@ -6,6 +6,30 @@ export function resolveCurrentBackofficeSeasonId(
   matchdays: readonly BackofficeMatchday[],
   now = new Date(),
 ): string | null {
+  const inferredSeasonId = resolveInferredBackofficeSeasonId(seasons, matchdays, now);
+
+  if (inferredSeasonId) {
+    return inferredSeasonId;
+  }
+
+  const latestSeason = [...seasons].sort(bySeasonStartDesc)[0];
+
+  return latestSeason?.id ?? null;
+}
+
+export function resolveBackofficeMatchdayCreationSeasonId(
+  seasons: readonly BackofficeSeason[],
+  matchdays: readonly BackofficeMatchday[],
+  now = new Date(),
+): string | null {
+  return resolveInferredBackofficeSeasonId(seasons, matchdays, now);
+}
+
+function resolveInferredBackofficeSeasonId(
+  seasons: readonly BackofficeSeason[],
+  matchdays: readonly BackofficeMatchday[],
+  now: Date,
+): string | null {
   const currentMatchday =
     matchdays.find((matchday) => matchday.status === 'in_progress') ??
     matchdays.find((matchday) => matchday.status === 'scheduled') ??
@@ -24,13 +48,9 @@ export function resolveCurrentBackofficeSeasonId(
       return startsAt <= nowTime && nowTime <= endsAt;
     }) ?? null;
 
-  if (activeSeason) {
-    return activeSeason.id;
-  }
+  return activeSeason?.id ?? null;
+}
 
-  const latestSeason = [...seasons].sort(
-    (left, right) => new Date(right.startsAt).getTime() - new Date(left.startsAt).getTime(),
-  )[0];
-
-  return latestSeason?.id ?? null;
+function bySeasonStartDesc(left: BackofficeSeason, right: BackofficeSeason): number {
+  return new Date(right.startsAt).getTime() - new Date(left.startsAt).getTime();
 }

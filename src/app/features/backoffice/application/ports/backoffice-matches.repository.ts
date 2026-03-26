@@ -15,7 +15,6 @@ export interface CreateBackofficeMatchInput {
   readonly scheduledAt: string;
   readonly localTeamScorePoints: number;
   readonly awayTeamScorePoints: number;
-  readonly mvpId: string | null;
 }
 
 export interface BackofficeMatchesRepository {
@@ -24,7 +23,6 @@ export interface BackofficeMatchesRepository {
   create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch>;
   start(matchId: string): Promise<void>;
   finish(matchId: string): Promise<void>;
-  updateMvp(matchId: string, mvpId: string | null): Promise<void>;
 }
 
 export const BACKOFFICE_MATCHES_REPOSITORY = new InjectionToken<BackofficeMatchesRepository>(

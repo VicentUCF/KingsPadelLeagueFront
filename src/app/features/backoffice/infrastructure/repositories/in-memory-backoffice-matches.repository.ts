@@ -16,7 +16,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-15T16:00:00'),
     status: 'in_progress',
-    mvpId: null,
   },
   {
     id: 'match-2',
@@ -27,7 +26,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-15T18:00:00'),
     status: 'scheduled',
-    mvpId: null,
   },
   {
     id: 'match-3',
@@ -38,7 +36,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-15T20:00:00'),
     status: 'scheduled',
-    mvpId: null,
   },
   {
     id: 'match-4',
@@ -49,7 +46,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-01T16:00:00'),
     status: 'finished',
-    mvpId: null,
   },
   {
     id: 'match-5',
@@ -60,7 +56,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 2,
     scheduledAt: new Date('2026-03-08T18:00:00'),
     status: 'finished',
-    mvpId: null,
   },
   {
     id: 'match-6',
@@ -71,7 +66,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 2,
     scheduledAt: new Date('2026-03-01T18:00:00'),
     status: 'finished',
-    mvpId: null,
   },
   {
     id: 'match-7',
@@ -82,7 +76,6 @@ const MOCK_MATCHES: readonly BackofficeMatch[] = [
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-08T16:00:00'),
     status: 'finished',
-    mvpId: null,
   },
 ];
 
@@ -110,7 +103,6 @@ export class InMemoryBackofficeMatchesRepository implements BackofficeMatchesRep
       awayTeamScorePoints: input.awayTeamScorePoints,
       scheduledAt: new Date(input.scheduledAt),
       status: 'scheduled',
-      mvpId: input.mvpId,
     };
     this.matches = [...this.matches, match];
     return Promise.resolve(match);
@@ -126,13 +118,6 @@ export class InMemoryBackofficeMatchesRepository implements BackofficeMatchesRep
   finish(matchId: string): Promise<void> {
     this.matches = this.matches.map((match) =>
       match.id === matchId ? { ...match, status: 'finished' } : match,
-    );
-    return Promise.resolve();
-  }
-
-  updateMvp(matchId: string, mvpId: string | null): Promise<void> {
-    this.matches = this.matches.map((match) =>
-      match.id === matchId ? { ...match, mvpId } : match,
     );
     return Promise.resolve();
   }

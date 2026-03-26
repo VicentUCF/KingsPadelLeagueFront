@@ -16,7 +16,29 @@ function createMatch(overrides: Partial<BackofficeMatch> = {}): BackofficeMatch 
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
     status: 'scheduled',
-    mvpId: null,
+    ...overrides,
+  };
+}
+
+function createPair(
+  overrides: Partial<{
+    id: string;
+    lineupId: string;
+    player1Id: string | null;
+    player2Id: string | null;
+    totalPlayersValue: number;
+    wonGame: null;
+    sets: readonly [];
+  }> = {},
+) {
+  return {
+    id: 'pair-1',
+    lineupId: 'lineup-1',
+    player1Id: 'player-1',
+    player2Id: 'player-2',
+    totalPlayersValue: 100,
+    wonGame: null,
+    sets: [] as const,
     ...overrides,
   };
 }
@@ -34,6 +56,7 @@ function createLineup(overrides: Partial<BackofficeLineup> = {}): BackofficeLine
 function createLineupsUseCaseMock() {
   return {
     byMatchIds: jest.fn(),
+    findByMatchAndTeam: jest.fn(),
     pairsByLineupIds: jest.fn(),
     create: jest.fn(),
     createPair: jest.fn(),
@@ -54,28 +77,19 @@ describe('BackofficeLineupsStore', () => {
     TestBed.resetTestingModule();
   });
 
-  it('creates a missing admin lineup, persists complete pairs and refreshes the current matchday', async () => {
+  it('refreshes the lineup from the server before submitting and persists complete pairs', async () => {
     const loadBackofficeMatchesUseCase = createMatchesUseCaseMock();
     const loadBackofficeLineupsUseCase = createLineupsUseCaseMock();
     const match = createMatch();
     const lineup = createLineup();
 
-    loadBackofficeMatchesUseCase.byMatchday.mockResolvedValue([match]);
-    loadBackofficeLineupsUseCase.byMatchIds
+    loadBackofficeMatchesUseCase.byTeam.mockResolvedValue([match]);
+    loadBackofficeLineupsUseCase.byMatchIds.mockResolvedValue([lineup]);
+    loadBackofficeLineupsUseCase.findByMatchAndTeam.mockResolvedValue(lineup);
+    loadBackofficeLineupsUseCase.pairsByLineupIds
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([lineup]);
-    loadBackofficeLineupsUseCase.pairsByLineupIds.mockResolvedValueOnce([
-      {
-        id: 'pair-1',
-        lineupId: 'lineup-1',
-        player1Id: 'player-1',
-        player2Id: 'player-2',
-        totalPlayersValue: 100,
-        wonGame: null,
-        sets: [],
-      },
-    ]);
-    loadBackofficeLineupsUseCase.create.mockResolvedValue(lineup);
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([createPair()]);
     loadBackofficeLineupsUseCase.createPair.mockResolvedValue({
       id: 'pair-1',
       lineupId: 'lineup-1',
@@ -96,30 +110,31 @@ describe('BackofficeLineupsStore', () => {
 
     const store = TestBed.inject(BackofficeLineupsStore);
 
-    await store.loadForMatchday('matchday-1');
-    await store.saveDraft(
+    await store.loadForTeam('team-1');
+    loadBackofficeLineupsUseCase.submit.mockResolvedValue(undefined);
+
+    await store.submitDraft('match-1', 'team-1', [
+      { player1Id: 'player-1', player2Id: 'player-2' },
+      { player1Id: 'player-3', player2Id: null },
+    ]);
+
+    expect(loadBackofficeLineupsUseCase.findByMatchAndTeam).toHaveBeenCalledWith(
       'match-1',
       'team-1',
-      [
-        { player1Id: 'player-1', player2Id: 'player-2' },
-        { player1Id: 'player-3', player2Id: null },
-      ],
-      { canCreateLineup: true },
     );
-
-    expect(loadBackofficeLineupsUseCase.create).toHaveBeenCalledWith('match-1', 'team-1');
+    expect(loadBackofficeLineupsUseCase.create).not.toHaveBeenCalled();
     expect(loadBackofficeLineupsUseCase.createPair).toHaveBeenCalledTimes(1);
     expect(loadBackofficeLineupsUseCase.createPair).toHaveBeenCalledWith(
       'lineup-1',
       'player-1',
       'player-2',
     );
-    expect(loadBackofficeMatchesUseCase.byMatchday).toHaveBeenCalledTimes(2);
+    expect(loadBackofficeMatchesUseCase.byTeam).toHaveBeenCalledTimes(2);
     expect(store.lineups()).toEqual([lineup]);
     expect(store.pairs()).toEqual([
       expect.objectContaining({ id: 'pair-1', lineupId: 'lineup-1' }),
     ]);
-    expect(store.isSavingDraft()).toBe(false);
+    expect(store.isSubmittingLineup()).toBe(false);
   });
 
   it('updates existing lineup pairs and refreshes the current team context', async () => {
@@ -170,7 +185,9 @@ describe('BackofficeLineupsStore', () => {
 
     loadBackofficeMatchesUseCase.byTeam.mockResolvedValue([match]);
     loadBackofficeLineupsUseCase.byMatchIds.mockResolvedValue([lineup]);
+    loadBackofficeLineupsUseCase.findByMatchAndTeam.mockResolvedValue(lineup);
     loadBackofficeLineupsUseCase.pairsByLineupIds
+      .mockResolvedValueOnce(existingPairs)
       .mockResolvedValueOnce(existingPairs)
       .mockResolvedValueOnce(refreshedPairs);
     loadBackofficeLineupsUseCase.updatePair.mockResolvedValue(undefined);
@@ -186,18 +203,19 @@ describe('BackofficeLineupsStore', () => {
     const store = TestBed.inject(BackofficeLineupsStore);
 
     await store.loadForTeam('team-1');
-    await store.saveDraft(
-      'match-1',
-      'team-1',
-      [
-        { player1Id: 'player-5', player2Id: 'player-6' },
-        { player1Id: null, player2Id: null },
-      ],
-      { canCreateLineup: false },
-    );
+    loadBackofficeLineupsUseCase.submit.mockResolvedValue(undefined);
+
+    await store.submitDraft('match-1', 'team-1', [
+      { player1Id: 'player-5', player2Id: 'player-6' },
+      { player1Id: null, player2Id: null },
+    ]);
 
     expect(loadBackofficeLineupsUseCase.create).not.toHaveBeenCalled();
     expect(loadBackofficeLineupsUseCase.createPair).not.toHaveBeenCalled();
+    expect(loadBackofficeLineupsUseCase.findByMatchAndTeam).toHaveBeenCalledWith(
+      'match-1',
+      'team-1',
+    );
     expect(loadBackofficeLineupsUseCase.updatePair).toHaveBeenNthCalledWith(
       1,
       'pair-1',
@@ -212,10 +230,10 @@ describe('BackofficeLineupsStore', () => {
     );
     expect(loadBackofficeMatchesUseCase.byTeam).toHaveBeenCalledTimes(2);
     expect(store.pairs()).toEqual(refreshedPairs);
-    expect(store.isSavingDraft()).toBe(false);
+    expect(store.isSubmittingLineup()).toBe(false);
   });
 
-  it('submits the lineup after persisting the draft and refreshes the context', async () => {
+  it('refreshes the lineup from the server before submitting', async () => {
     const loadBackofficeMatchesUseCase = createMatchesUseCaseMock();
     const loadBackofficeLineupsUseCase = createLineupsUseCaseMock();
     const match = createMatch();
@@ -232,9 +250,11 @@ describe('BackofficeLineupsStore', () => {
       },
     ];
 
-    loadBackofficeMatchesUseCase.byMatchday.mockResolvedValue([match]);
+    loadBackofficeMatchesUseCase.byTeam.mockResolvedValue([match]);
     loadBackofficeLineupsUseCase.byMatchIds.mockResolvedValue([lineup]);
+    loadBackofficeLineupsUseCase.findByMatchAndTeam.mockResolvedValue(lineup);
     loadBackofficeLineupsUseCase.pairsByLineupIds
+      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce(refreshedPairs);
     loadBackofficeLineupsUseCase.createPair.mockResolvedValue(refreshedPairs[0]);
@@ -250,21 +270,53 @@ describe('BackofficeLineupsStore', () => {
 
     const store = TestBed.inject(BackofficeLineupsStore);
 
-    await store.loadForMatchday('matchday-1');
-    await store.submitDraft(
+    await store.loadForTeam('team-1');
+    await store.submitDraft('match-1', 'team-1', [
+      { player1Id: 'player-1', player2Id: 'player-2' },
+    ]);
+
+    expect(loadBackofficeLineupsUseCase.findByMatchAndTeam).toHaveBeenCalledWith(
       'match-1',
       'team-1',
-      [{ player1Id: 'player-1', player2Id: 'player-2' }],
-      { canCreateLineup: true },
     );
-
+    expect(loadBackofficeLineupsUseCase.create).not.toHaveBeenCalled();
     expect(loadBackofficeLineupsUseCase.createPair).toHaveBeenCalledWith(
       'lineup-1',
       'player-1',
       'player-2',
     );
     expect(loadBackofficeLineupsUseCase.submit).toHaveBeenCalledWith('lineup-1');
-    expect(loadBackofficeMatchesUseCase.byMatchday).toHaveBeenCalledTimes(2);
+    expect(loadBackofficeMatchesUseCase.byTeam).toHaveBeenCalledTimes(2);
+    expect(store.isSubmittingLineup()).toBe(false);
+  });
+
+  it('fails with lineup_not_initialized when the preflight lookup does not find any lineup', async () => {
+    const loadBackofficeMatchesUseCase = createMatchesUseCaseMock();
+    const loadBackofficeLineupsUseCase = createLineupsUseCaseMock();
+    const match = createMatch();
+
+    loadBackofficeMatchesUseCase.byTeam.mockResolvedValue([match]);
+    loadBackofficeLineupsUseCase.byMatchIds.mockResolvedValue([]);
+    loadBackofficeLineupsUseCase.findByMatchAndTeam.mockResolvedValue(null);
+
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeLineupsStore,
+        { provide: LoadBackofficeMatchesUseCase, useValue: loadBackofficeMatchesUseCase },
+        { provide: LoadBackofficeLineupsUseCase, useValue: loadBackofficeLineupsUseCase },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeLineupsStore);
+
+    await store.loadForTeam('team-1');
+
+    await expect(
+      store.submitDraft('match-1', 'team-1', [{ player1Id: 'player-1', player2Id: 'player-2' }]),
+    ).rejects.toThrow('lineup_not_initialized');
+
+    expect(loadBackofficeLineupsUseCase.create).not.toHaveBeenCalled();
+    expect(loadBackofficeLineupsUseCase.createPair).not.toHaveBeenCalled();
     expect(store.isSubmittingLineup()).toBe(false);
   });
 });

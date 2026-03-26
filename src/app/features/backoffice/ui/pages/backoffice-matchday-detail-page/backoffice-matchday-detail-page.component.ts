@@ -15,6 +15,7 @@ import type {
 } from '@features/backoffice/domain/entities/backoffice-player';
 import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
 import type { BackofficePairMatch } from '@features/backoffice/domain/entities/backoffice-pair-match';
+import type { BackofficeMatchEncounter } from '@features/backoffice/domain/rules/backoffice-match-encounter.rule';
 import { ActionToastStore } from '@core/state/action-toast.store';
 import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
 import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
@@ -31,6 +32,7 @@ import {
   type BackofficeMatchCardViewModel,
 } from '../../models/backoffice-lineups.viewmodel';
 import { toBackofficeMatchdayRowViewModel } from '../../models/backoffice-matchdays.viewmodel';
+import { createDefaultBackofficeMatchScheduledAt } from '../../models/backoffice-match-form-schedule';
 import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
 import { BackofficeMatchFormDialogComponent } from '../../components/backoffice-match-form-dialog/backoffice-match-form-dialog.component';
 import { BackofficePairMatchResultDialogComponent } from '../../components/backoffice-pair-match-result-dialog/backoffice-pair-match-result-dialog.component';
@@ -143,18 +145,34 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     return this.teamsStore.teams().find((t) => t.id === teamId) ?? null;
   });
 
+  protected readonly matchdayMatches = computed(() =>
+    this.lineupsStore.matches().filter((match) => match.matchdayId === this.matchdayId()),
+  );
+
+  protected readonly existingMatchEncounters = computed<readonly BackofficeMatchEncounter[]>(() =>
+    this.matchdayMatches().map((match) => ({
+      localTeamId: match.localTeamId,
+      awayTeamId: match.awayTeamId,
+    })),
+  );
+
+  protected readonly createMatchInitialValue = computed(() => ({
+    localTeamId: '',
+    awayTeamId: '',
+    scheduledAt: this.matchday()
+      ? createDefaultBackofficeMatchScheduledAt(this.matchday()!.scheduledAt)
+      : '',
+  }));
+
   protected readonly matchCards = computed<readonly BackofficeMatchCardViewModel[]>(() => {
-    const currentMatchdayId = this.matchdayId();
-    const matches = this.lineupsStore
-      .matches()
-      .filter((match) => match.matchdayId === currentMatchdayId);
+    const matches = this.matchdayMatches();
     const teams = this.teamsStore.teams();
     const lineups = this.lineupsStore.lineups();
+    const presidentTeamId = this.sessionStore.currentPresidentTeamId();
 
     const filtered = this.isAdmin()
       ? matches
       : matches.filter((m) => {
-          const presidentTeamId = this.sessionStore.currentPresidentTeamId();
           return m.localTeamId === presidentTeamId || m.awayTeamId === presidentTeamId;
         });
 
@@ -163,16 +181,16 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
         const localTeam = teams.find((t) => t.id === match.localTeamId);
         const awayTeam = teams.find((t) => t.id === match.awayTeamId);
         if (!localTeam || !awayTeam) return null;
-        const lineup = lineups.find((l) => l.matchId === match.id);
+        const lineup = this.isAdmin()
+          ? lineups.find((l) => l.matchId === match.id)
+          : lineups.find((l) => l.matchId === match.id && l.teamId === presidentTeamId);
         return toBackofficeMatchCardViewModel(match, localTeam, awayTeam, lineup);
       })
       .filter((card): card is BackofficeMatchCardViewModel => card !== null);
   });
 
   protected readonly matchdayOverview = computed<MatchdayOverviewViewModel>(() => {
-    const matches = this.lineupsStore
-      .matches()
-      .filter((match) => match.matchdayId === this.matchdayId());
+    const matches = this.matchdayMatches();
     const finishedMatches = matches.filter((match) => match.status === 'finished').length;
     const pairSlots = matches.flatMap((match) =>
       this.pairMatchupsForMatch(match.id, match.localTeamId, match.awayTeamId),
@@ -566,26 +584,18 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     readonly awayTeamId: string;
     readonly scheduledAt: string;
   }): Promise<void> {
-    await this.adminOperationsStore.createMatch({
+    const created = await this.adminOperationsStore.createMatch({
       matchdayId: this.matchdayId(),
       localTeamId: input.localTeamId,
       awayTeamId: input.awayTeamId,
       scheduledAt: input.scheduledAt,
       localTeamScorePoints: 0,
       awayTeamScorePoints: 0,
-      mvpId: null,
     });
-    this.closeCreateMatchDialog();
-  }
 
-  protected async updateMvp(matchId: string, currentMvpId: string | null): Promise<void> {
-    const playerId = globalThis.prompt('ID del MVP', currentMvpId ?? '')?.trim();
-    if (playerId === undefined) return;
-    await this.adminOperationsStore.updateMatchMvp(
-      this.matchdayId(),
-      matchId,
-      playerId.length > 0 ? playerId : null,
-    );
+    if (created) {
+      this.closeCreateMatchDialog();
+    }
   }
 
   protected openPairMatchResultDialog(pairMatchId: string): void {
@@ -921,39 +931,6 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     return this.lineupsStore.lineupForMatch(matchId, teamId)?.status === 'submited';
   }
 
-  protected async saveDraft(): Promise<void> {
-    const matchId = this.selectedMatchId();
-    const teamId = this.plannerTeamId();
-
-    if (!matchId || !teamId) {
-      return;
-    }
-
-    try {
-      await this.lineupsStore.saveDraft(matchId, teamId, this.plannerPairs(), {
-        canCreateLineup: this.sessionStore.currentRole() === 'ADMIN',
-      });
-      this.closePlanner();
-      this.toastStore.success(
-        'El borrador de alineación se ha guardado correctamente.',
-        'Borrador guardado',
-      );
-    } catch (error) {
-      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
-        this.toastStore.error(
-          'La alineación todavía no existe. Un administrador debe crearla antes de poder guardar parejas.',
-          'Alineación no disponible',
-        );
-        return;
-      }
-
-      this.toastStore.error(
-        'No hemos podido guardar el borrador de alineación.',
-        'No se ha podido guardar',
-      );
-    }
-  }
-
   protected async submitLineup(): Promise<void> {
     const matchId = this.selectedMatchId();
     const teamId = this.plannerTeamId();
@@ -965,15 +942,13 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     }
 
     try {
-      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs(), {
-        canCreateLineup: this.sessionStore.currentRole() === 'ADMIN',
-      });
+      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs());
       this.closePlanner();
       this.toastStore.success('La alineación se ha enviado correctamente.', 'Alineación enviada');
     } catch (error) {
-      if (error instanceof Error && error.message === 'lineup_creation_not_allowed') {
+      if (error instanceof Error && error.message === 'lineup_not_initialized') {
         this.toastStore.error(
-          'La alineación todavía no existe. Un administrador debe crearla antes de poder enviarla.',
+          'La alineación aún no ha sido preparada por administración.',
           'Alineación no disponible',
         );
         return;

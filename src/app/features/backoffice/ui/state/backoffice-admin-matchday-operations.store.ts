@@ -12,7 +12,9 @@ import {
   type BackofficePairMatchesRepository,
   type FinishBackofficePairMatchInput,
 } from '@features/backoffice/application/ports/backoffice-pair-matches.repository';
+import { LoadBackofficeLineupsUseCase } from '@features/backoffice/application/use-cases/load-backoffice-lineups.use-case';
 import type { BackofficePairMatch } from '@features/backoffice/domain/entities/backoffice-pair-match';
+import { hasBackofficeMatchEncounterDuplicate } from '@features/backoffice/domain/rules/backoffice-match-encounter.rule';
 import { BackofficeLineupsStore } from './backoffice-lineups.store';
 import { BackofficeMatchdaysStore } from './backoffice-matchdays.store';
 import { BackofficePlayersStore } from './backoffice-players.store';
@@ -27,6 +29,7 @@ export class BackofficeAdminMatchdayOperationsStore {
   private readonly pairMatchesRepository = inject<BackofficePairMatchesRepository>(
     BACKOFFICE_PAIR_MATCHES_REPOSITORY,
   );
+  private readonly lineupsUseCase = inject(LoadBackofficeLineupsUseCase);
   private readonly matchdaysStore = inject(BackofficeMatchdaysStore);
   private readonly lineupsStore = inject(BackofficeLineupsStore);
   private readonly teamsStore = inject(BackofficeTeamsStore);
@@ -42,7 +45,7 @@ export class BackofficeAdminMatchdayOperationsStore {
   readonly isFinishingMatchday = signal(false);
   readonly isCreatingPairMatches = signal(false);
   readonly isCreatingMatch = signal(false);
-  readonly matchActionIds = signal<Record<string, 'starting' | 'finishing' | 'updating-mvp'>>({});
+  readonly matchActionIds = signal<Record<string, 'starting' | 'finishing'>>({});
   readonly pairMatchActionIds = signal<Record<string, 'finishing'>>({});
 
   async loadPairMatches(forceRefresh = false): Promise<void> {
@@ -132,14 +135,54 @@ export class BackofficeAdminMatchdayOperationsStore {
     }
   }
 
-  async createMatch(input: CreateBackofficeMatchInput): Promise<void> {
+  async createMatch(input: CreateBackofficeMatchInput): Promise<boolean> {
     this.isCreatingMatch.set(true);
     try {
-      await this.matchesRepository.create(input);
+      if (input.localTeamId === input.awayTeamId) {
+        this.toastStore.error(
+          'Local y visitante deben ser equipos distintos.',
+          'Partido no creado',
+        );
+        return false;
+      }
+
+      const existingMatchdayMatches = this.lineupsStore
+        .matches()
+        .filter((match) => match.matchdayId === input.matchdayId);
+
+      if (
+        hasBackofficeMatchEncounterDuplicate(
+          existingMatchdayMatches,
+          input.localTeamId,
+          input.awayTeamId,
+        )
+      ) {
+        this.toastStore.error('Ese enfrentamiento ya existe en esta jornada.', 'Partido duplicado');
+        return false;
+      }
+
+      const match = await this.matchesRepository.create(input);
+      const bootstrapResults = await Promise.allSettled([
+        this.lineupsUseCase.create(match.id, input.localTeamId),
+        this.lineupsUseCase.create(match.id, input.awayTeamId),
+      ]);
       await this.refreshMatchdayContext(input.matchdayId);
+
+      const hasBootstrapFailures = bootstrapResults.some((result) => result.status === 'rejected');
+
+      if (hasBootstrapFailures) {
+        this.toastStore.error(
+          'El partido se ha creado, pero no hemos podido preparar las alineaciones automáticamente.',
+          'Revisión pendiente',
+        );
+        return true;
+      }
+
       this.toastStore.success('El partido se ha creado correctamente.', 'Partido creado');
+      return true;
     } catch {
       this.toastStore.error('No hemos podido crear el partido.', 'Partido no creado');
+      return false;
     } finally {
       this.isCreatingMatch.set(false);
     }
@@ -166,19 +209,6 @@ export class BackofficeAdminMatchdayOperationsStore {
       this.toastStore.success('El partido ha quedado finalizado.', 'Partido finalizado');
     } catch {
       this.toastStore.error('No hemos podido finalizar el partido.', 'Acción no completada');
-    } finally {
-      this.clearMatchAction(matchId);
-    }
-  }
-
-  async updateMatchMvp(matchdayId: string, matchId: string, mvpId: string | null): Promise<void> {
-    this.setMatchAction(matchId, 'updating-mvp');
-    try {
-      await this.matchesRepository.updateMvp(matchId, mvpId);
-      await this.refreshMatchdayContext(matchdayId);
-      this.toastStore.success('El MVP se ha actualizado.', 'MVP actualizado');
-    } catch {
-      this.toastStore.error('No hemos podido actualizar el MVP.', 'Acción no completada');
     } finally {
       this.clearMatchAction(matchId);
     }
@@ -218,7 +248,7 @@ export class BackofficeAdminMatchdayOperationsStore {
     await this.loadPairMatches(true);
   }
 
-  private setMatchAction(matchId: string, action: 'starting' | 'finishing' | 'updating-mvp'): void {
+  private setMatchAction(matchId: string, action: 'starting' | 'finishing'): void {
     this.matchActionIds.update((state) => ({ ...state, [matchId]: action }));
   }
 

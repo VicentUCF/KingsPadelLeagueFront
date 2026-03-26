@@ -6,7 +6,7 @@ import { provideLeagueHomeFeatureTesting } from '../../testing/league-home-testi
 import { LeagueStandingsPageComponent } from './league-standings-page.component';
 
 describe('LeagueStandingsPageComponent', () => {
-  it('renders the standings view with hero, table and tiebreaks', async () => {
+  it('renders the standings view with hero, table and quick actions', async () => {
     await render(LeagueStandingsPageComponent, {
       providers: [...provideLeagueHomeFeatureTesting(), provideRouter([])],
     });
@@ -20,7 +20,8 @@ describe('LeagueStandingsPageComponent', () => {
     expect(screen.getByRole('columnheader', { name: 'JP' })).toBeVisible();
     expect(screen.getByRole('columnheader', { name: 'DIF' })).toBeVisible();
     expect(screen.getByRole('columnheader', { name: 'PTS' })).toBeVisible();
-    expect(screen.getByText(/Criterios de desempate/i)).toBeVisible();
+    expect(screen.getByText(/Jornada 3 de 5/i)).toBeVisible();
+    expect(screen.getByText(/Fase regular/i)).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver jornadas/i })).toBeVisible();
     expect(screen.getByRole('link', { name: /Ver calendario/i })).toBeVisible();
   });

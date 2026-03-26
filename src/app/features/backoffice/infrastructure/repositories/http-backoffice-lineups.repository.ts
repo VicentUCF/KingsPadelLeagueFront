@@ -46,6 +46,23 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
     ).then((res) => res.items.map(mapLineup));
   }
 
+  findByMatchAndTeam(matchId: string, teamId: string): Promise<BackofficeLineup | null> {
+    const params = withJsonArrayParam(new HttpParams().set('limit', '200'), 'matchIds', [matchId]);
+
+    return firstValueFrom(
+      this.http.get<PaginatedResponse<MatchTeamLineUpHttpV1>>(
+        `${this.baseUrl}${this.lineupsBasePath()}`,
+        {
+          params,
+          context: withHttpErrorToast({ key: 'load-lineup' }),
+        },
+      ),
+    ).then((res) => {
+      const lineup = res.items.find((item) => item.teamId === teamId);
+      return lineup ? mapLineup(lineup) : null;
+    });
+  }
+
   loadPairsByLineupIds(lineupIds: string[]): Promise<readonly BackofficeLineupPair[]> {
     const params = withJsonArrayParam(
       new HttpParams().set('limit', '200').set('sortBy', JSON.stringify([{ createdAt: 'ASC' }])),

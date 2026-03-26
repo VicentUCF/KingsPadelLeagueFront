@@ -22,7 +22,7 @@ describe('toPlayerProfileViewModel', () => {
       displayName: 'Alex Soler',
       teamName: 'Kings of Favar',
       teamMonogram: 'OF',
-      teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.png',
+      teamLogoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
       avatarPath: null,
       wonMatchesLabel: '4',
       lostMatchesLabel: '1',
@@ -70,7 +70,7 @@ describe('toPlayerProfileViewModel', () => {
       ),
     );
 
-    expect(viewModel.teamLogoPath).toBe('/teams_logos/barbarida_no_bg.png');
+    expect(viewModel.teamLogoPath).toBe('/teams_logos/barbarida_no_bg.webp');
   });
 
   it('drops placeholder avatars so the UI can render the icon fallback', () => {

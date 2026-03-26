@@ -6,13 +6,11 @@ import { ModalShellComponent } from '@shared/ui/modal-shell/modal-shell.componen
 interface MatchdayFormValue {
   readonly name: string;
   readonly scheduledAt: string;
-  readonly seasonId: string;
 }
 
 type MatchdayFormGroup = FormGroup<{
   name: FormControl<string>;
   scheduledAt: FormControl<string>;
-  seasonId: FormControl<string>;
 }>;
 
 @Component({
@@ -30,7 +28,6 @@ export class BackofficeMatchdayFormDialogComponent {
   readonly initialValue = input<MatchdayFormValue>({
     name: '',
     scheduledAt: '',
-    seasonId: '',
   });
 
   readonly cancelled = output<void>();
@@ -39,7 +36,6 @@ export class BackofficeMatchdayFormDialogComponent {
   protected readonly form: MatchdayFormGroup = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     scheduledAt: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    seasonId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
 
   constructor() {
@@ -67,7 +63,6 @@ export class BackofficeMatchdayFormDialogComponent {
     this.submitted.emit({
       name: value.name.trim(),
       scheduledAt: value.scheduledAt,
-      seasonId: value.seasonId,
     });
   }
 }

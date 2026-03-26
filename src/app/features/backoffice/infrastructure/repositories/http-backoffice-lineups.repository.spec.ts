@@ -67,7 +67,40 @@ describe('HttpBackofficeLineupsRepository', () => {
     ]);
   });
 
+  it('finds one lineup by match and team through the player/president endpoint for non-admin users', async () => {
+    currentRole.set('PRESIDENT');
+
+    const promise = repository.findByMatchAndTeam('match-1', 'team-1');
+
+    const request = httpTestingController.expectOne(
+      'http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D',
+    );
+    expect(request.request.method).toBe('GET');
+    request.flush({
+      items: [createLineupHttp({ id: 'lineup-2', teamId: 'team-2' }), createLineupHttp()],
+      meta: createMeta(2),
+    });
+
+    await expect(promise).resolves.toEqual(
+      expect.objectContaining({ id: 'lineup-1', matchId: 'match-1', teamId: 'team-1' }),
+    );
+  });
+
+  it('returns null when the preflight lineup lookup does not find any lineup', async () => {
+    currentRole.set('PRESIDENT');
+
+    const promise = repository.findByMatchAndTeam('match-1', 'team-1');
+
+    httpTestingController
+      .expectOne('http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D')
+      .flush({ items: [createLineupHttp({ teamId: 'team-2' })], meta: createMeta(1) });
+
+    await expect(promise).resolves.toBeNull();
+  });
+
   it('creates a lineup through the admin endpoint', async () => {
+    currentRole.set('ADMIN');
+
     const promise = repository.create('match-1', 'team-1');
 
     const request = httpTestingController.expectOne('http://api.test/admin/v1/match-team-line-ups');
@@ -104,13 +137,22 @@ function createMeta(itemCount: number) {
   };
 }
 
-function createLineupHttp() {
+function createLineupHttp(
+  overrides: Partial<{
+    id: string;
+    matchId: string;
+    teamId: string;
+    status: 'pending' | 'submited';
+    createdAt: string;
+  }> = {},
+) {
   return {
     id: 'lineup-1',
     matchId: 'match-1',
     teamId: 'team-1',
     status: 'pending',
     createdAt: '2026-03-17T10:00:00.000Z',
+    ...overrides,
   } as const;
 }
 

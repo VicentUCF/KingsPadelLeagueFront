@@ -11,6 +11,21 @@ import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { BackofficeAdminMatchdayOperationsStore } from '../../state/backoffice-admin-matchday-operations.store';
 import { BackofficeMatchdayDetailPageComponent } from './backoffice-matchday-detail-page.component';
 
+interface LineupSubmissionTestApi {
+  readonly selectedMatchId: { set(value: string | null): void };
+  readonly plannerTeamId: { set(value: string | null): void };
+  readonly plannerPairs: {
+    set(
+      value: readonly {
+        readonly id: string;
+        readonly player1Id: string;
+        readonly player2Id: string;
+      }[],
+    ): void;
+  };
+  submitLineup(): Promise<void>;
+}
+
 describe('BackofficeMatchdayDetailPageComponent', () => {
   it('shows admin operational controls in the matchday detail', async () => {
     await renderComponentWithRole('ADMIN');
@@ -21,7 +36,6 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
       screen.getByRole('button', { name: /Generar enfrentamientos de parejas/i }),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: /Nuevo partido/i })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Editar MVP/i })).toBeVisible();
     expect(screen.getByText('Resumen operativo')).toBeVisible();
     expect(screen.getByText('2/2 enfrentamientos')).toBeVisible();
     expect(screen.getByRole('button', { name: /Finalizar jornada/i })).toBeDisabled();
@@ -40,7 +54,6 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
     expect(screen.getByRole('button', { name: /Gestionar alineación/i })).toBeVisible();
     expect(screen.queryByRole('button', { name: /Iniciar jornada/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Nuevo partido/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Editar MVP/i })).not.toBeInTheDocument();
 
     screen.getByRole('button', { name: /Gestionar alineación/i }).click();
 
@@ -49,9 +62,50 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Alineación enviada' })).toBeDisabled();
   });
+
+  it('shows an admin-preparation error when the president submits without an initialized lineup', async () => {
+    const toastStore = { success: jest.fn(), error: jest.fn() };
+    const view = await renderComponentWithRole('PRESIDENT', {
+      lineupsStoreOverrides: {
+        lineups: signal([
+          { id: 'lineup-1', matchId: 'match-1', teamId: 'team-1', status: 'pending' as const },
+          { id: 'lineup-2', matchId: 'match-1', teamId: 'team-2', status: 'pending' as const },
+        ]),
+        lineupForMatch: jest.fn((matchId: string, teamId: string) =>
+          [
+            { id: 'lineup-1', matchId: 'match-1', teamId: 'team-1', status: 'pending' as const },
+            { id: 'lineup-2', matchId: 'match-1', teamId: 'team-2', status: 'pending' as const },
+          ].find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId),
+        ),
+        submitDraft: jest.fn().mockRejectedValue(new Error('lineup_not_initialized')),
+      },
+      toastStore,
+    });
+
+    const component = view.fixture.componentInstance as unknown as LineupSubmissionTestApi;
+    component.selectedMatchId.set('match-1');
+    component.plannerTeamId.set('team-1');
+    component.plannerPairs.set([
+      { id: 'pair-1', player1Id: 'player-1', player2Id: 'player-2' },
+      { id: 'pair-2', player1Id: 'player-5', player2Id: 'player-6' },
+    ]);
+
+    await component.submitLineup();
+
+    expect(toastStore.error).toHaveBeenCalledWith(
+      'La alineación aún no ha sido preparada por administración.',
+      'Alineación no disponible',
+    );
+  });
 });
 
-async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
+async function renderComponentWithRole(
+  role: 'ADMIN' | 'PRESIDENT',
+  options: {
+    lineupsStoreOverrides?: Record<string, unknown>;
+    toastStore?: { success: jest.Mock; error: jest.Mock };
+  } = {},
+) {
   const match = {
     id: 'match-1',
     matchdayId: 'matchday-1',
@@ -61,7 +115,6 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
     status: 'scheduled' as const,
-    mvpId: null,
   };
   const otherMatch = {
     id: 'match-2',
@@ -72,7 +125,6 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     awayTeamScorePoints: 0,
     scheduledAt: new Date('2026-03-26T18:00:00.000Z'),
     status: 'scheduled' as const,
-    mvpId: null,
   };
   const localLineup = {
     id: 'lineup-1',
@@ -128,12 +180,10 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     lineups: signal([localLineup, awayLineup]),
     pairs: signal([localPair, awayPair, localPairTwo, awayPairTwo]),
     isLoading: signal(false),
-    isSavingDraft: signal(false),
     isSubmittingLineup: signal(false),
     errorMessage: signal<string | null>(null),
     hasContent: signal(true),
     loadForMatchday: jest.fn().mockResolvedValue(undefined),
-    saveDraft: jest.fn().mockResolvedValue(undefined),
     submitDraft: jest.fn().mockResolvedValue(undefined),
     lineupForMatch: jest.fn((matchId: string, teamId: string) =>
       [localLineup, awayLineup].find(
@@ -143,12 +193,12 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     pairsForLineup: jest.fn((lineupId: string) =>
       [localPair, awayPair, localPairTwo, awayPairTwo].filter((pair) => pair.lineupId === lineupId),
     ),
+    ...options.lineupsStoreOverrides,
   } satisfies Pick<
     BackofficeLineupsStore,
     | 'errorMessage'
     | 'hasContent'
     | 'isLoading'
-    | 'isSavingDraft'
     | 'isSubmittingLineup'
     | 'lineupForMatch'
     | 'lineups'
@@ -156,11 +206,10 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
     | 'matches'
     | 'pairs'
     | 'pairsForLineup'
-    | 'saveDraft'
     | 'submitDraft'
   >;
 
-  await render(BackofficeMatchdayDetailPageComponent, {
+  return render(BackofficeMatchdayDetailPageComponent, {
     providers: [
       {
         provide: ActivatedRoute,
@@ -297,10 +346,9 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
           startMatchday: jest.fn().mockResolvedValue(undefined),
           finishMatchday: jest.fn().mockResolvedValue(undefined),
           createPairMatches: jest.fn().mockResolvedValue(undefined),
-          createMatch: jest.fn().mockResolvedValue(undefined),
+          createMatch: jest.fn().mockResolvedValue(true),
           startMatch: jest.fn().mockResolvedValue(undefined),
           finishMatch: jest.fn().mockResolvedValue(undefined),
-          updateMatchMvp: jest.fn().mockResolvedValue(undefined),
           finishPairMatch: jest.fn().mockResolvedValue(undefined),
         } satisfies Pick<
           BackofficeAdminMatchdayOperationsStore,
@@ -322,12 +370,11 @@ async function renderComponentWithRole(role: 'ADMIN' | 'PRESIDENT') {
           | 'pairMatchesErrorMessage'
           | 'startMatch'
           | 'startMatchday'
-          | 'updateMatchMvp'
         >,
       },
       {
         provide: ActionToastStore,
-        useValue: { success: jest.fn(), error: jest.fn() },
+        useValue: options.toastStore ?? { success: jest.fn(), error: jest.fn() },
       },
     ],
   });

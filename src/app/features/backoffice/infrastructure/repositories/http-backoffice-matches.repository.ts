@@ -47,14 +47,8 @@ export class HttpBackofficeMatchesRepository implements BackofficeMatchesReposit
   }
 
   create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch> {
-    const { mvpId, ...rest } = input;
-    const payload = {
-      ...rest,
-      ...(mvpId == null ? {} : { mvpId }),
-    };
-
     return firstValueFrom(
-      this.http.post<MatchHttpV1>(`${this.baseUrl}/admin/v1/matches`, payload, {
+      this.http.post<MatchHttpV1>(`${this.baseUrl}/admin/v1/matches`, input, {
         context: withHttpErrorToast({ key: 'create-match' }),
       }),
     ).then(mapMatch);
@@ -75,16 +69,6 @@ export class HttpBackofficeMatchesRepository implements BackofficeMatchesReposit
       }),
     ).then(() => undefined);
   }
-
-  updateMvp(matchId: string, mvpId: string | null): Promise<void> {
-    const payload = mvpId == null ? {} : { mvpId };
-
-    return firstValueFrom(
-      this.http.patch<void>(`${this.baseUrl}/admin/v1/matches/${matchId}`, payload, {
-        context: withHttpErrorToast({ key: 'update-match-mvp' }),
-      }),
-    ).then(() => undefined);
-  }
 }
 
 function mapMatch(raw: MatchHttpV1): BackofficeMatch {
@@ -97,6 +81,5 @@ function mapMatch(raw: MatchHttpV1): BackofficeMatch {
     awayTeamScorePoints: raw.awayTeamScorePoints,
     scheduledAt: new Date(raw.scheduledAt),
     status: raw.status,
-    mvpId: raw.mvpId ?? null,
   };
 }
