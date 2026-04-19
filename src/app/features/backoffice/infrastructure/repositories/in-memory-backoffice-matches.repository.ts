@@ -93,6 +93,16 @@ export class InMemoryBackofficeMatchesRepository implements BackofficeMatchesRep
     );
   }
 
+  loadByMatchdayAndTeam(matchdayId: string, teamId: string): Promise<readonly BackofficeMatch[]> {
+    return Promise.resolve(
+      this.matches.filter(
+        (match) =>
+          match.matchdayId === matchdayId &&
+          (match.localTeamId === teamId || match.awayTeamId === teamId),
+      ),
+    );
+  }
+
   create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch> {
     const match: BackofficeMatch = {
       id: `match-${this.matches.length + 1}`,

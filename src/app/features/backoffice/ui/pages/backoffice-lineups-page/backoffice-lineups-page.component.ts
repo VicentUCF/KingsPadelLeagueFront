@@ -6,470 +6,298 @@ import {
   signal,
   type OnInit,
 } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { ChevronDown, LucideAngularModule } from 'lucide-angular';
-
-import type { BackofficeTeam } from '@features/backoffice/domain/entities/backoffice-team';
-import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import { ActionToastStore } from '@core/state/action-toast.store';
 import { LoadFeedbackComponent } from '@shared/ui/load-feedback/load-feedback.component';
 import { LoadingStateComponent } from '@shared/ui/loading-state/loading-state.component';
-import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
-import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
-import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
-import { BackofficePlayersStore } from '../../state/backoffice-players.store';
-import { BackofficeSessionStore } from '../../state/backoffice-session.store';
-import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
+import { BackofficeLineupPlannerComponent } from '../../components/backoffice-lineup-planner/backoffice-lineup-planner.component';
+import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
 import {
   toBackofficeMatchCardViewModel,
   type BackofficeMatchCardViewModel,
 } from '../../models/backoffice-lineups.viewmodel';
-import { StatusBadgeComponent } from '../../components/status-badge/status-badge.component';
-
-interface PlannerPair {
-  id: string;
-  player1Id: string | null;
-  player2Id: string | null;
-}
+import { toBackofficeMatchdayRowViewModel } from '../../models/backoffice-matchdays.viewmodel';
+import {
+  BackofficeLineupsStore,
+  type BackofficeLineupDraftPairInput,
+} from '../../state/backoffice-lineups.store';
+import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
+import { BackofficePlayersStore } from '../../state/backoffice-players.store';
+import { BackofficeSessionStore } from '../../state/backoffice-session.store';
+import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 
 @Component({
   selector: 'app-backoffice-lineups-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'backoffice-lineups-page' },
   imports: [
+    BackofficeLineupPlannerComponent,
     LoadFeedbackComponent,
     LoadingStateComponent,
-    LucideAngularModule,
     StatusBadgeComponent,
   ],
   templateUrl: './backoffice-lineups-page.component.html',
   styleUrl: './backoffice-lineups-page.component.scss',
 })
 export class BackofficeLineupsPageComponent implements OnInit {
-  protected readonly chevronDownIcon = ChevronDown;
   protected readonly lineupsStore = inject(BackofficeLineupsStore);
   protected readonly matchdaysStore = inject(BackofficeMatchdaysStore);
   protected readonly teamsStore = inject(BackofficeTeamsStore);
   protected readonly playersStore = inject(BackofficePlayersStore);
   protected readonly sessionStore = inject(BackofficeSessionStore);
   private readonly toastStore = inject(ActionToastStore);
+  private readonly router = inject(Router);
 
-  protected readonly selectedMatchdayId = signal<string | null>(null);
-  protected readonly hasContent = computed(() => {
-    if (this.isAdmin()) {
-      return this.matchdaysStore.hasContent() && this.lineupsStore.hasContent();
+  protected readonly activeMatchdayId = signal<string | null>(null);
+  protected readonly selectedMatchId = signal<string | null>(null);
+  protected readonly plannerMatchId = signal<string | null>(null);
+  protected readonly isRedirecting = signal(false);
+
+  protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
+
+  protected readonly sessionErrorMessage = computed(() =>
+    this.isAdmin() || this.sessionStore.currentPresidentTeamId()
+      ? null
+      : 'No hemos podido resolver el equipo del presidente desde la sesion actual.',
+  );
+
+  protected readonly activeMatchday = computed(
+    () =>
+      this.matchdaysStore.matchdays().find((matchday) => matchday.id === this.activeMatchdayId()) ??
+      null,
+  );
+
+  protected readonly activeMatchdayRow = computed(() => {
+    const matchday = this.activeMatchday();
+    return matchday ? toBackofficeMatchdayRowViewModel(matchday) : null;
+  });
+
+  protected readonly selectedMatch = computed(
+    () => this.lineupsStore.matches().find((match) => match.id === this.selectedMatchId()) ?? null,
+  );
+
+  protected readonly plannerMatch = computed(
+    () => this.lineupsStore.matches().find((match) => match.id === this.plannerMatchId()) ?? null,
+  );
+
+  protected readonly presidentPlayers = computed(() => {
+    const teamId = this.sessionStore.currentPresidentTeamId();
+
+    if (!teamId) {
+      return [];
     }
 
-    return this.teamsStore.hasContent() && this.lineupsStore.hasContent();
+    return this.playersStore.players().filter((player) => player.teamId === teamId);
   });
+
+  protected readonly plannerLineup = computed(() => {
+    const match = this.plannerMatch();
+    const teamId = this.sessionStore.currentPresidentTeamId();
+
+    if (!match || !teamId) {
+      return null;
+    }
+
+    return this.lineupsStore.lineupForMatch(match.id, teamId) ?? null;
+  });
+
+  protected readonly plannerPairs = computed(() => {
+    const lineup = this.plannerLineup();
+
+    return lineup ? this.lineupsStore.pairsForLineup(lineup.id) : [];
+  });
+
+  protected readonly selectedMatchCard = computed<BackofficeMatchCardViewModel | null>(() => {
+    const match = this.selectedMatch();
+    const teamId = this.sessionStore.currentPresidentTeamId();
+
+    if (!match || !teamId) {
+      return null;
+    }
+
+    const localTeam = this.teamsStore.teams().find((team) => team.id === match.localTeamId);
+    const awayTeam = this.teamsStore.teams().find((team) => team.id === match.awayTeamId);
+
+    if (!localTeam || !awayTeam) {
+      return null;
+    }
+
+    const lineup = this.lineupsStore.lineupForMatch(match.id, teamId);
+    const pairCount = lineup ? this.lineupsStore.pairsForLineup(lineup.id).length : 0;
+
+    return toBackofficeMatchCardViewModel(match, localTeam, awayTeam, lineup, pairCount);
+  });
+
+  protected readonly plannerMatchTitle = computed(() => {
+    const match = this.plannerMatch();
+
+    if (!match) {
+      return 'Partido';
+    }
+
+    const localTeamName =
+      this.teamsStore.teams().find((team) => team.id === match.localTeamId)?.name ?? 'Local';
+    const awayTeamName =
+      this.teamsStore.teams().find((team) => team.id === match.awayTeamId)?.name ?? 'Visitante';
+
+    return `${localTeamName} vs ${awayTeamName}`;
+  });
+
+  protected readonly plannerTeamName = computed(
+    () =>
+      this.teamsStore.teams().find((team) => team.id === this.sessionStore.currentPresidentTeamId())
+        ?.name ?? 'Mi equipo',
+  );
+
+  protected readonly hasContent = computed(() => {
+    if (this.isRedirecting()) {
+      return true;
+    }
+
+    const baseReady =
+      this.matchdaysStore.hasContent() &&
+      this.teamsStore.hasContent() &&
+      this.playersStore.hasContent();
+
+    if (!baseReady) {
+      return false;
+    }
+
+    return this.activeMatchday() ? this.lineupsStore.hasContent() : true;
+  });
+
   protected readonly pageErrorMessage = computed(
     () =>
+      this.sessionErrorMessage() ??
       this.lineupsStore.errorMessage() ??
       this.matchdaysStore.errorMessage() ??
       this.teamsStore.errorMessage() ??
       this.playersStore.errorMessage(),
   );
 
-  // Planner signals
-  protected readonly selectedMatchId = signal<string | null>(null);
-  protected readonly plannerTeamId = signal<string | null>(null);
-  protected readonly plannerStep = signal<1 | 2>(1);
-  protected readonly availability = signal<Record<string, 'available' | 'unavailable'>>({});
-  protected readonly plannerPairs = signal<PlannerPair[]>([]);
-  protected readonly playerSearch = signal('');
-  protected readonly selectedPlayerId = signal<string | null>(null);
-  protected readonly dragOverSlot = signal<string | null>(null);
-
-  protected readonly matchCards = computed<readonly BackofficeMatchCardViewModel[]>(() => {
-    const matches = this.lineupsStore.matches();
-    const teams = this.teamsStore.teams();
-    const managedTeamId = this.isAdmin()
-      ? null
-      : (this.sessionStore.currentPresidentTeamId() ?? this.presidentTeam()?.id);
-
-    return matches
-      .map((match) => {
-        const localTeam = teams.find((t) => t.id === match.localTeamId);
-        const awayTeam = teams.find((t) => t.id === match.awayTeamId);
-        if (!localTeam || !awayTeam) return null;
-
-        const lineupTeamId = this.isAdmin() ? match.localTeamId : managedTeamId;
-        const lineup = lineupTeamId
-          ? this.lineupsStore.lineupForMatch(match.id, lineupTeamId)
-          : undefined;
-        const pairCount = lineup ? this.lineupsStore.pairsForLineup(lineup.id).length : 0;
-
-        return toBackofficeMatchCardViewModel(match, localTeam, awayTeam, lineup, pairCount);
-      })
-      .filter((card): card is BackofficeMatchCardViewModel => card !== null);
-  });
-
-  protected readonly isAdmin = computed(() => this.sessionStore.currentRole() === 'ADMIN');
-
-  protected readonly presidentTeam = computed<BackofficeTeam | null>(() => {
-    const teamId = this.sessionStore.currentPresidentTeamId();
-    return this.teamsStore.teams().find((t) => t.id === teamId) ?? null;
-  });
-
-  // Planner computed
-  protected readonly plannerMatch = computed(
-    () => this.lineupsStore.matches().find((m) => m.id === this.selectedMatchId()) ?? null,
-  );
-  protected readonly plannerLineup = computed(() => {
-    const matchId = this.selectedMatchId();
-    const teamId = this.plannerTeamId();
-
-    if (!matchId || !teamId) {
-      return null;
-    }
-
-    return this.lineupsStore.lineupForMatch(matchId, teamId) ?? null;
-  });
-
-  protected readonly plannerPlayers = computed(() => {
-    const teamId = this.plannerTeamId();
-    if (!teamId) return [];
-    return this.playersStore.players().filter((p) => p.teamId === teamId);
-  });
-
-  protected readonly availableCount = computed(
-    () => Object.values(this.availability()).filter((s) => s === 'available').length,
-  );
-
-  protected readonly assignedIds = computed(() => {
-    const ids = new Set<string>();
-    this.plannerPairs().forEach((pair) => {
-      if (pair.player1Id) ids.add(pair.player1Id);
-      if (pair.player2Id) ids.add(pair.player2Id);
-    });
-    return ids;
-  });
-
-  protected readonly assignedCount = computed(() => this.assignedIds().size);
-  protected readonly pairsCount = computed(() => 3);
-  protected readonly requiredPlayers = computed(() => this.pairsCount() * 2);
-  protected readonly isPlannerComplete = computed(() =>
-    this.plannerPairs().every((pair) => !!pair.player1Id && !!pair.player2Id),
-  );
-  protected readonly isPlannerSubmitted = computed(
-    () => this.plannerLineup()?.status === 'submited',
-  );
-
-  protected readonly availablePlayers = computed(() => {
-    const assigned = this.assignedIds();
-    return this.plannerPlayers().filter(
-      (p) => this.availability()[p.id] === 'available' && !assigned.has(p.id),
-    );
-  });
-
-  protected readonly filteredAvailablePlayers = computed(() => {
-    const term = this.playerSearch().toLowerCase();
-    if (!term) return this.availablePlayers();
-    return this.availablePlayers().filter((p) =>
-      `${p.firstName} ${p.lastName}`.toLowerCase().includes(term),
-    );
-  });
-
-  protected readonly plannerMatchTitle = computed(() => {
-    const match = this.plannerMatch();
-    if (!match) return 'Partido';
-    const teams = this.teamsStore.teams();
-    const local = teams.find((t) => t.id === match.localTeamId)?.name ?? 'Local';
-    const away = teams.find((t) => t.id === match.awayTeamId)?.name ?? 'Visitante';
-    const date =
-      match.scheduledAt instanceof Date
-        ? match.scheduledAt.toLocaleDateString('es-ES', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-          })
-        : String(match.scheduledAt);
-    return `${local} vs ${away} · ${date}`;
-  });
-
   ngOnInit(): void {
-    const matchdaysLoad = this.matchdaysStore.load();
-    const teamsLoad = this.teamsStore.load();
-    const playersLoad = this.playersStore.load();
-
-    if (this.sessionStore.currentRole() === 'ADMIN') {
-      void matchdaysLoad.then(() => this.loadForCurrentMatchday());
-    } else {
-      void Promise.all([teamsLoad, playersLoad]).then(() => this.loadForPresidentTeam());
+    if (this.isAdmin()) {
+      this.isRedirecting.set(true);
+      void this.router.navigate(['/backoffice/jornadas']);
+      return;
     }
+
+    void Promise.all([
+      this.matchdaysStore.load(),
+      this.teamsStore.load(),
+      this.playersStore.load(),
+    ]).then(() => this.loadDefaultMatchday());
   }
 
-  protected onMatchdayChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const id = select.value;
-    this.selectedMatchdayId.set(id || null);
-    if (id) {
-      void this.lineupsStore.loadForMatchday(id);
+  protected onMatchChange(event: Event): void {
+    const element = event.target;
+
+    if (!(element instanceof HTMLSelectElement)) {
+      return;
     }
+
+    this.selectedMatchId.set(element.value || null);
+  }
+
+  protected openPlanner(): void {
+    this.plannerMatchId.set(this.selectedMatchId());
+  }
+
+  protected closePlanner(): void {
+    this.plannerMatchId.set(null);
   }
 
   protected reloadData(): void {
     if (this.isAdmin()) {
-      const selectedMatchdayId = this.selectedMatchdayId();
-      void Promise.all([
-        this.matchdaysStore.load(true),
-        this.teamsStore.load(true),
-        this.playersStore.load(true),
-      ]).then(() => {
-        const matchdayId = selectedMatchdayId ?? this.selectedMatchdayId();
-        if (matchdayId) {
-          void this.lineupsStore.loadForMatchday(matchdayId, true);
-        } else {
-          this.loadForCurrentMatchday();
-        }
-      });
       return;
     }
 
-    void Promise.all([this.teamsStore.load(true), this.playersStore.load(true)]).then(() => {
-      const team = this.presidentTeam();
-      if (team) {
-        void this.lineupsStore.loadForTeam(team.id, true);
-      }
-    });
+    void Promise.all([
+      this.matchdaysStore.load(true),
+      this.teamsStore.load(true),
+      this.playersStore.load(true),
+    ]).then(() => this.loadDefaultMatchday(true));
   }
 
-  protected openPlanner(matchId: string, teamId: string): void {
-    this.selectedMatchId.set(matchId);
-    this.plannerTeamId.set(teamId);
-    this.selectedPlayerId.set(null);
-    this.playerSearch.set('');
+  protected async submitLineup(
+    draftPairs: readonly BackofficeLineupDraftPairInput[],
+  ): Promise<void> {
+    const match = this.plannerMatch();
+    const teamId = this.sessionStore.currentPresidentTeamId();
 
-    const existingLineup = this.lineupsStore.lineupForMatch(matchId, teamId);
-    const existingPairs = existingLineup ? this.lineupsStore.pairsForLineup(existingLineup.id) : [];
-
-    const initAvail: Record<string, 'available'> = {};
-    this.playersStore
-      .players()
-      .filter((p) => p.teamId === teamId)
-      .forEach((p) => {
-        initAvail[p.id] = 'available';
-      });
-    this.availability.set(initAvail);
-
-    if (existingPairs.length > 0) {
-      const pairs: PlannerPair[] = existingPairs.slice(0, 3).map((pair, index) => ({
-        id: `pair-${index + 1}`,
-        player1Id: pair.player1Id,
-        player2Id: pair.player2Id,
-      }));
-
-      while (pairs.length < 3) {
-        pairs.push({ id: `pair-${pairs.length + 1}`, player1Id: null, player2Id: null });
-      }
-
-      this.plannerPairs.set(pairs);
-      this.plannerStep.set(2);
-      return;
-    }
-
-    this.plannerStep.set(1);
-    this.plannerPairs.set([
-      { id: 'pair-1', player1Id: null, player2Id: null },
-      { id: 'pair-2', player1Id: null, player2Id: null },
-      { id: 'pair-3', player1Id: null, player2Id: null },
-    ]);
-  }
-
-  protected closePlanner(): void {
-    this.selectedMatchId.set(null);
-  }
-
-  protected availabilityFor(playerId: string): 'available' | 'unavailable' {
-    return this.availability()[playerId] ?? 'available';
-  }
-
-  protected setAvailability(playerId: string, state: 'available' | 'unavailable'): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    this.availability.update((a) => ({ ...a, [playerId]: state }));
-    if (state === 'unavailable' && this.selectedPlayerId() === playerId) {
-      this.selectedPlayerId.set(null);
-    }
-  }
-
-  protected goToStep(step: 1 | 2): void {
-    this.plannerStep.set(step);
-  }
-
-  protected selectPlayerMobile(playerId: string): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    this.selectedPlayerId.update((current) => (current === playerId ? null : playerId));
-  }
-
-  protected assignSelectedToSlot(pairIndex: number, slot: 'player1' | 'player2'): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    const playerId = this.selectedPlayerId();
-    if (!playerId) return;
-    this.assignPlayerToSlot(playerId, pairIndex, slot);
-    this.selectedPlayerId.set(null);
-  }
-
-  protected onDragStart(event: DragEvent, playerId: string): void {
-    event.dataTransfer?.setData('text/plain', `player:${playerId}`);
-  }
-
-  protected onDrop(event: DragEvent, pairIndex: number, slot: 'player1' | 'player2'): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    event.preventDefault();
-    const data = event.dataTransfer?.getData('text/plain') ?? '';
-    if (!data.startsWith('player:')) return;
-    const playerId = data.slice('player:'.length);
-    this.assignPlayerToSlot(playerId, pairIndex, slot);
-    this.dragOverSlot.set(null);
-  }
-
-  protected clearSlot(pairIndex: number, slot: 'player1' | 'player2'): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    this.plannerPairs.update((pairs) =>
-      pairs.map((p, i) => (i === pairIndex ? { ...p, [`${slot}Id`]: null } : p)),
-    );
-  }
-
-  protected clearPair(pairIndex: number): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    this.plannerPairs.update((pairs) =>
-      pairs.map((p, i) => (i === pairIndex ? { ...p, player1Id: null, player2Id: null } : p)),
-    );
-  }
-
-  protected swapPair(pairIndex: number): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    this.plannerPairs.update((pairs) =>
-      pairs.map((p, i) =>
-        i === pairIndex ? { ...p, player1Id: p.player2Id, player2Id: p.player1Id } : p,
-      ),
-    );
-  }
-
-  protected autoAssign(): void {
-    if (this.isPlannerSubmitted()) {
-      return;
-    }
-
-    const available = this.availablePlayers();
-    if (!available.length) return;
-    let avIdx = 0;
-    this.plannerPairs.update((pairs) =>
-      pairs.map((pair) => {
-        let { player1Id, player2Id } = pair;
-        if (!player1Id && avIdx < available.length) {
-          player1Id = available[avIdx++]!.id;
-        }
-        if (!player2Id && avIdx < available.length) {
-          player2Id = available[avIdx++]!.id;
-        }
-        return { ...pair, player1Id, player2Id };
-      }),
-    );
-  }
-
-  protected playerById(playerId: string | null): BackofficePlayer | null {
-    if (!playerId) return null;
-    return this.playersStore.players().find((p) => p.id === playerId) ?? null;
-  }
-
-  protected playerAvatarPath(player: BackofficePlayer): string | null {
-    return resolvePlayerAvatarPath(player.profileImage);
-  }
-
-  protected positionLabel(pos: BackofficePlayer['preferredPosition']): string {
-    switch (pos) {
-      case 'left':
-        return 'Revés';
-      case 'right':
-        return 'Drive';
-      case 'both':
-        return 'Ambas';
-    }
-  }
-
-  protected async submitLineup(): Promise<void> {
-    const matchId = this.selectedMatchId();
-    const teamId = this.plannerTeamId();
-
-    if (!matchId || !teamId || !this.isPlannerComplete() || this.isPlannerSubmitted()) {
+    if (!match || !teamId) {
       return;
     }
 
     try {
-      await this.lineupsStore.submitDraft(matchId, teamId, this.plannerPairs());
+      await this.lineupsStore.submitDraft(match.id, teamId, draftPairs);
       this.closePlanner();
-      this.toastStore.success('La alineación se ha enviado correctamente.', 'Alineación enviada');
+      this.toastStore.success('La alineacion se ha enviado correctamente.', 'Alineacion enviada');
     } catch (error) {
       if (error instanceof Error && error.message === 'lineup_not_initialized') {
         this.toastStore.error(
-          'La alineación aún no ha sido preparada por administración.',
-          'Alineación no disponible',
+          'La alineacion aun no ha sido preparada por administracion.',
+          'Alineacion no disponible',
         );
         return;
       }
 
-      this.toastStore.error('No hemos podido enviar la alineación.', 'No se ha podido enviar');
+      if (error instanceof Error && error.message === 'lineup_locked') {
+        this.toastStore.error(
+          'La alineacion ya fue enviada y no se puede modificar desde el front.',
+          'Alineacion bloqueada',
+        );
+        return;
+      }
+
+      if (error instanceof Error && error.message === 'invalid_lineup_draft') {
+        this.toastStore.error(
+          'Debes completar exactamente 2 parejas validas antes de enviar la alineacion.',
+          'Alineacion invalida',
+        );
+        return;
+      }
+
+      this.toastStore.error('No hemos podido enviar la alineacion.', 'No se ha podido enviar');
     }
   }
 
-  private assignPlayerToSlot(
-    playerId: string,
-    pairIndex: number,
-    slot: 'player1' | 'player2',
-  ): void {
-    if (this.isPlannerSubmitted()) {
+  private async loadDefaultMatchday(forceRefresh = false): Promise<void> {
+    const teamId = this.sessionStore.currentPresidentTeamId();
+
+    if (!teamId) {
       return;
     }
 
-    // Remove the player from any existing slot first
-    this.plannerPairs.update((pairs) =>
-      pairs.map((p) => ({
-        ...p,
-        player1Id: p.player1Id === playerId ? null : p.player1Id,
-        player2Id: p.player2Id === playerId ? null : p.player2Id,
-      })),
-    );
-    this.plannerPairs.update((pairs) =>
-      pairs.map((p, i) => (i === pairIndex ? { ...p, [`${slot}Id`]: playerId } : p)),
-    );
-  }
+    const matchday = this.matchdaysStore.currentMatchday() ?? this.matchdaysStore.nextMatchday();
+    this.activeMatchdayId.set(matchday?.id ?? null);
 
-  private loadForCurrentMatchday(): void {
-    const currentMatchday = this.matchdaysStore.currentMatchday();
-    const firstMatchday = this.matchdaysStore.matchdays()[0];
-    const matchday = currentMatchday ?? firstMatchday;
-    if (matchday) {
-      this.selectedMatchdayId.set(matchday.id);
-      void this.lineupsStore.loadForMatchday(matchday.id);
+    if (!matchday) {
+      this.selectedMatchId.set(null);
+      this.plannerMatchId.set(null);
+      return;
     }
+
+    await this.lineupsStore.loadForMatchdayAndTeam(matchday.id, teamId, forceRefresh);
+    this.syncSelectedMatch();
   }
 
-  private loadForPresidentTeam(): void {
-    const team = this.presidentTeam();
-    if (team) {
-      void this.lineupsStore.loadForTeam(team.id);
+  private syncSelectedMatch(): void {
+    const matches = this.lineupsStore.matches();
+
+    if (matches.length === 0) {
+      this.selectedMatchId.set(null);
+      this.plannerMatchId.set(null);
+      return;
+    }
+
+    if (!matches.some((match) => match.id === this.selectedMatchId())) {
+      this.selectedMatchId.set(matches[0]!.id);
+    }
+
+    if (this.plannerMatchId() && !matches.some((match) => match.id === this.plannerMatchId())) {
+      this.plannerMatchId.set(null);
     }
   }
 }

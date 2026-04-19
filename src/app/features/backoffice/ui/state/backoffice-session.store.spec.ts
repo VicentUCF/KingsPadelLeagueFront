@@ -4,8 +4,6 @@ import { Router } from '@angular/router';
 
 import type { AuthUser } from '@features/auth/domain/entities/auth-user';
 import { AuthStore } from '@features/auth/ui/state/auth.store';
-import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
-import { BackofficePlayersStore } from './backoffice-players.store';
 import { BackofficeSessionStore } from './backoffice-session.store';
 
 function createAuthStoreMock(user: AuthUser | null) {
@@ -14,30 +12,6 @@ function createAuthStoreMock(user: AuthUser | null) {
     logout: jest.fn().mockResolvedValue(undefined),
     user: signal(user),
   } satisfies Pick<AuthStore, 'currentRole' | 'logout' | 'user'>;
-}
-
-function createPlayersStoreMock(players: readonly BackofficePlayer[]) {
-  return {
-    players: signal(players),
-  } satisfies Pick<BackofficePlayersStore, 'players'>;
-}
-
-function createPlayer(overrides: Partial<BackofficePlayer> = {}): BackofficePlayer {
-  return {
-    id: 'player-1',
-    firstName: 'Adri',
-    lastName: 'Alvarez',
-    email: 'adri@example.com',
-    profileImage: null,
-    isPresident: true,
-    teamId: 'team-1',
-    value: 0,
-    wonGames: 0,
-    lostGames: 0,
-    preferredPosition: 'both',
-    description: 'Description',
-    ...overrides,
-  };
 }
 
 describe('BackofficeSessionStore', () => {
@@ -59,10 +33,6 @@ describe('BackofficeSessionStore', () => {
             teamId: 'team-from-auth',
           }),
         },
-        {
-          provide: BackofficePlayersStore,
-          useValue: createPlayersStoreMock([createPlayer({ teamId: 'team-from-player' })]),
-        },
         { provide: Router, useValue: { navigate: jest.fn() } },
       ],
     });
@@ -72,7 +42,7 @@ describe('BackofficeSessionStore', () => {
     expect(store.currentPresidentTeamId()).toBe('team-from-auth');
   });
 
-  it('falls back to the linked player team when auth metadata has no teamId', () => {
+  it('returns null when auth metadata does not include a teamId', () => {
     TestBed.configureTestingModule({
       providers: [
         BackofficeSessionStore,
@@ -80,18 +50,11 @@ describe('BackofficeSessionStore', () => {
           provide: AuthStore,
           useValue: createAuthStoreMock({
             id: 'user-1',
-            email: 'adri@example.com',
-            displayName: 'Adri',
-            role: 'PLAYER',
+            email: 'president@example.com',
+            displayName: 'President',
+            role: 'PRESIDENT',
             teamId: null,
           }),
-        },
-        {
-          provide: BackofficePlayersStore,
-          useValue: createPlayersStoreMock([
-            createPlayer({ email: 'other@example.com', teamId: 'team-other' }),
-            createPlayer({ email: 'Adri@Example.com', teamId: 'team-1' }),
-          ]),
         },
         { provide: Router, useValue: { navigate: jest.fn() } },
       ],
@@ -99,7 +62,7 @@ describe('BackofficeSessionStore', () => {
 
     const store = TestBed.inject(BackofficeSessionStore);
 
-    expect(store.currentPresidentTeamId()).toBe('team-1');
+    expect(store.currentPresidentTeamId()).toBeNull();
   });
 
   it('keeps PRESIDENT accounts in the president backoffice role', () => {
@@ -115,10 +78,6 @@ describe('BackofficeSessionStore', () => {
             role: 'PRESIDENT',
             teamId: 'team-1',
           }),
-        },
-        {
-          provide: BackofficePlayersStore,
-          useValue: createPlayersStoreMock([createPlayer()]),
         },
         { provide: Router, useValue: { navigate: jest.fn() } },
       ],

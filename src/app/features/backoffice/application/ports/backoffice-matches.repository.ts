@@ -20,6 +20,7 @@ export interface CreateBackofficeMatchInput {
 export interface BackofficeMatchesRepository {
   loadByMatchday(matchdayId: string): Promise<readonly BackofficeMatch[]>;
   loadByTeam(teamId: string): Promise<readonly BackofficeMatch[]>;
+  loadByMatchdayAndTeam(matchdayId: string, teamId: string): Promise<readonly BackofficeMatch[]>;
   create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch>;
   start(matchId: string): Promise<void>;
   finish(matchId: string): Promise<void>;

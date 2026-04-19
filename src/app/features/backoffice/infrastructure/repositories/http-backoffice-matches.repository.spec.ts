@@ -57,6 +57,22 @@ describe('HttpBackofficeMatchesRepository', () => {
     ]);
   });
 
+  it('loads president matches by matchday and team through teamIds', async () => {
+    currentRole.set('PRESIDENT');
+
+    const promise = repository.loadByMatchdayAndTeam('jornada-1', 'team-1');
+
+    httpTestingController
+      .expectOne(
+        (req) =>
+          req.urlWithParams ===
+          'http://api.test/v1/matches?limit=100&matchdayIds=%5B%22jornada-1%22%5D&teamIds=%5B%22team-1%22%5D',
+      )
+      .flush({ items: [createMatchHttp()], meta: createMeta(1) });
+
+    await expect(promise).resolves.toHaveLength(1);
+  });
+
   it('uses /admin/v1 for admin reads', async () => {
     currentRole.set('ADMIN');
 

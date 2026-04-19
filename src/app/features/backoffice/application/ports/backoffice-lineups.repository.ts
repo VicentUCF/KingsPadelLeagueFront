@@ -7,6 +7,10 @@ import type {
 
 export interface BackofficeLineupsRepository {
   loadByMatchIds(matchIds: string[]): Promise<readonly BackofficeLineup[]>;
+  loadByMatchIdsAndTeamIds(
+    matchIds: string[],
+    teamIds: string[],
+  ): Promise<readonly BackofficeLineup[]>;
   findByMatchAndTeam(matchId: string, teamId: string): Promise<BackofficeLineup | null>;
   loadPairsByLineupIds(lineupIds: string[]): Promise<readonly BackofficeLineupPair[]>;
   create(matchId: string, teamId: string): Promise<BackofficeLineup>;

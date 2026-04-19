@@ -247,6 +247,17 @@ export class InMemoryBackofficeLineupsRepository implements BackofficeLineupsRep
     return Promise.resolve(MOCK_LINEUPS.filter((l) => matchIds.includes(l.matchId)));
   }
 
+  loadByMatchIdsAndTeamIds(
+    matchIds: string[],
+    teamIds: string[],
+  ): Promise<readonly BackofficeLineup[]> {
+    return Promise.resolve(
+      MOCK_LINEUPS.filter(
+        (lineup) => matchIds.includes(lineup.matchId) && teamIds.includes(lineup.teamId),
+      ),
+    );
+  }
+
   findByMatchAndTeam(matchId: string, teamId: string): Promise<BackofficeLineup | null> {
     return Promise.resolve(
       MOCK_LINEUPS.find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId) ?? null,

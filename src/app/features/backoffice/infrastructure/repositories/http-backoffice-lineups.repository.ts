@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { computed, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { withJsonArrayParam } from '@core/api/http-query-params';
@@ -10,7 +10,6 @@ import type {
   PaginatedResponse,
 } from '@core/api/kings-padel-api.types';
 import { withHttpErrorToast } from '@core/interceptors/http-error-toast.interceptor';
-import { AuthStore } from '@features/auth/ui/state/auth.store';
 import type { BackofficeLineupsRepository } from '@features/backoffice/application/ports/backoffice-lineups.repository';
 import type {
   BackofficeLineup,
@@ -21,23 +20,31 @@ import type {
 export class HttpBackofficeLineupsRepository implements BackofficeLineupsRepository {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
-  private readonly authStore = inject(AuthStore);
-  private readonly lineupsBasePath = computed(() =>
-    this.authStore.currentRole() === 'ADMIN'
-      ? '/admin/v1/match-team-line-ups'
-      : '/v1/match-team-line-ups',
-  );
-  private readonly lineupPairsBasePath = computed(() =>
-    this.authStore.currentRole() === 'ADMIN'
-      ? '/admin/v1/match-team-line-up-pairs'
-      : '/v1/match-team-line-up-pairs',
-  );
 
   loadByMatchIds(matchIds: string[]): Promise<readonly BackofficeLineup[]> {
     const params = withJsonArrayParam(new HttpParams().set('limit', '200'), 'matchIds', matchIds);
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpHttpV1>>(
-        `${this.baseUrl}${this.lineupsBasePath()}`,
+        `${this.baseUrl}/v1/match-team-line-ups`,
+        {
+          params,
+          context: withHttpErrorToast({ key: 'load-lineups' }),
+        },
+      ),
+    ).then((res) => res.items.map(mapLineup));
+  }
+
+  loadByMatchIdsAndTeamIds(
+    matchIds: string[],
+    teamIds: string[],
+  ): Promise<readonly BackofficeLineup[]> {
+    let params = new HttpParams().set('limit', '200');
+    params = withJsonArrayParam(params, 'matchIds', matchIds);
+    params = withJsonArrayParam(params, 'teamIds', teamIds);
+
+    return firstValueFrom(
+      this.http.get<PaginatedResponse<MatchTeamLineUpHttpV1>>(
+        `${this.baseUrl}/v1/match-team-line-ups`,
         {
           params,
           context: withHttpErrorToast({ key: 'load-lineups' }),
@@ -47,11 +54,13 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
   }
 
   findByMatchAndTeam(matchId: string, teamId: string): Promise<BackofficeLineup | null> {
-    const params = withJsonArrayParam(new HttpParams().set('limit', '200'), 'matchIds', [matchId]);
+    let params = new HttpParams().set('limit', '200');
+    params = withJsonArrayParam(params, 'matchIds', [matchId]);
+    params = withJsonArrayParam(params, 'teamIds', [teamId]);
 
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpHttpV1>>(
-        `${this.baseUrl}${this.lineupsBasePath()}`,
+        `${this.baseUrl}/v1/match-team-line-ups`,
         {
           params,
           context: withHttpErrorToast({ key: 'load-lineup' }),
@@ -71,7 +80,7 @@ export class HttpBackofficeLineupsRepository implements BackofficeLineupsReposit
     );
     return firstValueFrom(
       this.http.get<PaginatedResponse<MatchTeamLineUpPairHttpV1>>(
-        `${this.baseUrl}${this.lineupPairsBasePath()}`,
+        `${this.baseUrl}/v1/match-team-line-up-pairs`,
         {
           params,
           context: withHttpErrorToast({ key: 'load-lineup-pairs' }),

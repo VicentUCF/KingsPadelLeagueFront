@@ -7,6 +7,7 @@ import type {
   BackofficeLineupPair,
 } from '@features/backoffice/domain/entities/backoffice-lineup';
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
+import { BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT } from '../models/backoffice-lineup-operation.viewmodel';
 
 export interface BackofficeLineupDraftPairInput {
   readonly player1Id: string | null;
@@ -14,6 +15,8 @@ export interface BackofficeLineupDraftPairInput {
 }
 
 const LINEUP_NOT_INITIALIZED_ERROR = 'lineup_not_initialized';
+const LINEUP_LOCKED_ERROR = 'lineup_locked';
+const INVALID_LINEUP_DRAFT_ERROR = 'invalid_lineup_draft';
 
 @Injectable()
 export class BackofficeLineupsStore {
@@ -31,6 +34,8 @@ export class BackofficeLineupsStore {
 
   private _loadedMatchdayId: string | null = null;
   private _loadedTeamId: string | null = null;
+  private _loadedTeamMatchdayId: string | null = null;
+  private _loadedPresidentTeamId: string | null = null;
 
   readonly hasContent = computed(
     () =>
@@ -119,6 +124,72 @@ export class BackofficeLineupsStore {
       }
       this._loadedTeamId = teamId;
       this._loadedMatchdayId = null;
+      this._loadedTeamMatchdayId = null;
+      this._loadedPresidentTeamId = null;
+      this.resolvedContextKey.set(contextKey);
+    } catch {
+      this.errorMessage.set('No se pudieron cargar las alineaciones.');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async loadForMatchdayAndTeam(
+    matchdayId: string,
+    teamId: string,
+    forceRefresh = false,
+  ): Promise<void> {
+    if (
+      !forceRefresh &&
+      this._loadedTeamMatchdayId === matchdayId &&
+      this._loadedPresidentTeamId === teamId
+    ) {
+      return;
+    }
+
+    const contextKey = `matchday-team:${matchdayId}:${teamId}`;
+    const isContextChange = this.currentContextKey() !== contextKey;
+
+    this.currentContextKey.set(contextKey);
+    if (isContextChange) {
+      this.matches.set([]);
+      this.lineups.set([]);
+      this.pairs.set([]);
+      this.resolvedContextKey.set(null);
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    try {
+      const matches = (await this.loadMatchesUseCase.byMatchdayAndTeam(matchdayId, teamId)).filter(
+        (match) =>
+          match.matchdayId === matchdayId &&
+          (match.localTeamId === teamId || match.awayTeamId === teamId),
+      );
+      this.matches.set(matches);
+
+      if (matches.length > 0) {
+        const matchIds = matches.map((match) => match.id);
+        const lineups = await this.loadLineupsUseCase.byMatchIdsAndTeamIds(matchIds, [teamId]);
+        this.lineups.set(lineups);
+
+        if (lineups.length > 0) {
+          const lineupIds = lineups.map((lineup) => lineup.id);
+          const pairs = await this.loadLineupsUseCase.pairsByLineupIds(lineupIds);
+          this.pairs.set(pairs);
+        } else {
+          this.pairs.set([]);
+        }
+      } else {
+        this.lineups.set([]);
+        this.pairs.set([]);
+      }
+
+      this._loadedTeamMatchdayId = matchdayId;
+      this._loadedPresidentTeamId = teamId;
+      this._loadedMatchdayId = null;
+      this._loadedTeamId = null;
       this.resolvedContextKey.set(contextKey);
     } catch {
       this.errorMessage.set('No se pudieron cargar las alineaciones.');
@@ -156,10 +227,21 @@ export class BackofficeLineupsStore {
     teamId: string,
     draftPairs: readonly BackofficeLineupDraftPairInput[],
   ): Promise<BackofficeLineup> {
+    if (
+      draftPairs.length !== BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT ||
+      draftPairs.some((pair) => !pair.player1Id || !pair.player2Id)
+    ) {
+      throw new Error(INVALID_LINEUP_DRAFT_ERROR);
+    }
+
     const lineup = await this.loadLineupsUseCase.findByMatchAndTeam(matchId, teamId);
 
     if (!lineup) {
       throw new Error(LINEUP_NOT_INITIALIZED_ERROR);
+    }
+
+    if (lineup.status !== 'pending') {
+      throw new Error(LINEUP_LOCKED_ERROR);
     }
 
     const existingPairs = await this.loadLineupsUseCase.pairsByLineupIds([lineup.id]);
@@ -191,6 +273,15 @@ export class BackofficeLineupsStore {
   private async refreshCurrentContext(): Promise<void> {
     if (this._loadedMatchdayId) {
       await this.loadForMatchday(this._loadedMatchdayId, true);
+      return;
+    }
+
+    if (this._loadedTeamMatchdayId && this._loadedPresidentTeamId) {
+      await this.loadForMatchdayAndTeam(
+        this._loadedTeamMatchdayId,
+        this._loadedPresidentTeamId,
+        true,
+      );
       return;
     }
 

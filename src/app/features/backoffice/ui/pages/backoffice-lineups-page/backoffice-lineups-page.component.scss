@@ -3,77 +3,93 @@
   gap: var(--space-4);
 }
 
-.availability-row__avatar,
-.available-card__avatar,
-.pair-slot__avatar {
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: inherit;
-  }
-}
-
 .backoffice-lineups-page {
+  &__header,
+  &__selector,
+  &__empty {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  &__header {
+    align-items: start;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+  }
+
+  &__header-main {
+    display: grid;
+    gap: 0.25rem;
+
+    h1 {
+      margin: 0;
+      color: var(--color-text-strong);
+      font-family: var(--font-family-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 0.86rem;
+    }
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
   &__selector-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+    display: grid;
+    gap: 0.5rem;
   }
 
   &__selector-label {
     color: var(--color-text-muted);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
 
-  &__selector {
-    @media (min-width: 640px) {
-      max-width: 320px;
-    }
-  }
-
-  &__team-label {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: 0.95rem;
-  }
-
-  &__list {
-    display: grid;
-    gap: var(--space-3);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+  &__selector-input {
+    max-width: 30rem;
   }
 
   &__card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-5) var(--space-6);
+    display: grid;
+    gap: 1rem;
+    padding-top: 0.5rem;
   }
 
-  &__card-header {
+  &__card-header,
+  &__card-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-2);
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
-  &__scheduled {
+  &__scheduled,
+  &__pairs {
     margin: 0;
     color: var(--color-text-muted);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
   }
 
   &__match {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: 0.75rem;
   }
 
   &__team {
@@ -85,547 +101,56 @@
     letter-spacing: -0.02em;
 
     &--local {
-      text-align: left;
-    }
-    &--away {
       text-align: right;
+    }
+
+    &--away {
+      text-align: left;
     }
   }
 
   &__vs {
     color: var(--color-text-muted);
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-weight: 600;
     text-transform: uppercase;
-    white-space: nowrap;
   }
 
-  &__card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
-  }
-
-  &__pairs {
-    color: var(--color-text-muted);
-    font-size: 0.85rem;
-  }
-
-  &__loading,
-  &__error,
   &__empty {
-    color: var(--color-text-muted);
+    p {
+      margin: 0;
+      color: var(--color-text-muted);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--color-text-strong);
+      font-family: var(--font-family-heading);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
   }
 }
 
-// ── Lineup Planner ──────────────────────────────────────────────────────────
-
-.lineup-planner {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  &__header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  &__heading {
-    h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--color-text-strong);
-      margin: 0.35rem 0 0.2rem;
-    }
-    p {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-  }
-
-  &__hero {
-    margin-top: 0.25rem;
-  }
-
-  &__hero-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
-    max-width: 30rem;
-  }
-
-  &__hero-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.85rem 1rem;
-    border-radius: 0.85rem;
-    background: rgb(255 255 255 / 0.03);
-    border: 1px solid rgb(245 245 245 / 7%);
-
-    span {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--color-text-strong);
-      line-height: 1;
+@media (max-width: 768px) {
+  .backoffice-lineups-page {
+    &__header {
+      grid-template-columns: 1fr;
     }
 
-    small {
-      font-size: 0.72rem;
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-  }
-
-  &__steps {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  &__step {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.85rem;
-    border: 1px solid rgb(245 245 245 / 8%);
-    background: rgb(255 255 255 / 0.02);
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition:
-      border-color 0.2s,
-      background 0.2s,
-      color 0.2s;
-    text-align: left;
-
-    p {
-      margin: 0;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    small {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
+    &__match {
+      flex-direction: column;
     }
 
-    &--active {
-      border-color: rgb(201 162 39 / 35%);
-      background: rgb(201 162 39 / 8%);
-      color: var(--color-brand-strong);
+    &__team {
+      text-align: center;
+    }
 
-      small {
-        color: var(--color-brand-strong);
-        opacity: 0.7;
+    &__card-footer {
+      > * {
+        width: 100%;
       }
-    }
-  }
-
-  &__step-num {
-    flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.06);
-    border: 1px solid rgb(245 245 245 / 10%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 700;
-
-    .lineup-planner__step--active & {
-      background: rgb(201 162 39 / 20%);
-      border-color: rgb(201 162 39 / 40%);
-      color: var(--color-brand-strong);
-    }
-  }
-
-  &__panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  &__grid {
-    display: grid;
-    gap: 1rem;
-
-    @media (min-width: 900px) {
-      grid-template-columns: 1fr 1.6fr;
-    }
-  }
-
-  &__footer-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-}
-
-// ── Planner Card ─────────────────────────────────────────────────────────────
-
-.planner-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.25rem;
-  border-radius: 1rem;
-  background: var(--color-surface-raised, #161616);
-  border: 1px solid rgb(245 245 245 / 7%);
-
-  &--wide {
-    /* inherits layout */
-  }
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    flex-wrap: wrap;
-
-    h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--color-text-strong);
-      margin: 0.2rem 0 0.2rem;
-    }
-    p {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-  }
-
-  &__eyebrow {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-text-muted);
-    margin: 0;
-  }
-
-  &__subtitle {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin: 0;
-  }
-
-  &__chips {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  &__toolbar {
-    /* search input row */
-  }
-
-  &__empty {
-    color: var(--color-text-muted);
-    font-size: 0.85rem;
-    padding: 0.5rem 0;
-    p {
-      margin: 0;
-    }
-  }
-}
-
-// ── Availability List ─────────────────────────────────────────────────────────
-
-.availability-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.availability-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgb(245 245 245 / 6%);
-  background: rgb(255 255 255 / 0.02);
-  flex-wrap: wrap;
-  transition:
-    border-color 0.2s,
-    background 0.2s;
-
-  &--active {
-    border-color: rgb(16 185 129 / 20%);
-    background: rgb(16 185 129 / 4%);
-  }
-
-  &--inactive {
-    border-color: rgb(239 68 68 / 15%);
-    background: rgb(239 68 68 / 3%);
-    opacity: 0.7;
-  }
-
-  &__info {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-
-    h4 {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--color-text-strong);
-      margin: 0;
-    }
-    p {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-  }
-
-  &__avatar {
-    flex-shrink: 0;
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 50%;
-    background: rgb(201 162 39 / 12%);
-    border: 1px solid rgb(201 162 39 / 20%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--color-brand-strong);
-  }
-
-  &__actions {
-    display: flex;
-    gap: 0.4rem;
-  }
-}
-
-// ── Available Cards ───────────────────────────────────────────────────────────
-
-.available-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-height: 22rem;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-}
-
-.available-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.6rem 0.85rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgb(245 245 245 / 7%);
-  background: rgb(255 255 255 / 0.02);
-  cursor: grab;
-  transition:
-    border-color 0.2s,
-    background 0.2s;
-
-  &:hover {
-    border-color: rgb(201 162 39 / 25%);
-    background: rgb(201 162 39 / 4%);
-  }
-
-  &--selected {
-    border-color: rgb(201 162 39 / 40%);
-    background: rgb(201 162 39 / 8%);
-  }
-
-  &__info {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-
-    h4 {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--color-text-strong);
-      margin: 0;
-    }
-    p {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-  }
-
-  &__avatar {
-    flex-shrink: 0;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: rgb(201 162 39 / 12%);
-    border: 1px solid rgb(201 162 39 / 20%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: var(--color-brand-strong);
-  }
-}
-
-// ── Pair Grid ─────────────────────────────────────────────────────────────────
-
-.pair-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.pair-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.85rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgb(245 245 245 / 7%);
-  background: rgb(255 255 255 / 0.02);
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-
-  &__label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-text-muted);
-  }
-
-  &__actions {
-    display: flex;
-    gap: 0.3rem;
-  }
-
-  &__slots {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  &__divider {
-    color: var(--color-text-muted);
-    font-size: 1.2rem;
-    text-align: center;
-  }
-}
-
-.pair-slot {
-  min-height: 3.5rem;
-  border-radius: 0.7rem;
-  border: 1px dashed rgb(245 245 245 / 12%);
-  background: rgb(255 255 255 / 0.02);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-  transition:
-    border-color 0.2s,
-    background 0.2s;
-
-  &:hover {
-    border-color: rgb(201 162 39 / 30%);
-    background: rgb(201 162 39 / 4%);
-  }
-
-  &--filled {
-    border-style: solid;
-    border-color: rgb(201 162 39 / 20%);
-    background: rgb(201 162 39 / 5%);
-  }
-
-  &--drop-target {
-    border-color: var(--color-brand);
-    background: rgb(201 162 39 / 10%);
-  }
-
-  &__empty {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    margin: 0;
-    text-align: center;
-  }
-
-  &__player {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    min-width: 0;
-  }
-
-  &__avatar {
-    flex-shrink: 0;
-    width: 1.8rem;
-    height: 1.8rem;
-    border-radius: 50%;
-    background: rgb(201 162 39 / 15%);
-    border: 1px solid rgb(201 162 39 / 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--color-brand-strong);
-  }
-
-  &__name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--color-text-strong);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__pos {
-    font-size: 0.7rem;
-    color: var(--color-text-muted);
-    margin: 0;
-  }
-
-  &__remove {
-    margin-left: auto;
-    flex-shrink: 0;
-    width: 1.4rem;
-    height: 1.4rem;
-    border-radius: 50%;
-    border: 1px solid rgb(245 245 245 / 10%);
-    background: rgb(255 255 255 / 0.04);
-    color: var(--color-text-muted);
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-
-    &:hover {
-      background: rgb(239 68 68 / 15%);
-      color: #fca5a5;
-      border-color: rgb(239 68 68 / 25%);
     }
   }
 }

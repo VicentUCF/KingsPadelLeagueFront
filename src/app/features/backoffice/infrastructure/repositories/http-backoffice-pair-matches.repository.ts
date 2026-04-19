@@ -23,7 +23,7 @@ export class HttpBackofficePairMatchesRepository implements BackofficePairMatche
     params = withJsonArrayParam(params, 'awayLineUpPairIds', lineupPairIds);
 
     return firstValueFrom(
-      this.http.get<PaginatedResponse<PairMatchHttpV1>>(`${this.baseUrl}/admin/v1/pair-matches`, {
+      this.http.get<PaginatedResponse<PairMatchHttpV1>>(`${this.baseUrl}/v1/pair-matches`, {
         params,
         context: withHttpErrorToast({ key: 'load-pair-matches' }),
       }),
@@ -44,7 +44,7 @@ function mapPairMatch(raw: PairMatchHttpV1): BackofficePairMatch {
     id: raw.id,
     localLineUpPairId: raw.localLineUpPairId,
     awayLineUpPairId: raw.awayLineUpPairId,
-    status: raw.setsResult && raw.setsResult.length > 0 ? 'finished' : 'scheduled',
+    status: raw.status,
     setsResult: raw.setsResult ?? [],
   };
 }

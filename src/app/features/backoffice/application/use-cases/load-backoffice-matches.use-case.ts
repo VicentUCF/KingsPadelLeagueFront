@@ -14,4 +14,8 @@ export class LoadBackofficeMatchesUseCase {
   byTeam(teamId: string): Promise<readonly BackofficeMatch[]> {
     return this.repo.loadByTeam(teamId);
   }
+
+  byMatchdayAndTeam(matchdayId: string, teamId: string): Promise<readonly BackofficeMatch[]> {
+    return this.repo.loadByMatchdayAndTeam(matchdayId, teamId);
+  }
 }

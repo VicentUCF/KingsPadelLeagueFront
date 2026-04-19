@@ -168,6 +168,65 @@ describe('BackofficeAdminMatchdayOperationsStore', () => {
     );
   });
 
+  it('prepares only the missing base lineups and refreshes the matchday context', async () => {
+    const match = createBackofficeMatch();
+    const lineupsUseCase = createLineupsRepositoryMock();
+    const matchdaysStore = { load: jest.fn().mockResolvedValue(undefined) };
+    const teamsStore = { load: jest.fn().mockResolvedValue(undefined) };
+    const playersStore = { load: jest.fn().mockResolvedValue(undefined) };
+    const lineupsStore = createLineupsStoreMock(
+      [match],
+      [
+        {
+          id: 'lineup-away',
+          matchId: 'match-1',
+          teamId: 'team-2',
+          status: 'pending',
+        },
+      ],
+    );
+    const toastStore = {
+      success: jest.fn(),
+      error: jest.fn(),
+      warning: jest.fn(),
+      info: jest.fn(),
+    } satisfies Pick<ActionToastStore, 'error' | 'info' | 'success' | 'warning'>;
+
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeAdminMatchdayOperationsStore,
+        { provide: BackofficeMatchdaysRepository, useValue: createMatchdaysRepositoryMock() },
+        { provide: LoadBackofficeLineupsUseCase, useValue: lineupsUseCase },
+        { provide: BACKOFFICE_MATCHES_REPOSITORY, useValue: createMatchesRepositoryMock() },
+        {
+          provide: BACKOFFICE_PAIR_MATCHES_REPOSITORY,
+          useValue: createPairMatchesRepositoryMock(),
+        },
+        { provide: BackofficeMatchdaysStore, useValue: matchdaysStore },
+        { provide: BackofficeLineupsStore, useValue: lineupsStore },
+        { provide: BackofficeTeamsStore, useValue: teamsStore },
+        { provide: BackofficePlayersStore, useValue: playersStore },
+        { provide: ActionToastStore, useValue: toastStore },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeAdminMatchdayOperationsStore);
+
+    await store.prepareBaseLineups('matchday-1');
+
+    expect(lineupsUseCase.create).toHaveBeenCalledTimes(1);
+    expect(lineupsUseCase.create).toHaveBeenCalledWith('match-1', 'team-1');
+    expect(matchdaysStore.load).toHaveBeenCalledWith(true);
+    expect(teamsStore.load).toHaveBeenCalledWith(true);
+    expect(playersStore.load).toHaveBeenCalledWith(true);
+    expect(lineupsStore.loadForMatchday).toHaveBeenCalledWith('matchday-1', true);
+    expect(toastStore.success).toHaveBeenCalledWith(
+      'Las alineaciones base pendientes se han preparado correctamente.',
+      'Alineaciones preparadas',
+    );
+    expect(store.isPreparingBaseLineups()).toBe(false);
+  });
+
   it('tracks match action pending state while a match start is in flight', async () => {
     const deferred = createDeferred<void>();
     const matchesRepository = createMatchesRepositoryMock();
@@ -451,6 +510,7 @@ function createBackofficeMatch(overrides: Partial<BackofficeMatch> = {}): Backof
 function createMatchesRepositoryMock() {
   return {
     loadByMatchday: jest.fn(),
+    loadByMatchdayAndTeam: jest.fn(),
     loadByTeam: jest.fn(),
     create: jest.fn(),
     start: jest.fn().mockResolvedValue(undefined),
@@ -465,9 +525,20 @@ function createPairMatchesRepositoryMock() {
   } satisfies BackofficePairMatchesRepository;
 }
 
-function createLineupsStoreMock(matches: readonly BackofficeMatch[] = []) {
+function createLineupsStoreMock(
+  matches: readonly BackofficeMatch[] = [],
+  lineups: readonly {
+    readonly id: string;
+    readonly matchId: string;
+    readonly teamId: string;
+    readonly status: 'pending' | 'submited';
+  }[] = [],
+) {
+  const lineupsSignal = signal(lineups);
+
   return {
     matches: signal(matches),
+    lineups: lineupsSignal,
     pairs: signal([
       {
         id: 'pair-1',
@@ -479,6 +550,12 @@ function createLineupsStoreMock(matches: readonly BackofficeMatch[] = []) {
         sets: [],
       },
     ]),
+    lineupForMatch: jest.fn((matchId: string, teamId: string) =>
+      lineupsSignal().find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId),
+    ),
     loadForMatchday: jest.fn().mockResolvedValue(undefined),
-  } satisfies Pick<BackofficeLineupsStore, 'loadForMatchday' | 'matches' | 'pairs'>;
+  } satisfies Pick<
+    BackofficeLineupsStore,
+    'lineupForMatch' | 'lineups' | 'loadForMatchday' | 'matches' | 'pairs'
+  >;
 }

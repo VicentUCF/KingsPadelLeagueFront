@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
-import { render, screen } from '@testing-library/angular';
+import { Router } from '@angular/router';
+import { render, screen, waitFor } from '@testing-library/angular';
 
 import { ActionToastStore } from '@core/state/action-toast.store';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
@@ -8,21 +9,6 @@ import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
 import { BackofficeLineupsPageComponent } from './backoffice-lineups-page.component';
-
-interface LineupSubmissionTestApi {
-  readonly selectedMatchId: { set(value: string | null): void };
-  readonly plannerTeamId: { set(value: string | null): void };
-  readonly plannerPairs: {
-    set(
-      value: readonly {
-        readonly id: string;
-        readonly player1Id: string;
-        readonly player2Id: string;
-      }[],
-    ): void;
-  };
-  submitLineup(): Promise<void>;
-}
 
 function createLineupsStoreMock() {
   const matches = signal([
@@ -38,7 +24,6 @@ function createLineupsStoreMock() {
     },
   ]);
   const lineups = signal([
-    { id: 'lineup-local', matchId: 'match-1', teamId: 'team-local', status: 'pending' as const },
     {
       id: 'lineup-away',
       matchId: 'match-1',
@@ -75,8 +60,7 @@ function createLineupsStoreMock() {
     isSubmittingLineup: signal(false),
     errorMessage: signal<string | null>(null),
     hasContent: signal(true),
-    loadForTeam: jest.fn().mockResolvedValue(undefined),
-    loadForMatchday: jest.fn().mockResolvedValue(undefined),
+    loadForMatchdayAndTeam: jest.fn().mockResolvedValue(undefined),
     submitDraft: jest.fn().mockResolvedValue(undefined),
     lineupForMatch: jest.fn((matchId: string, teamId: string) =>
       lineups().find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId),
@@ -93,304 +77,212 @@ function createLineupsStoreMock() {
     | 'isSubmittingLineup'
     | 'errorMessage'
     | 'hasContent'
-    | 'loadForTeam'
-    | 'loadForMatchday'
+    | 'loadForMatchdayAndTeam'
     | 'submitDraft'
     | 'lineupForMatch'
     | 'pairsForLineup'
   >;
 }
 
+function createMatchdaysStoreMock() {
+  const currentMatchday = {
+    id: 'matchday-1',
+    name: 'Jornada 1',
+    scheduledAt: '2026-03-25T18:00:00.000Z',
+    seasonId: 'season-1',
+    status: 'in_progress' as const,
+  };
+
+  return {
+    isLoading: signal(false),
+    hasContent: signal(true),
+    errorMessage: signal<string | null>(null),
+    matchdays: signal([currentMatchday]),
+    currentMatchday: signal(currentMatchday),
+    nextMatchday: signal(null),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficeMatchdaysStore,
+    | 'isLoading'
+    | 'hasContent'
+    | 'errorMessage'
+    | 'matchdays'
+    | 'currentMatchday'
+    | 'nextMatchday'
+    | 'load'
+  >;
+}
+
+function createTeamsStoreMock() {
+  return {
+    isLoading: signal(false),
+    hasContent: signal(true),
+    errorMessage: signal<string | null>(null),
+    teams: signal([
+      {
+        id: 'team-local',
+        name: 'Locales',
+        description: '',
+        secondaryDescription: '',
+        logo: null,
+      },
+      {
+        id: 'team-away',
+        name: 'Visitantes',
+        description: '',
+        secondaryDescription: '',
+        logo: null,
+      },
+    ]),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficeTeamsStore,
+    'isLoading' | 'hasContent' | 'errorMessage' | 'teams' | 'load'
+  >;
+}
+
+function createPlayersStoreMock() {
+  return {
+    isLoading: signal(false),
+    hasContent: signal(true),
+    errorMessage: signal<string | null>(null),
+    players: signal([
+      {
+        id: 'player-1',
+        firstName: 'Adri',
+        lastName: 'Uno',
+        email: 'adri@example.com',
+        teamId: 'team-away',
+        isPresident: false,
+        preferredPosition: 'right' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-2',
+        firstName: 'Beto',
+        lastName: 'Dos',
+        email: 'beto@example.com',
+        teamId: 'team-away',
+        isPresident: false,
+        preferredPosition: 'left' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-3',
+        firstName: 'Ciro',
+        lastName: 'Tres',
+        email: 'ciro@example.com',
+        teamId: 'team-away',
+        isPresident: false,
+        preferredPosition: 'right' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-4',
+        firstName: 'Dani',
+        lastName: 'Cuatro',
+        email: 'dani@example.com',
+        teamId: 'team-away',
+        isPresident: false,
+        preferredPosition: 'left' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+    ]),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficePlayersStore,
+    'isLoading' | 'hasContent' | 'errorMessage' | 'players' | 'load'
+  >;
+}
+
 describe('BackofficeLineupsPageComponent', () => {
-  it('shows the president lineup status and pair count for the managed team', async () => {
+  it('redirects admins away from the president lineup shell', async () => {
+    const router = { navigate: jest.fn().mockResolvedValue(true) };
     const lineupsStore = createLineupsStoreMock();
 
     await render(BackofficeLineupsPageComponent, {
       providers: [
+        { provide: Router, useValue: router },
         { provide: BackofficeLineupsStore, useValue: lineupsStore },
-        {
-          provide: BackofficeMatchdaysStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(false),
-            errorMessage: signal<string | null>(null),
-            matchdays: signal([]),
-            currentMatchday: signal(null),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficeTeamsStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(true),
-            errorMessage: signal<string | null>(null),
-            teams: signal([
-              {
-                id: 'team-local',
-                name: 'Locales',
-                description: '',
-                secondaryDescription: '',
-                logo: null,
-              },
-              {
-                id: 'team-away',
-                name: 'Visitantes',
-                description: '',
-                secondaryDescription: '',
-                logo: null,
-              },
-            ]),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficePlayersStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(true),
-            errorMessage: signal<string | null>(null),
-            players: signal([
-              {
-                id: 'player-1',
-                firstName: 'Adri',
-                lastName: 'Uno',
-                email: 'adri@example.com',
-                teamId: 'team-away',
-                isPresident: false,
-                preferredPosition: 'right',
-                profileImage: null,
-                value: 10,
-                wonGames: 0,
-                lostGames: 0,
-                description: '',
-              },
-              {
-                id: 'player-2',
-                firstName: 'Beto',
-                lastName: 'Dos',
-                email: 'beto@example.com',
-                teamId: 'team-away',
-                isPresident: false,
-                preferredPosition: 'left',
-                profileImage: null,
-                value: 10,
-                wonGames: 0,
-                lostGames: 0,
-                description: '',
-              },
-            ]),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
+        { provide: BackofficeMatchdaysStore, useValue: createMatchdaysStoreMock() },
+        { provide: BackofficeTeamsStore, useValue: createTeamsStoreMock() },
+        { provide: BackofficePlayersStore, useValue: createPlayersStoreMock() },
         {
           provide: BackofficeSessionStore,
           useValue: {
-            currentRole: signal('PRESIDENT'),
-            currentPresidentTeamId: signal('team-away'),
-          },
+            currentRole: signal('ADMIN'),
+            currentPresidentTeamId: signal(null),
+          } satisfies Pick<BackofficeSessionStore, 'currentPresidentTeamId' | 'currentRole'>,
         },
         {
           provide: ActionToastStore,
           useValue: { success: jest.fn(), error: jest.fn() },
         },
       ],
+    });
+
+    await waitFor(() => {
+      expect(router.navigate).toHaveBeenCalledWith(['/backoffice/jornadas']);
+    });
+    expect(lineupsStore.loadForMatchdayAndTeam).not.toHaveBeenCalled();
+  });
+
+  it('loads the current president matchday and shows the planner in read-only mode after submit', async () => {
+    const lineupsStore = createLineupsStoreMock();
+
+    await render(BackofficeLineupsPageComponent, {
+      providers: [
+        { provide: Router, useValue: { navigate: jest.fn().mockResolvedValue(true) } },
+        { provide: BackofficeLineupsStore, useValue: lineupsStore },
+        { provide: BackofficeMatchdaysStore, useValue: createMatchdaysStoreMock() },
+        { provide: BackofficeTeamsStore, useValue: createTeamsStoreMock() },
+        { provide: BackofficePlayersStore, useValue: createPlayersStoreMock() },
+        {
+          provide: BackofficeSessionStore,
+          useValue: {
+            currentRole: signal('PRESIDENT'),
+            currentPresidentTeamId: signal('team-away'),
+          } satisfies Pick<BackofficeSessionStore, 'currentPresidentTeamId' | 'currentRole'>,
+        },
+        {
+          provide: ActionToastStore,
+          useValue: { success: jest.fn(), error: jest.fn() },
+        },
+      ],
+    });
+
+    await waitFor(() => {
+      expect(lineupsStore.loadForMatchdayAndTeam).toHaveBeenCalledWith(
+        'matchday-1',
+        'team-away',
+        false,
+      );
     });
 
     expect(await screen.findByText('Enviada')).toBeVisible();
     expect(screen.getByText('2 parejas')).toBeVisible();
-    expect(screen.queryByText('Pendiente')).toBeNull();
-  });
 
-  it('preloads existing pairs when opening the planner', async () => {
-    const lineupsStore = createLineupsStoreMock();
+    screen.getByRole('button', { name: /Gestionar alineacion/i }).click();
 
-    await render(BackofficeLineupsPageComponent, {
-      providers: [
-        { provide: BackofficeLineupsStore, useValue: lineupsStore },
-        {
-          provide: BackofficeMatchdaysStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(false),
-            errorMessage: signal<string | null>(null),
-            matchdays: signal([]),
-            currentMatchday: signal(null),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficeTeamsStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(true),
-            errorMessage: signal<string | null>(null),
-            teams: signal([
-              {
-                id: 'team-local',
-                name: 'Locales',
-                description: '',
-                secondaryDescription: '',
-                logo: null,
-              },
-              {
-                id: 'team-away',
-                name: 'Visitantes',
-                description: '',
-                secondaryDescription: '',
-                logo: null,
-              },
-            ]),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficePlayersStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(true),
-            errorMessage: signal<string | null>(null),
-            players: signal([
-              {
-                id: 'player-1',
-                firstName: 'Adri',
-                lastName: 'Uno',
-                email: 'adri@example.com',
-                teamId: 'team-away',
-                isPresident: false,
-                preferredPosition: 'right',
-                profileImage: null,
-                value: 10,
-                wonGames: 0,
-                lostGames: 0,
-                description: '',
-              },
-              {
-                id: 'player-2',
-                firstName: 'Beto',
-                lastName: 'Dos',
-                email: 'beto@example.com',
-                teamId: 'team-away',
-                isPresident: false,
-                preferredPosition: 'left',
-                profileImage: null,
-                value: 10,
-                wonGames: 0,
-                lostGames: 0,
-                description: '',
-              },
-            ]),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficeSessionStore,
-          useValue: {
-            currentRole: signal('PRESIDENT'),
-            currentPresidentTeamId: signal('team-away'),
-          },
-        },
-        {
-          provide: ActionToastStore,
-          useValue: { success: jest.fn(), error: jest.fn() },
-        },
-      ],
-    });
-
-    (await screen.findByRole('button', { name: 'Gestionar' })).click();
-
-    expect(await screen.findByText('Formación de parejas')).toBeVisible();
-    expect(screen.getByText('Adri Uno')).toBeVisible();
-    expect(screen.getByText('Beto Dos')).toBeVisible();
     expect(
-      screen.getByText('Esta alineación ya está enviada y se muestra en modo lectura.'),
+      await screen.findByText('Esta alineación ya fue enviada y se muestra en modo lectura.'),
     ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Alineación enviada' })).toBeDisabled();
-  });
-
-  it('shows an admin-preparation error when the president submits without an initialized lineup', async () => {
-    const lineupsStore = createLineupsStoreMock();
-    lineupsStore.submitDraft.mockRejectedValue(new Error('lineup_not_initialized'));
-    lineupsStore.lineups.set([
-      { id: 'lineup-local', matchId: 'match-1', teamId: 'team-local', status: 'pending' },
-      { id: 'lineup-away', matchId: 'match-1', teamId: 'team-away', status: 'pending' },
-    ]);
-    const toastStore = { success: jest.fn(), error: jest.fn() };
-
-    const view = await render(BackofficeLineupsPageComponent, {
-      providers: [
-        { provide: BackofficeLineupsStore, useValue: lineupsStore },
-        {
-          provide: BackofficeMatchdaysStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(false),
-            errorMessage: signal<string | null>(null),
-            matchdays: signal([]),
-            currentMatchday: signal(null),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficeTeamsStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(true),
-            errorMessage: signal<string | null>(null),
-            teams: signal([
-              {
-                id: 'team-local',
-                name: 'Locales',
-                description: '',
-                secondaryDescription: '',
-                logo: null,
-              },
-              {
-                id: 'team-away',
-                name: 'Visitantes',
-                description: '',
-                secondaryDescription: '',
-                logo: null,
-              },
-            ]),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficePlayersStore,
-          useValue: {
-            isLoading: signal(false),
-            hasContent: signal(true),
-            errorMessage: signal<string | null>(null),
-            players: signal([]),
-            load: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: BackofficeSessionStore,
-          useValue: {
-            currentRole: signal('PRESIDENT'),
-            currentPresidentTeamId: signal('team-away'),
-          },
-        },
-        { provide: ActionToastStore, useValue: toastStore },
-      ],
-    });
-
-    const component = view.fixture.componentInstance as unknown as LineupSubmissionTestApi;
-    component.selectedMatchId.set('match-1');
-    component.plannerTeamId.set('team-away');
-    component.plannerPairs.set([
-      { id: 'pair-1', player1Id: 'player-1', player2Id: 'player-2' },
-      { id: 'pair-2', player1Id: 'player-3', player2Id: 'player-4' },
-      { id: 'pair-3', player1Id: 'player-5', player2Id: 'player-6' },
-    ]);
-
-    await component.submitLineup();
-
-    expect(toastStore.error).toHaveBeenCalledWith(
-      'La alineación aún no ha sido preparada por administración.',
-      'Alineación no disponible',
-    );
+    expect(screen.getByRole('button', { name: /Alineación enviada/i })).toBeDisabled();
   });
 });

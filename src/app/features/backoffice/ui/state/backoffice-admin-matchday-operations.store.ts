@@ -41,6 +41,7 @@ export class BackofficeAdminMatchdayOperationsStore {
   readonly pairMatchesErrorMessage = signal<string | null>(null);
 
   readonly isCreatingMatchday = signal(false);
+  readonly isPreparingBaseLineups = signal(false);
   readonly isStartingMatchday = signal(false);
   readonly isFinishingMatchday = signal(false);
   readonly isCreatingPairMatches = signal(false);
@@ -100,6 +101,69 @@ export class BackofficeAdminMatchdayOperationsStore {
       this.toastStore.error('No hemos podido iniciar la jornada.', 'Acción no completada');
     } finally {
       this.isStartingMatchday.set(false);
+    }
+  }
+
+  async prepareBaseLineups(matchdayId: string): Promise<void> {
+    const matches = this.lineupsStore.matches().filter((match) => match.matchdayId === matchdayId);
+
+    if (matches.length === 0) {
+      this.toastStore.info(
+        'Todavia no hay partidos en la jornada para preparar alineaciones base.',
+        'Sin partidos',
+      );
+      return;
+    }
+
+    const pendingCreations = matches.flatMap((match) => {
+      const operations: Promise<unknown>[] = [];
+
+      if (!this.lineupsStore.lineupForMatch(match.id, match.localTeamId)) {
+        operations.push(this.lineupsUseCase.create(match.id, match.localTeamId));
+      }
+
+      if (!this.lineupsStore.lineupForMatch(match.id, match.awayTeamId)) {
+        operations.push(this.lineupsUseCase.create(match.id, match.awayTeamId));
+      }
+
+      return operations;
+    });
+
+    if (pendingCreations.length === 0) {
+      this.toastStore.info(
+        'Todos los partidos ya tienen sus contenedores base preparados.',
+        'Sin cambios',
+      );
+      return;
+    }
+
+    this.isPreparingBaseLineups.set(true);
+
+    try {
+      const results = await Promise.allSettled(pendingCreations);
+      await this.refreshMatchdayContext(matchdayId);
+
+      const hasFailures = results.some((result) => result.status === 'rejected');
+
+      if (hasFailures) {
+        this.toastStore.warning(
+          'Hemos preparado parte de las alineaciones base, pero algunas siguen pendientes de revision.',
+          'Revision pendiente',
+        );
+        return;
+      }
+
+      this.toastStore.success(
+        'Las alineaciones base pendientes se han preparado correctamente.',
+        'Alineaciones preparadas',
+      );
+    } catch {
+      this.toastStore.error(
+        'No hemos podido preparar las alineaciones base pendientes.',
+        'Accion no completada',
+      );
+    } finally {
+      this.isPreparingBaseLineups.set(false);
     }
   }
 

@@ -1,32 +1,20 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { API_BASE_URL } from '@core/api/api-base-url.token';
-import { AuthStore } from '@features/auth/ui/state/auth.store';
-
 import { HttpBackofficeLineupsRepository } from './http-backoffice-lineups.repository';
 
 describe('HttpBackofficeLineupsRepository', () => {
   let repository: HttpBackofficeLineupsRepository;
   let httpTestingController: HttpTestingController;
-  let currentRole: ReturnType<typeof signal<'ADMIN' | 'PRESIDENT' | 'PLAYER'>>;
 
   beforeEach(() => {
-    currentRole = signal<'ADMIN' | 'PRESIDENT' | 'PLAYER'>('PLAYER');
-
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: 'http://api.test' },
-        {
-          provide: AuthStore,
-          useValue: {
-            currentRole: computed(() => currentRole()),
-          },
-        },
         HttpBackofficeLineupsRepository,
       ],
     });
@@ -39,9 +27,7 @@ describe('HttpBackofficeLineupsRepository', () => {
     httpTestingController.verify();
   });
 
-  it('uses /v1 for non-admin lineup reads', async () => {
-    currentRole.set('PLAYER');
-
+  it('loads lineups through the public endpoint', async () => {
     const promise = repository.loadByMatchIds(['match-1']);
 
     httpTestingController
@@ -51,14 +37,26 @@ describe('HttpBackofficeLineupsRepository', () => {
     await expect(promise).resolves.toHaveLength(1);
   });
 
-  it('uses /admin/v1 for admin lineup pair reads', async () => {
-    currentRole.set('ADMIN');
+  it('loads president lineups by match and team through the public endpoint', async () => {
+    const promise = repository.loadByMatchIdsAndTeamIds(['match-1'], ['team-1']);
 
+    httpTestingController
+      .expectOne(
+        'http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D&teamIds=%5B%22team-1%22%5D',
+      )
+      .flush({ items: [createLineupHttp()], meta: createMeta(1) });
+
+    await expect(promise).resolves.toEqual([
+      expect.objectContaining({ id: 'lineup-1', matchId: 'match-1', teamId: 'team-1' }),
+    ]);
+  });
+
+  it('loads lineup pairs through the public endpoint even for admin flows', async () => {
     const promise = repository.loadPairsByLineupIds(['lineup-1']);
 
     httpTestingController
       .expectOne(
-        'http://api.test/admin/v1/match-team-line-up-pairs?limit=200&sortBy=%5B%7B%22createdAt%22:%22ASC%22%7D%5D&matchTeamLineUpIds=%5B%22lineup-1%22%5D',
+        'http://api.test/v1/match-team-line-up-pairs?limit=200&sortBy=%5B%7B%22createdAt%22:%22ASC%22%7D%5D&matchTeamLineUpIds=%5B%22lineup-1%22%5D',
       )
       .flush({ items: [createPairHttp()], meta: createMeta(1) });
 
@@ -67,13 +65,11 @@ describe('HttpBackofficeLineupsRepository', () => {
     ]);
   });
 
-  it('finds one lineup by match and team through the player/president endpoint for non-admin users', async () => {
-    currentRole.set('PRESIDENT');
-
+  it('finds one lineup by match and team including teamIds in the query', async () => {
     const promise = repository.findByMatchAndTeam('match-1', 'team-1');
 
     const request = httpTestingController.expectOne(
-      'http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D',
+      'http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D&teamIds=%5B%22team-1%22%5D',
     );
     expect(request.request.method).toBe('GET');
     request.flush({
@@ -86,21 +82,7 @@ describe('HttpBackofficeLineupsRepository', () => {
     );
   });
 
-  it('returns null when the preflight lineup lookup does not find any lineup', async () => {
-    currentRole.set('PRESIDENT');
-
-    const promise = repository.findByMatchAndTeam('match-1', 'team-1');
-
-    httpTestingController
-      .expectOne('http://api.test/v1/match-team-line-ups?limit=200&matchIds=%5B%22match-1%22%5D')
-      .flush({ items: [createLineupHttp({ teamId: 'team-2' })], meta: createMeta(1) });
-
-    await expect(promise).resolves.toBeNull();
-  });
-
   it('creates a lineup through the admin endpoint', async () => {
-    currentRole.set('ADMIN');
-
     const promise = repository.create('match-1', 'team-1');
 
     const request = httpTestingController.expectOne('http://api.test/admin/v1/match-team-line-ups');

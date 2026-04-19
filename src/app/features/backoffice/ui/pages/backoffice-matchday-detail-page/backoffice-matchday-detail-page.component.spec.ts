@@ -1,213 +1,347 @@
 import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { render, screen } from '@testing-library/angular';
+import { render, screen, waitFor } from '@testing-library/angular';
 
 import { ActionToastStore } from '@core/state/action-toast.store';
-import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
+import { BackofficeAdminMatchdayOperationsStore } from '../../state/backoffice-admin-matchday-operations.store';
 import { BackofficeLineupsStore } from '../../state/backoffice-lineups.store';
+import { BackofficeMatchdaysStore } from '../../state/backoffice-matchdays.store';
 import { BackofficePlayersStore } from '../../state/backoffice-players.store';
 import { BackofficeSessionStore } from '../../state/backoffice-session.store';
 import { BackofficeTeamsStore } from '../../state/backoffice-teams.store';
-import { BackofficeAdminMatchdayOperationsStore } from '../../state/backoffice-admin-matchday-operations.store';
 import { BackofficeMatchdayDetailPageComponent } from './backoffice-matchday-detail-page.component';
 
-interface LineupSubmissionTestApi {
-  readonly selectedMatchId: { set(value: string | null): void };
-  readonly plannerTeamId: { set(value: string | null): void };
-  readonly plannerPairs: {
-    set(
-      value: readonly {
-        readonly id: string;
-        readonly player1Id: string;
-        readonly player2Id: string;
-      }[],
-    ): void;
-  };
-  submitLineup(): Promise<void>;
-}
-
-describe('BackofficeMatchdayDetailPageComponent', () => {
-  it('shows admin operational controls in the matchday detail', async () => {
-    await renderComponentWithRole('ADMIN');
-
-    expect(screen.getAllByRole('button', { name: /Iniciar jornada/i })).toHaveLength(2);
-    expect(screen.getByRole('button', { name: /Finalizar jornada/i })).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: /Generar enfrentamientos de parejas/i }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: /Nuevo partido/i })).toBeVisible();
-    expect(screen.getByText('Resumen operativo')).toBeVisible();
-    expect(screen.getByText('2/2 enfrentamientos')).toBeVisible();
-    expect(screen.getByRole('button', { name: /Finalizar jornada/i })).toBeDisabled();
-    expect(screen.getByText('Partido 1')).toBeVisible();
-    expect(screen.getByText('Partido 2')).toBeVisible();
-    expect(screen.getByText('3 puntos')).toBeVisible();
-    expect(screen.getByText('2 puntos')).toBeVisible();
-    expect(screen.queryByText('Magic City')).not.toBeInTheDocument();
-    expect(screen.queryByText('Barbaridad')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: /Registrar resultado/i })).toHaveLength(2);
-  });
-
-  it('keeps the president lineup flow and hides admin controls', async () => {
-    await renderComponentWithRole('PRESIDENT');
-
-    expect(screen.getByRole('button', { name: /Gestionar alineación/i })).toBeVisible();
-    expect(screen.queryByRole('button', { name: /Iniciar jornada/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Nuevo partido/i })).not.toBeInTheDocument();
-
-    screen.getByRole('button', { name: /Gestionar alineación/i }).click();
-
-    expect(
-      await screen.findByText('Esta alineación ya está enviada y se muestra en modo lectura.'),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Alineación enviada' })).toBeDisabled();
-  });
-
-  it('shows an admin-preparation error when the president submits without an initialized lineup', async () => {
-    const toastStore = { success: jest.fn(), error: jest.fn() };
-    const view = await renderComponentWithRole('PRESIDENT', {
-      lineupsStoreOverrides: {
-        lineups: signal([
-          { id: 'lineup-1', matchId: 'match-1', teamId: 'team-1', status: 'pending' as const },
-          { id: 'lineup-2', matchId: 'match-1', teamId: 'team-2', status: 'pending' as const },
-        ]),
-        lineupForMatch: jest.fn((matchId: string, teamId: string) =>
-          [
-            { id: 'lineup-1', matchId: 'match-1', teamId: 'team-1', status: 'pending' as const },
-            { id: 'lineup-2', matchId: 'match-1', teamId: 'team-2', status: 'pending' as const },
-          ].find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId),
-        ),
-        submitDraft: jest.fn().mockRejectedValue(new Error('lineup_not_initialized')),
+function createLineupsStoreMock(
+  overrides: Partial<Pick<BackofficeLineupsStore, 'lineups' | 'pairs'>> = {},
+) {
+  const matches = signal([
+    {
+      id: 'match-1',
+      matchdayId: 'matchday-1',
+      localTeamId: 'team-1',
+      awayTeamId: 'team-2',
+      localTeamScorePoints: 0,
+      awayTeamScorePoints: 0,
+      scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
+      status: 'in_progress' as const,
+    },
+  ]);
+  const lineups =
+    overrides.lineups ??
+    signal([
+      { id: 'lineup-1', matchId: 'match-1', teamId: 'team-1', status: 'submited' as const },
+      { id: 'lineup-2', matchId: 'match-1', teamId: 'team-2', status: 'submited' as const },
+    ]);
+  const pairs =
+    overrides.pairs ??
+    signal([
+      {
+        id: 'pair-1',
+        lineupId: 'lineup-1',
+        player1Id: 'player-1',
+        player2Id: 'player-2',
+        totalPlayersValue: 100,
+        wonGame: null,
+        sets: [],
       },
-      toastStore,
-    });
-
-    const component = view.fixture.componentInstance as unknown as LineupSubmissionTestApi;
-    component.selectedMatchId.set('match-1');
-    component.plannerTeamId.set('team-1');
-    component.plannerPairs.set([
-      { id: 'pair-1', player1Id: 'player-1', player2Id: 'player-2' },
-      { id: 'pair-2', player1Id: 'player-5', player2Id: 'player-6' },
+      {
+        id: 'pair-2',
+        lineupId: 'lineup-2',
+        player1Id: 'player-3',
+        player2Id: 'player-4',
+        totalPlayersValue: 100,
+        wonGame: null,
+        sets: [],
+      },
+      {
+        id: 'pair-3',
+        lineupId: 'lineup-1',
+        player1Id: 'player-5',
+        player2Id: 'player-6',
+        totalPlayersValue: 100,
+        wonGame: null,
+        sets: [],
+      },
+      {
+        id: 'pair-4',
+        lineupId: 'lineup-2',
+        player1Id: 'player-7',
+        player2Id: 'player-8',
+        totalPlayersValue: 100,
+        wonGame: null,
+        sets: [],
+      },
     ]);
 
-    await component.submitLineup();
-
-    expect(toastStore.error).toHaveBeenCalledWith(
-      'La alineación aún no ha sido preparada por administración.',
-      'Alineación no disponible',
-    );
-  });
-});
-
-async function renderComponentWithRole(
-  role: 'ADMIN' | 'PRESIDENT',
-  options: {
-    lineupsStoreOverrides?: Record<string, unknown>;
-    toastStore?: { success: jest.Mock; error: jest.Mock };
-  } = {},
-) {
-  const match = {
-    id: 'match-1',
-    matchdayId: 'matchday-1',
-    localTeamId: 'team-1',
-    awayTeamId: 'team-2',
-    localTeamScorePoints: 0,
-    awayTeamScorePoints: 0,
-    scheduledAt: new Date('2026-03-25T18:00:00.000Z'),
-    status: 'scheduled' as const,
-  };
-  const otherMatch = {
-    id: 'match-2',
-    matchdayId: 'matchday-2',
-    localTeamId: 'team-3',
-    awayTeamId: 'team-4',
-    localTeamScorePoints: 0,
-    awayTeamScorePoints: 0,
-    scheduledAt: new Date('2026-03-26T18:00:00.000Z'),
-    status: 'scheduled' as const,
-  };
-  const localLineup = {
-    id: 'lineup-1',
-    matchId: 'match-1',
-    teamId: 'team-1',
-    status: 'submited' as const,
-  };
-  const awayLineup = {
-    id: 'lineup-2',
-    matchId: 'match-1',
-    teamId: 'team-2',
-    status: 'submited' as const,
-  };
-  const localPair = {
-    id: 'pair-1',
-    lineupId: 'lineup-1',
-    player1Id: 'player-1',
-    player2Id: 'player-2',
-    totalPlayersValue: 100,
-    wonGame: null,
-    sets: [],
-  };
-  const localPairTwo = {
-    id: 'pair-3',
-    lineupId: 'lineup-1',
-    player1Id: 'player-5',
-    player2Id: 'player-6',
-    totalPlayersValue: 100,
-    wonGame: null,
-    sets: [],
-  };
-  const awayPair = {
-    id: 'pair-2',
-    lineupId: 'lineup-2',
-    player1Id: 'player-3',
-    player2Id: 'player-4',
-    totalPlayersValue: 100,
-    wonGame: null,
-    sets: [],
-  };
-  const awayPairTwo = {
-    id: 'pair-4',
-    lineupId: 'lineup-2',
-    player1Id: 'player-7',
-    player2Id: 'player-8',
-    totalPlayersValue: 100,
-    wonGame: null,
-    sets: [],
-  };
-
-  const lineupsStoreMock = {
-    matches: signal([match, otherMatch]),
-    lineups: signal([localLineup, awayLineup]),
-    pairs: signal([localPair, awayPair, localPairTwo, awayPairTwo]),
+  return {
+    matches,
+    lineups,
+    pairs,
     isLoading: signal(false),
     isSubmittingLineup: signal(false),
     errorMessage: signal<string | null>(null),
     hasContent: signal(true),
     loadForMatchday: jest.fn().mockResolvedValue(undefined),
+    loadForMatchdayAndTeam: jest.fn().mockResolvedValue(undefined),
     submitDraft: jest.fn().mockResolvedValue(undefined),
     lineupForMatch: jest.fn((matchId: string, teamId: string) =>
-      [localLineup, awayLineup].find(
-        (lineup) => lineup.matchId === matchId && lineup.teamId === teamId,
-      ),
+      lineups().find((lineup) => lineup.matchId === matchId && lineup.teamId === teamId),
     ),
     pairsForLineup: jest.fn((lineupId: string) =>
-      [localPair, awayPair, localPairTwo, awayPairTwo].filter((pair) => pair.lineupId === lineupId),
+      pairs().filter((pair) => pair.lineupId === lineupId),
     ),
-    ...options.lineupsStoreOverrides,
   } satisfies Pick<
     BackofficeLineupsStore,
-    | 'errorMessage'
-    | 'hasContent'
+    | 'matches'
+    | 'lineups'
+    | 'pairs'
     | 'isLoading'
     | 'isSubmittingLineup'
-    | 'lineupForMatch'
-    | 'lineups'
+    | 'errorMessage'
+    | 'hasContent'
     | 'loadForMatchday'
-    | 'matches'
-    | 'pairs'
-    | 'pairsForLineup'
+    | 'loadForMatchdayAndTeam'
     | 'submitDraft'
+    | 'lineupForMatch'
+    | 'pairsForLineup'
   >;
+}
+
+function createMatchdaysStoreMock(matchStatus: 'scheduled' | 'in_progress' = 'in_progress') {
+  return {
+    matchdays: signal([
+      {
+        id: 'matchday-1',
+        name: 'Jornada 1',
+        scheduledAt: '2026-03-25T18:00:00.000Z',
+        seasonId: 'season-1',
+        status: matchStatus,
+      },
+    ]),
+    isLoading: signal(false),
+    errorMessage: signal<string | null>(null),
+    hasContent: signal(true),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficeMatchdaysStore,
+    'matchdays' | 'isLoading' | 'errorMessage' | 'hasContent' | 'load'
+  >;
+}
+
+function createTeamsStoreMock() {
+  return {
+    teams: signal([
+      { id: 'team-1', name: 'Locales', description: '', secondaryDescription: '', logo: null },
+      { id: 'team-2', name: 'Visitantes', description: '', secondaryDescription: '', logo: null },
+    ]),
+    isLoading: signal(false),
+    errorMessage: signal<string | null>(null),
+    hasContent: signal(true),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficeTeamsStore,
+    'teams' | 'isLoading' | 'errorMessage' | 'hasContent' | 'load'
+  >;
+}
+
+function createPlayersStoreMock() {
+  return {
+    players: signal([
+      {
+        id: 'player-1',
+        firstName: 'Adri',
+        lastName: 'Uno',
+        email: 'adri@example.com',
+        teamId: 'team-1',
+        isPresident: false,
+        preferredPosition: 'right' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-2',
+        firstName: 'Beto',
+        lastName: 'Dos',
+        email: 'beto@example.com',
+        teamId: 'team-1',
+        isPresident: false,
+        preferredPosition: 'left' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-3',
+        firstName: 'Ciro',
+        lastName: 'Tres',
+        email: 'ciro@example.com',
+        teamId: 'team-2',
+        isPresident: false,
+        preferredPosition: 'right' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-4',
+        firstName: 'Dani',
+        lastName: 'Cuatro',
+        email: 'dani@example.com',
+        teamId: 'team-2',
+        isPresident: false,
+        preferredPosition: 'left' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-5',
+        firstName: 'Eli',
+        lastName: 'Cinco',
+        email: 'eli@example.com',
+        teamId: 'team-1',
+        isPresident: false,
+        preferredPosition: 'right' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-6',
+        firstName: 'Fede',
+        lastName: 'Seis',
+        email: 'fede@example.com',
+        teamId: 'team-1',
+        isPresident: false,
+        preferredPosition: 'left' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-7',
+        firstName: 'Gabi',
+        lastName: 'Siete',
+        email: 'gabi@example.com',
+        teamId: 'team-2',
+        isPresident: false,
+        preferredPosition: 'right' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+      {
+        id: 'player-8',
+        firstName: 'Hugo',
+        lastName: 'Ocho',
+        email: 'hugo@example.com',
+        teamId: 'team-2',
+        isPresident: false,
+        preferredPosition: 'left' as const,
+        profileImage: null,
+        value: 10,
+        wonGames: 0,
+        lostGames: 0,
+        description: '',
+      },
+    ]),
+    isLoading: signal(false),
+    errorMessage: signal<string | null>(null),
+    hasContent: signal(true),
+    load: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficePlayersStore,
+    'players' | 'isLoading' | 'errorMessage' | 'hasContent' | 'load'
+  >;
+}
+
+function createAdminOperationsStoreMock(pairMatchesOverrides?: readonly unknown[]) {
+  return {
+    pairMatches: signal(
+      (pairMatchesOverrides ?? [
+        {
+          id: 'pair-match-1',
+          localLineUpPairId: 'pair-1',
+          awayLineUpPairId: 'pair-2',
+          status: 'scheduled' as const,
+          setsResult: [],
+        },
+        {
+          id: 'pair-match-2',
+          localLineUpPairId: 'pair-3',
+          awayLineUpPairId: 'pair-4',
+          status: 'scheduled' as const,
+          setsResult: [],
+        },
+      ]) as never[],
+    ),
+    isLoadingPairMatches: signal(false),
+    pairMatchesErrorMessage: signal<string | null>(null),
+    isCreatingMatchday: signal(false),
+    isPreparingBaseLineups: signal(false),
+    isStartingMatchday: signal(false),
+    isFinishingMatchday: signal(false),
+    isCreatingPairMatches: signal(false),
+    isCreatingMatch: signal(false),
+    matchActionIds: signal<Record<string, 'starting' | 'finishing'>>({}),
+    pairMatchActionIds: signal<Record<string, 'finishing'>>({}),
+    loadPairMatches: jest.fn().mockResolvedValue(undefined),
+    prepareBaseLineups: jest.fn().mockResolvedValue(undefined),
+    startMatchday: jest.fn().mockResolvedValue(undefined),
+    finishMatchday: jest.fn().mockResolvedValue(undefined),
+    createPairMatches: jest.fn().mockResolvedValue(undefined),
+    createMatch: jest.fn().mockResolvedValue(true),
+    startMatch: jest.fn().mockResolvedValue(undefined),
+    finishMatch: jest.fn().mockResolvedValue(undefined),
+    finishPairMatch: jest.fn().mockResolvedValue(undefined),
+  } satisfies Pick<
+    BackofficeAdminMatchdayOperationsStore,
+    | 'pairMatches'
+    | 'isLoadingPairMatches'
+    | 'pairMatchesErrorMessage'
+    | 'isCreatingMatchday'
+    | 'isPreparingBaseLineups'
+    | 'isStartingMatchday'
+    | 'isFinishingMatchday'
+    | 'isCreatingPairMatches'
+    | 'isCreatingMatch'
+    | 'matchActionIds'
+    | 'pairMatchActionIds'
+    | 'loadPairMatches'
+    | 'prepareBaseLineups'
+    | 'startMatchday'
+    | 'finishMatchday'
+    | 'createPairMatches'
+    | 'createMatch'
+    | 'startMatch'
+    | 'finishMatch'
+    | 'finishPairMatch'
+  >;
+}
+
+async function renderComponent(options: {
+  role: 'ADMIN' | 'PRESIDENT';
+  lineupsStore?: ReturnType<typeof createLineupsStoreMock>;
+  adminOperationsStore?: ReturnType<typeof createAdminOperationsStoreMock>;
+  matchdaysStore?: ReturnType<typeof createMatchdaysStoreMock>;
+}) {
+  const lineupsStore = options.lineupsStore ?? createLineupsStoreMock();
+  const adminOperationsStore = options.adminOperationsStore ?? createAdminOperationsStoreMock();
 
   return render(BackofficeMatchdayDetailPageComponent, {
     providers: [
@@ -222,177 +356,105 @@ async function renderComponentWithRole(
         },
       },
       {
-        provide: BackofficeMatchdaysStore,
-        useValue: {
-          matchdays: signal([
-            {
-              id: 'matchday-1',
-              name: 'Jornada 1',
-              scheduledAt: '2026-03-25T18:00:00.000Z',
-              seasonId: 'season-1',
-              status: 'scheduled',
-            },
-          ]),
-          isLoading: signal(false),
-          errorMessage: signal<string | null>(null),
-          hasContent: signal(true),
-          load: jest.fn().mockResolvedValue(undefined),
-        } satisfies Pick<
-          BackofficeMatchdaysStore,
-          'errorMessage' | 'hasContent' | 'isLoading' | 'load' | 'matchdays'
-        >,
-      },
-      { provide: BackofficeLineupsStore, useValue: lineupsStoreMock },
-      {
-        provide: BackofficeTeamsStore,
-        useValue: {
-          teams: signal([
-            {
-              id: 'team-1',
-              name: 'Kings Of Favar',
-              description: 'Local',
-              secondaryDescription: 'Local',
-              logo: null,
-            },
-            {
-              id: 'team-2',
-              name: 'Titanics',
-              description: 'Away',
-              secondaryDescription: 'Away',
-              logo: null,
-            },
-            {
-              id: 'team-3',
-              name: 'Magic City',
-              description: 'Other',
-              secondaryDescription: 'Other',
-              logo: null,
-            },
-            {
-              id: 'team-4',
-              name: 'Barbaridad',
-              description: 'Other',
-              secondaryDescription: 'Other',
-              logo: null,
-            },
-          ]),
-          isLoading: signal(false),
-          errorMessage: signal<string | null>(null),
-          hasContent: signal(true),
-          load: jest.fn().mockResolvedValue(undefined),
-        } satisfies Pick<
-          BackofficeTeamsStore,
-          'errorMessage' | 'hasContent' | 'isLoading' | 'load' | 'teams'
-        >,
-      },
-      {
-        provide: BackofficePlayersStore,
-        useValue: {
-          players: signal([
-            createPlayer('player-1', 'Adri', 'Alvarez', 'team-1'),
-            createPlayer('player-2', 'Luis', 'Lopez', 'team-1'),
-            createPlayer('player-3', 'Marta', 'Martin', 'team-2'),
-            createPlayer('player-4', 'Nora', 'Navarro', 'team-2'),
-            createPlayer('player-5', 'Pau', 'Perez', 'team-1'),
-            createPlayer('player-6', 'Sara', 'Soler', 'team-1'),
-            createPlayer('player-7', 'Eva', 'Escriba', 'team-2'),
-            createPlayer('player-8', 'Joan', 'Jorda', 'team-2'),
-          ]),
-          isLoading: signal(false),
-          errorMessage: signal<string | null>(null),
-          hasContent: signal(true),
-          load: jest.fn().mockResolvedValue(undefined),
-        } satisfies Pick<
-          BackofficePlayersStore,
-          'errorMessage' | 'hasContent' | 'isLoading' | 'load' | 'players'
-        >,
-      },
-      {
         provide: BackofficeSessionStore,
         useValue: {
-          currentRole: signal(role),
-          currentPresidentTeamId: signal('team-1'),
+          currentRole: signal(options.role),
+          currentPresidentTeamId: signal(options.role === 'PRESIDENT' ? 'team-1' : null),
         } satisfies Pick<BackofficeSessionStore, 'currentPresidentTeamId' | 'currentRole'>,
       },
+      { provide: BackofficeLineupsStore, useValue: lineupsStore },
       {
-        provide: BackofficeAdminMatchdayOperationsStore,
-        useValue: {
-          pairMatches: signal([
-            {
-              id: 'pair-match-1',
-              localLineUpPairId: 'pair-1',
-              awayLineUpPairId: 'pair-2',
-              status: 'scheduled',
-              setsResult: [],
-            },
-            {
-              id: 'pair-match-2',
-              localLineUpPairId: 'pair-3',
-              awayLineUpPairId: 'pair-4',
-              status: 'scheduled',
-              setsResult: [],
-            },
-          ]),
-          pairMatchesErrorMessage: signal<string | null>(null),
-          isLoadingPairMatches: signal(false),
-          isCreatingMatchday: signal(false),
-          isStartingMatchday: signal(false),
-          isFinishingMatchday: signal(false),
-          isCreatingPairMatches: signal(false),
-          isCreatingMatch: signal(false),
-          matchActionIds: signal({}),
-          pairMatchActionIds: signal({}),
-          loadPairMatches: jest.fn().mockResolvedValue(undefined),
-          startMatchday: jest.fn().mockResolvedValue(undefined),
-          finishMatchday: jest.fn().mockResolvedValue(undefined),
-          createPairMatches: jest.fn().mockResolvedValue(undefined),
-          createMatch: jest.fn().mockResolvedValue(true),
-          startMatch: jest.fn().mockResolvedValue(undefined),
-          finishMatch: jest.fn().mockResolvedValue(undefined),
-          finishPairMatch: jest.fn().mockResolvedValue(undefined),
-        } satisfies Pick<
-          BackofficeAdminMatchdayOperationsStore,
-          | 'createMatch'
-          | 'createPairMatches'
-          | 'finishMatch'
-          | 'finishMatchday'
-          | 'finishPairMatch'
-          | 'isCreatingMatch'
-          | 'isCreatingMatchday'
-          | 'isCreatingPairMatches'
-          | 'isFinishingMatchday'
-          | 'isLoadingPairMatches'
-          | 'isStartingMatchday'
-          | 'loadPairMatches'
-          | 'matchActionIds'
-          | 'pairMatchActionIds'
-          | 'pairMatches'
-          | 'pairMatchesErrorMessage'
-          | 'startMatch'
-          | 'startMatchday'
-        >,
+        provide: BackofficeMatchdaysStore,
+        useValue: options.matchdaysStore ?? createMatchdaysStoreMock(),
       },
+      { provide: BackofficeTeamsStore, useValue: createTeamsStoreMock() },
+      { provide: BackofficePlayersStore, useValue: createPlayersStoreMock() },
+      { provide: BackofficeAdminMatchdayOperationsStore, useValue: adminOperationsStore },
       {
         provide: ActionToastStore,
-        useValue: options.toastStore ?? { success: jest.fn(), error: jest.fn() },
+        useValue: { success: jest.fn(), error: jest.fn() },
       },
     ],
   });
 }
 
-function createPlayer(id: string, firstName: string, lastName: string, teamId: string) {
-  return {
-    id,
-    firstName,
-    lastName,
-    email: `${id}@example.com`,
-    profileImage: null,
-    isPresident: false,
-    teamId,
-    value: 100,
-    wonGames: 2,
-    lostGames: 1,
-    preferredPosition: 'both' as const,
-    description: 'Jugador de prueba',
-  };
-}
+describe('BackofficeMatchdayDetailPageComponent', () => {
+  it('loads the president view with the narrowed matchday-team query and hides admin actions', async () => {
+    const lineupsStore = createLineupsStoreMock();
+
+    await renderComponent({ role: 'PRESIDENT', lineupsStore });
+
+    await waitFor(() => {
+      expect(lineupsStore.loadForMatchdayAndTeam).toHaveBeenCalledWith(
+        'matchday-1',
+        'team-1',
+        false,
+      );
+    });
+
+    expect(screen.queryByRole('button', { name: /Nuevo partido/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Gestionar alineación/i })).toBeVisible();
+
+    screen.getByRole('button', { name: /Gestionar alineación/i }).click();
+
+    expect(
+      await screen.findByText('Esta alineación ya fue enviada y se muestra en modo lectura.'),
+    ).toBeVisible();
+  });
+
+  it('shows the new admin controls and blocks finishing a match without all pair results', async () => {
+    const adminOperationsStore = createAdminOperationsStoreMock([
+      {
+        id: 'pair-match-1',
+        localLineUpPairId: 'pair-1',
+        awayLineUpPairId: 'pair-2',
+        status: 'scheduled' as const,
+        setsResult: [],
+      },
+      {
+        id: 'pair-match-2',
+        localLineUpPairId: 'pair-3',
+        awayLineUpPairId: 'pair-4',
+        status: 'scheduled' as const,
+        setsResult: [],
+      },
+    ]);
+
+    await renderComponent({ role: 'ADMIN', adminOperationsStore });
+
+    expect(screen.getByRole('button', { name: /Preparar alineaciones base/i })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: /Generar enfrentamientos de parejas/i }),
+    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: /^Finalizar$/i })).toBeDisabled();
+    expect(
+      screen.getAllByRole('button', { name: /Registrar resultado/i }).length,
+    ).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows pair match results as read-only once they are registered', async () => {
+    const adminOperationsStore = createAdminOperationsStoreMock([
+      {
+        id: 'pair-match-1',
+        localLineUpPairId: 'pair-1',
+        awayLineUpPairId: 'pair-2',
+        status: 'finished' as const,
+        setsResult: [{ local: 6, away: 4 }],
+      },
+      {
+        id: 'pair-match-2',
+        localLineUpPairId: 'pair-3',
+        awayLineUpPairId: 'pair-4',
+        status: 'finished' as const,
+        setsResult: [{ local: 6, away: 2 }],
+      },
+    ]);
+
+    await renderComponent({ role: 'ADMIN', adminOperationsStore });
+
+    expect(screen.queryByRole('button', { name: /Registrar resultado/i })).not.toBeInTheDocument();
+    expect(screen.getAllByText('Resultado cerrado.')).toHaveLength(2);
+    expect(screen.getByText('6-4')).toBeVisible();
+    expect(screen.getByText('6-2')).toBeVisible();
+  });
+});

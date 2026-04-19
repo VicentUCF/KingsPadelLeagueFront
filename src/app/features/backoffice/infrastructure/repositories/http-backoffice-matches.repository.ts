@@ -46,6 +46,19 @@ export class HttpBackofficeMatchesRepository implements BackofficeMatchesReposit
     ).then((res) => res.items.map(mapMatch));
   }
 
+  loadByMatchdayAndTeam(matchdayId: string, teamId: string): Promise<readonly BackofficeMatch[]> {
+    let params = new HttpParams().set('limit', '100');
+    params = withJsonArrayParam(params, 'matchdayIds', [matchdayId]);
+    params = withJsonArrayParam(params, 'teamIds', [teamId]);
+
+    return firstValueFrom(
+      this.http.get<PaginatedResponse<MatchHttpV1>>(`${this.baseUrl}${this.matchesBasePath()}`, {
+        params,
+        context: withHttpErrorToast({ key: 'load-matches-matchday-team' }),
+      }),
+    ).then((res) => res.items.map(mapMatch));
+  }
+
   create(input: CreateBackofficeMatchInput): Promise<BackofficeMatch> {
     return firstValueFrom(
       this.http.post<MatchHttpV1>(`${this.baseUrl}/admin/v1/matches`, input, {
