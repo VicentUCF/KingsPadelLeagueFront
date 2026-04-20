@@ -423,6 +423,8 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
     await renderComponent({ role: 'ADMIN', adminOperationsStore });
 
     expect(screen.getByRole('button', { name: /Preparar alineaciones base/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Gestionar alineación Locales/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Gestionar alineación Visitantes/i })).toBeVisible();
     expect(
       screen.getByRole('button', { name: /Generar enfrentamientos de parejas/i }),
     ).toBeDisabled();
@@ -456,5 +458,27 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
     expect(screen.getAllByText('Resultado cerrado.')).toHaveLength(2);
     expect(screen.getByText('6-4')).toBeVisible();
     expect(screen.getByText('6-2')).toBeVisible();
+  });
+
+  it('lets the admin intervene and submit the lineup of any team in the matchday', async () => {
+    const lineupsStore = createLineupsStoreMock({
+      lineups: signal([
+        { id: 'lineup-1', matchId: 'match-1', teamId: 'team-1', status: 'submited' as const },
+        { id: 'lineup-2', matchId: 'match-1', teamId: 'team-2', status: 'pending' as const },
+      ]),
+    });
+
+    await renderComponent({ role: 'ADMIN', lineupsStore });
+
+    screen.getByRole('button', { name: /Gestionar alineación Visitantes/i }).click();
+
+    (await screen.findByRole('button', { name: /Enviar alineación/i })).click();
+
+    await waitFor(() => {
+      expect(lineupsStore.submitDraft).toHaveBeenCalledWith('match-1', 'team-2', [
+        { player1Id: 'player-3', player2Id: 'player-4' },
+        { player1Id: 'player-7', player2Id: 'player-8' },
+      ]);
+    });
   });
 });

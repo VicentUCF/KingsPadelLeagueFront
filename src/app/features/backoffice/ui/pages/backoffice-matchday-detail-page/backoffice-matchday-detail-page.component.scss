@@ -161,6 +161,47 @@
     gap: 1rem;
   }
 
+  &__lineup-management {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  &__lineup-team-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(245 245 245 / 7%);
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  &__lineup-team-copy {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  &__lineup-team-name {
+    margin: 0;
+    color: var(--color-text-strong);
+    font-size: 0.92rem;
+    font-weight: 700;
+  }
+
+  &__lineup-team-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__lineup-team-pairs {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+
   &__admin-match-head {
     display: flex;
     justify-content: space-between;

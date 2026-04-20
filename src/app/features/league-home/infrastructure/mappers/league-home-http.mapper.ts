@@ -4,6 +4,7 @@ import type {
   MatchTeamLineUpHttpV1,
   MatchTeamLineUpPairHttpV1,
   PairMatchHttpV1,
+  PairMatchSetHttpV1,
   PlayerHttpV1,
   TeamHttpV1,
 } from '@core/api/kings-padel-api.types';
@@ -126,7 +127,7 @@ function mapLeagueMatchdaysFromContext(context: LeagueHomeContext): readonly Lea
       encounters: (context.matchesByMatchdayId.get(matchday.id) ?? [])
         .slice()
         .sort(compareByScheduledAt)
-        .map((match) => toMatchdayEncounter(match, matchday, context)),
+        .map((match) => toMatchdayEncounter(match, context)),
     }));
 
   return orderedMatchdays.map(({ matchday, number, encounters }) => ({
@@ -371,12 +372,19 @@ function toTeamPlayerSummary(
 
 function toMatchdayEncounter(
   match: MatchHttpV1,
-  matchday: MatchdayHttpV1,
   context: LeagueHomeContext,
 ): LeagueMatchday['encounters'][number] {
   const homeTeam = context.teamById.get(match.localTeamId);
   const awayTeam = context.teamById.get(match.awayTeamId);
   const lineupContext = resolveLineupContext(match, context);
+  const pairResults = createPairResults(
+    lineupContext.localPairs,
+    lineupContext.awayPairs,
+    lineupContext.pairMatchesByLocalPairId,
+    context.playerById,
+    match.localTeamId,
+    match.awayTeamId,
+  );
 
   return {
     id: match.id,
@@ -388,19 +396,10 @@ function toMatchdayEncounter(
     awayTeamName: awayTeam?.name ?? match.awayTeamId,
     homeScore: match.localTeamScorePoints,
     awayScore: match.awayTeamScorePoints,
-    status: mapMatchdayStatus(matchday.status),
+    status: mapMatchStatus(match.status),
     scheduledAtIso: match.scheduledAt,
     scheduledAtLabel: formatScheduledAtLabel(match.scheduledAt),
-    pairResults: createPairResults(
-      lineupContext.localPairs,
-      lineupContext.awayPairs,
-      lineupContext.pairMatchesByLocalPairId,
-      context.playerById,
-      homeTeam?.name ?? match.localTeamId,
-      awayTeam?.name ?? match.awayTeamId,
-      match.localTeamId,
-      match.awayTeamId,
-    ),
+    pairResults,
   };
 }
 
@@ -440,8 +439,6 @@ function createPairResults(
   awayPairs: readonly MatchTeamLineUpPairHttpV1[],
   pairMatchesByLocalPairId: ReadonlyMap<string, PairMatchHttpV1>,
   playerById: ReadonlyMap<string, PlayerHttpV1>,
-  homeTeamName: string,
-  awayTeamName: string,
   homeTeamId: string,
   awayTeamId: string,
 ): readonly LeagueMatchPairResult[] {
@@ -453,6 +450,7 @@ function createPairResults(
       (pairMatch ? awayPairsById.get(pairMatch.awayLineUpPairId) : null) ??
       awayPairs[index] ??
       null;
+    const pairLabel = `Pareja ${index + 1}`;
 
     if (!awayPair) {
       return [];
@@ -463,9 +461,9 @@ function createPairResults(
     return [
       {
         id: pairMatch?.id ?? `${localPair.id}-${awayPair.id}`,
-        label: `Pareja ${index + 1}`,
-        homePair: createPairLineup(localPair, playerById, homeTeamName),
-        awayPair: createPairLineup(awayPair, playerById, awayTeamName),
+        label: pairLabel,
+        homePair: createPairLineup(localPair, playerById, pairLabel),
+        awayPair: createPairLineup(awayPair, playerById, pairLabel),
         homeScoreLabel: scoreLabel.home,
         awayScoreLabel: scoreLabel.away,
         winnerTeamId: resolvePairWinnerTeamId(pairMatch, homeTeamId, awayTeamId),
@@ -477,10 +475,10 @@ function createPairResults(
 function createPairLineup(
   pair: MatchTeamLineUpPairHttpV1,
   playerById: ReadonlyMap<string, PlayerHttpV1>,
-  teamName: string,
+  pairLabel: string,
 ): LeagueMatchPairLineup {
   return {
-    label: teamName,
+    label: pairLabel,
     players: [pair.player1Id, pair.player2Id]
       .map((playerId) => playerById.get(playerId))
       .filter((player): player is PlayerHttpV1 => player !== undefined)
@@ -500,7 +498,7 @@ function createPairScoreLabel(pairMatch: PairMatchHttpV1 | null): {
   readonly home: string;
   readonly away: string;
 } {
-  const setResults = pairMatch?.setsResult ?? [];
+  const setResults = getValidPairMatchSetResults(pairMatch?.setsResult);
 
   if (setResults.length === 0) {
     return {
@@ -520,16 +518,14 @@ function resolvePairWinnerTeamId(
   homeTeamId: string,
   awayTeamId: string,
 ): string | null {
-  if (!pairMatch || pairMatch.status !== 'finished' || !pairMatch.setsResult?.length) {
+  const setResults = getValidPairMatchSetResults(pairMatch?.setsResult);
+
+  if (!pairMatch || setResults.length === 0) {
     return null;
   }
 
-  const homeSetWins = pairMatch.setsResult.filter(
-    (setResult) => setResult.local > setResult.away,
-  ).length;
-  const awaySetWins = pairMatch.setsResult.filter(
-    (setResult) => setResult.away > setResult.local,
-  ).length;
+  const homeSetWins = setResults.filter((setResult) => setResult.local > setResult.away).length;
+  const awaySetWins = setResults.filter((setResult) => setResult.away > setResult.local).length;
 
   if (homeSetWins > awaySetWins) {
     return homeTeamId;
@@ -540,6 +536,44 @@ function resolvePairWinnerTeamId(
   }
 
   return null;
+}
+
+function getValidPairMatchSetResults(
+  rawSetResults: PairMatchHttpV1['setsResult'] | null | undefined,
+): readonly PairMatchSetHttpV1[] {
+  if (!Array.isArray(rawSetResults) || rawSetResults.length === 0) {
+    return [];
+  }
+
+  const setResults = rawSetResults.map((rawSetResult) => toValidPairMatchSetResult(rawSetResult));
+
+  return setResults.every((setResult) => setResult !== null) ? setResults : [];
+}
+
+function toValidPairMatchSetResult(rawSetResult: unknown): PairMatchSetHttpV1 | null {
+  if (!isRecord(rawSetResult)) {
+    return null;
+  }
+
+  const localScore = toFiniteScore(rawSetResult['local']);
+  const awayScore = toFiniteScore(rawSetResult['away']);
+
+  if (localScore === null || awayScore === null) {
+    return null;
+  }
+
+  return {
+    local: localScore,
+    away: awayScore,
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function toFiniteScore(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
 function createByeTeam(
@@ -686,6 +720,17 @@ function sortLineupPairs(
 }
 
 function mapMatchdayStatus(status: MatchdayHttpV1['status']): LeagueMatchdayStatus {
+  switch (status) {
+    case 'finished':
+      return 'completed';
+    case 'in_progress':
+      return 'current';
+    case 'scheduled':
+      return 'upcoming';
+  }
+}
+
+function mapMatchStatus(status: MatchHttpV1['status']): LeagueMatchdayStatus {
   switch (status) {
     case 'finished':
       return 'completed';

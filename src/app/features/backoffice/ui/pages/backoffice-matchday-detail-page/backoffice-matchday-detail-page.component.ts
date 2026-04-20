@@ -111,6 +111,7 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
 
   protected readonly matchdayId = signal('');
   protected readonly selectedMatchId = signal<string | null>(null);
+  protected readonly selectedPlannerTeamId = signal<string | null>(null);
   protected readonly confirmAction = signal<{
     readonly kind: ConfirmActionKind;
     readonly matchId?: string;
@@ -426,9 +427,13 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     () => this.matchdayMatches().find((match) => match.id === this.selectedMatchId()) ?? null,
   );
 
+  protected readonly currentPlannerTeamId = computed(() =>
+    this.isAdmin() ? this.selectedPlannerTeamId() : this.sessionStore.currentPresidentTeamId(),
+  );
+
   protected readonly plannerLineup = computed(() => {
     const match = this.plannerMatch();
-    const teamId = this.sessionStore.currentPresidentTeamId();
+    const teamId = this.currentPlannerTeamId();
 
     if (!match || !teamId) {
       return null;
@@ -443,14 +448,14 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
   });
 
   protected readonly plannerPlayers = computed(() => {
-    const teamId = this.sessionStore.currentPresidentTeamId();
+    const teamId = this.currentPlannerTeamId();
     return teamId ? this.playersStore.players().filter((player) => player.teamId === teamId) : [];
   });
 
   protected readonly plannerTeamName = computed(
     () =>
-      this.teamsStore.teams().find((team) => team.id === this.sessionStore.currentPresidentTeamId())
-        ?.name ?? 'Mi equipo',
+      this.teamsStore.teams().find((team) => team.id === this.currentPlannerTeamId())?.name ??
+      'Mi equipo',
   );
 
   protected readonly plannerMatchTitle = computed(() => {
@@ -635,19 +640,21 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     }
   }
 
-  protected openPlanner(matchId: string): void {
+  protected openPlanner(matchId: string, teamId: string): void {
     this.selectedMatchId.set(matchId);
+    this.selectedPlannerTeamId.set(teamId);
   }
 
   protected closePlanner(): void {
     this.selectedMatchId.set(null);
+    this.selectedPlannerTeamId.set(null);
   }
 
   protected async submitLineup(
     draftPairs: readonly BackofficeLineupDraftPairInput[],
   ): Promise<void> {
     const match = this.plannerMatch();
-    const teamId = this.sessionStore.currentPresidentTeamId();
+    const teamId = this.currentPlannerTeamId();
 
     if (!match || !teamId) {
       return;
@@ -684,6 +691,31 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
 
       this.toastStore.error('No hemos podido enviar la alineacion.', 'No se ha podido enviar');
     }
+  }
+
+  protected lineupStatusForMatchTeam(
+    matchId: string,
+    teamId: string,
+  ): BackofficeMatchCardViewModel['lineupStatus'] {
+    return this.lineupsStore.lineupForMatch(matchId, teamId)?.status ?? 'no_lineup';
+  }
+
+  protected lineupStatusTone(
+    status: BackofficeMatchCardViewModel['lineupStatus'],
+  ): BackofficeMatchCardViewModel['lineupStatusTone'] {
+    switch (status) {
+      case 'pending':
+        return 'warning';
+      case 'submited':
+        return 'success';
+      case 'no_lineup':
+        return 'neutral';
+    }
+  }
+
+  protected lineupPairCountForMatchTeam(matchId: string, teamId: string): number {
+    const lineup = this.lineupsStore.lineupForMatch(matchId, teamId);
+    return lineup ? this.lineupsStore.pairsForLineup(lineup.id).length : 0;
   }
 
   protected openPairMatchResultDialog(pairMatchId: string): void {

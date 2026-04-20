@@ -192,6 +192,12 @@ describe('HttpLeagueHomeRepository', () => {
     expect(matchdays[0]?.encounters[0]?.pairResults[0]).toEqual(
       expect.objectContaining({
         label: 'Pareja 1',
+        homePair: expect.objectContaining({
+          label: 'Pareja 1',
+        }),
+        awayPair: expect.objectContaining({
+          label: 'Pareja 1',
+        }),
         winnerTeamId: 'team-kings',
         homeScoreLabel: '6/4 · 6/3',
         awayScoreLabel: '4/6 · 3/6',
@@ -213,6 +219,351 @@ describe('HttpLeagueHomeRepository', () => {
         points: 2,
         playedMatches: 1,
         gameDifference: 5,
+      }),
+    );
+  });
+
+  it('keeps the public encounter score tied to the match payload when pair results and match points disagree', async () => {
+    const matchdaysPromise = repository.loadMatchdays();
+
+    flushLeagueHomeRequests({
+      teams: [
+        createTeamHttp({ id: 'team-kings', name: 'Kings Of Favar' }),
+        createTeamHttp({ id: 'team-magic', name: 'Magic City' }),
+      ],
+      players: [
+        createPlayerHttp({
+          id: 'player-kings-1',
+          firstName: 'Raul',
+          lastName: 'Bataller',
+          teamId: 'team-kings',
+          preferredPosition: 'both',
+        }),
+        createPlayerHttp({
+          id: 'player-kings-2',
+          firstName: 'Tono',
+          lastName: 'Miñana',
+          teamId: 'team-kings',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-kings-3',
+          firstName: 'Vicent',
+          lastName: 'Ciscar',
+          teamId: 'team-kings',
+          preferredPosition: 'both',
+        }),
+        createPlayerHttp({
+          id: 'player-kings-4',
+          firstName: 'Jose',
+          lastName: 'Sanfelix',
+          teamId: 'team-kings',
+          preferredPosition: 'left',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-1',
+          firstName: 'Ruben',
+          lastName: 'Marzal',
+          teamId: 'team-magic',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-2',
+          firstName: 'Adri',
+          lastName: 'Alvarez',
+          teamId: 'team-magic',
+          preferredPosition: 'left',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-3',
+          firstName: 'Josep',
+          lastName: 'Castello',
+          teamId: 'team-magic',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-4',
+          firstName: 'Artur',
+          lastName: 'Peris',
+          teamId: 'team-magic',
+          preferredPosition: 'left',
+        }),
+      ],
+      matchdays: [
+        createMatchdayHttp({
+          id: 'matchday-1',
+          name: 'Jornada 1',
+          scheduledAt: '2026-04-19T16:00:00.000Z',
+          status: 'finished',
+        }),
+      ],
+      matches: [
+        createMatchHttp({
+          id: 'match-1',
+          matchdayId: 'matchday-1',
+          localTeamId: 'team-kings',
+          awayTeamId: 'team-magic',
+          localTeamScorePoints: 0,
+          awayTeamScorePoints: 0,
+          status: 'finished',
+          scheduledAt: '2026-04-19T16:00:00.000Z',
+        }),
+      ],
+      lineups: [
+        createLineupHttp({ id: 'lineup-kings', matchId: 'match-1', teamId: 'team-kings' }),
+        createLineupHttp({ id: 'lineup-magic', matchId: 'match-1', teamId: 'team-magic' }),
+      ],
+      lineupPairs: [
+        createLineupPairHttp({
+          id: 'pair-kings-1',
+          matchTeamLineUpId: 'lineup-kings',
+          player1Id: 'player-kings-1',
+          player2Id: 'player-kings-2',
+        }),
+        createLineupPairHttp({
+          id: 'pair-kings-2',
+          matchTeamLineUpId: 'lineup-kings',
+          player1Id: 'player-kings-3',
+          player2Id: 'player-kings-4',
+        }),
+        createLineupPairHttp({
+          id: 'pair-magic-1',
+          matchTeamLineUpId: 'lineup-magic',
+          player1Id: 'player-magic-1',
+          player2Id: 'player-magic-2',
+        }),
+        createLineupPairHttp({
+          id: 'pair-magic-2',
+          matchTeamLineUpId: 'lineup-magic',
+          player1Id: 'player-magic-3',
+          player2Id: 'player-magic-4',
+        }),
+      ],
+      pairMatches: [
+        createPairMatchHttp({
+          id: 'pair-match-1',
+          localLineUpPairId: 'pair-kings-1',
+          awayLineUpPairId: 'pair-magic-1',
+          status: 'finished',
+          setsResult: [
+            { local: 6, away: 4 },
+            { local: 6, away: 3 },
+          ],
+        }),
+      ],
+    });
+
+    const matchdays = await matchdaysPromise;
+    const [encounter] = matchdays[0]?.encounters ?? [];
+
+    expect(encounter).toEqual(
+      expect.objectContaining({
+        status: 'completed',
+        homeScore: 0,
+        awayScore: 0,
+      }),
+    );
+  });
+
+  it('resolves the pair winner from valid set objects even when pair-match status is missing', async () => {
+    const matchdaysPromise = repository.loadMatchdays();
+
+    flushLeagueHomeRequests({
+      teams: [
+        createTeamHttp({ id: 'team-kings', name: 'Kings Of Favar' }),
+        createTeamHttp({ id: 'team-magic', name: 'Magic City' }),
+      ],
+      players: [
+        createPlayerHttp({
+          id: 'player-kings-1',
+          firstName: 'Raul',
+          lastName: 'Bataller',
+          teamId: 'team-kings',
+          preferredPosition: 'both',
+        }),
+        createPlayerHttp({
+          id: 'player-kings-2',
+          firstName: 'Tono',
+          lastName: 'Miñana',
+          teamId: 'team-kings',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-1',
+          firstName: 'Ruben',
+          lastName: 'Marzal',
+          teamId: 'team-magic',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-2',
+          firstName: 'Adri',
+          lastName: 'Alvarez',
+          teamId: 'team-magic',
+          preferredPosition: 'left',
+        }),
+      ],
+      matchdays: [
+        createMatchdayHttp({
+          id: 'matchday-1',
+          name: 'Jornada 1',
+          status: 'finished',
+        }),
+      ],
+      matches: [
+        createMatchHttp({
+          id: 'match-1',
+          matchdayId: 'matchday-1',
+          localTeamId: 'team-kings',
+          awayTeamId: 'team-magic',
+          localTeamScorePoints: 0,
+          awayTeamScorePoints: 0,
+          status: 'finished',
+        }),
+      ],
+      lineups: [
+        createLineupHttp({ id: 'lineup-kings', matchId: 'match-1', teamId: 'team-kings' }),
+        createLineupHttp({ id: 'lineup-magic', matchId: 'match-1', teamId: 'team-magic' }),
+      ],
+      lineupPairs: [
+        createLineupPairHttp({
+          id: 'pair-kings-1',
+          matchTeamLineUpId: 'lineup-kings',
+          player1Id: 'player-kings-1',
+          player2Id: 'player-kings-2',
+        }),
+        createLineupPairHttp({
+          id: 'pair-magic-1',
+          matchTeamLineUpId: 'lineup-magic',
+          player1Id: 'player-magic-1',
+          player2Id: 'player-magic-2',
+        }),
+      ],
+      pairMatches: [
+        createPairMatchHttp({
+          id: 'pair-match-1',
+          localLineUpPairId: 'pair-kings-1',
+          awayLineUpPairId: 'pair-magic-1',
+          status: null,
+          setsResult: [
+            { local: 6, away: 4 },
+            { local: 6, away: 3 },
+          ],
+        }),
+      ],
+    });
+
+    const matchdays = await matchdaysPromise;
+    const pairResult = matchdays[0]?.encounters[0]?.pairResults[0];
+
+    expect(pairResult).toEqual(
+      expect.objectContaining({
+        homeScoreLabel: '6/4 · 6/3',
+        awayScoreLabel: '4/6 · 3/6',
+        winnerTeamId: 'team-kings',
+      }),
+    );
+  });
+
+  it('treats malformed pair-match set payloads as unpublished results instead of rendering broken scores', async () => {
+    const matchdaysPromise = repository.loadMatchdays();
+
+    flushLeagueHomeRequests({
+      teams: [
+        createTeamHttp({ id: 'team-kings', name: 'Kings Of Favar' }),
+        createTeamHttp({ id: 'team-magic', name: 'Magic City' }),
+      ],
+      players: [
+        createPlayerHttp({
+          id: 'player-kings-1',
+          firstName: 'Raul',
+          lastName: 'Bataller',
+          teamId: 'team-kings',
+          preferredPosition: 'both',
+        }),
+        createPlayerHttp({
+          id: 'player-kings-2',
+          firstName: 'Tono',
+          lastName: 'Miñana',
+          teamId: 'team-kings',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-1',
+          firstName: 'Ruben',
+          lastName: 'Marzal',
+          teamId: 'team-magic',
+          preferredPosition: 'right',
+        }),
+        createPlayerHttp({
+          id: 'player-magic-2',
+          firstName: 'Adri',
+          lastName: 'Alvarez',
+          teamId: 'team-magic',
+          preferredPosition: 'left',
+        }),
+      ],
+      matchdays: [
+        createMatchdayHttp({
+          id: 'matchday-1',
+          name: 'Jornada 1',
+          status: 'finished',
+        }),
+      ],
+      matches: [
+        createMatchHttp({
+          id: 'match-1',
+          matchdayId: 'matchday-1',
+          localTeamId: 'team-kings',
+          awayTeamId: 'team-magic',
+          localTeamScorePoints: 0,
+          awayTeamScorePoints: 0,
+          status: 'finished',
+        }),
+      ],
+      lineups: [
+        createLineupHttp({ id: 'lineup-kings', matchId: 'match-1', teamId: 'team-kings' }),
+        createLineupHttp({ id: 'lineup-magic', matchId: 'match-1', teamId: 'team-magic' }),
+      ],
+      lineupPairs: [
+        createLineupPairHttp({
+          id: 'pair-kings-1',
+          matchTeamLineUpId: 'lineup-kings',
+          player1Id: 'player-kings-1',
+          player2Id: 'player-kings-2',
+        }),
+        createLineupPairHttp({
+          id: 'pair-magic-1',
+          matchTeamLineUpId: 'lineup-magic',
+          player1Id: 'player-magic-1',
+          player2Id: 'player-magic-2',
+        }),
+      ],
+      pairMatches: [
+        createPairMatchHttp({
+          id: 'pair-match-1',
+          localLineUpPairId: 'pair-kings-1',
+          awayLineUpPairId: 'pair-magic-1',
+          status: null,
+          setsResult: [[], []],
+        }),
+      ],
+    });
+
+    const matchdays = await matchdaysPromise;
+    const pairResult = matchdays[0]?.encounters[0]?.pairResults[0];
+
+    expect(pairResult).toEqual(
+      expect.objectContaining({
+        homeScoreLabel: 'Pendiente',
+        awayScoreLabel: 'Pendiente',
+        winnerTeamId: null,
+        homePair: expect.objectContaining({
+          label: 'Pareja 1',
+        }),
+        awayPair: expect.objectContaining({
+          label: 'Pareja 1',
+        }),
       }),
     );
   });

@@ -47,7 +47,7 @@
       </div>
     </header>
 
-    @if (selectedMatchId() && plannerMatch()) {
+    @if (selectedMatchId() && plannerMatch() && currentPlannerTeamId()) {
       <app-backoffice-lineup-planner
         [isSubmitting]="lineupsStore.isSubmittingLineup()"
         [lineup]="plannerLineup()"
@@ -272,6 +272,78 @@
                       }}</span>
                     </div>
 
+                    <div class="matchday-detail__lineup-management">
+                      <div class="matchday-detail__lineup-team-card">
+                        <div class="matchday-detail__lineup-team-copy">
+                          <p class="matchday-detail__lineup-team-name">{{ card.localTeamName }}</p>
+                          <div class="matchday-detail__lineup-team-meta">
+                            <app-status-badge
+                              [label]="
+                                matchStatusLabel(
+                                  lineupStatusForMatchTeam(card.matchId, card.localTeamId)
+                                )
+                              "
+                              [tone]="
+                                lineupStatusTone(
+                                  lineupStatusForMatchTeam(card.matchId, card.localTeamId)
+                                )
+                              "
+                            />
+                            <span class="matchday-detail__lineup-team-pairs">
+                              {{ lineupPairCountForMatchTeam(card.matchId, card.localTeamId) }}
+                              {{
+                                lineupPairCountForMatchTeam(card.matchId, card.localTeamId) === 1
+                                  ? 'pareja'
+                                  : 'parejas'
+                              }}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          class="c-button c-button--pill c-button--outline c-button--sm"
+                          (click)="openPlanner(card.matchId, card.localTeamId)"
+                        >
+                          Gestionar alineación {{ card.localTeamName }}
+                        </button>
+                      </div>
+
+                      <div class="matchday-detail__lineup-team-card">
+                        <div class="matchday-detail__lineup-team-copy">
+                          <p class="matchday-detail__lineup-team-name">{{ card.awayTeamName }}</p>
+                          <div class="matchday-detail__lineup-team-meta">
+                            <app-status-badge
+                              [label]="
+                                matchStatusLabel(
+                                  lineupStatusForMatchTeam(card.matchId, card.awayTeamId)
+                                )
+                              "
+                              [tone]="
+                                lineupStatusTone(
+                                  lineupStatusForMatchTeam(card.matchId, card.awayTeamId)
+                                )
+                              "
+                            />
+                            <span class="matchday-detail__lineup-team-pairs">
+                              {{ lineupPairCountForMatchTeam(card.matchId, card.awayTeamId) }}
+                              {{
+                                lineupPairCountForMatchTeam(card.matchId, card.awayTeamId) === 1
+                                  ? 'pareja'
+                                  : 'parejas'
+                              }}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          class="c-button c-button--pill c-button--outline c-button--sm"
+                          (click)="openPlanner(card.matchId, card.awayTeamId)"
+                        >
+                          Gestionar alineación {{ card.awayTeamName }}
+                        </button>
+                      </div>
+                    </div>
+
                     <div class="matchday-detail__admin-match-actions">
                       <button
                         type="button"
@@ -431,7 +503,7 @@
                       <button
                         type="button"
                         class="c-button c-button--pill c-button--primary c-button--sm"
-                        (click)="openPlanner(card.matchId)"
+                        (click)="openPlanner(card.matchId, team.id)"
                       >
                         Gestionar alineación
                       </button>
