@@ -82,6 +82,8 @@ function createPlayerCard(
     lostMatchesLabel: overrides.lostMatchesLabel ?? '1',
     profileLink: `/jugadores/${overrides.displayName.toLowerCase().replace(/\s+/g, '-')}`,
     ranking: overrides.ranking ?? 1,
+    totalPoints: overrides.totalPoints ?? 8,
+    totalPointsLabel: overrides.totalPointsLabel ?? 'PTS 8',
     winRate: overrides.winRate ?? 80,
     winRateLabel: overrides.winRateLabel ?? '80%',
     side: overrides.side ?? 'ambas',

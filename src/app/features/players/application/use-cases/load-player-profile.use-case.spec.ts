@@ -61,6 +61,7 @@ function createPlayer(slug: string, displayName: string): Player {
     teamName: 'Kings of Favar',
     teamLogoPath: null,
     avatarPath: null,
+    totalPoints: 9,
     wonMatchesCount: 3,
     lostMatchesCount: 1,
     playedMatchesCount: 4,

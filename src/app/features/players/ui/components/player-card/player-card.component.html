@@ -48,6 +48,13 @@
   </div>
 
   <dl class="player-card__stats">
+    <div class="player-card__stat player-card__stat--points">
+      <dt class="u-visually-hidden">Puntos de temporada</dt>
+      <dd class="player-card__stat-value player-card__stat-value--points">
+        {{ player().totalPoints }}
+      </dd>
+    </div>
+
     <div class="player-card__stat">
       <dt class="u-visually-hidden">Ganados</dt>
       <dd class="player-card__stat-value">{{ player().wonMatchesLabel }}</dd>
@@ -61,13 +68,6 @@
     <div class="player-card__stat">
       <dt class="u-visually-hidden">Partidos jugados</dt>
       <dd class="player-card__stat-value">{{ player().playedMatchesCount }}</dd>
-    </div>
-
-    <div class="player-card__stat player-card__stat--rate">
-      <dt class="u-visually-hidden">Efectividad</dt>
-      <dd class="player-card__stat-value player-card__stat-value--rate">
-        {{ player().winRateLabel }}
-      </dd>
     </div>
   </dl>
 </a>

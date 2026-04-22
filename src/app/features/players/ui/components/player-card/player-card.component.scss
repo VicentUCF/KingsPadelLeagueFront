@@ -13,7 +13,7 @@ $col-wr-width: 4rem;
       $col-pos-width
       $col-avatar-width
       minmax(0, 1fr)
-      repeat(3, $col-stat-width)
+      repeat(4, $col-stat-width)
       $col-wr-width;
     gap: var(--space-3);
     align-items: center;
@@ -175,6 +175,10 @@ $col-wr-width: 4rem;
     &--rate {
       color: var(--color-brand-strong);
     }
+
+    &--points {
+      color: var(--color-text-strong);
+    }
   }
 }
 
@@ -183,12 +187,17 @@ $col-wr-width: 4rem;
 @media (max-width: 48rem) {
   .player-card {
     &__link {
-      grid-template-columns: $col-pos-width $col-avatar-width minmax(0, 1fr) $col-wr-width;
+      grid-template-columns:
+        $col-pos-width
+        $col-avatar-width
+        minmax(0, 1fr)
+        $col-stat-width
+        $col-wr-width;
       padding: var(--space-3) var(--space-4);
     }
 
-    // Hide G, P, PJ columns on mobile — only keep win rate
-    &__stat:not(.player-card__stat--rate) {
+    // Keep season points and win rate on mobile, hide the rest.
+    &__stat:not(.player-card__stat--points):not(.player-card__stat--rate) {
       display: none;
     }
   }

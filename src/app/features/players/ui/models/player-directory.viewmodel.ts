@@ -8,6 +8,8 @@ export interface PlayerCardViewModel {
   readonly teamName: string;
   readonly teamLogoPath: string | null;
   readonly avatarPath: string | null;
+  readonly totalPoints: number;
+  readonly totalPointsLabel: string;
   readonly wonMatchesCount: number;
   readonly lostMatchesCount: number;
   readonly playedMatchesCount: number;
@@ -32,6 +34,10 @@ export function toRankedPlayersViewModel(
   players: readonly Player[],
 ): readonly PlayerCardViewModel[] {
   const sorted = [...players].sort((a, b) => {
+    if (b.totalPoints !== a.totalPoints) {
+      return b.totalPoints - a.totalPoints;
+    }
+
     if (b.wonMatchesCount !== a.wonMatchesCount) {
       return b.wonMatchesCount - a.wonMatchesCount;
     }
@@ -97,6 +103,8 @@ export function toPlayerCardViewModel(player: Player, ranking = 0): PlayerCardVi
     teamName: player.teamName,
     teamLogoPath: teamBranding.logoPath,
     avatarPath: resolvePlayerAvatarPath(player.avatarPath),
+    totalPoints: player.totalPoints,
+    totalPointsLabel: `PTS ${player.totalPoints}`,
     wonMatchesCount: player.wonMatchesCount,
     lostMatchesCount: player.lostMatchesCount,
     playedMatchesCount: player.playedMatchesCount,

@@ -21,6 +21,8 @@ describe('PlayerCardComponent', () => {
           lostMatchesLabel: '1',
           profileLink: '/jugadores/alex-soler',
           ranking: 1,
+          totalPoints: 12,
+          totalPointsLabel: 'PTS 12',
           winRate: 80,
           winRateLabel: '80%',
           side: 'derecha',
@@ -33,6 +35,10 @@ describe('PlayerCardComponent', () => {
 
     expect(link).toHaveAttribute('href', '/jugadores/alex-soler');
     expect(screen.getByText('Kings of Favar')).toBeVisible();
+    expect(screen.getByText('12')).toBeVisible();
+    expect(
+      screen.getByText('Puntos de temporada', { selector: '.u-visually-hidden' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Ganados', { selector: '.u-visually-hidden' })).toBeInTheDocument();
     expect(screen.getByText('Perdidos', { selector: '.u-visually-hidden' })).toBeInTheDocument();
   });
@@ -54,6 +60,8 @@ describe('PlayerCardComponent', () => {
           lostMatchesLabel: '1',
           profileLink: '/jugadores/alex-soler',
           ranking: 1,
+          totalPoints: 0,
+          totalPointsLabel: 'PTS 0',
           winRate: 80,
           winRateLabel: '80%',
           side: 'derecha',

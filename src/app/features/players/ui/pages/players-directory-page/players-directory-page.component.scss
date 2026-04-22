@@ -205,7 +205,7 @@ $col-wr-width: 4rem;
     grid-template-columns:
       $col-pos-width
       minmax(0, 1fr)
-      repeat(3, $col-stat-width)
+      repeat(4, $col-stat-width)
       $col-wr-width;
     gap: var(--space-3);
     align-items: center;

@@ -168,15 +168,11 @@
       <div class="players-directory-page__ranking-header" aria-hidden="true">
         <span class="players-directory-page__col players-directory-page__col--pos">#</span>
         <span class="players-directory-page__col players-directory-page__col--player">Jugador</span>
-        <span class="players-directory-page__col players-directory-page__col--stat">G</span>
-        <span class="players-directory-page__col players-directory-page__col--stat">P</span>
+        <span class="players-directory-page__col players-directory-page__col--stat">PTS</span>
+        <span class="players-directory-page__col players-directory-page__col--stat">V</span>
+        <span class="players-directory-page__col players-directory-page__col--stat">D</span>
         <span class="players-directory-page__col players-directory-page__col--stat">PJ</span>
-        <span class="players-directory-page__col players-directory-page__col--wr">%</span>
       </div>
-
-      <p class="players-directory-page__metrics-legend">
-        G: juegos ganados · P: juegos perdidos · PJ: partidos jugados · %: porcentaje de victorias
-      </p>
 
       <ol class="players-directory-page__ranking" aria-label="Directorio de jugadores">
         @for (player of store.filteredPlayers(); track player.id) {

@@ -27,7 +27,8 @@ describe('PlayerProfileCardComponent', () => {
           playedMatchesLabel: '5',
           winRate: 80,
           winRateLabel: '80%',
-          overallRating: 88,
+          totalPoints: 12,
+          totalPointsLabel: 'PTS 12',
           side: 'derecha',
           sideLabel: 'Derecha',
           metaDescription: 'Perfil de Alex Soler',
@@ -37,6 +38,8 @@ describe('PlayerProfileCardComponent', () => {
     });
 
     expect(screen.getByText('Alex Soler')).toBeVisible();
+    expect(screen.getByText('12')).toBeVisible();
+    expect(screen.getByText('PTS')).toBeVisible();
     expect(screen.queryByAltText('Alex Soler')).not.toBeInTheDocument();
     expect(container.querySelector('.player-profile-card__avatar-fallback')).not.toBeNull();
   });

@@ -88,6 +88,8 @@ function getSearchableValues(player: PlayerCardViewModel): readonly string[] {
     player.side,
     player.sideLabel,
     `${player.ranking}`,
+    player.totalPointsLabel,
+    `${player.totalPoints}`,
     player.wonMatchesLabel,
     player.lostMatchesLabel,
     `${player.playedMatchesCount}`,

@@ -19,6 +19,8 @@ export interface PlayerProfileViewModel {
   readonly teamMonogram: string;
   readonly teamPalette: TeamBrandingPalette;
   readonly avatarPath: string | null;
+  readonly totalPoints: number;
+  readonly totalPointsLabel: string;
   readonly wonMatchesCount: number;
   readonly lostMatchesCount: number;
   readonly wonMatchesLabel: string;
@@ -26,7 +28,6 @@ export interface PlayerProfileViewModel {
   readonly playedMatchesLabel: string;
   readonly winRate: number;
   readonly winRateLabel: string;
-  readonly overallRating: number;
   readonly side: string;
   readonly sideLabel: string;
   readonly metaDescription: string;
@@ -39,7 +40,6 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
     player.playedMatchesCount > 0
       ? Math.round((player.wonMatchesCount / player.playedMatchesCount) * 100)
       : 0;
-  const overallRating = Math.round(60 + (winRate / 100) * 35);
   const hasCompetitiveStats = player.playedMatchesCount > 0;
   const teamBranding = resolveTeamBranding({
     teamName: player.teamName,
@@ -55,6 +55,8 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
     teamMonogram,
     teamPalette: teamBranding.palette,
     avatarPath: resolvePlayerAvatarPath(player.avatarPath),
+    totalPoints: player.totalPoints,
+    totalPointsLabel: `PTS ${player.totalPoints}`,
     wonMatchesCount: player.wonMatchesCount,
     lostMatchesCount: player.lostMatchesCount,
     wonMatchesLabel: `${player.wonMatchesCount}`,
@@ -62,7 +64,6 @@ export function toPlayerProfileViewModel(player: Player): PlayerProfileViewModel
     playedMatchesLabel: `${player.playedMatchesCount}`,
     winRate,
     winRateLabel: `${winRate}%`,
-    overallRating,
     side: player.side,
     sideLabel: SIDE_LABELS[player.side] ?? player.side,
     pageTitle: `${player.displayName} | Jugadores | KingsPadelLeague`,

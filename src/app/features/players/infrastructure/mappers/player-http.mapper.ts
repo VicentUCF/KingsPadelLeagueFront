@@ -1,5 +1,8 @@
 import type { PlayerHttpV1, TeamHttpV1 } from '@core/api/kings-padel-api.types';
-import { resolvePlayerHttpCompetitiveStats } from '@core/api/player-http-competitive-stats';
+import {
+  resolvePlayerHttpCompetitiveStats,
+  type PlayerSeasonCompetitiveScore,
+} from '@core/api/player-http-competitive-stats';
 import {
   Player,
   UNASSIGNED_PLAYER_TEAM_ID,
@@ -12,6 +15,7 @@ import { createPlayerSlugById } from '@shared/utils/player-slug';
 export function mapPlayersFromHttp(
   players: readonly PlayerHttpV1[],
   teams: readonly TeamHttpV1[],
+  seasonScoreByPlayerId: ReadonlyMap<string, PlayerSeasonCompetitiveScore> = new Map(),
 ): readonly Player[] {
   const teamById = new Map(teams.map((team) => [team.id, team]));
   const slugByPlayerId = createPlayerSlugById(
@@ -24,7 +28,10 @@ export function mapPlayersFromHttp(
   return [...players]
     .map((player) => {
       const team = player.teamId ? teamById.get(player.teamId) : undefined;
-      const competitiveStats = resolvePlayerHttpCompetitiveStats(player);
+      const competitiveStats = resolvePlayerHttpCompetitiveStats(
+        player,
+        seasonScoreByPlayerId.get(player.id),
+      );
 
       return new Player(
         player.id,
@@ -37,6 +44,7 @@ export function mapPlayersFromHttp(
         competitiveStats.wonMatchesCount,
         competitiveStats.lostMatchesCount,
         toPlayerSide(player.preferredPosition),
+        competitiveStats.totalPoints,
       );
     })
     .sort((leftPlayer, rightPlayer) =>

@@ -12,11 +12,14 @@ describe('Player', () => {
       null,
       4,
       2,
+      'ambas',
+      9,
     );
 
     expect(player.wonMatchesCount).toBe(4);
     expect(player.lostMatchesCount).toBe(2);
     expect(player.playedMatchesCount).toBe(6);
+    expect(player.totalPoints).toBe(9);
   });
 
   it('rejects negative statistics', () => {
@@ -33,5 +36,23 @@ describe('Player', () => {
         2,
       );
     }).toThrow('Player match statistics cannot be negative.');
+  });
+
+  it('rejects negative total points', () => {
+    expect(() => {
+      return new Player(
+        'player-3',
+        'vicent-ciscar',
+        'Vicent Ciscar',
+        'kings-of-favar',
+        'Kings of Favar',
+        null,
+        null,
+        1,
+        0,
+        'ambas',
+        -1,
+      );
+    }).toThrow('Player season points cannot be negative.');
   });
 });

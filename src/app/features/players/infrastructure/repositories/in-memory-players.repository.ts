@@ -20,6 +20,7 @@ export class InMemoryPlayersRepository extends PlayersRepository {
         player.wonMatchesCount,
         player.lostMatchesCount,
         player.side,
+        player.totalPoints,
       ),
   );
 

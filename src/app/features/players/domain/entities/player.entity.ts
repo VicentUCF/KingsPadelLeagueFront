@@ -21,9 +21,14 @@ export class Player {
     readonly wonMatchesCount: number,
     readonly lostMatchesCount: number,
     readonly side: PlayerSide = 'ambas',
+    readonly totalPoints = 0,
   ) {
     if (wonMatchesCount < 0 || lostMatchesCount < 0) {
       throw new Error('Player match statistics cannot be negative.');
+    }
+
+    if (totalPoints < 0) {
+      throw new Error('Player season points cannot be negative.');
     }
 
     this.playedMatchesCount = wonMatchesCount + lostMatchesCount;

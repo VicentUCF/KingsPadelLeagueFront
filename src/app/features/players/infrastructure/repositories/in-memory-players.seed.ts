@@ -16,6 +16,7 @@ export interface PlayerSeed {
   readonly teamName: string;
   readonly teamLogoPath: string | null;
   readonly avatarPath: string | null;
+  readonly totalPoints: number;
   readonly wonMatchesCount: number;
   readonly lostMatchesCount: number;
   readonly side: PlayerSide;
@@ -45,6 +46,7 @@ export const PLAYER_SEED: readonly PlayerSeed[] = PUBLIC_LEAGUE_PLAYER_CATALOG.m
     teamName: assignedTeam?.name ?? UNASSIGNED_PLAYER_TEAM_NAME,
     teamLogoPath: assignedTeam?.logoPath ?? null,
     avatarPath: player.photoPath,
+    totalPoints: 0,
     wonMatchesCount: 0,
     lostMatchesCount: 0,
     side: player.side,

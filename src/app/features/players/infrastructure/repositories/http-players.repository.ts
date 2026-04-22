@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
+import { resolveCurrentSeasonId } from '@core/api/current-season-id';
 import { KingsPadelApiClient } from '@core/api/kings-padel-api.client';
 import { type Player } from '@features/players/domain/entities/player.entity';
 
@@ -27,7 +28,26 @@ export class HttpPlayersRepository extends PlayersRepository {
       const request = Promise.all([
         this.apiClient.loadTeams(forceRefresh),
         this.apiClient.loadPlayers(forceRefresh),
-      ]).then(([teams, players]) => mapPlayersFromHttp(players, teams));
+        this.apiClient.loadSeasons(forceRefresh),
+        this.apiClient.loadMatchdays(forceRefresh),
+      ]).then(async ([teams, players, seasons, matchdays]) => {
+        const activeSeasonId = resolveCurrentSeasonId(seasons, matchdays);
+        const seasonPlayerScores = activeSeasonId
+          ? await this.apiClient.loadSeasonPlayerScores(activeSeasonId, forceRefresh)
+          : [];
+        const seasonScoreByPlayerId = new Map(
+          seasonPlayerScores.map((score) => [
+            score.playerId,
+            {
+              totalPoints: score.totalPoints ?? 0,
+              wonPairMatches: score.wonPairMatches,
+              lostPairMatches: score.lostPairMatches,
+            },
+          ]),
+        );
+
+        return mapPlayersFromHttp(players, teams, seasonScoreByPlayerId);
+      });
 
       this.playersPromise = request;
       request.catch(() => {

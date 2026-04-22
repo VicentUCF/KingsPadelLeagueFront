@@ -15,6 +15,8 @@ describe('toPlayerProfileViewModel', () => {
         null,
         4,
         1,
+        'ambas',
+        12,
       ),
     );
 
@@ -26,6 +28,8 @@ describe('toPlayerProfileViewModel', () => {
       avatarPath: null,
       wonMatchesLabel: '4',
       lostMatchesLabel: '1',
+      totalPoints: 12,
+      totalPointsLabel: 'PTS 12',
       pageTitle: 'Alex Soler | Jugadores | KingsPadelLeague',
     });
     expect(viewModel.teamPalette).toMatchObject({
@@ -48,6 +52,8 @@ describe('toPlayerProfileViewModel', () => {
         null,
         0,
         0,
+        'ambas',
+        0,
       ),
     );
 
@@ -67,6 +73,8 @@ describe('toPlayerProfileViewModel', () => {
         null,
         1,
         0,
+        'ambas',
+        6,
       ),
     );
 
@@ -84,6 +92,8 @@ describe('toPlayerProfileViewModel', () => {
         null,
         'https://placeholder.com/images/player.png',
         0,
+        0,
+        'ambas',
         0,
       ),
     );

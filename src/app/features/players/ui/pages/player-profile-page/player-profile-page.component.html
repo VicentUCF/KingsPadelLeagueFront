@@ -75,7 +75,7 @@
           <p class="player-profile-page__team-name">{{ player.teamName }}</p>
 
           <div class="player-profile-page__team-pills" aria-label="Resumen del jugador">
-            <span class="player-profile-page__team-pill">OVR {{ player.overallRating }}</span>
+            <span class="player-profile-page__team-pill">{{ player.totalPointsLabel }}</span>
             <span
               class="player-profile-page__team-pill player-profile-page__team-pill--side"
               [attr.data-side]="player.side"

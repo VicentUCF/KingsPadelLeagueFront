@@ -57,6 +57,21 @@ describe('toPlayerDirectorySectionsViewModel', () => {
       'Zeta Player',
     ]);
   });
+
+  it('sorts the ranking by season points before match record tiebreakers', () => {
+    const result = toRankedPlayersViewModel([
+      createPlayer('alex-soler', 'Alex Soler', 'kings-of-favar', 'Kings of Favar', 4, 1, 9),
+      createPlayer('bruno-sanz', 'Bruno Sanz', 'kings-of-favar', 'Kings of Favar', 6, 0, 12),
+      createPlayer('sergio-torres', 'Sergio Torres', 'titanics', 'Titanics', 5, 0, 12),
+    ]);
+
+    expect(result.map((player) => player.displayName)).toEqual([
+      'Bruno Sanz',
+      'Sergio Torres',
+      'Alex Soler',
+    ]);
+    expect(result.map((player) => player.totalPoints)).toEqual([12, 12, 9]);
+  });
 });
 
 function createPlayer(
@@ -66,6 +81,7 @@ function createPlayer(
   teamName: string,
   wonMatchesCount: number,
   lostMatchesCount: number,
+  totalPoints = 0,
 ): Player {
   return new Player(
     slug,
@@ -77,5 +93,7 @@ function createPlayer(
     null,
     wonMatchesCount,
     lostMatchesCount,
+    'ambas',
+    totalPoints,
   );
 }

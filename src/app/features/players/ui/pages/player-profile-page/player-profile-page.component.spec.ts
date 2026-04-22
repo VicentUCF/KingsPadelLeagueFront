@@ -24,6 +24,7 @@ describe('PlayerProfilePageComponent', () => {
     expect(screen.getAllByText('Kings Of Favar').length).toBeGreaterThan(0);
     expect(screen.getByText('Partidos ganados')).toBeVisible();
     expect(screen.getByText('Partidos perdidos')).toBeVisible();
+    expect(screen.getByText('PTS 0')).toBeVisible();
     const teamShowcase = screen.getByRole('region', { name: /Equipo Kings Of Favar/i });
     const brandedLayout = teamShowcase.closest('.player-profile-page__layout');
 

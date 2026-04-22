@@ -37,6 +37,7 @@ export interface PlayerHttpV1 {
   readonly teamId?: string;
   readonly role?: string;
   readonly value?: number | null;
+  readonly totalPoints?: number | null;
   readonly wonGames?: number | null;
   readonly lostGames?: number | null;
   readonly preferredPosition: 'both' | 'left' | 'right';
@@ -70,6 +71,7 @@ export interface SeasonPlayerScoreHttpV1 {
   readonly id: string;
   readonly playerId: string;
   readonly seasonId: string;
+  readonly totalPoints?: number | null;
   readonly wonGames: number;
   readonly lostGames: number;
   readonly wonPairMatches: number;

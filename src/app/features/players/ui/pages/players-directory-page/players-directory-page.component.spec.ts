@@ -53,6 +53,8 @@ describe('PlayersDirectoryPageComponent', () => {
     const list = screen.getByRole('list', { name: /Directorio de jugadores/i });
 
     expect(list).toBeVisible();
+    expect(screen.getByText('PTS')).toBeVisible();
+    expect(screen.getByText(/PTS: puntos de temporada/i)).toBeVisible();
   });
 
   it('filters the directory by team and side while keeping the search global', async () => {
