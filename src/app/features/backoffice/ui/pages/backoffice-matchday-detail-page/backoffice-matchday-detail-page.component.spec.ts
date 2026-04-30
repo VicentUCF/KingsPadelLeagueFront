@@ -157,6 +157,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'right' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -171,6 +172,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'left' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -185,6 +187,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'right' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -199,6 +202,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'left' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -213,6 +217,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'right' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -227,6 +232,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'left' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -241,6 +247,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'right' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -255,6 +262,7 @@ function createPlayersStoreMock() {
         preferredPosition: 'left' as const,
         profileImage: null,
         value: 10,
+        totalPoints: 0,
         wonGames: 0,
         lostGames: 0,
         description: '',
@@ -475,10 +483,20 @@ describe('BackofficeMatchdayDetailPageComponent', () => {
     (await screen.findByRole('button', { name: /Enviar alineación/i })).click();
 
     await waitFor(() => {
-      expect(lineupsStore.submitDraft).toHaveBeenCalledWith('match-1', 'team-2', [
-        { player1Id: 'player-3', player2Id: 'player-4' },
-        { player1Id: 'player-7', player2Id: 'player-8' },
-      ]);
+      expect(lineupsStore.submitDraft).toHaveBeenCalledWith(
+        'match-1',
+        'team-2',
+        [
+          { player1Id: 'player-3', player2Id: 'player-4' },
+          { player1Id: 'player-7', player2Id: 'player-8' },
+        ],
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'player-3', teamId: 'team-2' }),
+          expect.objectContaining({ id: 'player-4', teamId: 'team-2' }),
+          expect.objectContaining({ id: 'player-7', teamId: 'team-2' }),
+          expect.objectContaining({ id: 'player-8', teamId: 'team-2' }),
+        ]),
+      );
     });
   });
 });

@@ -5,6 +5,7 @@ import type {
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
 import type { BackofficePairMatch } from '@features/backoffice/domain/entities/backoffice-pair-match';
 import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
+import { isBackofficeLineupPairPointOrderValid } from '@features/backoffice/domain/rules/backoffice-lineup-pair-order.rule';
 
 export const BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT = 2;
 export const BACKOFFICE_REQUIRED_LINEUP_PLAYER_COUNT = 4;
@@ -26,6 +27,7 @@ export interface BackofficeLineupOperationViewModel {
   readonly duplicatePlayerIds: readonly string[];
   readonly invalidPlayerIds: readonly string[];
   readonly incompletePairIndexes: readonly number[];
+  readonly pairPointOrderValid: boolean;
   readonly lockReason: string | null;
   readonly reasons: readonly string[];
   readonly primaryReason: string | null;
@@ -83,12 +85,17 @@ export function createBackofficeLineupOperationViewModel(input: {
   const assignedPlayerCount = new Set(assignedPlayerIds).size;
   const lineupExists = input.lineup !== null;
   const lineupStatus = input.lineup?.status ?? 'missing';
+  const pairPointOrderValid =
+    pairCount !== BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT ||
+    incompletePairIndexes.length > 0 ||
+    isBackofficeLineupPairPointOrderValid(input.pairs, input.teamPlayers);
   const lineupDataValid =
     pairCount === BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT &&
     incompletePairIndexes.length === 0 &&
     duplicatePlayerIds.length === 0 &&
     invalidPlayerIds.length === 0 &&
-    assignedPlayerCount === BACKOFFICE_REQUIRED_LINEUP_PLAYER_COUNT;
+    assignedPlayerCount === BACKOFFICE_REQUIRED_LINEUP_PLAYER_COUNT &&
+    pairPointOrderValid;
 
   const lockReason = resolveLineupLockReason(input.lineup);
   const reasons = uniqueMessages([
@@ -104,6 +111,9 @@ export function createBackofficeLineupOperationViewModel(input: {
     ...(duplicatePlayerIds.length > 0 ? ['Un jugador no puede repetirse en dos parejas.'] : []),
     ...(invalidPlayerIds.length > 0
       ? ['Todos los jugadores asignados deben pertenecer al equipo del presidente.']
+      : []),
+    ...(!pairPointOrderValid
+      ? ['La pareja 1 debe tener igual o más puntos de temporada que la pareja 2.']
       : []),
     ...(lineupExists &&
     pairCount === BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT &&
@@ -129,6 +139,7 @@ export function createBackofficeLineupOperationViewModel(input: {
     duplicatePlayerIds,
     invalidPlayerIds,
     incompletePairIndexes,
+    pairPointOrderValid,
     lockReason,
     reasons,
     primaryReason: reasons[0] ?? lockReason,

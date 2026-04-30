@@ -17,6 +17,7 @@ function createPlayer(overrides: Partial<Record<string, unknown>> = {}) {
     isPresident: false,
     teamId: 'team-1',
     value: 10,
+    totalPoints: 0,
     wonGames: 1,
     lostGames: 0,
     preferredPosition: 'right' as const,

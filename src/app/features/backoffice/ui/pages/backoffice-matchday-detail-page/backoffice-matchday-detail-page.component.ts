@@ -661,7 +661,7 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
     }
 
     try {
-      await this.lineupsStore.submitDraft(match.id, teamId, draftPairs);
+      await this.lineupsStore.submitDraft(match.id, teamId, draftPairs, this.plannerPlayers());
       this.closePlanner();
       this.toastStore.success('La alineacion se ha enviado correctamente.', 'Alineacion enviada');
     } catch (error) {
@@ -683,7 +683,7 @@ export class BackofficeMatchdayDetailPageComponent implements OnInit {
 
       if (error instanceof Error && error.message === 'invalid_lineup_draft') {
         this.toastStore.error(
-          'Debes completar exactamente 2 parejas validas antes de enviar la alineacion.',
+          'Debes completar 2 parejas validas y dejar la Pareja 1 con igual o mas puntos que la Pareja 2.',
           'Alineacion invalida',
         );
         return;

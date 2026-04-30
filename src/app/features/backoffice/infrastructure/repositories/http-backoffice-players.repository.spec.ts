@@ -83,6 +83,7 @@ describe('HttpBackofficePlayersRepository', () => {
         wonGames: 0,
         lostGames: 0,
         value: 0,
+        totalPoints: 0,
       }),
     ]);
   });
@@ -169,6 +170,7 @@ describe('HttpBackofficePlayersRepository', () => {
           seasonId: 'season-2026',
           wonPairMatches: 2,
           lostPairMatches: 1,
+          totalPoints: 12,
           wonGames: 5,
           lostGames: 3,
         }),
@@ -181,6 +183,7 @@ describe('HttpBackofficePlayersRepository', () => {
         id: 'player-vicent',
         wonGames: 2,
         lostGames: 1,
+        totalPoints: 12,
       }),
     ]);
   });
@@ -263,6 +266,7 @@ function createPlayerHttp(overrides: Partial<Record<string, unknown>> = {}) {
     profileImage: 'https://cdn.test/player.png',
     isPresident: false,
     value: 0,
+    totalPoints: 0,
     wonGames: 0,
     lostGames: 0,
     preferredPosition: 'right',

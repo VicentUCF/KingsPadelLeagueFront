@@ -7,6 +7,7 @@ import type {
   BackofficeLineupPair,
 } from '@features/backoffice/domain/entities/backoffice-lineup';
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
+import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
 import { BackofficeLineupsStore } from './backoffice-lineups.store';
 
 function createMatch(overrides: Partial<BackofficeMatch> = {}): BackofficeMatch {
@@ -43,6 +44,24 @@ function createPair(overrides: Partial<BackofficeLineupPair> = {}): BackofficeLi
     wonGame: null,
     sets: [],
     ...overrides,
+  };
+}
+
+function createPlayer(id: string, totalPoints: number): BackofficePlayer {
+  return {
+    id,
+    firstName: id,
+    lastName: 'Player',
+    email: `${id}@example.com`,
+    profileImage: null,
+    isPresident: false,
+    teamId: 'team-1',
+    value: 0,
+    totalPoints,
+    wonGames: 0,
+    lostGames: 0,
+    preferredPosition: 'both',
+    description: '',
   };
 }
 
@@ -147,10 +166,20 @@ describe('BackofficeLineupsStore', () => {
     const store = TestBed.inject(BackofficeLineupsStore);
 
     await store.loadForMatchdayAndTeam('matchday-1', 'team-1');
-    await store.submitDraft('match-1', 'team-1', [
-      { player1Id: 'player-5', player2Id: 'player-6' },
-      { player1Id: 'player-7', player2Id: 'player-8' },
-    ]);
+    await store.submitDraft(
+      'match-1',
+      'team-1',
+      [
+        { player1Id: 'player-5', player2Id: 'player-6' },
+        { player1Id: 'player-7', player2Id: 'player-8' },
+      ],
+      [
+        createPlayer('player-5', 8),
+        createPlayer('player-6', 6),
+        createPlayer('player-7', 5),
+        createPlayer('player-8', 4),
+      ],
+    );
 
     expect(lineupsUseCase.findByMatchAndTeam).toHaveBeenCalledWith('match-1', 'team-1');
     expect(lineupsUseCase.updatePair).toHaveBeenNthCalledWith(1, 'pair-1', 'player-5', 'player-6');
@@ -160,6 +189,42 @@ describe('BackofficeLineupsStore', () => {
     expect(matchesUseCase.byMatchdayAndTeam).toHaveBeenCalledTimes(2);
     expect(store.pairs()).toEqual(refreshedPairs);
     expect(store.isSubmittingLineup()).toBe(false);
+  });
+
+  it('rejects drafts when pair two has more total points than pair one', async () => {
+    const matchesUseCase = createMatchesUseCaseMock();
+    const lineupsUseCase = createLineupsUseCaseMock();
+
+    TestBed.configureTestingModule({
+      providers: [
+        BackofficeLineupsStore,
+        { provide: LoadBackofficeMatchesUseCase, useValue: matchesUseCase },
+        { provide: LoadBackofficeLineupsUseCase, useValue: lineupsUseCase },
+      ],
+    });
+
+    const store = TestBed.inject(BackofficeLineupsStore);
+
+    await expect(
+      store.submitDraft(
+        'match-1',
+        'team-1',
+        [
+          { player1Id: 'player-1', player2Id: 'player-2' },
+          { player1Id: 'player-3', player2Id: 'player-4' },
+        ],
+        [
+          createPlayer('player-1', 1),
+          createPlayer('player-2', 2),
+          createPlayer('player-3', 7),
+          createPlayer('player-4', 5),
+        ],
+      ),
+    ).rejects.toThrow('invalid_lineup_draft');
+
+    expect(lineupsUseCase.findByMatchAndTeam).not.toHaveBeenCalled();
+    expect(lineupsUseCase.updatePair).not.toHaveBeenCalled();
+    expect(lineupsUseCase.submit).not.toHaveBeenCalled();
   });
 
   it('rejects incomplete drafts before calling lineup mutations', async () => {
@@ -177,10 +242,15 @@ describe('BackofficeLineupsStore', () => {
     const store = TestBed.inject(BackofficeLineupsStore);
 
     await expect(
-      store.submitDraft('match-1', 'team-1', [
-        { player1Id: 'player-1', player2Id: 'player-2' },
-        { player1Id: 'player-3', player2Id: null },
-      ]),
+      store.submitDraft(
+        'match-1',
+        'team-1',
+        [
+          { player1Id: 'player-1', player2Id: 'player-2' },
+          { player1Id: 'player-3', player2Id: null },
+        ],
+        [],
+      ),
     ).rejects.toThrow('invalid_lineup_draft');
 
     expect(lineupsUseCase.findByMatchAndTeam).not.toHaveBeenCalled();
@@ -205,10 +275,20 @@ describe('BackofficeLineupsStore', () => {
     const store = TestBed.inject(BackofficeLineupsStore);
 
     await expect(
-      store.submitDraft('match-1', 'team-1', [
-        { player1Id: 'player-1', player2Id: 'player-2' },
-        { player1Id: 'player-3', player2Id: 'player-4' },
-      ]),
+      store.submitDraft(
+        'match-1',
+        'team-1',
+        [
+          { player1Id: 'player-1', player2Id: 'player-2' },
+          { player1Id: 'player-3', player2Id: 'player-4' },
+        ],
+        [
+          createPlayer('player-1', 0),
+          createPlayer('player-2', 0),
+          createPlayer('player-3', 0),
+          createPlayer('player-4', 0),
+        ],
+      ),
     ).rejects.toThrow('lineup_locked');
 
     expect(lineupsUseCase.createPair).not.toHaveBeenCalled();

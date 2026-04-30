@@ -8,7 +8,7 @@ import {
   createBackofficeMatchOperationViewModel,
 } from './backoffice-lineup-operation.viewmodel';
 
-function createPlayer(id: string, teamId = 'team-1'): BackofficePlayer {
+function createPlayer(id: string, teamId = 'team-1', totalPoints = 0): BackofficePlayer {
   return {
     id,
     firstName: id,
@@ -19,6 +19,7 @@ function createPlayer(id: string, teamId = 'team-1'): BackofficePlayer {
     preferredPosition: 'both',
     profileImage: null,
     value: 10,
+    totalPoints,
     wonGames: 0,
     lostGames: 0,
     description: '',
@@ -104,6 +105,28 @@ describe('backoffice-lineup-operation.viewmodel', () => {
         'Un jugador no puede repetirse en dos parejas.',
         'Todos los jugadores asignados deben pertenecer al equipo del presidente.',
       ]),
+    );
+  });
+
+  it('blocks submit when pair two has more season points than pair one', () => {
+    const summary = createBackofficeLineupOperationViewModel({
+      lineup: createLineup(),
+      pairs: [
+        { player1Id: 'player-1', player2Id: 'player-2' },
+        { player1Id: 'player-3', player2Id: 'player-4' },
+      ],
+      teamPlayers: [
+        createPlayer('player-1', 'team-1', 1),
+        createPlayer('player-2', 'team-1', 2),
+        createPlayer('player-3', 'team-1', 7),
+        createPlayer('player-4', 'team-1', 5),
+      ],
+    });
+
+    expect(summary.lineupReadyForSubmit).toBe(false);
+    expect(summary.pairPointOrderValid).toBe(false);
+    expect(summary.reasons).toContain(
+      'La pareja 1 debe tener igual o más puntos de temporada que la pareja 2.',
     );
   });
 

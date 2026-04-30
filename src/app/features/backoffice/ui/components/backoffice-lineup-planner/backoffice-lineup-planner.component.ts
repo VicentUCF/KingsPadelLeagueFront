@@ -13,6 +13,7 @@ import type {
   BackofficeLineup,
   BackofficeLineupPair,
 } from '@features/backoffice/domain/entities/backoffice-lineup';
+import { calculateBackofficeLineupPairTotalPoints } from '@features/backoffice/domain/rules/backoffice-lineup-pair-order.rule';
 import { resolvePlayerAvatarPath } from '@shared/utils/player-avatar';
 import {
   BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT,
@@ -307,6 +308,10 @@ export class BackofficeLineupPlannerComponent {
 
   protected totalGames(player: BackofficePlayer): number {
     return player.wonGames + player.lostGames;
+  }
+
+  protected pairTotalPoints(pair: PlannerPair): number {
+    return calculateBackofficeLineupPairTotalPoints(pair, this.players());
   }
 
   protected submitLineup(): void {

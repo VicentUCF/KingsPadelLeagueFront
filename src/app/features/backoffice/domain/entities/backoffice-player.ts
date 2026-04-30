@@ -10,6 +10,7 @@ export interface BackofficePlayer {
   readonly isPresident: boolean;
   readonly teamId?: string;
   readonly value: number;
+  readonly totalPoints: number;
   readonly wonGames: number;
   readonly lostGames: number;
   readonly preferredPosition: BackofficePlayerPosition;

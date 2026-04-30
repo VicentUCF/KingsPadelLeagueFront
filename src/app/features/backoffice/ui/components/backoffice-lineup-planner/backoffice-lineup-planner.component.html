@@ -117,8 +117,8 @@
                       <span class="availability-row__stat--lost" title="Partidas perdidas"
                         >PP {{ player.lostGames }}</span
                       >
-                      <span class="availability-row__stat--value" title="Valor"
-                        >★ {{ player.value }}</span
+                      <span class="availability-row__stat--points" title="Puntos de temporada"
+                        >PTS {{ player.totalPoints }}</span
                       >
                     </div>
                   </div>
@@ -223,7 +223,8 @@
                     <h4>{{ player.firstName }} {{ player.lastName }}</h4>
                     <p>{{ positionLabel(player.preferredPosition) }}</p>
                     <p class="available-card__stats">
-                      PJ {{ totalGames(player) }} · PG {{ player.wonGames }} · ★ {{ player.value }}
+                      PJ {{ totalGames(player) }} · PG {{ player.wonGames }} · PTS
+                      {{ player.totalPoints }}
                     </p>
                   </div>
                 </div>
@@ -269,6 +270,7 @@
             <div class="pair-row">
               <div class="pair-row__header">
                 <span class="pair-row__label">Pareja {{ idx + 1 }}</span>
+                <span class="pair-row__points">{{ pairTotalPoints(pair) }} PTS</span>
                 <div class="pair-row__actions">
                   <button
                     type="button"
@@ -323,7 +325,8 @@
                             {{ player.firstName }} {{ player.lastName }}
                           </p>
                           <p class="pair-slot__meta">
-                            {{ positionLabel(player.preferredPosition) }} · ★ {{ player.value }}
+                            {{ positionLabel(player.preferredPosition) }} · PTS
+                            {{ player.totalPoints }}
                           </p>
                         </div>
                         <button
@@ -376,7 +379,8 @@
                             {{ player.firstName }} {{ player.lastName }}
                           </p>
                           <p class="pair-slot__meta">
-                            {{ positionLabel(player.preferredPosition) }} · ★ {{ player.value }}
+                            {{ positionLabel(player.preferredPosition) }} · PTS
+                            {{ player.totalPoints }}
                           </p>
                         </div>
                         <button

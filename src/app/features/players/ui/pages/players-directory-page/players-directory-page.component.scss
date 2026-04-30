@@ -217,6 +217,14 @@ $col-wr-width: 4rem;
     text-transform: uppercase;
   }
 
+  &__ranking-legend {
+    margin: 0;
+    padding-inline: var(--space-5);
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
   &__col {
     &--pos {
       text-align: center;

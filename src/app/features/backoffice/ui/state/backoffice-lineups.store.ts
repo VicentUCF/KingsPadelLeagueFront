@@ -7,6 +7,8 @@ import type {
   BackofficeLineupPair,
 } from '@features/backoffice/domain/entities/backoffice-lineup';
 import type { BackofficeMatch } from '@features/backoffice/domain/entities/backoffice-match';
+import type { BackofficePlayer } from '@features/backoffice/domain/entities/backoffice-player';
+import { isBackofficeLineupPairPointOrderValid } from '@features/backoffice/domain/rules/backoffice-lineup-pair-order.rule';
 import { BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT } from '../models/backoffice-lineup-operation.viewmodel';
 
 export interface BackofficeLineupDraftPairInput {
@@ -210,11 +212,12 @@ export class BackofficeLineupsStore {
     matchId: string,
     teamId: string,
     draftPairs: readonly BackofficeLineupDraftPairInput[],
+    teamPlayers: readonly BackofficePlayer[],
   ): Promise<void> {
     this.isSubmittingLineup.set(true);
 
     try {
-      const lineup = await this.persistDraft(matchId, teamId, draftPairs);
+      const lineup = await this.persistDraft(matchId, teamId, draftPairs, teamPlayers);
       await this.loadLineupsUseCase.submit(lineup.id);
       await this.refreshCurrentContext();
     } finally {
@@ -226,10 +229,12 @@ export class BackofficeLineupsStore {
     matchId: string,
     teamId: string,
     draftPairs: readonly BackofficeLineupDraftPairInput[],
+    teamPlayers: readonly BackofficePlayer[],
   ): Promise<BackofficeLineup> {
     if (
       draftPairs.length !== BACKOFFICE_REQUIRED_LINEUP_PAIR_COUNT ||
-      draftPairs.some((pair) => !pair.player1Id || !pair.player2Id)
+      draftPairs.some((pair) => !pair.player1Id || !pair.player2Id) ||
+      !isBackofficeLineupPairPointOrderValid(draftPairs, teamPlayers)
     ) {
       throw new Error(INVALID_LINEUP_DRAFT_ERROR);
     }

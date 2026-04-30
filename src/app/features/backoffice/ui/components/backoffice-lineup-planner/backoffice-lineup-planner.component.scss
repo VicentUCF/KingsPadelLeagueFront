@@ -337,7 +337,7 @@
     color: rgb(212 130 130);
   }
 
-  &__stat--value {
+  &__stat--points {
     color: var(--color-brand-strong);
   }
 
@@ -427,6 +427,13 @@
     color: var(--color-text-strong);
     font-size: 0.86rem;
     font-weight: 700;
+  }
+
+  &__points {
+    color: var(--color-brand-strong);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-right: auto;
   }
 
   &__actions {

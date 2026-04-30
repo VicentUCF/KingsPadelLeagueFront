@@ -153,6 +153,7 @@ function mapPlayer(
     isPresident: raw.isPresident,
     ...(raw.teamId != null ? { teamId: raw.teamId } : {}),
     value: competitiveStats.marketValue,
+    totalPoints: competitiveStats.totalPoints,
     wonGames: competitiveStats.wonMatchesCount,
     lostGames: competitiveStats.lostMatchesCount,
     preferredPosition: raw.preferredPosition,
