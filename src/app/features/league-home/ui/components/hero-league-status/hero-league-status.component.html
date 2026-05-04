@@ -6,10 +6,12 @@
       <p class="hero-league-status__tagline">{{ leagueTagline() }}</p>
 
       <div class="hero-league-status__meta" role="list">
-        <p class="hero-league-status__meta-item" role="listitem">
-          <lucide-angular [img]="calendarDaysIcon" [size]="16" aria-hidden="true" />
-          <span>{{ currentMatchdayLabel() }}</span>
-        </p>
+        <div role="listitem">
+          <a class="hero-league-status__meta-item" routerLink="/jornadas">
+            <lucide-angular [img]="calendarDaysIcon" [size]="16" aria-hidden="true" />
+            <span>{{ currentMatchdayLabel() }}</span>
+          </a>
+        </div>
         <p class="hero-league-status__meta-item" role="listitem">
           <lucide-angular [img]="trophyIcon" [size]="16" aria-hidden="true" />
           <span>{{ phaseLabel() }}</span>

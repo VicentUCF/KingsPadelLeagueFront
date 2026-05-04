@@ -19,6 +19,7 @@ describe('LeagueHomePageComponent', () => {
       'href',
       '/clasificacion',
     );
+    expect(screen.getByRole('link', { name: /Jornada 3/i })).toHaveAttribute('href', '/jornadas');
     expect(screen.getByText(/Jornada 3 · Descansa/i)).toBeVisible();
     expect(
       screen.getByRole('table', { name: /Clasificación actual de KingsPadelLeague/i }),
