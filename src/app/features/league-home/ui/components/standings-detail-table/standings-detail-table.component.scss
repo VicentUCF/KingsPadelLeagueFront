@@ -109,7 +109,7 @@
 
   &__table {
     width: 100%;
-    min-width: 50rem;
+    min-width: 36rem;
     border-collapse: collapse;
   }
 
@@ -178,18 +178,6 @@
     &--lost {
       color: #fca5a5;
       font-weight: 600;
-    }
-
-    &--difference {
-      font-weight: 700;
-    }
-
-    &--positive {
-      color: #6ee7b7;
-    }
-
-    &--negative {
-      color: #fca5a5;
     }
 
     &--pts {

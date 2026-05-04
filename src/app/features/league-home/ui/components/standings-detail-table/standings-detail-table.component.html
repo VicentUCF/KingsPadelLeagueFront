@@ -24,9 +24,6 @@
           <th class="standings-detail-table__header-cell" scope="col">J</th>
           <th class="standings-detail-table__header-cell" scope="col">G</th>
           <th class="standings-detail-table__header-cell" scope="col">P</th>
-          <th class="standings-detail-table__header-cell" scope="col">JG</th>
-          <th class="standings-detail-table__header-cell" scope="col">JP</th>
-          <th class="standings-detail-table__header-cell" scope="col">DIF</th>
           <th
             class="standings-detail-table__header-cell standings-detail-table__header-cell--pts"
             scope="col"
@@ -70,15 +67,6 @@
             <td class="standings-detail-table__cell standings-detail-table__cell--lost">
               {{ row.lostLabel }}
             </td>
-            <td class="standings-detail-table__cell">{{ row.wonGamesLabel }}</td>
-            <td class="standings-detail-table__cell">{{ row.lostGamesLabel }}</td>
-            <td
-              class="standings-detail-table__cell standings-detail-table__cell--difference"
-              [class.standings-detail-table__cell--positive]="row.gameDifferenceTone === 'positive'"
-              [class.standings-detail-table__cell--negative]="row.gameDifferenceTone === 'negative'"
-            >
-              {{ row.gameDifferenceLabel }}
-            </td>
             <td class="standings-detail-table__cell standings-detail-table__cell--pts">
               {{ row.pointsLabel }}
             </td>
@@ -92,9 +80,6 @@
     <span class="standings-detail-table__legend-item">J — Jugados</span>
     <span class="standings-detail-table__legend-item">G — Ganados</span>
     <span class="standings-detail-table__legend-item">P — Perdidos</span>
-    <span class="standings-detail-table__legend-item">JG — Juegos ganados</span>
-    <span class="standings-detail-table__legend-item">JP — Juegos perdidos</span>
-    <span class="standings-detail-table__legend-item">DIF — Diferencia de juegos</span>
     <span class="standings-detail-table__legend-item">PTS — Puntos de liga</span>
   </p>
 } @else {

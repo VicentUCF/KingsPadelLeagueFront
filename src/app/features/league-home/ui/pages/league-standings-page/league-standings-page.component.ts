@@ -56,10 +56,6 @@ export class LeagueStandingsPageComponent implements OnInit {
       return null;
     }
 
-    if (!this.matchdaysStore.hasContent() && !this.matchdaysStore.errorMessage()) {
-      return null;
-    }
-
     return toLeagueStandingsPageViewModel(snapshot, this.matchdaysStore.matchdays());
   });
 

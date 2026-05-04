@@ -4,32 +4,25 @@ import { type LeagueHomeSnapshot } from '@features/league-home/domain/entities/l
 import { toLeagueStandingsPageViewModel } from './league-standings.viewmodel';
 
 describe('toLeagueStandingsPageViewModel', () => {
-  it('maps public standings into the detailed competition table', () => {
+  it('uses official standings as the source of truth for the competition table', () => {
     const viewModel = toLeagueStandingsPageViewModel(createSnapshot(), createMatchdays());
 
     expect(viewModel.standings).toEqual([
       expect.objectContaining({
         teamName: 'House Navarro',
-        pointsLabel: '3 pts',
-        playedLabel: '1',
+        pointsLabel: '11 pts',
+        playedLabel: '3',
         wonLabel: '1',
         lostLabel: '0',
-        wonGamesLabel: '29',
-        lostGamesLabel: '21',
-        gameDifferenceLabel: '+8',
         isLeader: true,
       }),
       expect.objectContaining({
         teamName: 'House Perez',
-        pointsLabel: '0 pts',
-        playedLabel: '1',
+        pointsLabel: '3 pts',
+        playedLabel: '3',
         wonLabel: '0',
         lostLabel: '1',
-        wonGamesLabel: '21',
-        lostGamesLabel: '29',
-        gameDifferenceLabel: '-8',
         isLast: true,
-        gameDifferenceTone: 'negative',
       }),
     ]);
     expect(viewModel.tieBreakRules).toHaveLength(4);

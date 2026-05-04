@@ -16,9 +16,9 @@ describe('LeagueStandingsPageComponent', () => {
     ).toBeVisible();
     expect(screen.getByRole('heading', { name: /^Clasificación$/i })).toBeVisible();
     expect(screen.getByRole('table', { name: /Clasificación de KingsPadelLeague/i })).toBeVisible();
-    expect(screen.getByRole('columnheader', { name: 'JG' })).toBeVisible();
-    expect(screen.getByRole('columnheader', { name: 'JP' })).toBeVisible();
-    expect(screen.getByRole('columnheader', { name: 'DIF' })).toBeVisible();
+    expect(screen.queryByRole('columnheader', { name: 'JG' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'JP' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'DIF' })).toBeNull();
     expect(screen.getByRole('columnheader', { name: 'PTS' })).toBeVisible();
     expect(screen.getByText(/Jornada 3 de 5/i)).toBeVisible();
     expect(screen.getByText(/Fase regular/i)).toBeVisible();

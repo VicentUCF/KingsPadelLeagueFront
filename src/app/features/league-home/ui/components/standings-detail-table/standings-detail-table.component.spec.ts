@@ -17,13 +17,9 @@ describe('StandingsDetailTableComponent', () => {
       playedLabel: '2',
       wonLabel: '2',
       lostLabel: '0',
-      wonGamesLabel: '12',
-      lostGamesLabel: '4',
-      gameDifferenceLabel: '+8',
       isLeader: true,
       isLast: false,
       rankTone: 'leader' as const,
-      gameDifferenceTone: 'positive' as const,
     },
     {
       teamId: 'house-torres',
@@ -36,13 +32,9 @@ describe('StandingsDetailTableComponent', () => {
       playedLabel: '2',
       wonLabel: '1',
       lostLabel: '1',
-      wonGamesLabel: '9',
-      lostGamesLabel: '7',
-      gameDifferenceLabel: '+2',
       isLeader: false,
       isLast: false,
       rankTone: 'podium' as const,
-      gameDifferenceTone: 'positive' as const,
     },
     {
       teamId: 'house-perez',
@@ -55,13 +47,9 @@ describe('StandingsDetailTableComponent', () => {
       playedLabel: '2',
       wonLabel: '0',
       lostLabel: '2',
-      wonGamesLabel: '4',
-      lostGamesLabel: '12',
-      gameDifferenceLabel: '-8',
       isLeader: false,
       isLast: true,
       rankTone: 'standard' as const,
-      gameDifferenceTone: 'negative' as const,
     },
   ];
 
@@ -80,13 +68,14 @@ describe('StandingsDetailTableComponent', () => {
     expect(
       within(renderedRows[1]!).getByRole('rowheader', { name: /House Navarro/i }),
     ).toBeVisible();
-    expect(screen.getByRole('columnheader', { name: 'JG' })).toBeVisible();
+    expect(screen.queryByRole('columnheader', { name: 'JG' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'JP' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'DIF' })).toBeNull();
     expect(screen.getByRole('columnheader', { name: 'PTS' })).toBeVisible();
     expect(screen.getByRole('link', { name: /House Navarro/i })).toHaveAttribute(
       'href',
       '/equipos/house-navarro',
     );
-    expect(screen.getByText('-8')).toBeVisible();
   });
 
   it('renders compact mobile cards with J, G, P and PTS metrics', async () => {
