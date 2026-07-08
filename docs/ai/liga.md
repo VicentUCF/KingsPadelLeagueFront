@@ -1,6 +1,29 @@
 REGLAMENTO DE LA LIGA
 
-FORMATO GENERAL
+ESTADO ACTUAL DE COMUNICACION
+
+La web pública debe mostrar una vista temporal de pretemporada hasta el arranque previsto en
+septiembre.
+
+Mensajes actuales:
+
+- Titanics es el campeón vigente tras los playoff.
+- Hay mercado y cambios de equipos en preparación.
+- RedLions se incorpora como nuevo equipo.
+- Habrá nuevas noticias antes del arranque.
+
+Las páginas de jugadores, equipos, clasificación, jornadas y calendario pueden seguir leyendo el
+dato actual de backend hasta que se actualice oficialmente la nueva temporada.
+
+TEMPORADA CERRADA
+
+1. Titanics
+2. Magic City
+3. Thormentadores
+4. Barbaridad Team
+5. Kings Of Favar
+
+FORMATO DE LA TEMPORADA CERRADA
 
 Liga cerrada de pádel tipo Kings League.
 

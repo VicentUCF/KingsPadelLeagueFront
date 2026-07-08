@@ -1,0 +1,111 @@
+<section class="preseason-home-page__hero">
+  <div class="o-container preseason-home-page__hero-layout">
+    <div class="preseason-home-page__hero-copy">
+      <p class="preseason-home-page__eyebrow">
+        <lucide-angular [img]="calendarIcon" [size]="16" aria-hidden="true" />
+        <span>Pretemporada</span>
+      </p>
+
+      <h1>Pretemporada KingsPadelLeague</h1>
+      <p class="preseason-home-page__lead">
+        Titanics cerró la temporada como campeón. Hasta septiembre preparamos la nueva etapa con
+        mercado de equipos, llegada de RedLions y noticias por publicar.
+      </p>
+
+      <ul class="preseason-home-page__status-list" aria-label="Estado actual de la liga">
+        <li>Arranque previsto en septiembre</li>
+        <li>Equipos y plantillas en actualización</li>
+        <li>Nuevas noticias próximamente</li>
+      </ul>
+    </div>
+
+    <div class="preseason-home-page__visual" role="group" aria-label="Transición de temporada">
+      <figure class="preseason-home-page__team-mark preseason-home-page__team-mark--champion">
+        <img
+          src="/teams_logos/titanics_no_bg.webp"
+          alt="Escudo de Titanics"
+          width="220"
+          height="220"
+          decoding="async"
+        />
+        <figcaption>
+          <span>Campeón</span>
+          <strong>Titanics</strong>
+        </figcaption>
+      </figure>
+
+      <figure class="preseason-home-page__team-mark preseason-home-page__team-mark--new">
+        <img
+          src="/teams_logos/redlions.webp"
+          alt="Escudo de RedLions"
+          width="220"
+          height="220"
+          decoding="async"
+        />
+        <figcaption>
+          <span>Nuevo equipo</span>
+          <strong>RedLions</strong>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="o-container preseason-home-page__section" aria-labelledby="preseason-news-title">
+  <div class="preseason-home-page__section-heading">
+    <p class="preseason-home-page__eyebrow">
+      <lucide-angular [img]="shieldIcon" [size]="16" aria-hidden="true" />
+      <span>Nueva etapa</span>
+    </p>
+    <h2 id="preseason-news-title">Mercado, equipos y próximas noticias</h2>
+    <p>
+      La web queda en modo pretemporada mientras se consolidan los cambios de equipos y las
+      plantillas oficiales. La información competitiva completa volverá cuando arranque la
+      temporada.
+    </p>
+  </div>
+
+  <ul class="preseason-home-page__highlight-grid">
+    @for (highlight of highlights; track highlight.title) {
+      <li class="preseason-home-page__highlight">
+        <span class="preseason-home-page__highlight-icon" aria-hidden="true">
+          <lucide-angular [img]="highlight.icon" [size]="22" aria-hidden="true" />
+        </span>
+        <h3>{{ highlight.title }}</h3>
+        <p>{{ highlight.description }}</p>
+      </li>
+    }
+  </ul>
+</section>
+
+<section class="o-container preseason-home-page__section" aria-labelledby="final-ranking-title">
+  <div class="preseason-home-page__section-heading">
+    <p class="preseason-home-page__eyebrow">
+      <lucide-angular [img]="trophyIcon" [size]="16" aria-hidden="true" />
+      <span>Cierre de temporada</span>
+    </p>
+    <h2 id="final-ranking-title">Ranking final de la temporada terminada</h2>
+  </div>
+
+  <ol class="preseason-home-page__ranking" aria-label="Ranking final de la temporada terminada">
+    @for (entry of finalRanking; track entry.teamName) {
+      <li
+        class="preseason-home-page__ranking-item"
+        [class.preseason-home-page__ranking-item--champion]="entry.rank === 1"
+      >
+        <span class="preseason-home-page__ranking-position">{{ entry.rank }}</span>
+        <img
+          [src]="entry.logoPath"
+          alt=""
+          aria-hidden="true"
+          class="preseason-home-page__ranking-logo"
+          width="56"
+          height="56"
+          decoding="async"
+        />
+        <strong>{{ entry.teamName }}</strong>
+        <span>{{ entry.label }}</span>
+      </li>
+    }
+  </ol>
+</section>

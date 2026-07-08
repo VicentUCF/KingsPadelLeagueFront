@@ -85,6 +85,16 @@ const TEAM_BRANDING_REGISTRY: Record<string, TeamBrandingRegistryEntry> = {
       contrast: '#05100f',
     },
   },
+  redlions: {
+    logoPath: '/teams_logos/redlions.webp',
+    palette: {
+      primary: '#d62f35',
+      accent: '#f7d36b',
+      surface: '#101827',
+      glow: 'rgb(214 47 53 / 0.38)',
+      contrast: '#080d16',
+    },
+  },
   'house-perez': {
     logoPath: null,
     palette: {

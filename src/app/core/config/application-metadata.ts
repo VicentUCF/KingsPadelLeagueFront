@@ -3,5 +3,5 @@ export const applicationMetadata = {
   tagline: 'Liga amateur de pádel',
   logoPath: '/kpl-logo-wordmark.png',
   description:
-    'Sigue la KingsPadelLeague: equipos participantes, clasificación, jugadores, jornadas y calendario oficial de la temporada 2026.',
+    'KingsPadelLeague está en pretemporada: Titanics es el campeón vigente, RedLions se incorpora y habrá nuevas noticias antes de septiembre.',
 } as const;
