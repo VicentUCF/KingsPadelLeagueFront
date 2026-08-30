@@ -1,0 +1,63 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+const view = await loadPublicLeagueView();
+---
+
+<BaseLayout
+	title={`Equipos · ${view.season.name} · Kings Padel League`}
+	description="Equipos y plantillas de la Kings Padel League."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<PageHero
+				eyebrow="Universo KPL"
+				title="Los equipos de la liga"
+				description="Descubre la identidad de cada club, su presidencia y la plantilla que defiende sus colores."
+				meta={[
+					view.season.name,
+					`${view.teams.length} equipos`,
+					`${view.players.length} jugadores`,
+				]}
+			>
+				<a slot="actions" class="c-button c-button--primary" href="/jugadores">Ver jugadores</a>
+			</PageHero>
+
+			{
+				view.teams.length ? (
+					<section class="team-grid" aria-label="Equipos de la liga">
+						{view.teams.map((team) => (
+							<a
+								class="team-card c-surface-card"
+								href={`/equipos/${team.slug}`}
+								style={`--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
+							>
+								<span class="team-card__logo" aria-hidden="true">
+									{team.logoPath ? (
+										<img src={team.logoPath} alt="" width="240" height="240" decoding="async" />
+									) : (
+										team.monogram
+									)}
+								</span>
+								<div class="team-card__copy">
+									<p class="c-eyebrow">{team.players.length} jugadores</p>
+									<h2>{team.name}</h2>
+									<p>Presidencia: {team.presidentLabel}</p>
+									<strong>Ver equipo →</strong>
+								</div>
+							</a>
+						))}
+					</section>
+				) : (
+					<EmptyState
+						title="No hay equipos disponibles"
+						description="El catálogo de equipos todavía no se ha publicado."
+					/>
+				)
+			}
+		</div>
+	</main>
+</BaseLayout>

@@ -1,0 +1,90 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import MatchCard from '../../components/MatchCard.astro';
+import PageHero from '../../components/PageHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { PublicMatchday } from '../../lib/public-league';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+export async function getStaticPaths() {
+	const view = await loadPublicLeagueView();
+	return view.matchdays.map((matchday) => ({
+		params: { matchdayId: matchday.id },
+		props: { matchday, seasonName: view.season.name },
+	}));
+}
+
+interface Props {
+	matchday: PublicMatchday;
+	seasonName: string;
+}
+const { matchday, seasonName } = Astro.props as Props;
+const statusLabels = {
+	completed: 'Jornada finalizada',
+	current: 'Jornada en curso',
+	upcoming: 'Jornada programada',
+} as const;
+---
+
+<BaseLayout
+	title={`${matchday.label} · ${seasonName} · Kings Padel League`}
+	description={`Cruces y resultados de ${matchday.label}.`}
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<nav class="c-breadcrumbs" aria-label="Migas de pan">
+				<a class="c-breadcrumbs__item" href="/jornadas">← Volver a jornadas</a>
+			</nav>
+			<PageHero
+				eyebrow={statusLabels[matchday.status]}
+				title={matchday.label}
+				description="Consulta el horario, los equipos, las parejas inscritas y el marcador oficial de cada cruce."
+				meta={[
+					matchday.dateLabel,
+					`${matchday.encounters.length} enfrentamientos`,
+					matchday.byeTeam ? `Descansa ${matchday.byeTeam.name}` : 'Todos los equipos compiten',
+				]}
+			>
+				<a slot="actions" class="c-button c-button--outline" href="/clasificacion"
+					>Ver clasificación</a
+				>
+			</PageHero>
+
+			{
+				matchday.byeTeam && (
+					<aside class="c-panel c-panel--accent">
+						<>
+							<p class="c-eyebrow">Descansa</p>
+							<h2>{matchday.byeTeam.name}</h2>
+							<p>Este equipo no disputa encuentro durante la jornada.</p>
+						</>
+					</aside>
+				)
+			}
+
+			<section class="section-block" aria-labelledby="encounters-title">
+				<div class="section-block__header">
+					<div>
+						<p class="c-eyebrow">Programa oficial</p><h2 id="encounters-title">
+							Cruces de la jornada
+						</h2>
+					</div>
+				</div>
+				{
+					matchday.encounters.length ? (
+						<div class="match-list">
+							{matchday.encounters.map((encounter) => (
+								<MatchCard encounter={encounter} showPairs />
+							))}
+						</div>
+					) : (
+						<EmptyState
+							title="Cruces pendientes"
+							description="Los enfrentamientos de esta jornada todavía no se han publicado."
+						/>
+					)
+				}
+			</section>
+		</div>
+	</main>
+</BaseLayout>

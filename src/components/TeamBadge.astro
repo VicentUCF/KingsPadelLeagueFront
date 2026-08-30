@@ -1,0 +1,31 @@
+---
+import type { PublicTeam } from '../lib/public-league';
+
+interface Props {
+	team: PublicTeam;
+	linked?: boolean;
+	meta?: string;
+}
+
+const { team, linked = true, meta } = Astro.props;
+const Tag = linked ? 'a' : 'span';
+---
+
+<Tag
+	class="c-team-badge"
+	{...linked ? { href: `/equipos/${team.slug}`, 'aria-label': `Ver equipo ${team.name}` } : {}}
+>
+	<span class="c-team-badge__crest" aria-hidden="true">
+		{
+			team.logoPath ? (
+				<img src={team.logoPath} alt="" width="44" height="44" loading="lazy" decoding="async" />
+			) : (
+				<span>{team.monogram}</span>
+			)
+		}
+	</span>
+	<span class="c-team-badge__copy">
+		<span class="c-team-badge__name">{team.name}</span>
+		{meta && <span class="c-team-badge__meta">{meta}</span>}
+	</span>
+</Tag>

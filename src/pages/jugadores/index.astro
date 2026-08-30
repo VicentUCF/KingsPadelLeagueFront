@@ -1,0 +1,187 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import PlayerCard from '../../components/PlayerCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+const view = await loadPublicLeagueView();
+const playedMatches = view.players.reduce(
+	(total, player) => total + player.wonGames + player.lostGames,
+	0,
+);
+---
+
+<BaseLayout
+	title={`Jugadores · ${view.season.name} · Kings Padel League`}
+	description="Directorio oficial de jugadores de la Kings Padel League."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<PageHero
+				eyebrow="Jugadores"
+				title="Talento dentro de la pista"
+				description="Consulta la plantilla completa, sus estadísticas de temporada y filtra por equipo o lado de juego."
+				meta={[
+					view.season.name,
+					`${view.players.length} jugadores inscritos`,
+					`${view.teams.length} equipos`,
+				]}
+			>
+				<a slot="actions" class="c-button c-button--primary" href="/equipos">Ver equipos</a>
+			</PageHero>
+
+			<section class="o-grid o-grid--metrics" aria-label="Resumen del directorio">
+				<article class="c-metric">
+					<span class="c-metric__label">Jugadores</span><strong class="c-metric__value"
+						>{view.players.length}</strong
+					>
+				</article>
+				<article class="c-metric">
+					<span class="c-metric__label">Equipos</span><strong class="c-metric__value"
+						>{view.teams.length}</strong
+					>
+				</article>
+				<article class="c-metric">
+					<span class="c-metric__label">Partidos registrados</span><strong class="c-metric__value"
+						>{playedMatches}</strong
+					>
+				</article>
+			</section>
+
+			{
+				view.players.length ? (
+					<>
+						<section
+							class="filters-panel c-panel"
+							aria-labelledby="player-filters-title"
+							data-player-filters
+						>
+							<h2 id="player-filters-title" class="u-visually-hidden">
+								Filtrar jugadores
+							</h2>
+							<div class="filters-panel__grid">
+								<label class="c-field">
+									<>
+										<span class="c-field__label">Buscar</span>
+										<input
+											class="c-input c-input--search"
+											type="search"
+											placeholder="Nombre o alias"
+											autocomplete="off"
+											data-player-search
+										/>
+									</>
+								</label>
+								<label class="c-field">
+									<>
+										<span class="c-field__label">Equipo</span>
+										<select class="c-select" data-player-team>
+											<option value="">Todos los equipos</option>
+											{view.teams.map((team) => (
+												<option value={team.id}>{team.name}</option>
+											))}
+										</select>
+									</>
+								</label>
+								<label class="c-field">
+									<>
+										<span class="c-field__label">Lado</span>
+										<select class="c-select" data-player-side>
+											<>
+												<option value="">Todos los lados</option>
+												<option value="left">Revés</option>
+												<option value="right">Drive</option>
+												<option value="both">Ambos lados</option>
+											</>
+										</select>
+									</>
+								</label>
+							</div>
+							<div class="filters-panel__footer">
+								<>
+									<p role="status" aria-live="polite" data-player-count>
+										{view.players.length} jugadores inscritos
+									</p>
+									<button
+										class="c-button c-button--ghost c-button--sm"
+										type="button"
+										data-player-clear
+										hidden
+									>
+										Limpiar filtros
+									</button>
+								</>
+							</div>
+						</section>
+
+						<section class="section-block" aria-labelledby="players-results-title">
+							<>
+								<div class="section-block__header">
+									<div>
+										<>
+											<p class="c-eyebrow">Ranking de temporada</p>
+											<h2 id="players-results-title">Directorio de jugadores</h2>
+										</>
+									</div>
+								</div>
+								<ol class="player-list" data-player-list>
+									{view.players.map((player) => (
+										<li>
+											<PlayerCard player={player} />
+										</li>
+									))}
+								</ol>
+								<p class="c-panel" role="status" data-player-empty hidden>
+									No hay jugadores que coincidan con los filtros seleccionados.
+								</p>
+							</>
+						</section>
+					</>
+				) : (
+					<EmptyState
+						title="Todavía no hay jugadores inscritos"
+						description="Cuando se publiquen las plantillas, los perfiles aparecerán aquí."
+					/>
+				)
+			}
+		</div>
+	</main>
+</BaseLayout>
+
+<script>
+	const root = document.querySelector<HTMLElement>('[data-player-filters]');
+	if (root) {
+		const search = root.querySelector<HTMLInputElement>('[data-player-search]')!;
+		const team = root.querySelector<HTMLSelectElement>('[data-player-team]')!;
+		const side = root.querySelector<HTMLSelectElement>('[data-player-side]')!;
+		const count = root.querySelector<HTMLElement>('[data-player-count]')!;
+		const clear = root.querySelector<HTMLButtonElement>('[data-player-clear]')!;
+		const empty = document.querySelector<HTMLElement>('[data-player-empty]')!;
+		const cards = [...document.querySelectorAll<HTMLElement>('[data-player-card]')];
+		const update = () => {
+			const query = search.value.trim().toLocaleLowerCase('es');
+			let visible = 0;
+			for (const card of cards) {
+				const matchesSearch = !query || card.dataset.name?.includes(query);
+				const matchesTeam = !team.value || card.dataset.team === team.value;
+				const matchesSide = !side.value || card.dataset.side === side.value;
+				const show = Boolean(matchesSearch && matchesTeam && matchesSide);
+				card.closest('li')!.hidden = !show;
+				if (show) visible += 1;
+			}
+			count.textContent = `${visible} ${visible === 1 ? 'jugador inscrito' : 'jugadores inscritos'}`;
+			empty.hidden = visible !== 0;
+			clear.hidden = !(query || team.value || side.value);
+		};
+		root.addEventListener('input', update);
+		root.addEventListener('change', update);
+		clear.addEventListener('click', () => {
+			search.value = '';
+			team.value = '';
+			side.value = '';
+			update();
+			search.focus();
+		});
+	}
+</script>

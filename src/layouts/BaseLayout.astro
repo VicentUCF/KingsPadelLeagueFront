@@ -1,15 +1,25 @@
 ---
 import '@kpl/design-system/css';
+import '../styles/site-shell.css';
+import '../styles/public-pages.css';
 
 interface Props {
 	description?: string;
 	title: string;
 }
 
-const {
-	description = 'Web oficial de Kings Padel League.',
-	title,
-} = Astro.props;
+const { description = 'Web oficial de Kings Padel League.', title } = Astro.props;
+const currentPath = Astro.url.pathname;
+const navigation = [
+	{ href: '/', label: 'Home' },
+	{ href: '/clasificacion', label: 'Clasificación' },
+	{ href: '/jornadas', label: 'Jornadas' },
+	{ href: '/jugadores', label: 'Jugadores' },
+	{ href: '/equipos', label: 'Equipos' },
+	{ href: '/calendario', label: 'Calendario' },
+] as const;
+const isCurrent = (href: string) =>
+	href === '/' ? currentPath === href : currentPath === href || currentPath.startsWith(`${href}/`);
 ---
 
 <!doctype html>
@@ -18,12 +28,74 @@ const {
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="theme-color" content="#0b0b0b" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body>
+	<body data-kpl-root>
+		<a class="c-skip-link u-visually-hidden-focusable" href="#main-content"> Ir al contenido </a>
+		<header class="c-site-header site-shell__header">
+			<div class="c-site-header__inner o-container">
+				<a class="c-brand site-shell__brand" href="/" aria-label="Kings Padel League, inicio">
+					<img
+						class="site-shell__brand-image"
+						src="/kpl-logo-wordmark.png"
+						alt=""
+						width="318"
+						height="135"
+						decoding="async"
+					/>
+					<span class="c-brand__copy">
+						<span class="c-brand__name">Kings Padel League</span>
+						<span class="c-brand__tagline">Liga amateur de pádel</span>
+					</span>
+				</a>
+
+				<nav class="c-nav site-shell__desktop-nav" aria-label="Principal">
+					{
+						navigation.map((item) => (
+							<a
+								class="c-nav__link"
+								href={item.href}
+								aria-current={isCurrent(item.href) ? 'page' : undefined}
+							>
+								{item.label}
+							</a>
+						))
+					}
+				</nav>
+
+				<details class="site-shell__menu">
+					<summary class="c-button c-button--outline c-button--sm">Menú</summary>
+					<nav class="site-shell__mobile-nav" aria-label="Principal móvil">
+						{
+							navigation.map((item) => (
+								<a
+									class="c-nav__link"
+									href={item.href}
+									aria-current={isCurrent(item.href) ? 'page' : undefined}
+								>
+									{item.label}
+								</a>
+							))
+						}
+					</nav>
+				</details>
+			</div>
+		</header>
 		<slot />
+		<footer class="site-shell__footer">
+			<div class="site-shell__footer-inner o-container">
+				<div class="site-shell__footer-brand">
+					<strong>Kings Padel League</strong>
+					<span>Liga amateur de pádel</span>
+				</div>
+				<nav class="site-shell__footer-nav" aria-label="Pie de página">
+					{navigation.slice(1).map((item) => <a href={item.href}>{item.label}</a>)}
+				</nav>
+			</div>
+		</footer>
 	</body>
 </html>

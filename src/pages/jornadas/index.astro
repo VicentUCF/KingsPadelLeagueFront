@@ -1,0 +1,91 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+const view = await loadPublicLeagueView();
+const statusLabels = {
+	completed: 'Finalizada',
+	current: 'En curso',
+	upcoming: 'Programada',
+} as const;
+---
+
+<BaseLayout
+	title={`Jornadas · ${view.season.name} · Kings Padel League`}
+	description="Jornadas, cruces y resultados oficiales de la Kings Padel League."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<PageHero
+				eyebrow="Jornadas Kings Padel League"
+				title="Cada fecha. Cada duelo."
+				description="Recorre las jornadas publicadas y abre cada fecha para consultar sus cruces, parejas y resultados."
+				meta={[view.season.name, `${view.matchdays.length} jornadas publicadas`, view.phaseLabel]}
+			>
+				<a slot="actions" class="c-button c-button--primary" href="/clasificacion"
+					>Ver clasificación</a
+				>
+			</PageHero>
+
+			{
+				view.matchdays.length ? (
+					<section class="matchday-grid" aria-label="Jornadas publicadas">
+						{view.matchdays.map((matchday) => (
+							<a
+								class="matchday-card c-surface-card c-surface-card--raised"
+								href={`/jornadas/${matchday.id}`}
+								data-status={matchday.status}
+							>
+								<div class="matchday-card__top">
+									<span
+										class:list={[
+											'c-chip',
+											matchday.status === 'current'
+												? 'c-chip--tone-warning'
+												: matchday.status === 'completed'
+													? 'c-chip--tone-success'
+													: 'c-chip--tone-info',
+										]}
+									>
+										{statusLabels[matchday.status]}
+									</span>
+									<time datetime={matchday.date}>{matchday.dateLabel}</time>
+								</div>
+								<h2>{matchday.label}</h2>
+								<div class="matchday-card__encounters">
+									{matchday.encounters.slice(0, 3).map((encounter) => (
+										<div class="matchday-card__encounter">
+											<span>{encounter.homeTeam.name}</span>
+											<strong>
+												{encounter.homeScore} : {encounter.awayScore}
+											</strong>
+											<span>{encounter.awayTeam.name}</span>
+										</div>
+									))}
+									{matchday.encounters.length === 0 && (
+										<p>Enfrentamientos pendientes de publicación.</p>
+									)}
+								</div>
+								<div class="matchday-card__footer">
+									<span>{matchday.encounters.length} cruces</span>
+									<strong>Ver jornada →</strong>
+								</div>
+							</a>
+						))}
+					</section>
+				) : (
+					<EmptyState
+						title="Calendario pendiente"
+						description="Las jornadas aparecerán aquí cuando se publique el calendario oficial."
+					>
+						<a class="c-button c-button--primary" href="/calendario">
+							Ir al calendario
+						</a>
+					</EmptyState>
+				)
+			}
+		</div>
+	</main>
+</BaseLayout>

@@ -1,0 +1,17 @@
+---
+interface Props {
+	title: string;
+	description: string;
+	headingLevel?: 'h1' | 'h2';
+}
+
+const { title, description, headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<section class="empty-state c-panel c-panel--accent">
+	<p class="c-eyebrow">Kings Padel League</p>
+	<Heading>{title}</Heading>
+	<p>{description}</p>
+	<div class="empty-state__actions"><slot /></div>
+</section>

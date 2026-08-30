@@ -1,0 +1,81 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import PlayerCard from '../../components/PlayerCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { PublicTeam } from '../../lib/public-league';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+export async function getStaticPaths() {
+	const view = await loadPublicLeagueView();
+	return view.teams.map((team) => ({
+		params: { slug: team.slug },
+		props: { team, seasonName: view.season.name },
+	}));
+}
+
+interface Props {
+	team: PublicTeam;
+	seasonName: string;
+}
+const { team, seasonName } = Astro.props;
+const teamStyle = `--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow};--team-contrast:${team.palette.contrast}`;
+---
+
+<BaseLayout
+	title={`${team.name} · ${seasonName} · Kings Padel League`}
+	description={`Perfil oficial y plantilla de ${team.name}.`}
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<nav class="c-breadcrumbs" aria-label="Migas de pan">
+				<a class="c-breadcrumbs__item" href="/equipos">← Volver a equipos</a>
+			</nav>
+			<section class="team-hero" style={teamStyle}>
+				<div class="team-hero__copy">
+					<p class="c-eyebrow">Perfil oficial · {seasonName}</p><h1>{team.name}</h1><p>
+						<strong>{team.tagline}</strong>
+					</p><p>{team.description}</p><div class="team-hero__facts">
+						<span class="c-chip c-chip--tone-brand">{team.players.length} jugadores</span><span
+							class="c-chip">Presidencia: {team.presidentLabel}</span
+						>
+					</div>
+				</div>
+				<div class="team-hero__logo" aria-hidden="true">
+					{
+						team.logoPath ? (
+							<img src={team.logoPath} alt="" width="360" height="360" decoding="async" />
+						) : (
+							team.monogram
+						)
+					}
+				</div>
+			</section>
+
+			<section class="section-block" aria-labelledby="roster-title">
+				<div class="section-block__header">
+					<div>
+						<p class="c-eyebrow">Plantilla oficial</p><h2 id="roster-title">
+							Jugadores de {team.name}
+						</h2>
+					</div><a class="c-button c-button--outline" href="/jugadores">Directorio completo</a>
+				</div>
+				{
+					team.players.length ? (
+						<ol class="player-list">
+							{team.players.map((player) => (
+								<li>
+									<PlayerCard player={player} compact />
+								</li>
+							))}
+						</ol>
+					) : (
+						<EmptyState
+							title="Plantilla pendiente"
+							description="Este equipo todavía no tiene jugadores publicados."
+						/>
+					)
+				}
+			</section>
+		</div>
+	</main>
+</BaseLayout>

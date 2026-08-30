@@ -1,0 +1,221 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import MatchCard from '../../components/MatchCard.astro';
+import PageHero from '../../components/PageHero.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { PublicEncounter, PublicMatchday } from '../../lib/public-league';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+const view = await loadPublicLeagueView();
+const allEncounters = view.matchdays.flatMap((matchday) =>
+	matchday.encounters.map((encounter) => ({ encounter, matchday })),
+);
+const finishedCount = allEncounters.filter(
+	({ encounter }) => encounter.status === 'completed',
+).length;
+const upcomingCount = allEncounters.filter(
+	({ encounter }) => encounter.status !== 'completed',
+).length;
+const dateGroups = new Map<
+	string,
+	{ date: Date; items: { encounter: PublicEncounter; matchday: PublicMatchday }[] }
+>();
+for (const item of allEncounters) {
+	const date = new Date(item.encounter.scheduledAt);
+	const key = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(date);
+	const group = dateGroups.get(key) ?? { date, items: [] };
+	group.items.push(item);
+	dateGroups.set(key, group);
+}
+const groups = [...dateGroups.entries()].sort(([left], [right]) => left.localeCompare(right));
+const formatDay = new Intl.DateTimeFormat('es-ES', { day: '2-digit', timeZone: 'Europe/Madrid' });
+const formatMonth = new Intl.DateTimeFormat('es-ES', { month: 'short', timeZone: 'Europe/Madrid' });
+const formatWeekday = new Intl.DateTimeFormat('es-ES', {
+	weekday: 'short',
+	timeZone: 'Europe/Madrid',
+});
+---
+
+<BaseLayout
+	title={`Calendario · ${view.season.name} · Kings Padel League`}
+	description="Agenda oficial de partidos de la Kings Padel League."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<PageHero
+				eyebrow="Agenda oficial"
+				title="Calendario de competición"
+				description="Todas las fechas, horarios y enfrentamientos oficiales de la temporada en una sola agenda."
+				meta={[
+					view.season.name,
+					view.focusMatchday?.label ?? 'Calendario pendiente',
+					view.phaseLabel,
+				]}
+			>
+				<a slot="actions" class="c-button c-button--primary" href="/jornadas">Ver jornadas</a><a
+					slot="actions"
+					class="c-button c-button--outline"
+					href="/clasificacion">Clasificación</a
+				>
+			</PageHero>
+
+			<section class="o-grid o-grid--metrics" aria-label="Resumen del calendario">
+				<article class="c-metric">
+					<span class="c-metric__label">Jornadas</span><strong class="c-metric__value"
+						>{view.matchdays.length}</strong
+					>
+				</article><article class="c-metric">
+					<span class="c-metric__label">Partidos</span><strong class="c-metric__value"
+						>{allEncounters.length}</strong
+					>
+				</article><article class="c-metric">
+					<span class="c-metric__label">Finalizados</span><strong class="c-metric__value"
+						>{finishedCount}</strong
+					>
+				</article><article class="c-metric">
+					<span class="c-metric__label">Pendientes</span><strong class="c-metric__value"
+						>{upcomingCount}</strong
+					>
+				</article>
+			</section>
+
+			{
+				allEncounters.length ? (
+					<>
+						<section
+							class="filters-panel c-panel"
+							aria-labelledby="calendar-filters-title"
+							data-calendar-filters
+						>
+							<>
+								<h2 id="calendar-filters-title">Filtra la agenda</h2>
+								<div class="filters-panel__grid">
+									<>
+										<label class="c-field">
+											<>
+												<span class="c-field__label">Estado</span>
+												<select class="c-select" data-calendar-status>
+													<>
+														<option value="">Todos los estados</option>
+														<option value="upcoming">Programados</option>
+														<option value="current">En juego</option>
+														<option value="completed">Finalizados</option>
+													</>
+												</select>
+											</>
+										</label>
+										<label class="c-field">
+											<>
+												<span class="c-field__label">Equipo</span>
+												<select class="c-select" data-calendar-team>
+													<option value="">Todos los equipos</option>
+													{view.teams.map((team) => (
+														<option value={team.id}>{team.name}</option>
+													))}
+												</select>
+											</>
+										</label>
+									</>
+								</div>
+								<div class="filters-panel__footer">
+									<>
+										<p role="status" aria-live="polite" data-calendar-count>
+											{allEncounters.length} partidos
+										</p>
+										<button
+											class="c-button c-button--ghost c-button--sm"
+											type="button"
+											data-calendar-clear
+											hidden
+										>
+											Limpiar filtros
+										</button>
+									</>
+								</div>
+							</>
+						</section>
+						<div class="calendar-list" data-calendar-list>
+							{groups.map(([, group]) => (
+								<section class="calendar-day" data-calendar-day>
+									<div class="calendar-day__date c-surface-card">
+										<span>{formatWeekday.format(group.date)}</span>
+										<strong>{formatDay.format(group.date)}</strong>
+										<span>{formatMonth.format(group.date)}</span>
+									</div>
+									<div class="match-list">
+										<div class="section-block__header">
+											<div>
+												<p class="c-eyebrow">Agenda del día</p>
+												<h2>
+													{new Intl.DateTimeFormat('es-ES', {
+														dateStyle: 'long',
+														timeZone: 'Europe/Madrid',
+													}).format(group.date)}
+												</h2>
+											</div>
+										</div>
+										{group.items.map(({ encounter, matchday }) => (
+											<div
+												data-calendar-match
+												data-status={encounter.status}
+												data-home={encounter.homeTeam.id}
+												data-away={encounter.awayTeam.id}
+											>
+												<MatchCard
+													encounter={encounter}
+													matchdayHref={`/jornadas/${matchday.id}`}
+												/>
+											</div>
+										))}
+									</div>
+								</section>
+							))}
+						</div>
+						<p class="c-panel" role="status" data-calendar-empty hidden>
+							No hay partidos que coincidan con los filtros seleccionados.
+						</p>
+					</>
+				) : (
+					<EmptyState
+						title="Calendario pendiente"
+						description="Aquí se publicarán las fechas, horarios y enfrentamientos oficiales de la liga."
+					/>
+				)
+			}
+		</div>
+	</main>
+</BaseLayout>
+
+<script>
+	const filters = document.querySelector<HTMLElement>('[data-calendar-filters]');
+	if (filters) {
+		const status = filters.querySelector<HTMLSelectElement>('[data-calendar-status]')!;
+		const team = filters.querySelector<HTMLSelectElement>('[data-calendar-team]')!;
+		const count = filters.querySelector<HTMLElement>('[data-calendar-count]')!;
+		const clear = filters.querySelector<HTMLButtonElement>('[data-calendar-clear]')!;
+		const empty = document.querySelector<HTMLElement>('[data-calendar-empty]')!;
+		const matches = [...document.querySelectorAll<HTMLElement>('[data-calendar-match]')];
+		const update = () => {
+			let visible = 0;
+			for (const match of matches) {
+				const show =
+					(!status.value || match.dataset.status === status.value) &&
+					(!team.value || match.dataset.home === team.value || match.dataset.away === team.value);
+				match.hidden = !show;
+				if (show) visible += 1;
+			}
+			for (const day of document.querySelectorAll<HTMLElement>('[data-calendar-day]'))
+				day.hidden = !day.querySelector('[data-calendar-match]:not([hidden])');
+			count.textContent = `${visible} ${visible === 1 ? 'partido' : 'partidos'}`;
+			empty.hidden = visible !== 0;
+			clear.hidden = !(status.value || team.value);
+		};
+		filters.addEventListener('change', update);
+		clear.addEventListener('click', () => {
+			status.value = '';
+			team.value = '';
+			update();
+			status.focus();
+		});
+	}
+</script>

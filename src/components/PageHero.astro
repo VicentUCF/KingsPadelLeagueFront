@@ -1,0 +1,28 @@
+---
+interface Props {
+	eyebrow: string;
+	title: string;
+	description: string;
+	meta?: string[];
+}
+
+const { eyebrow, title, description, meta = [] } = Astro.props;
+---
+
+<header class="page-hero c-page-header">
+	<div class="c-page-header__copy">
+		<p class="c-page-header__eyebrow">{eyebrow}</p>
+		<h1>{title}</h1>
+		<p class="c-page-header__description">{description}</p>
+		{
+			meta.length > 0 && (
+				<p class="page-hero__meta">
+					{meta.map((item) => (
+						<span>{item}</span>
+					))}
+				</p>
+			)
+		}
+	</div>
+	<div class="c-page-header__actions"><slot name="actions" /></div>
+</header>

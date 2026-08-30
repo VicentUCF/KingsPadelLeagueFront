@@ -1,0 +1,108 @@
+@layer app {
+	.site-shell__header {
+		view-transition-name: site-header;
+	}
+
+	.site-shell__brand-image {
+		inline-size: 5.4rem;
+		block-size: 2.5rem;
+		flex: none;
+		object-fit: contain;
+	}
+
+	.site-shell__menu {
+		position: relative;
+		display: none;
+	}
+
+	.site-shell__menu summary {
+		list-style: none;
+	}
+
+	.site-shell__menu summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.site-shell__mobile-nav {
+		position: absolute;
+		inset-block-start: calc(100% + var(--kpl-space-3));
+		inset-inline-end: 0;
+		display: grid;
+		inline-size: min(18rem, calc(100vw - var(--kpl-space-7)));
+		gap: var(--kpl-space-1);
+		padding: var(--kpl-space-3);
+		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		border-radius: var(--kpl-radius-lg);
+		background: var(--kpl-color-surface-raised);
+		box-shadow: var(--kpl-shadow-lg);
+	}
+
+	.site-shell__mobile-nav .c-nav__link {
+		inline-size: 100%;
+	}
+
+	.site-shell__footer {
+		border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		background: color-mix(in oklch, var(--kpl-color-surface) 78%, black);
+	}
+
+	.site-shell__footer-inner {
+		display: grid;
+		gap: var(--kpl-space-7);
+		padding-block: var(--kpl-space-8);
+	}
+
+	.site-shell__footer-brand {
+		display: grid;
+		gap: var(--kpl-space-1);
+	}
+
+	.site-shell__footer-brand strong {
+		color: var(--kpl-color-text-strong);
+		font-family: var(--kpl-font-family-heading);
+		text-transform: uppercase;
+	}
+
+	.site-shell__footer-brand span,
+	.site-shell__footer-nav a {
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-100);
+	}
+
+	.site-shell__footer-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--kpl-space-3) var(--kpl-space-5);
+	}
+
+	.site-shell__footer-nav a {
+		text-decoration: none;
+	}
+
+	@media (width >= 64rem) {
+		.site-shell__footer-inner {
+			grid-template-columns: minmax(16rem, 0.65fr) minmax(0, 1.35fr);
+			align-items: end;
+		}
+
+		.site-shell__footer-nav {
+			justify-content: flex-end;
+		}
+	}
+
+	@media (width < 64rem) {
+		.site-shell__desktop-nav {
+			display: none;
+		}
+
+		.site-shell__menu {
+			display: block;
+		}
+	}
+
+	@media (width < 30rem) {
+		.site-shell__brand .c-brand__copy {
+			display: none;
+		}
+	}
+}

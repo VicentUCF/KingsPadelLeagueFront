@@ -1,0 +1,23 @@
+---
+import EmptyState from '../components/EmptyState.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+	title="Página no encontrada · Kings Padel League"
+	description="La página solicitada no existe."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<EmptyState
+				headingLevel="h1"
+				title="Esta bola se fue fuera"
+				description="La página que buscas no existe o ya no está disponible."
+				><a class="c-button c-button--primary" href="/">Volver a HOME</a><a
+					class="c-button c-button--outline"
+					href="/jornadas">Ver jornadas</a
+				></EmptyState
+			>
+		</div>
+	</main>
+</BaseLayout>

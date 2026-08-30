@@ -1,0 +1,47 @@
+---
+import type { PublicPlayer } from '../lib/public-league';
+
+interface Props {
+	player: PublicPlayer;
+	compact?: boolean;
+}
+
+const { player, compact = false } = Astro.props;
+---
+
+<a
+	class:list={['player-card c-surface-card', compact && 'player-card--compact']}
+	href={`/jugadores/${player.slug}`}
+	data-player-card
+	data-name={player.displayName.toLowerCase()}
+	data-team={player.teamId ?? ''}
+	data-side={player.preferredPosition}
+>
+	<span class="c-rank" aria-label={`Posición ${player.rank}`}>{player.rank}</span>
+	<span class="player-card__avatar" aria-hidden="true">
+		{
+			player.profileImage ? (
+				<img
+					src={player.profileImage}
+					alt=""
+					width="72"
+					height="72"
+					loading="lazy"
+					decoding="async"
+				/>
+			) : (
+				<span>
+					{player.firstName[0]}
+					{player.lastName[0]}
+				</span>
+			)
+		}
+	</span>
+	<span class="player-card__identity">
+		<strong>{player.displayName}</strong>
+		<span>{player.teamName} · {player.positionLabel}</span>
+	</span>
+	<span class="player-card__stat"><strong>{player.totalPoints}</strong><small>PTS</small></span>
+	<span class="player-card__stat"><strong>{player.wonGames}</strong><small>V</small></span>
+	<span class="player-card__stat"><strong>{player.lostGames}</strong><small>D</small></span>
+</a>

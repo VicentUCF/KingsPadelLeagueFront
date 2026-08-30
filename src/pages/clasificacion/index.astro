@@ -1,0 +1,83 @@
+---
+import PageHero from '../../components/PageHero.astro';
+import TeamBadge from '../../components/TeamBadge.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+const view = await loadPublicLeagueView();
+const focusLabel = view.focusMatchday?.label ?? 'Calendario pendiente';
+---
+
+<BaseLayout
+	title={`Clasificación · ${view.season.name} · Kings Padel League`}
+	description="Clasificación oficial de la Kings Padel League."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<PageHero
+				eyebrow="Clasificación oficial"
+				title="La carrera por la corona"
+				description="Consulta la tabla de la temporada, los puntos disputados y la diferencia de juegos de cada equipo."
+				meta={[view.season.name, focusLabel, view.phaseLabel]}
+			>
+				<a slot="actions" class="c-button c-button--primary" href="/jornadas">Ver jornadas</a>
+				<a slot="actions" class="c-button c-button--outline" href="/calendario">Ver calendario</a>
+			</PageHero>
+
+			<section class="section-block" aria-labelledby="standings-title">
+				<div class="section-block__header c-section-heading">
+					<div class="c-section-heading__copy">
+						<p class="c-section-heading__eyebrow">{view.season.name}</p>
+						<h2 id="standings-title">Clasificación general</h2>
+					</div>
+					<span class="c-chip c-chip--tone-brand">{view.standings.length} equipos</span>
+				</div>
+
+				<div class="c-table-wrap">
+					<table class="c-table standings-table">
+						<caption class="u-visually-hidden">Clasificación de {view.season.name}</caption>
+						<thead
+							><tr
+								><th scope="col">Pos.</th><th scope="col">Equipo</th><th
+									class="c-table__numeric"
+									scope="col">PTS</th
+								><th class="c-table__numeric" scope="col">PJ</th><th
+									class="c-table__numeric"
+									scope="col">Dif.</th
+								></tr
+							></thead
+						>
+						<tbody>
+							{
+								view.standings.map((standing) => (
+									<tr>
+										<td>
+											<span class="c-rank">{standing.rank}</span>
+										</td>
+										<th scope="row">
+											<TeamBadge team={standing.team} />
+										</th>
+										<td class="c-table__numeric">
+											<strong>{standing.points}</strong>
+										</td>
+										<td class="c-table__numeric">{standing.playedMatches}</td>
+										<td
+											class:list={[
+												'c-table__numeric',
+												standing.gameDifference > 0 && 'standings-table__positive',
+												standing.gameDifference < 0 && 'standings-table__negative',
+											]}
+										>
+											{standing.gameDifference > 0 ? '+' : ''}
+											{standing.gameDifference}
+										</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+	</main>
+</BaseLayout>
