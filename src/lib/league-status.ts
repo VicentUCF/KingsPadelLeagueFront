@@ -16,18 +16,41 @@ export interface Matchday {
 	status: MatchdayStatus;
 }
 
+export interface HomePlayoff {
+	id: string;
+	seasonId: string;
+	name: string;
+}
+
+export interface HomePlayoffMatch {
+	id: string;
+	playoffId: string;
+	scheduledAt: string;
+	stage: 'round_of_16' | 'round_of_8' | 'quarter_final' | 'semi_final' | 'final';
+	status: MatchdayStatus;
+}
+
 export interface HomeSeasonStatus {
 	seasonName: string;
-	phaseLabel: 'Pretemporada' | 'Fase regular' | 'Temporada finalizada';
-	matchdayEyebrow: 'Calendario' | 'Jornada en curso' | 'Próxima jornada' | 'Última jornada';
+	phaseLabel: 'Pretemporada' | 'Fase regular' | 'Playoffs' | 'Temporada finalizada';
+	matchdayEyebrow:
+		| 'Calendario'
+		| 'Jornada en curso'
+		| 'Próxima jornada'
+		| 'Última jornada'
+		| 'Playoffs en curso'
+		| 'Próximo playoff';
 	matchdayLabel: string;
 	dateLabel: string;
+	focusHref: '/jornadas' | '/playoffs';
 }
 
 export function resolveHomeSeasonStatus(
 	seasons: readonly Season[],
 	matchdays: readonly Matchday[],
 	now = new Date(),
+	playoffs: readonly HomePlayoff[] = [],
+	playoffMatches: readonly HomePlayoffMatch[] = [],
 ): HomeSeasonStatus {
 	if (seasons.length === 0) {
 		throw new Error('La API no ha devuelto ninguna temporada.');
@@ -63,6 +86,25 @@ export function resolveHomeSeasonStatus(
 	const seasonMatchdays = matchdays
 		.filter((matchday) => matchday.seasonId === selectedSeason.id)
 		.sort(byScheduledAtAsc);
+	const seasonPlayoffs = playoffs.filter((playoff) => playoff.seasonId === selectedSeason.id);
+	const seasonPlayoffIds = new Set(seasonPlayoffs.map((playoff) => playoff.id));
+	const seasonPlayoffMatches = playoffMatches
+		.filter((match) => seasonPlayoffIds.has(match.playoffId))
+		.sort(byScheduledAtAsc);
+	const playoffInProgress = seasonPlayoffMatches.find((match) => match.status === 'in_progress');
+	const playoffScheduled = seasonPlayoffMatches.find((match) => match.status === 'scheduled');
+	const focusPlayoff = playoffInProgress ?? playoffScheduled;
+	if (focusPlayoff) {
+		const playoff = seasonPlayoffs.find((item) => item.id === focusPlayoff.playoffId);
+		return {
+			seasonName: selectedSeason.name,
+			phaseLabel: 'Playoffs',
+			matchdayEyebrow: playoffInProgress ? 'Playoffs en curso' : 'Próximo playoff',
+			matchdayLabel: `${playoff?.name ?? 'Playoffs'} · ${playoffStageLabel(focusPlayoff.stage)}`,
+			dateLabel: formatMatchdayDate(focusPlayoff.scheduledAt),
+			focusHref: '/playoffs',
+		};
+	}
 	const focusedInProgress = seasonMatchdays.find((matchday) => matchday.status === 'in_progress');
 	const focusedScheduled = seasonMatchdays.find((matchday) => matchday.status === 'scheduled');
 	const focusedFinished = [...seasonMatchdays]
@@ -72,7 +114,7 @@ export function resolveHomeSeasonStatus(
 
 	return {
 		seasonName: selectedSeason.name,
-		phaseLabel: resolvePhaseLabel(selectedSeason, seasonMatchdays, now),
+		phaseLabel: resolvePhaseLabel(selectedSeason, seasonMatchdays, seasonPlayoffMatches, now),
 		matchdayEyebrow: focusedInProgress
 			? 'Jornada en curso'
 			: focusedScheduled
@@ -84,12 +126,14 @@ export function resolveHomeSeasonStatus(
 		dateLabel: focusMatchday
 			? formatMatchdayDate(focusMatchday.scheduledAt)
 			: 'Fechas por confirmar',
+		focusHref: '/jornadas',
 	};
 }
 
 function resolvePhaseLabel(
 	season: Season,
 	matchdays: readonly Matchday[],
+	playoffMatches: readonly HomePlayoffMatch[],
 	now: Date,
 ): HomeSeasonStatus['phaseLabel'] {
 	if (matchdays.length === 0 || now.getTime() < Date.parse(season.startsAt)) {
@@ -98,12 +142,23 @@ function resolvePhaseLabel(
 
 	if (
 		now.getTime() > Date.parse(season.endsAt) ||
-		matchdays.every((matchday) => matchday.status === 'finished')
+		(matchdays.every((matchday) => matchday.status === 'finished') &&
+			playoffMatches.every((match) => match.status === 'finished'))
 	) {
 		return 'Temporada finalizada';
 	}
 
 	return 'Fase regular';
+}
+
+function playoffStageLabel(stage: HomePlayoffMatch['stage']): string {
+	return {
+		round_of_16: 'Ronda de 16',
+		round_of_8: 'Ronda de 8',
+		quarter_final: 'Cuartos de final',
+		semi_final: 'Semifinales',
+		final: 'Final',
+	}[stage];
 }
 
 function isDateWithinSeason(now: Date, season: Season): boolean {
@@ -116,11 +171,11 @@ function bySeasonStartDesc(left: Season, right: Season): number {
 	return Date.parse(right.startsAt) - Date.parse(left.startsAt);
 }
 
-function byScheduledAtAsc(left: Matchday, right: Matchday): number {
+function byScheduledAtAsc(left: { scheduledAt: string }, right: { scheduledAt: string }): number {
 	return Date.parse(left.scheduledAt) - Date.parse(right.scheduledAt);
 }
 
-function byScheduledAtDesc(left: Matchday, right: Matchday): number {
+function byScheduledAtDesc(left: { scheduledAt: string }, right: { scheduledAt: string }): number {
 	return Date.parse(right.scheduledAt) - Date.parse(left.scheduledAt);
 }
 

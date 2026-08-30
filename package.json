@@ -12,13 +12,15 @@
 	},
 	"scripts": {
 		"dev": "astro dev",
+		"dev:fixture": "node tests/dev-with-fixture.mjs",
 		"build": "astro build",
 		"preview": "astro preview",
 		"astro": "astro",
 		"check": "astro check",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"test": "node --experimental-strip-types --test tests/*.test.ts"
+		"test": "node --experimental-strip-types --test tests/*.test.ts",
+		"test:ssg": "node tests/ssg-build.mjs"
 	},
 	"dependencies": {
 		"@kpl/design-system": "file:../../Projects/kpl-design-system",

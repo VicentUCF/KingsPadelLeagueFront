@@ -1,0 +1,80 @@
+---
+import type { PublicPlayoffMatch } from '../lib/public-league';
+import TeamBadge from './TeamBadge.astro';
+
+interface Props {
+	match: PublicPlayoffMatch;
+}
+
+const { match } = Astro.props;
+const labels = {
+	completed: 'Finalizado',
+	current: 'En juego',
+	upcoming: 'Programado',
+} as const;
+const scoreLabel =
+	match.awayTeam && match.awayScore !== null
+		? `${match.homeScore} a ${match.awayScore}`
+		: 'Marcador pendiente';
+---
+
+<article class="playoff-match-card c-match-card" data-status={match.status}>
+	<header class="c-match-card__header">
+		<div class="o-cluster">
+			<span class="c-chip c-chip--tone-brand">{match.stageLabel}</span>
+			<span
+				class:list={[
+					'c-chip',
+					match.status === 'current'
+						? 'c-chip--tone-warning'
+						: match.status === 'completed'
+							? 'c-chip--tone-success'
+							: 'c-chip--tone-info',
+				]}
+			>
+				{labels[match.status]}
+			</span>
+		</div>
+		<time datetime={match.scheduledAt}>{match.scheduledAtLabel}</time>
+	</header>
+
+	<div class="c-match-card__teams">
+		<div class="c-match-card__team"><TeamBadge team={match.homeTeam} meta="Local" /></div>
+		<strong class="c-score" aria-label={scoreLabel}>
+			<span>{match.homeScore}</span><span class="c-score__separator">:</span><span
+				>{match.awayScore ?? '—'}</span
+			>
+		</strong>
+		<div class="c-match-card__team playoff-match-card__away">
+			{
+				match.awayTeam ? (
+					<TeamBadge team={match.awayTeam} meta="Visitante" />
+				) : (
+					<div class="playoff-match-card__pending">
+						<span class="playoff-match-card__pending-mark">?</span>
+						<span>
+							<>
+								<strong>Por determinar</strong>
+								<small>Visitante</small>
+							</>
+						</span>
+					</div>
+				)
+			}
+		</div>
+	</div>
+
+	{
+		match.pairResults.length > 0 && (
+			<div class="match-card__pairs">
+				{match.pairResults.map((pair) => (
+					<div class="match-card__pair">
+						<span>{pair.homePair.players.map((player) => player.displayName).join(' / ')}</span>
+						<strong>{pair.homeScoreLabel}</strong>
+						<span>{pair.awayPair.players.map((player) => player.displayName).join(' / ')}</span>
+					</div>
+				))}
+			</div>
+		)
+	}
+</article>

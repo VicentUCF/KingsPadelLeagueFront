@@ -93,7 +93,7 @@ const matches = [
 		localTeamScorePoints: 2,
 		awayTeamScorePoints: 1,
 		scheduledAt: '2026-08-16T16:00:00.000Z',
-		status: 'finished',
+		mvpId: 'player-0-0',
 	},
 	{
 		id: 'match-2',
@@ -103,7 +103,7 @@ const matches = [
 		localTeamScorePoints: 1,
 		awayTeamScorePoints: 2,
 		scheduledAt: '2026-08-16T18:00:00.000Z',
-		status: 'finished',
+		mvpId: 'player-3-0',
 	},
 	{
 		id: 'match-3',
@@ -113,7 +113,7 @@ const matches = [
 		localTeamScorePoints: 1,
 		awayTeamScorePoints: 1,
 		scheduledAt: '2026-08-27T16:00:00.000Z',
-		status: 'in_progress',
+		mvpId: null,
 	},
 	{
 		id: 'match-4',
@@ -123,7 +123,7 @@ const matches = [
 		localTeamScorePoints: 0,
 		awayTeamScorePoints: 0,
 		scheduledAt: '2026-08-27T18:00:00.000Z',
-		status: 'scheduled',
+		mvpId: null,
 	},
 	{
 		id: 'match-5',
@@ -133,7 +133,7 @@ const matches = [
 		localTeamScorePoints: 0,
 		awayTeamScorePoints: 0,
 		scheduledAt: '2026-09-06T16:00:00.000Z',
-		status: 'scheduled',
+		mvpId: null,
 	},
 	{
 		id: 'match-6',
@@ -143,7 +143,7 @@ const matches = [
 		localTeamScorePoints: 0,
 		awayTeamScorePoints: 0,
 		scheduledAt: '2026-09-06T18:00:00.000Z',
-		status: 'scheduled',
+		mvpId: null,
 	},
 ];
 const lineups = teams
@@ -160,7 +160,7 @@ const pairMatches = [
 		id: 'pair-match-1',
 		localLineUpPairId: 'pair-team-kings',
 		awayLineUpPairId: 'pair-team-titanics',
-		status: 'finished',
+		order: 1,
 		setsResult: [
 			{ local: 6, away: 4 },
 			{ local: 6, away: 3 },
@@ -174,6 +174,67 @@ const scores = players.map((player, index) => ({
 	wonPairMatches: Math.max(0, 6 - index),
 	lostPairMatches: index % 3,
 }));
+const teamScores = teams.map((team, index) => ({
+	seasonId: season.id,
+	teamId: team.id,
+	totalPoints: Math.max(0, 9 - index * 2),
+	wonMatches: Math.max(0, 3 - index),
+	lostMatches: index,
+	wonGames: Math.max(0, 18 - index * 3),
+	lostGames: 8 + index * 3,
+	wonSets: Math.max(0, 8 - index),
+	lostSets: 3 + index,
+}));
+const playoffs = [{ id: 'playoff-2026', seasonId: season.id, name: 'Copa de Oro' }];
+const playoffMatches = [
+	{
+		id: 'playoff-semi-1',
+		playoffId: 'playoff-2026',
+		localTeamId: 'team-kings',
+		awayTeamId: 'team-titanics',
+		localTeamScorePoints: 2,
+		awayTeamScorePoints: 1,
+		scheduledAt: '2026-09-20T16:00:00.000Z',
+		stage: 'semi_final',
+		status: 'finished',
+	},
+	{
+		id: 'playoff-final',
+		playoffId: 'playoff-2026',
+		localTeamId: 'team-kings',
+		awayTeamId: null,
+		localTeamScorePoints: 0,
+		awayTeamScorePoints: null,
+		scheduledAt: '2026-09-27T16:00:00.000Z',
+		stage: 'final',
+		status: 'scheduled',
+	},
+];
+const playoffLineups = teams.slice(0, 2).map((team) => ({
+	id: `playoff-lineup-${team.id}`,
+	playoffMatchId: 'playoff-semi-1',
+	status: 'submited',
+	teamId: team.id,
+}));
+const playoffLineupPairs = teams.slice(0, 2).map((team, teamIndex) => ({
+	id: `playoff-pair-${team.id}`,
+	playoffMatchTeamLineUpId: `playoff-lineup-${team.id}`,
+	player1Id: `player-${teamIndex}-0`,
+	player2Id: `player-${teamIndex}-1`,
+	totalPlayersValue: 100,
+}));
+const playoffPairMatches = [
+	{
+		id: 'playoff-pair-match-1',
+		localLineUpPairId: 'playoff-pair-team-kings',
+		awayLineUpPairId: 'playoff-pair-team-titanics',
+		order: 1,
+		setsResult: [
+			{ local: 6, away: 4 },
+			{ local: 6, away: 3 },
+		],
+	},
+];
 
 const collections = new Map([
 	['/v1/seasons', [season]],
@@ -185,6 +246,12 @@ const collections = new Map([
 	['/v1/match-team-line-up-pairs', lineupPairs],
 	['/v1/pair-matches', pairMatches],
 	['/v1/season-player-scores', scores],
+	['/v1/season-team-scores', teamScores],
+	['/v1/playoffs', playoffs],
+	['/v1/playoff-matches', playoffMatches],
+	['/v1/playoff-match-team-line-ups', playoffLineups],
+	['/v1/playoff-match-team-line-up-pairs', playoffLineupPairs],
+	['/v1/playoff-pair-matches', playoffPairMatches],
 ]);
 
 createServer((request, response) => {
@@ -196,5 +263,16 @@ createServer((request, response) => {
 		return;
 	}
 	response.writeHead(200, { 'content-type': 'application/json' });
-	response.end(JSON.stringify({ items }));
+	response.end(
+		JSON.stringify({
+			items,
+			meta: {
+				currentPage: 1,
+				itemCount: items.length,
+				itemsPerPage: items.length,
+				totalItems: items.length,
+				totalPages: 1,
+			},
+		}),
+	);
 }).listen(port, '127.0.0.1', () => console.log(`Fixture KPL API listening on ${port}`));

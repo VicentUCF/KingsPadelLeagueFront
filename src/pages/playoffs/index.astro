@@ -1,0 +1,115 @@
+---
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import PlayoffMatchCard from '../../components/PlayoffMatchCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PLAYOFFS_ENABLED } from '../../lib/features';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+if (!PLAYOFFS_ENABLED) return Astro.redirect('/');
+
+const view = await loadPublicLeagueView();
+const rounds = view.playoffs.flatMap((playoff) => playoff.rounds);
+const matches = rounds.flatMap((round) => round.matches);
+const completedMatches = matches.filter((match) => match.status === 'completed').length;
+const nextMatch =
+	matches.find((match) => match.status === 'current') ??
+	matches.find((match) => match.status === 'upcoming');
+---
+
+<BaseLayout
+	title={`Playoffs · ${view.season.name} · Kings Padel League`}
+	description="Cuadro, cruces y resultados oficiales de los playoffs de Kings Padel League."
+>
+	<main id="main-content" class="public-page">
+		<div class="o-container public-page__body">
+			<PageHero
+				eyebrow="Camino a la corona"
+				title="Playoffs"
+				description="Sigue cada eliminatoria, las parejas inscritas y los resultados que deciden al campeón."
+				meta={[
+					view.season.name,
+					`${matches.length} cruces publicados`,
+					nextMatch?.stageLabel ?? view.phaseLabel,
+				]}
+			>
+				<a slot="actions" class="c-button c-button--primary" href="/clasificacion"
+					>Ver clasificación</a
+				>
+				<a slot="actions" class="c-button c-button--outline" href="/jornadas">Fase regular</a>
+			</PageHero>
+
+			{
+				matches.length ? (
+					<>
+						<section class="o-grid o-grid--metrics" aria-label="Resumen de los playoffs">
+							<article class="c-metric">
+								<>
+									<span class="c-metric__label">Cuadros</span>
+									<strong class="c-metric__value">{view.playoffs.length}</strong>
+								</>
+							</article>
+							<article class="c-metric">
+								<>
+									<span class="c-metric__label">Rondas</span>
+									<strong class="c-metric__value">{rounds.length}</strong>
+								</>
+							</article>
+							<article class="c-metric">
+								<>
+									<span class="c-metric__label">Cruces</span>
+									<strong class="c-metric__value">{matches.length}</strong>
+								</>
+							</article>
+							<article class="c-metric">
+								<>
+									<span class="c-metric__label">Finalizados</span>
+									<strong class="c-metric__value">{completedMatches}</strong>
+								</>
+							</article>
+						</section>
+
+						{view.playoffs.map((playoff) => (
+							<section
+								class="playoff-bracket section-block"
+								aria-labelledby={`playoff-${playoff.id}`}
+							>
+								<div class="section-block__header c-section-heading">
+									<div class="c-section-heading__copy">
+										<p class="c-section-heading__eyebrow">Cuadro oficial</p>
+										<h2 id={`playoff-${playoff.id}`}>{playoff.name}</h2>
+									</div>
+								</div>
+
+								<div class="playoff-rounds">
+									{playoff.rounds.map((round) => (
+										<section class="playoff-round" aria-labelledby={`${playoff.id}-${round.stage}`}>
+											<header class="playoff-round__header">
+												<p class="c-eyebrow">Eliminatoria</p>
+												<h3 id={`${playoff.id}-${round.stage}`}>{round.label}</h3>
+											</header>
+											<div class="match-list">
+												{round.matches.map((match) => (
+													<PlayoffMatchCard match={match} />
+												))}
+											</div>
+										</section>
+									))}
+								</div>
+							</section>
+						))}
+					</>
+				) : (
+					<EmptyState
+						title="Cuadro pendiente"
+						description="Los cruces de playoffs aparecerán aquí cuando se publique el cuadro oficial."
+					>
+						<a class="c-button c-button--primary" href="/jornadas">
+							Ver fase regular
+						</a>
+					</EmptyState>
+				)
+			}
+		</div>
+	</main>
+</BaseLayout>

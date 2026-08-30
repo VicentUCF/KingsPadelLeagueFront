@@ -2,6 +2,7 @@
 import '@kpl/design-system/css';
 import '../styles/site-shell.css';
 import '../styles/public-pages.css';
+import { PLAYOFFS_ENABLED } from '../lib/features';
 
 interface Props {
 	description?: string;
@@ -14,6 +15,7 @@ const navigation = [
 	{ href: '/', label: 'Home' },
 	{ href: '/clasificacion', label: 'Clasificación' },
 	{ href: '/jornadas', label: 'Jornadas' },
+	...(PLAYOFFS_ENABLED ? [{ href: '/playoffs', label: 'Playoffs' }] : []),
 	{ href: '/jugadores', label: 'Jugadores' },
 	{ href: '/equipos', label: 'Equipos' },
 	{ href: '/calendario', label: 'Calendario' },

@@ -8,11 +8,17 @@ import { resolveHomeSeasonStatus } from '../lib/league-status';
 import '../styles/home.css';
 
 const buildDate = new Date();
-const [{ seasons, matchdays }, announcementEntries] = await Promise.all([
+const [{ seasons, matchdays, playoffs, playoffMatches }, announcementEntries] = await Promise.all([
 	loadLeagueHomeData(),
 	getCollection('announcements'),
 ]);
-const seasonStatus = resolveHomeSeasonStatus(seasons, matchdays, buildDate);
+const seasonStatus = resolveHomeSeasonStatus(
+	seasons,
+	matchdays,
+	buildDate,
+	playoffs,
+	playoffMatches,
+);
 const announcements = selectPublishedAnnouncements(announcementEntries, buildDate);
 const announcementCategoryLabels = {
 	calendario: 'Calendario',
@@ -69,8 +75,13 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 					</dl>
 
 					<div class="home-hero__actions">
-						<a class="c-button c-button--primary c-button--lg" href="/clasificacion">
-							Ver clasificación
+						<a
+							class="c-button c-button--primary c-button--lg"
+							href={seasonStatus.phaseLabel === 'Playoffs'
+								? seasonStatus.focusHref
+								: '/clasificacion'}
+						>
+							{seasonStatus.phaseLabel === 'Playoffs' ? 'Ver playoffs' : 'Ver clasificación'}
 							<svg aria-hidden="true" viewBox="0 0 20 20">
 								<path
 									d="m7 4 6 6-6 6"

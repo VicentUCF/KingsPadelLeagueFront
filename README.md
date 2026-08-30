@@ -22,21 +22,30 @@ La aplicación estará disponible en `http://localhost:4321`.
 
 ```sh
 npm run dev      # servidor de desarrollo
+npm run dev:fixture # desarrollo con datos simulados, sin depender de la API remota
 npm run build    # build de producción
 npm run preview  # previsualización del build
 npm run check    # validación estricta de Astro y TypeScript
 npm run format   # formato automático del código
 npm test         # pruebas de dominio, temporada y anuncios
+npm run test:ssg # build aislada contra una API fixture; no modifica dist/
 ```
 
 ## Generación del sitio público
 
 Todas las rutas públicas se prerenderizan por completo durante cada build. La variable privada
 `KPL_API_BASE_URL` indica el backend desde el que se consultan temporadas, jornadas, equipos,
-jugadores, partidos, alineaciones y puntuaciones:
+jugadores, partidos, alineaciones, puntuaciones oficiales y playoffs:
 
 ```sh
 KPL_API_BASE_URL=https://kings-league-api.esteveep.dev npm run build
+```
+
+Los playoffs permanecen ocultos mientras sus endpoints públicos requieran autenticación. Para
+probarlos expresamente cuando el backend esté preparado:
+
+```sh
+KPL_PLAYOFFS_ENABLED=true npm run dev
 ```
 
 Si la variable no existe, la API no responde o devuelve datos inconsistentes, la build falla. El
@@ -47,6 +56,7 @@ usan JavaScript local y no realizan peticiones posteriores.
 Rutas incluidas:
 
 - `/`, `/clasificacion`, `/jornadas` y `/jornadas/:matchdayId`
+- `/playoffs`
 - `/equipos` y `/equipos/:slug`
 - `/jugadores` y `/jugadores/:slug`
 - `/calendario` y la página `404`
@@ -55,6 +65,19 @@ Las rutas de autenticación, perfil y backoffice quedan fuera de este cliente p�
 
 Los anuncios se editan como Markdown en `src/content/announcements`. Se publican hasta tres
 entradas que no sean borradores y cuya fecha no sea futura.
+
+## Arquitectura de `src/lib`
+
+La integración está separada por responsabilidad para que los cambios de contrato no se mezclen
+con las reglas de presentación:
+
+- `api/`: tipos HTTP, validación de respuestas, cliente de red y repositorio de la liga.
+- `domain/`: participantes, fase regular, playoffs, clasificación, validación relacional y modelo
+  público.
+- `kpl-api.ts` y `public-league.ts`: fachadas estables para las páginas y los tests existentes.
+
+Los módulos se extrajeron aplicando refactorizaciones pequeñas y verificables —Extract/Move Method
+y Extract Class/Module— sin modificar el comportamiento público.
 
 ## Sistema de diseño
 

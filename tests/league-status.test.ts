@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { resolveHomeSeasonStatus, type Matchday, type Season } from '../src/lib/league-status.ts';
+import {
+	resolveHomeSeasonStatus,
+	type HomePlayoff,
+	type HomePlayoffMatch,
+	type Matchday,
+	type Season,
+} from '../src/lib/league-status.ts';
 
 const seasonOne: Season = {
 	id: 'season-1',
@@ -88,6 +94,31 @@ describe('resolveHomeSeasonStatus', () => {
 				),
 			/temporada inexistente/,
 		);
+	});
+
+	it('prioriza un playoff activo y enlaza su sección pública', () => {
+		const playoffs: HomePlayoff[] = [{ id: 'gold', seasonId: 'season-1', name: 'Copa de Oro' }];
+		const playoffMatches: HomePlayoffMatch[] = [
+			{
+				id: 'final',
+				playoffId: 'gold',
+				scheduledAt: '2026-06-25T18:00:00Z',
+				stage: 'final',
+				status: 'scheduled',
+			},
+		];
+		const result = resolveHomeSeasonStatus(
+			[seasonOne],
+			[matchday('last', 'Jornada 8', 'season-1', '2026-06-01T18:00:00Z', 'finished')],
+			new Date('2026-06-20T10:00:00Z'),
+			playoffs,
+			playoffMatches,
+		);
+
+		assert.equal(result.phaseLabel, 'Playoffs');
+		assert.equal(result.matchdayEyebrow, 'Próximo playoff');
+		assert.equal(result.matchdayLabel, 'Copa de Oro · Final');
+		assert.equal(result.focusHref, '/playoffs');
 	});
 });
 

@@ -71,7 +71,6 @@ function dataset(): PublicLeagueData {
 				localTeamScorePoints: 9,
 				awayTeamScorePoints: 0,
 				scheduledAt: '2025-02-01T10:00:00Z',
-				status: 'finished',
 			},
 			{
 				id: 'current-match',
@@ -81,7 +80,6 @@ function dataset(): PublicLeagueData {
 				localTeamScorePoints: 0,
 				awayTeamScorePoints: 0,
 				scheduledAt: '2026-09-01T10:00:00Z',
-				status: 'scheduled',
 			},
 		],
 		lineups: [],
@@ -103,6 +101,35 @@ function dataset(): PublicLeagueData {
 				lostPairMatches: 3,
 			},
 		],
+		seasonTeamScores: [
+			{
+				seasonId: 'current',
+				teamId: 'a',
+				totalPoints: 5,
+				wonMatches: 2,
+				lostMatches: 1,
+				wonGames: 12,
+				lostGames: 8,
+				wonSets: 5,
+				lostSets: 3,
+			},
+			{
+				seasonId: 'current',
+				teamId: 'b',
+				totalPoints: 2,
+				wonMatches: 1,
+				lostMatches: 2,
+				wonGames: 8,
+				lostGames: 12,
+				wonSets: 3,
+				lostSets: 5,
+			},
+		],
+		playoffs: [],
+		playoffMatches: [],
+		playoffLineups: [],
+		playoffLineupPairs: [],
+		playoffPairMatches: [],
 	};
 }
 
@@ -115,7 +142,9 @@ describe('createPublicLeagueView', () => {
 			view.matchdays.map((matchday) => matchday.id),
 			['current-day'],
 		);
-		assert.equal(view.standings[0]?.points, 0, 'no arrastra resultados de 2025');
+		assert.equal(view.standings[0]?.points, 5, 'usa la puntuación oficial de 2026');
+		assert.equal(view.standings[0]?.playedMatches, 3);
+		assert.equal(view.standings[0]?.gameDifference, 4);
 		assert.equal(view.players[0]?.displayName, 'Ana Uno');
 		assert.equal(view.players[0]?.totalPoints, 12);
 	});
@@ -141,5 +170,95 @@ describe('createPublicLeagueView', () => {
 		const view = createPublicLeagueView(duplicateNames, new Date('2026-08-27T12:00:00Z'));
 
 		assert.deepEqual(view.players.map((player) => player.slug).sort(), ['ana-uno', 'ana-uno-2']);
+	});
+
+	it('crea rondas de playoffs y admite un rival todavía no decidido', () => {
+		const playoffData = dataset();
+		playoffData.playoffs = [{ id: 'playoff-1', seasonId: 'current', name: 'Copa de Oro' }];
+		playoffData.playoffMatches = [
+			{
+				id: 'semi-1',
+				playoffId: 'playoff-1',
+				localTeamId: 'a',
+				awayTeamId: null,
+				localTeamScorePoints: 0,
+				awayTeamScorePoints: null,
+				scheduledAt: '2026-09-20T10:00:00Z',
+				stage: 'semi_final',
+				status: 'scheduled',
+			},
+		];
+
+		const view = createPublicLeagueView(playoffData, new Date('2026-09-10T12:00:00Z'));
+
+		assert.equal(view.phaseLabel, 'Playoffs');
+		assert.equal(view.playoffs[0]?.rounds[0]?.label, 'Semifinales');
+		assert.equal(view.playoffs[0]?.rounds[0]?.matches[0]?.awayTeam, null);
+		assert.equal(view.focusPlayoffMatch?.id, 'semi-1');
+	});
+
+	it('ordena los resultados de parejas mediante el campo order', () => {
+		const orderedPairs = dataset();
+		orderedPairs.lineups = [
+			{ id: 'lineup-a', matchId: 'current-match', teamId: 'a' },
+			{ id: 'lineup-b', matchId: 'current-match', teamId: 'b' },
+		];
+		orderedPairs.lineupPairs = [
+			{ id: 'home-1', matchTeamLineUpId: 'lineup-a', player1Id: 'p1', player2Id: 'p1' },
+			{ id: 'home-2', matchTeamLineUpId: 'lineup-a', player1Id: 'p1', player2Id: 'p1' },
+			{ id: 'away-1', matchTeamLineUpId: 'lineup-b', player1Id: 'p2', player2Id: 'p2' },
+			{ id: 'away-2', matchTeamLineUpId: 'lineup-b', player1Id: 'p2', player2Id: 'p2' },
+		];
+		orderedPairs.pairMatches = [
+			{
+				id: 'pair-second',
+				localLineUpPairId: 'home-1',
+				awayLineUpPairId: 'away-1',
+				order: 2,
+				setsResult: [],
+			},
+			{
+				id: 'pair-first',
+				localLineUpPairId: 'home-2',
+				awayLineUpPairId: 'away-2',
+				order: 1,
+				setsResult: [],
+			},
+		];
+
+		const view = createPublicLeagueView(orderedPairs, new Date('2026-08-27T12:00:00Z'));
+		const pairResults = view.matchdays[0]?.encounters[0]?.pairResults ?? [];
+
+		assert.deepEqual(
+			pairResults.map((pair) => pair.id),
+			['pair-first', 'pair-second'],
+		);
+		assert.deepEqual(
+			pairResults.map((pair) => pair.label),
+			['Pareja 1', 'Pareja 2'],
+		);
+	});
+
+	it('rechaza referencias inválidas dentro del cuadro de playoffs', () => {
+		const invalid = dataset();
+		invalid.playoffs = [{ id: 'playoff-1', seasonId: 'current', name: 'Copa de Oro' }];
+		invalid.playoffMatches = [
+			{
+				id: 'final',
+				playoffId: 'playoff-1',
+				localTeamId: 'a',
+				awayTeamId: 'missing-team',
+				localTeamScorePoints: 0,
+				awayTeamScorePoints: 0,
+				scheduledAt: '2026-09-20T10:00:00Z',
+				stage: 'final',
+				status: 'scheduled',
+			},
+		];
+
+		assert.throws(
+			() => createPublicLeagueView(invalid, new Date('2026-09-10T12:00:00Z')),
+			/referencia un equipo visitante inexistente/,
+		);
 	});
 });

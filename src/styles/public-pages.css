@@ -203,6 +203,67 @@
 		text-align: end;
 	}
 
+	.playoff-bracket {
+		padding-block-start: var(--kpl-space-4);
+		border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+	}
+
+	.playoff-rounds {
+		display: grid;
+		gap: var(--kpl-space-7);
+	}
+
+	.playoff-round {
+		display: grid;
+		gap: var(--kpl-space-4);
+	}
+
+	.playoff-round__header {
+		display: grid;
+		gap: var(--kpl-space-1);
+	}
+
+	.playoff-round__header h3 {
+		font-size: var(--kpl-font-size-500);
+	}
+
+	.playoff-match-card {
+		padding: var(--kpl-space-5);
+	}
+
+	.playoff-match-card__away {
+		justify-content: flex-end;
+		text-align: end;
+	}
+
+	.playoff-match-card__pending {
+		display: inline-flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: var(--kpl-space-3);
+		color: var(--kpl-color-text-muted);
+	}
+
+	.playoff-match-card__pending > span:last-child {
+		display: grid;
+	}
+
+	.playoff-match-card__pending small {
+		font-size: var(--kpl-font-size-50);
+	}
+
+	.playoff-match-card__pending-mark {
+		display: grid;
+		place-items: center;
+		inline-size: 2.75rem;
+		aspect-ratio: 1;
+		border: var(--kpl-border-width) dashed var(--kpl-color-border-strong);
+		border-radius: 50%;
+		color: var(--kpl-color-brand);
+		font-family: var(--kpl-font-family-heading);
+		font-size: var(--kpl-font-size-300);
+	}
+
 	.standings-table td:first-child,
 	.standings-table th:first-child {
 		inline-size: 4rem;
