@@ -3,145 +3,160 @@ import EmptyState from '../../components/EmptyState.astro';
 import PageHero from '../../components/PageHero.astro';
 import PlayerCard from '../../components/PlayerCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+	isPublicPreseason,
+	PUBLIC_SEASON_NAME,
+	SEASON_STARTS_LABEL,
+} from '../../lib/league-presentation';
 import { loadPublicLeagueView } from '../../lib/public-view';
 
 const view = await loadPublicLeagueView();
-const playedMatches = view.players.reduce(
-	(total, player) => total + player.wonGames + player.lostGames,
-	0,
-);
+const preseason = isPublicPreseason();
+const teamById = new Map(view.teams.map((team) => [team.id, team]));
+const presidents = view.players.filter((player) => player.isPresident).length;
+const profiledPlayers = view.players.filter((player) => player.profileImage).length;
 ---
 
 <BaseLayout
-	title={`Jugadores · ${view.season.name} · Kings Padel League`}
-	description="Directorio oficial de jugadores de la Kings Padel League."
+	title={`Jugadores · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
+	description={`Directorio de jugadores, posiciones y equipos de ${PUBLIC_SEASON_NAME}.`}
 >
-	<main id="main-content" class="public-page">
-		<div class="o-container public-page__body">
+	<main id="main-content" class="public-page public-page--players">
+		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow="Jugadores"
-				title="Talento dentro de la pista"
-				description="Consulta la plantilla completa, sus estadísticas de temporada y filtra por equipo o lado de juego."
+				eyebrow={`${PUBLIC_SEASON_NAME} · Jugadores`}
+				title="Los nombres de la nueva temporada"
+				description="Descubre quién compite, en qué lado juega y qué equipo representa. Un directorio vivo, preparado para reflejar cada movimiento del mercado."
 				meta={[
-					view.season.name,
-					`${view.players.length} jugadores inscritos`,
+					`${view.players.length} jugadores publicados`,
 					`${view.teams.length} equipos`,
+					preseason ? 'Fichas en actualización' : 'Temporada en curso',
 				]}
+				mark="T2"
 			>
-				<a slot="actions" class="c-button c-button--primary" href="/equipos">Ver equipos</a>
+				<a slot="actions" class="c-button c-button--primary" href="/equipos">Explorar equipos</a>
 			</PageHero>
 
-			<section class="o-grid o-grid--metrics" aria-label="Resumen del directorio">
-				<article class="c-metric">
-					<span class="c-metric__label">Jugadores</span><strong class="c-metric__value"
-						>{view.players.length}</strong
-					>
+			<section class="player-overview" aria-label="Resumen de jugadores">
+				<article>
+					<span>01</span><small>Jugadores</small><strong>{view.players.length}</strong>
 				</article>
-				<article class="c-metric">
-					<span class="c-metric__label">Equipos</span><strong class="c-metric__value"
-						>{view.teams.length}</strong
-					>
+				<article>
+					<span>02</span><small>Equipos</small><strong>{view.teams.length}</strong>
 				</article>
-				<article class="c-metric">
-					<span class="c-metric__label">Partidos registrados</span><strong class="c-metric__value"
-						>{playedMatches}</strong
-					>
+				<article>
+					<span>03</span><small>Presidencias</small><strong>{presidents}</strong>
+				</article>
+				<article>
+					<span>04</span><small>Retratos publicados</small><strong>{profiledPlayers}</strong>
 				</article>
 			</section>
+
+			{
+				preseason && (
+					<aside class="roster-status">
+						<div>
+							<span class="roster-status__pulse" aria-hidden="true" />
+							<p class="c-eyebrow">Mercado de jugadores</p>
+							<h2>Las plantillas de {PUBLIC_SEASON_NAME} siguen actualizándose.</h2>
+						</div>
+						<p>
+							Los cambios de equipo y nuevas incorporaciones aparecerán aquí antes del inicio, el
+							{SEASON_STARTS_LABEL}.
+						</p>
+					</aside>
+				)
+			}
 
 			{
 				view.players.length ? (
 					<>
 						<section
-							class="filters-panel c-panel"
+							class="filters-panel filters-panel--players"
 							aria-labelledby="player-filters-title"
 							data-player-filters
 						>
-							<h2 id="player-filters-title" class="u-visually-hidden">
-								Filtrar jugadores
-							</h2>
+							<div class="filters-panel__heading">
+								<div>
+									<p class="c-eyebrow">Encuentra tu jugador</p>
+									<h2 id="player-filters-title">Filtra la parrilla</h2>
+								</div>
+								<p role="status" aria-live="polite" data-player-count>
+									{view.players.length} jugadores publicados
+								</p>
+							</div>
 							<div class="filters-panel__grid">
-								<label class="c-field">
-									<>
-										<span class="c-field__label">Buscar</span>
-										<input
-											class="c-input c-input--search"
-											type="search"
-											placeholder="Nombre o alias"
-											autocomplete="off"
-											data-player-search
-										/>
-									</>
+								<label class="c-field filters-panel__search">
+									<span class="c-field__label">Nombre o alias</span>
+									<input
+										class="c-input c-input--search"
+										type="search"
+										placeholder="Buscar jugador"
+										autocomplete="off"
+										data-player-search
+									/>
 								</label>
 								<label class="c-field">
-									<>
-										<span class="c-field__label">Equipo</span>
-										<select class="c-select" data-player-team>
-											<option value="">Todos los equipos</option>
-											{view.teams.map((team) => (
-												<option value={team.id}>{team.name}</option>
-											))}
-										</select>
-									</>
+									<span class="c-field__label">Equipo</span>
+									<select class="c-select" data-player-team>
+										<option value="">Todos los equipos</option>
+										{view.teams.map((team) => (
+											<option value={team.id}>{team.name}</option>
+										))}
+									</select>
 								</label>
 								<label class="c-field">
-									<>
-										<span class="c-field__label">Lado</span>
-										<select class="c-select" data-player-side>
-											<>
-												<option value="">Todos los lados</option>
-												<option value="left">Revés</option>
-												<option value="right">Drive</option>
-												<option value="both">Ambos lados</option>
-											</>
-										</select>
-									</>
+									<span class="c-field__label">Posición</span>
+									<select class="c-select" data-player-side>
+										<option value="">Todos los lados</option>
+										<option value="left">Revés</option>
+										<option value="right">Drive</option>
+										<option value="both">Ambos lados</option>
+									</select>
 								</label>
 							</div>
 							<div class="filters-panel__footer">
-								<>
-									<p role="status" aria-live="polite" data-player-count>
-										{view.players.length} jugadores inscritos
-									</p>
-									<button
-										class="c-button c-button--ghost c-button--sm"
-										type="button"
-										data-player-clear
-										hidden
-									>
-										Limpiar filtros
-									</button>
-								</>
+								<span>Busca por nombre, equipo o lado de juego.</span>
+								<button
+									class="c-button c-button--ghost c-button--sm"
+									type="button"
+									data-player-clear
+									hidden
+								>
+									Limpiar filtros
+								</button>
 							</div>
 						</section>
 
 						<section class="section-block" aria-labelledby="players-results-title">
-							<>
-								<div class="section-block__header">
-									<div>
-										<>
-											<p class="c-eyebrow">Ranking de temporada</p>
-											<h2 id="players-results-title">Directorio de jugadores</h2>
-										</>
-									</div>
+							<header class="section-block__header section-block__header--editorial">
+								<div>
+									<p class="c-eyebrow">Directorio KPL</p>
+									<h2 id="players-results-title">Una ficha para cada protagonista.</h2>
 								</div>
-								<ol class="player-list" data-player-list>
-									{view.players.map((player) => (
-										<li>
-											<PlayerCard player={player} />
-										</li>
-									))}
-								</ol>
-								<p class="c-panel" role="status" data-player-empty hidden>
-									No hay jugadores que coincidan con los filtros seleccionados.
-								</p>
-							</>
+								<p>Abre un perfil para consultar posición, equipo, rol y datos publicados.</p>
+							</header>
+							<ol class="player-list player-list--cards" data-player-list>
+								{view.players.map((player) => (
+									<li>
+										<PlayerCard
+											player={player}
+											team={player.teamId ? teamById.get(player.teamId) : undefined}
+											preseason={preseason}
+										/>
+									</li>
+								))}
+							</ol>
+							<div class="directory-empty" role="status" data-player-empty hidden>
+								<strong>No encontramos coincidencias.</strong>
+								<p>Prueba con otro nombre, equipo o lado de juego.</p>
+							</div>
 						</section>
 					</>
 				) : (
 					<EmptyState
-						title="Todavía no hay jugadores inscritos"
-						description="Cuando se publiquen las plantillas, los perfiles aparecerán aquí."
+						title="Las nuevas plantillas se anunciarán pronto"
+						description={`Los perfiles aparecerán aquí conforme se confirme el mercado de ${PUBLIC_SEASON_NAME}.`}
 					/>
 				)
 			}
@@ -170,7 +185,7 @@ const playedMatches = view.players.reduce(
 				card.closest('li')!.hidden = !show;
 				if (show) visible += 1;
 			}
-			count.textContent = `${visible} ${visible === 1 ? 'jugador inscrito' : 'jugadores inscritos'}`;
+			count.textContent = `${visible} ${visible === 1 ? 'jugador publicado' : 'jugadores publicados'}`;
 			empty.hidden = visible !== 0;
 			clear.hidden = !(query || team.value || side.value);
 		};

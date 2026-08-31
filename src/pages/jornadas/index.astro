@@ -1,10 +1,18 @@
 ---
 import EmptyState from '../../components/EmptyState.astro';
 import PageHero from '../../components/PageHero.astro';
+import SeasonReveal from '../../components/SeasonReveal.astro';
+import TeamBadge from '../../components/TeamBadge.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+	isPublicPreseason,
+	PUBLIC_SEASON_NAME,
+	SEASON_STARTS_LABEL,
+} from '../../lib/league-presentation';
 import { loadPublicLeagueView } from '../../lib/public-view';
 
 const view = await loadPublicLeagueView();
+const preseason = isPublicPreseason();
 const statusLabels = {
 	completed: 'Finalizada',
 	current: 'En curso',
@@ -13,72 +21,105 @@ const statusLabels = {
 ---
 
 <BaseLayout
-	title={`Jornadas · ${view.season.name} · Kings Padel League`}
-	description="Jornadas, cruces y resultados oficiales de la Kings Padel League."
+	title={`Jornadas · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
+	description={`Jornadas, cruces y resultados de ${PUBLIC_SEASON_NAME}.`}
 >
-	<main id="main-content" class="public-page">
-		<div class="o-container public-page__body">
+	<main id="main-content" class="public-page public-page--matchdays">
+		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow="Jornadas Kings Padel League"
-				title="Cada fecha. Cada duelo."
-				description="Recorre las jornadas publicadas y abre cada fecha para consultar sus cruces, parejas y resultados."
-				meta={[view.season.name, `${view.matchdays.length} jornadas publicadas`, view.phaseLabel]}
+				eyebrow={`${PUBLIC_SEASON_NAME} · Jornadas`}
+				title={preseason
+					? 'La pista abre el 20 de septiembre'
+					: 'Cada fecha tiene su propia historia'}
+				description={preseason
+					? 'La nueva parrilla todavía se está formando. Publicaremos las jornadas cuando equipos, horarios y cruces estén confirmados.'
+					: 'Entra en cada jornada para consultar cruces, horarios, parejas y resultados oficiales.'}
+				meta={preseason
+					? ['Pretemporada', `Inicio · ${SEASON_STARTS_LABEL}`, 'Cruces próximamente']
+					: [`${view.matchdays.length} jornadas`, view.phaseLabel, 'Resultados oficiales']}
+				mark="J"
 			>
-				<a slot="actions" class="c-button c-button--primary" href="/clasificacion"
-					>Ver clasificación</a
-				>
+				<a slot="actions" class="c-button c-button--primary" href="/equipos">Ver equipos</a>
+				<a slot="actions" class="c-button c-button--outline" href="/calendario">Calendario</a>
 			</PageHero>
 
 			{
-				view.matchdays.length ? (
-					<section class="matchday-grid" aria-label="Jornadas publicadas">
-						{view.matchdays.map((matchday) => (
-							<a
-								class="matchday-card c-surface-card c-surface-card--raised"
-								href={`/jornadas/${matchday.id}`}
-								data-status={matchday.status}
-							>
-								<div class="matchday-card__top">
-									<span
-										class:list={[
-											'c-chip',
-											matchday.status === 'current'
-												? 'c-chip--tone-warning'
-												: matchday.status === 'completed'
-													? 'c-chip--tone-success'
-													: 'c-chip--tone-info',
-										]}
+				preseason ? (
+					<SeasonReveal
+						eyebrow="Jornadas próximamente"
+						title="Primero se construye la rivalidad. Después llega el marcador."
+						description="No mostraremos cruces provisionales como si fueran definitivos. Esta vista está preparada para activarse con equipos, horarios y resultados en cuanto empiece la competición."
+						items={['Equipos renovados', 'Jornadas confirmadas', 'Resultados oficiales']}
+					>
+						<a class="c-button c-button--primary" href="/jugadores">
+							Conocer protagonistas
+						</a>
+						<a class="c-button c-button--outline" href="/">
+							Ver estado de liga
+						</a>
+					</SeasonReveal>
+				) : view.matchdays.length ? (
+					<section class="section-block" aria-labelledby="matchdays-title">
+						<header class="section-block__header section-block__header--editorial">
+							<div>
+								<p class="c-eyebrow">Temporada completa</p>
+								<h2 id="matchdays-title">Elige una jornada.</h2>
+							</div>
+							<p>Cada tarjeta resume sus cruces y te lleva al detalle oficial.</p>
+						</header>
+						<ol class="matchday-grid matchday-grid--premium" aria-label="Jornadas publicadas">
+							{view.matchdays.map((matchday) => (
+								<li>
+									<a
+										class="matchday-card matchday-card--premium"
+										href={`/jornadas/${matchday.id}`}
+										data-status={matchday.status}
 									>
-										{statusLabels[matchday.status]}
-									</span>
-									<time datetime={matchday.date}>{matchday.dateLabel}</time>
-								</div>
-								<h2>{matchday.label}</h2>
-								<div class="matchday-card__encounters">
-									{matchday.encounters.slice(0, 3).map((encounter) => (
-										<div class="matchday-card__encounter">
-											<span>{encounter.homeTeam.name}</span>
-											<strong>
-												{encounter.homeScore} : {encounter.awayScore}
-											</strong>
-											<span>{encounter.awayTeam.name}</span>
+										<div class="matchday-card__top">
+											<span
+												class:list={[
+													'c-chip',
+													matchday.status === 'current'
+														? 'c-chip--tone-warning'
+														: matchday.status === 'completed'
+															? 'c-chip--tone-success'
+															: 'c-chip--tone-info',
+												]}
+											>
+												{statusLabels[matchday.status]}
+											</span>
+											<time datetime={matchday.date}>{matchday.dateLabel}</time>
 										</div>
-									))}
-									{matchday.encounters.length === 0 && (
-										<p>Enfrentamientos pendientes de publicación.</p>
-									)}
-								</div>
-								<div class="matchday-card__footer">
-									<span>{matchday.encounters.length} cruces</span>
-									<strong>Ver jornada →</strong>
-								</div>
-							</a>
-						))}
+										<h2>{matchday.label}</h2>
+										<div class="matchday-card__encounters">
+											{matchday.encounters.slice(0, 3).map((encounter) => (
+												<div class="matchday-card__encounter">
+													<TeamBadge team={encounter.homeTeam} />
+													<strong>
+														{encounter.status === 'upcoming'
+															? 'VS'
+															: `${encounter.homeScore} : ${encounter.awayScore}`}
+													</strong>
+													<div class="matchday-card__away">
+														<TeamBadge team={encounter.awayTeam} />
+													</div>
+												</div>
+											))}
+											{matchday.encounters.length === 0 && <p>Cruces pendientes de publicación.</p>}
+										</div>
+										<div class="matchday-card__footer">
+											<span>{matchday.encounters.length} cruces</span>
+											<strong>Abrir jornada ↗</strong>
+										</div>
+									</a>
+								</li>
+							))}
+						</ol>
 					</section>
 				) : (
 					<EmptyState
-						title="Calendario pendiente"
-						description="Las jornadas aparecerán aquí cuando se publique el calendario oficial."
+						title="Jornadas pendientes"
+						description="Las fechas y cruces aparecerán aquí cuando se publique el calendario oficial."
 					>
 						<a class="c-button c-button--primary" href="/calendario">
 							Ir al calendario

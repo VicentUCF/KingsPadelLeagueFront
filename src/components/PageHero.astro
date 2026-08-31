@@ -4,12 +4,15 @@ interface Props {
 	title: string;
 	description: string;
 	meta?: string[];
+	mark?: string;
 }
 
-const { eyebrow, title, description, meta = [] } = Astro.props;
+const { eyebrow, title, description, meta = [], mark = 'KPL' } = Astro.props;
 ---
 
 <header class="page-hero c-page-header">
+	<span class="page-hero__mark" aria-hidden="true">{mark}</span>
+	<span class="page-hero__court" aria-hidden="true"></span>
 	<div class="c-page-header__copy">
 		<p class="c-page-header__eyebrow">{eyebrow}</p>
 		<h1>{title}</h1>

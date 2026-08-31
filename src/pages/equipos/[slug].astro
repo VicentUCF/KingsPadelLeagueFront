@@ -2,76 +2,127 @@
 import EmptyState from '../../components/EmptyState.astro';
 import PlayerCard from '../../components/PlayerCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isPublicPreseason, PUBLIC_SEASON_NAME } from '../../lib/league-presentation';
 import type { PublicTeam } from '../../lib/public-league';
 import { loadPublicLeagueView } from '../../lib/public-view';
 
 export async function getStaticPaths() {
 	const view = await loadPublicLeagueView();
-	return view.teams.map((team) => ({
-		params: { slug: team.slug },
-		props: { team, seasonName: view.season.name },
-	}));
+	return view.teams.map((team) => ({ params: { slug: team.slug }, props: { team } }));
 }
 
 interface Props {
 	team: PublicTeam;
-	seasonName: string;
 }
-const { team, seasonName } = Astro.props;
+
+const { team } = Astro.props;
+const preseason = isPublicPreseason();
 const teamStyle = `--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow};--team-contrast:${team.palette.contrast}`;
+const presidents = team.players.filter((player) => player.isPresident);
 ---
 
 <BaseLayout
-	title={`${team.name} · ${seasonName} · Kings Padel League`}
-	description={`Perfil oficial y plantilla de ${team.name}.`}
+	title={`${team.name} · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
+	description={`Identidad, presidencia y plantilla de ${team.name} para ${PUBLIC_SEASON_NAME}.`}
 >
-	<main id="main-content" class="public-page">
-		<div class="o-container public-page__body">
+	<main id="main-content" class="public-page public-page--team-detail" style={teamStyle}>
+		<div class="o-container o-container--xl public-page__body">
 			<nav class="c-breadcrumbs" aria-label="Migas de pan">
-				<a class="c-breadcrumbs__item" href="/equipos">← Volver a equipos</a>
+				<a class="c-breadcrumbs__item" href="/equipos">← Todos los equipos</a>
 			</nav>
-			<section class="team-hero" style={teamStyle}>
-				<div class="team-hero__copy">
-					<p class="c-eyebrow">Perfil oficial · {seasonName}</p><h1>{team.name}</h1><p>
-						<strong>{team.tagline}</strong>
-					</p><p>{team.description}</p><div class="team-hero__facts">
-						<span class="c-chip c-chip--tone-brand">{team.players.length} jugadores</span><span
-							class="c-chip">Presidencia: {team.presidentLabel}</span
+
+			<article class="team-profile-hero">
+				<span class="team-profile-hero__number" aria-hidden="true">KPL</span>
+				<div class="team-profile-hero__identity">
+					<div class="team-profile-hero__status">
+						<span class="c-chip c-chip--tone-brand">{PUBLIC_SEASON_NAME}</span>
+						<span class="c-chip">{preseason ? 'Plantilla en actualización' : 'Perfil oficial'}</span
 						>
 					</div>
+					<div class="team-profile-hero__copy">
+						<p class="c-eyebrow">Identidad del club</p>
+						<h1>{team.name}</h1>
+						<p class="team-profile-hero__tagline">{team.tagline}</p>
+						<p class="team-profile-hero__description">{team.description}</p>
+					</div>
+					<dl class="team-profile-hero__facts">
+						<div>
+							<dt>Plantilla publicada</dt>
+							<dd>{team.players.length} jugadores</dd>
+						</div>
+						<div>
+							<dt>Presidencia</dt>
+							<dd>{team.presidentLabel}</dd>
+						</div>
+						<div>
+							<dt>Estado</dt>
+							<dd>{preseason ? 'Mercado abierto' : 'Compitiendo'}</dd>
+						</div>
+					</dl>
 				</div>
-				<div class="team-hero__logo" aria-hidden="true">
-					{
-						team.logoPath ? (
-							<img src={team.logoPath} alt="" width="360" height="360" decoding="async" />
-						) : (
-							team.monogram
-						)
-					}
-				</div>
-			</section>
 
-			<section class="section-block" aria-labelledby="roster-title">
-				<div class="section-block__header">
-					<div>
-						<p class="c-eyebrow">Plantilla oficial</p><h2 id="roster-title">
-							Jugadores de {team.name}
-						</h2>
-					</div><a class="c-button c-button--outline" href="/jugadores">Directorio completo</a>
+				<div class="team-profile-hero__visual" aria-hidden="true">
+					<span class="team-profile-hero__orbit"></span>
+					<span class="team-profile-hero__logo">
+						{
+							team.logoPath ? (
+								<img src={team.logoPath} alt="" width="440" height="440" decoding="async" />
+							) : (
+								team.monogram
+							)
+						}
+					</span>
 				</div>
+			</article>
+
+			{
+				preseason && (
+					<aside class="team-update-note">
+						<div>
+							<p class="c-eyebrow">Mercado en curso</p>
+							<h2>Esta plantilla está preparada para seguir creciendo.</h2>
+						</div>
+						<p>
+							Las altas, cambios de equipo y roles se reflejarán automáticamente conforme se
+							confirmen en los datos oficiales de {PUBLIC_SEASON_NAME}.
+						</p>
+					</aside>
+				)
+			}
+
+			<section class="section-block team-roster" aria-labelledby="roster-title">
+				<header class="section-block__header section-block__header--editorial">
+					<div>
+						<p class="c-eyebrow">{preseason ? 'Plantilla publicada' : 'Plantilla oficial'}</p>
+						<h2 id="roster-title">Las caras de {team.name}</h2>
+					</div>
+					<div class="section-block__actions">
+						{
+							presidents.length > 0 && (
+								<span class="c-chip c-chip--tone-brand">
+									{presidents.length === 1
+										? 'Presidencia identificada'
+										: `${presidents.length} presidentes`}
+								</span>
+							)
+						}
+						<a class="c-button c-button--outline" href="/jugadores">Todos los jugadores</a>
+					</div>
+				</header>
+
 				{
 					team.players.length ? (
-						<ol class="player-list">
+						<ol class="player-list player-list--cards">
 							{team.players.map((player) => (
 								<li>
-									<PlayerCard player={player} compact />
+									<PlayerCard player={player} team={team} preseason={preseason} compact />
 								</li>
 							))}
 						</ol>
 					) : (
 						<EmptyState
-							title="Plantilla pendiente"
-							description="Este equipo todavía no tiene jugadores publicados."
+							title="La plantilla se anunciará pronto"
+							description={`Todavía no hay jugadores publicados para ${team.name}. La ficha se actualizará con el mercado de ${PUBLIC_SEASON_NAME}.`}
 						/>
 					)
 				}

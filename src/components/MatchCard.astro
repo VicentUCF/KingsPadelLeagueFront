@@ -34,17 +34,31 @@ const labels = {
 	</header>
 	<div class="c-match-card__teams">
 		<div class="c-match-card__team"><TeamBadge team={encounter.homeTeam} meta="Local" /></div>
-		<strong class="c-score" aria-label={`${encounter.homeScore} a ${encounter.awayScore}`}>
-			<span>{encounter.homeScore}</span><span class="c-score__separator">:</span><span
-				>{encounter.awayScore}</span
-			>
-		</strong>
+		{
+			encounter.status === 'upcoming' ? (
+				<strong
+					class="c-score c-score--versus"
+					aria-label={`${encounter.homeTeam.name} contra ${encounter.awayTeam.name}`}
+				>
+					VS
+				</strong>
+			) : (
+				<strong
+					class="c-score"
+					aria-label={`${encounter.homeTeam.name}, ${encounter.homeScore}; ${encounter.awayTeam.name}, ${encounter.awayScore}`}
+				>
+					<span>{encounter.homeScore}</span>
+					<span class="c-score__separator">:</span>
+					<span>{encounter.awayScore}</span>
+				</strong>
+			)
+		}
 		<div class="c-match-card__team match-card__away">
 			<TeamBadge team={encounter.awayTeam} meta="Visitante" />
 		</div>
 	</div>
 	{
-		showPairs && encounter.pairResults.length > 0 && (
+		showPairs && encounter.status !== 'upcoming' && encounter.pairResults.length > 0 && (
 			<div class="match-card__pairs">
 				{encounter.pairResults.map((pair) => (
 					<div class="match-card__pair">
@@ -59,7 +73,9 @@ const labels = {
 	{
 		matchdayHref && (
 			<footer class="c-match-card__footer">
-				<span class="c-match-card__meta">Resultado oficial</span>
+				<span class="c-match-card__meta">
+					{encounter.status === 'upcoming' ? 'Horario oficial' : 'Resultado oficial'}
+				</span>
 				<a class="c-button c-button--ghost c-button--sm" href={matchdayHref}>
 					Ver jornada →
 				</a>

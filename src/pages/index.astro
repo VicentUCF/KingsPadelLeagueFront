@@ -4,7 +4,13 @@ import { getCollection } from 'astro:content';
 import TeamBadge from '../components/TeamBadge.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { selectPublishedAnnouncements } from '../lib/announcements';
+import { PLAYOFFS_ENABLED } from '../lib/features';
 import { loadLeagueHomeData } from '../lib/kpl-api';
+import {
+	isPublicPreseason,
+	PUBLIC_SEASON_NAME,
+	SEASON_STARTS_LABEL,
+} from '../lib/league-presentation';
 import { resolveHomeSeasonStatus } from '../lib/league-status';
 import { loadPublicLeagueView } from '../lib/public-view';
 import '../styles/home.css';
@@ -19,6 +25,13 @@ const seasonStatus = resolveHomeSeasonStatus(
 	playoffs,
 	playoffMatches,
 );
+const preseason = isPublicPreseason(buildDate);
+const displayPhase = preseason
+	? 'Pretemporada'
+	: seasonStatus.phaseLabel === 'Playoffs' && !PLAYOFFS_ENABLED
+		? 'Fase regular'
+		: seasonStatus.phaseLabel;
+const displaySeasonName = PUBLIC_SEASON_NAME;
 const announcements = selectPublishedAnnouncements(announcementEntries, buildDate);
 const announcementCategoryLabels = {
 	calendario: 'Calendario',
@@ -44,44 +57,43 @@ const nextMatchday = view.matchdays.find((matchday) => matchday.status === 'upco
 const latestCompletedMatchday =
 	[...view.matchdays].reverse().find((matchday) => matchday.status === 'completed') ?? null;
 const focusMatchday = currentMatchday ?? nextMatchday ?? latestCompletedMatchday;
-const dashboardMatchday =
-	seasonStatus.phaseLabel === 'Playoffs'
+const dashboardMatchday = preseason
+	? null
+	: seasonStatus.phaseLabel === 'Playoffs'
 		? (latestCompletedMatchday ?? focusMatchday)
 		: focusMatchday;
 const focusEncounter =
 	focusMatchday?.encounters.find((encounter) => encounter.status === 'current') ??
 	focusMatchday?.encounters[0] ??
 	null;
-const playoffFocus =
-	seasonStatus.phaseLabel === 'Playoffs' ? (view.focusPlayoffMatch ?? null) : null;
-const spotlight =
-	seasonStatus.phaseLabel === 'Pretemporada'
-		? null
-		: playoffFocus
+const playoffFocus = displayPhase === 'Playoffs' ? (view.focusPlayoffMatch ?? null) : null;
+const spotlight = preseason
+	? null
+	: playoffFocus
+		? {
+				awayScore: playoffFocus.awayScore,
+				awayTeam: playoffFocus.awayTeam,
+				homeScore: playoffFocus.homeScore,
+				homeTeam: playoffFocus.homeTeam,
+				href: '/playoffs',
+				label: playoffFocus.stageLabel,
+				scheduledAt: playoffFocus.scheduledAt,
+				scheduledAtLabel: playoffFocus.scheduledAtLabel,
+				status: playoffFocus.status,
+			}
+		: focusEncounter
 			? {
-					awayScore: playoffFocus.awayScore,
-					awayTeam: playoffFocus.awayTeam,
-					homeScore: playoffFocus.homeScore,
-					homeTeam: playoffFocus.homeTeam,
-					href: '/playoffs',
-					label: playoffFocus.stageLabel,
-					scheduledAt: playoffFocus.scheduledAt,
-					scheduledAtLabel: playoffFocus.scheduledAtLabel,
-					status: playoffFocus.status,
+					awayScore: focusEncounter.awayScore,
+					awayTeam: focusEncounter.awayTeam,
+					homeScore: focusEncounter.homeScore,
+					homeTeam: focusEncounter.homeTeam,
+					href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
+					label: focusMatchday?.label ?? 'Próximo cruce',
+					scheduledAt: focusEncounter.scheduledAt,
+					scheduledAtLabel: focusEncounter.scheduledAtLabel,
+					status: focusEncounter.status,
 				}
-			: focusEncounter
-				? {
-						awayScore: focusEncounter.awayScore,
-						awayTeam: focusEncounter.awayTeam,
-						homeScore: focusEncounter.homeScore,
-						homeTeam: focusEncounter.homeTeam,
-						href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
-						label: focusMatchday?.label ?? 'Próximo cruce',
-						scheduledAt: focusEncounter.scheduledAt,
-						scheduledAtLabel: focusEncounter.scheduledAtLabel,
-						status: focusEncounter.status,
-					}
-				: null;
+			: null;
 
 const heroContent = {
 	Pretemporada: {
@@ -120,22 +132,31 @@ const heroContent = {
 		secondaryHref: '/equipos',
 		secondaryLabel: 'Ver equipos',
 	},
-}[seasonStatus.phaseLabel];
+}[displayPhase];
 
 const completedMatchdays = view.matchdays.filter(
 	(matchday) => matchday.status === 'completed',
 ).length;
-const hasStandingsData = view.standings.some(
-	(standing) => standing.points > 0 || standing.playedMatches > 0,
-);
+const hasStandingsData =
+	!preseason &&
+	view.standings.some((standing) => standing.points > 0 || standing.playedMatches > 0);
 const standingsByTeamId = new Map(view.standings.map((standing) => [standing.team.id, standing]));
 const topStandings = view.standings.slice(0, 5);
-const resultPathMeta = currentMatchday
-	? `${currentMatchday.label} en curso`
-	: latestCompletedMatchday
-		? `Última: ${latestCompletedMatchday.label}`
-		: 'Jornadas y cruces';
-const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
+const resultPathMeta = preseason
+	? `Comienza el ${SEASON_STARTS_LABEL}`
+	: currentMatchday
+		? `${currentMatchday.label} en curso`
+		: latestCompletedMatchday
+			? `Última: ${latestCompletedMatchday.label}`
+			: 'Jornadas y cruces';
+const calendarPathMeta = preseason
+	? `Desde el ${SEASON_STARTS_LABEL}`
+	: (nextMatchday?.dateLabel ?? 'Próximas fechas');
+const focusEyebrow = preseason ? 'Próximamente' : seasonStatus.matchdayEyebrow;
+const focusLabel = preseason ? displaySeasonName : seasonStatus.matchdayLabel;
+const focusDateLabel = preseason
+	? `La competición empieza el ${SEASON_STARTS_LABEL}`
+	: seasonStatus.dateLabel;
 ---
 
 <BaseLayout
@@ -151,7 +172,7 @@ const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 						<span class="home-live-dot" aria-hidden="true"></span>
 						<span>Estado de liga</span>
 						<span class="home-hero__status-separator" aria-hidden="true"></span>
-						<span>{seasonStatus.seasonName}</span>
+						<span>{displaySeasonName}</span>
 					</div>
 
 					<div class="home-hero__heading">
@@ -181,7 +202,7 @@ const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 					<dl class="home-hero__facts" aria-label="Resumen de la temporada">
 						<div>
 							<dt>Fase actual</dt>
-							<dd>{seasonStatus.phaseLabel}</dd>
+							<dd>{displayPhase}</dd>
 						</div>
 						<div>
 							<dt>Equipos</dt>
@@ -189,7 +210,13 @@ const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 						</div>
 						<div>
 							<dt>Jornadas</dt>
-							<dd>{completedMatchdays} / {view.matchdays.length} disputadas</dd>
+							<dd>
+								{
+									preseason
+										? `${view.matchdays.length} por disputar`
+										: `${completedMatchdays} / ${view.matchdays.length} disputadas`
+								}
+							</dd>
 						</div>
 					</dl>
 				</div>
@@ -215,16 +242,16 @@ const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 								<span
 									class:list={[
 										'c-chip',
-										seasonStatus.phaseLabel === 'Pretemporada'
+										preseason
 											? 'c-chip--tone-brand'
 											: currentMatchday || spotlight?.status === 'current'
 												? 'c-chip--tone-warning'
 												: 'c-chip--tone-info',
 									]}
 								>
-									{seasonStatus.matchdayEyebrow}
+									{focusEyebrow}
 								</span>
-								<h2>{seasonStatus.matchdayLabel}</h2>
+								<h2>{focusLabel}</h2>
 							</div>
 							<span class="home-spotlight__mark" aria-hidden="true">KPL</span>
 						</header>
@@ -277,21 +304,18 @@ const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 
 						<footer class="home-spotlight__footer">
 							<div>
-								<span>{spotlight?.label ?? seasonStatus.phaseLabel}</span>
+								<span>{spotlight?.label ?? displayPhase}</span>
 								{
 									spotlight ? (
 										<time datetime={spotlight.scheduledAt}>{spotlight.scheduledAtLabel}</time>
 									) : (
-										<span>{seasonStatus.dateLabel}</span>
+										<span>{focusDateLabel}</span>
 									)
 								}
 							</div>
 							<a
 								class="home-spotlight__link"
-								href={spotlight?.href ??
-									(seasonStatus.phaseLabel === 'Pretemporada'
-										? '/equipos'
-										: seasonStatus.focusHref)}
+								href={spotlight?.href ?? (preseason ? '/equipos' : seasonStatus.focusHref)}
 							>
 								{spotlight ? 'Abrir detalle' : 'Ver equipos'}
 								<span aria-hidden="true">↗</span>
@@ -359,7 +383,7 @@ const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 					<p class="c-eyebrow">Estado de la competición</p>
 					<h2 id="league-title">
 						{
-							seasonStatus.phaseLabel === 'Pretemporada'
+							preseason
 								? 'Todo lo que cambia antes del primer saque.'
 								: 'La liga, jornada a jornada.'
 						}

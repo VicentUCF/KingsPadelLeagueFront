@@ -2,6 +2,7 @@
 import '@kpl/design-system/css';
 import '../styles/site-shell.css';
 import '../styles/public-pages.css';
+import '../styles/premium-pages.css';
 import { PLAYOFFS_ENABLED } from '../lib/features';
 
 interface Props {
@@ -13,12 +14,12 @@ const { description = 'Web oficial de Kings Padel League.', title } = Astro.prop
 const currentPath = Astro.url.pathname;
 const navigation = [
 	{ href: '/', label: 'Inicio' },
-	{ href: '/clasificacion', label: 'Clasificación' },
-	{ href: '/jornadas', label: 'Jornadas' },
-	...(PLAYOFFS_ENABLED ? [{ href: '/playoffs', label: 'Playoffs' }] : []),
-	{ href: '/jugadores', label: 'Jugadores' },
 	{ href: '/equipos', label: 'Equipos' },
+	{ href: '/jugadores', label: 'Jugadores' },
+	{ href: '/jornadas', label: 'Jornadas' },
+	{ href: '/clasificacion', label: 'Clasificación' },
 	{ href: '/calendario', label: 'Calendario' },
+	...(PLAYOFFS_ENABLED ? [{ href: '/playoffs', label: 'Playoffs' }] : []),
 ] as const;
 const isCurrent = (href: string) =>
 	href === '/' ? currentPath === href : currentPath === href || currentPath.startsWith(`${href}/`);
@@ -31,6 +32,7 @@ const isCurrent = (href: string) =>
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="theme-color" content="#0b0b0b" />
+		<meta name="color-scheme" content="dark" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
@@ -51,7 +53,7 @@ const isCurrent = (href: string) =>
 					/>
 					<span class="c-brand__copy">
 						<span class="c-brand__name">Kings Padel League</span>
-						<span class="c-brand__tagline">Liga amateur de pádel</span>
+						<span class="c-brand__tagline">Temporada 2 · Liga amateur</span>
 					</span>
 				</a>
 
@@ -92,7 +94,7 @@ const isCurrent = (href: string) =>
 			<div class="site-shell__footer-inner o-container">
 				<div class="site-shell__footer-brand">
 					<strong>Kings Padel League</strong>
-					<span>Liga amateur de pádel</span>
+					<span>Temporada 2 · Liga amateur de pádel</span>
 				</div>
 				<nav class="site-shell__footer-nav" aria-label="Pie de página">
 					{navigation.slice(1).map((item) => <a href={item.href}>{item.label}</a>)}

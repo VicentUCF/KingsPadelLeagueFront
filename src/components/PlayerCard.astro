@@ -1,47 +1,90 @@
 ---
-import type { PublicPlayer } from '../lib/public-league';
+import type { PublicPlayer, PublicTeam } from '../lib/public-league';
 
 interface Props {
 	player: PublicPlayer;
+	team?: PublicTeam;
 	compact?: boolean;
+	preseason?: boolean;
 }
 
-const { player, compact = false } = Astro.props;
+const { player, team, compact = false, preseason = false } = Astro.props;
+const cardStyle = team
+	? `--player-accent:${team.palette.primary};--player-surface:${team.palette.surface};--player-glow:${team.palette.glow}`
+	: undefined;
 ---
 
 <a
-	class:list={['player-card c-surface-card', compact && 'player-card--compact']}
+	class:list={[
+		'player-card',
+		compact && 'player-card--compact',
+		preseason && 'player-card--preseason',
+	]}
 	href={`/jugadores/${player.slug}`}
+	style={cardStyle}
 	data-player-card
-	data-name={player.displayName.toLowerCase()}
+	data-name={`${player.displayName} ${player.alias ?? ''}`.toLocaleLowerCase('es')}
 	data-team={player.teamId ?? ''}
 	data-side={player.preferredPosition}
 >
-	<span class="c-rank" aria-label={`Posición ${player.rank}`}>{player.rank}</span>
+	<span class="player-card__topline">
+		<span>{player.isPresident ? 'Presidencia' : player.positionLabel}</span>
+		<span>{preseason ? 'T2' : `#${player.rank}`}</span>
+	</span>
+
 	<span class="player-card__avatar" aria-hidden="true">
+		<span class="player-card__avatar-glow"></span>
 		{
 			player.profileImage ? (
 				<img
 					src={player.profileImage}
 					alt=""
-					width="72"
-					height="72"
+					width="320"
+					height="380"
 					loading="lazy"
 					decoding="async"
 				/>
 			) : (
-				<span>
+				<span class="player-card__initials">
 					{player.firstName[0]}
 					{player.lastName[0]}
 				</span>
 			)
 		}
 	</span>
+
 	<span class="player-card__identity">
+		<small>{player.teamName}</small>
 		<strong>{player.displayName}</strong>
-		<span>{player.teamName} · {player.positionLabel}</span>
+		<span>{player.positionLabel}{player.isPresident ? ' · Presidente' : ''}</span>
 	</span>
-	<span class="player-card__stat"><strong>{player.totalPoints}</strong><small>PTS</small></span>
-	<span class="player-card__stat"><strong>{player.wonGames}</strong><small>V</small></span>
-	<span class="player-card__stat"><strong>{player.lostGames}</strong><small>D</small></span>
+
+	{
+		preseason ? (
+			<span class="player-card__preseason-note">
+				<small>Nueva temporada</small>
+				<strong>Ficha preparada para el mercado</strong>
+			</span>
+		) : (
+			<span class="player-card__stats" aria-label="Estadísticas de temporada">
+				<span>
+					<strong>{player.totalPoints}</strong>
+					<small>PTS</small>
+				</span>
+				<span>
+					<strong>{player.wonGames}</strong>
+					<small>V</small>
+				</span>
+				<span>
+					<strong>{player.lostGames}</strong>
+					<small>D</small>
+				</span>
+			</span>
+		)
+	}
+
+	<span class="player-card__cta">
+		Ver perfil
+		<span aria-hidden="true">↗</span>
+	</span>
 </a>

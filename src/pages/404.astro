@@ -7,17 +7,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 	title="Página no encontrada · Kings Padel League"
 	description="La página solicitada no existe."
 >
-	<main id="main-content" class="public-page">
-		<div class="o-container public-page__body">
+	<main id="main-content" class="public-page public-page--not-found">
+		<div class="o-container o-container--md public-page__body">
+			<div class="not-found-visual" aria-hidden="true"><span>404</span></div>
 			<EmptyState
 				headingLevel="h1"
 				title="Esta bola se fue fuera"
-				description="La página que buscas no existe o ya no está disponible."
-				><a class="c-button c-button--primary" href="/">Volver a HOME</a><a
-					class="c-button c-button--outline"
-					href="/jornadas">Ver jornadas</a
-				></EmptyState
+				description="La página que buscas no existe o ha cambiado de posición. Puedes volver al estado de liga o explorar la nueva temporada."
 			>
+				<a class="c-button c-button--primary" href="/">Volver al inicio</a>
+				<a class="c-button c-button--outline" href="/equipos">Descubrir equipos</a>
+			</EmptyState>
 		</div>
 	</main>
 </BaseLayout>

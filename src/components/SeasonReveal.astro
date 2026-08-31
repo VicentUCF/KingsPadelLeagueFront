@@ -1,0 +1,57 @@
+---
+import {
+	PUBLIC_SEASON_NAME,
+	SEASON_STARTS_AT,
+	SEASON_STARTS_LABEL,
+} from '../lib/league-presentation';
+
+interface Props {
+	eyebrow?: string;
+	title: string;
+	description: string;
+	items?: string[];
+}
+
+const {
+	eyebrow = 'La próxima temporada se está preparando',
+	title,
+	description,
+	items = ['Mercado y plantillas', 'Calendario oficial', 'Primera jornada'],
+} = Astro.props;
+---
+
+<section class="season-reveal" aria-labelledby="season-reveal-title">
+	<div class="season-reveal__visual" aria-hidden="true">
+		<span class="season-reveal__orbit"></span>
+		<img src="/kpl-trophy.png" alt="" width="500" height="500" decoding="async" />
+		<span class="season-reveal__date"><strong>20</strong><small>SEP</small></span>
+	</div>
+
+	<div class="season-reveal__content">
+		<div class="season-reveal__status">
+			<span class="c-chip c-chip--tone-brand">Pretemporada</span>
+			<span>{PUBLIC_SEASON_NAME}</span>
+		</div>
+		<div class="season-reveal__copy">
+			<p class="c-eyebrow">{eyebrow}</p>
+			<h2 id="season-reveal-title">{title}</h2>
+			<p>{description}</p>
+		</div>
+		<ol class="season-reveal__steps" aria-label="Hitos antes del inicio">
+			{
+				items.map((item, index) => (
+					<li>
+						<span>0{index + 1}</span>
+						<strong>{item}</strong>
+					</li>
+				))
+			}
+		</ol>
+		<footer class="season-reveal__footer">
+			<p>
+				La competición comienza el <time datetime={SEASON_STARTS_AT}>{SEASON_STARTS_LABEL}</time>.
+			</p>
+			<div class="season-reveal__actions"><slot /></div>
+		</footer>
+	</div>
+</section>

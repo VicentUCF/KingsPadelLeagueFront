@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isPublicPreseason, PUBLIC_SEASON_NAME } from '../../lib/league-presentation';
 import type { PublicPlayer, PublicTeam } from '../../lib/public-league';
 import { loadPublicLeagueView } from '../../lib/public-view';
 
@@ -11,7 +12,6 @@ export async function getStaticPaths() {
 		props: {
 			player,
 			team: player.teamId ? teamById.get(player.teamId) : undefined,
-			seasonName: view.season.name,
 		},
 	}));
 }
@@ -19,9 +19,10 @@ export async function getStaticPaths() {
 interface Props {
 	player: PublicPlayer;
 	team?: PublicTeam;
-	seasonName: string;
 }
-const { player, team, seasonName } = Astro.props;
+
+const { player, team } = Astro.props;
+const preseason = isPublicPreseason();
 const palette = team?.palette ?? {
 	primary: '#e0bb45',
 	accent: '#f5e3a3',
@@ -34,16 +35,28 @@ const winRate = played ? `${Math.round((player.wonGames / played) * 100)}%` : '�
 ---
 
 <BaseLayout
-	title={`${player.displayName} · Jugadores · Kings Padel League`}
-	description={`Perfil y estadísticas de ${player.displayName} en ${seasonName}.`}
+	title={`${player.displayName} · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
+	description={`Perfil de ${player.displayName}, ${player.positionLabel.toLowerCase()} de ${player.teamName}, en ${PUBLIC_SEASON_NAME}.`}
 >
-	<main id="main-content" class="public-page">
-		<div class="o-container public-page__body">
+	<main id="main-content" class="public-page public-page--player-detail" style={profileStyle}>
+		<div class="o-container o-container--xl public-page__body">
 			<nav class="c-breadcrumbs" aria-label="Migas de pan">
-				<a class="c-breadcrumbs__item" href="/jugadores">← Volver a jugadores</a>
+				<a class="c-breadcrumbs__item" href="/jugadores">← Todos los jugadores</a>
+				{
+					team && (
+						<a class="c-breadcrumbs__item" href={`/equipos/${team.slug}`}>
+							{team.name}
+						</a>
+					)
+				}
 			</nav>
-			<article class="player-profile" style={profileStyle}>
-				<div class="player-profile__visual c-surface-card">
+
+			<article class="player-profile player-profile--premium">
+				<div class="player-profile__visual">
+					<span class="player-profile__watermark" aria-hidden="true">
+						{player.firstName}
+					</span>
+					<span class="player-profile__orbit" aria-hidden="true"></span>
 					{
 						player.profileImage ? (
 							<img
@@ -60,50 +73,104 @@ const winRate = played ? `${Math.round((player.wonGames / played) * 100)}%` : '�
 							</span>
 						)
 					}
+					<div class="player-profile__visual-meta">
+						<span>{player.positionLabel}</span>
+						<span>{player.isPresident ? 'Presidencia' : 'Jugador KPL'}</span>
+					</div>
 				</div>
-				<div class="player-profile__detail c-panel c-panel--raised">
-					<div>
-						<p class="c-eyebrow">Perfil del jugador · {seasonName}</p><h1>
-							{player.displayName}
-						</h1><p>{player.teamName} · {player.positionLabel}</p>
+
+				<div class="player-profile__detail">
+					<div class="player-profile__status">
+						<span class="c-chip c-chip--tone-brand">{PUBLIC_SEASON_NAME}</span>
+						<span class="c-chip"
+							>{preseason ? 'Ficha en actualización' : `Ranking #${player.rank}`}</span
+						>
 					</div>
-					<div class="o-grid o-grid--metrics" aria-label="Estadísticas del jugador">
-						<article class="c-metric">
-							<span class="c-metric__label">Puntos</span><strong class="c-metric__value"
-								>{player.totalPoints}</strong
-							>
-						</article>
-						<article class="c-metric">
-							<span class="c-metric__label">Victorias</span><strong class="c-metric__value"
-								>{player.wonGames}</strong
-							>
-						</article>
-						<article class="c-metric">
-							<span class="c-metric__label">Derrotas</span><strong class="c-metric__value"
-								>{player.lostGames}</strong
-							>
-						</article>
-						<article class="c-metric">
-							<span class="c-metric__label">Partidos</span><strong class="c-metric__value"
-								>{played}</strong
-							>
-						</article>
-						<article class="c-metric">
-							<span class="c-metric__label">Efectividad</span><strong class="c-metric__value"
-								>{winRate}</strong
-							>
-						</article>
-					</div>
-					<div>
+
+					<header class="player-profile__header">
+						<p class="c-eyebrow">Perfil del jugador</p>
+						<h1>{player.displayName}</h1>
+						<p>
+							<span>{player.teamName}</span>
+							<span aria-hidden="true">·</span>
+							<span>{player.positionLabel}</span>
+							{
+								player.isPresident && (
+									<>
+										<>
+											<span aria-hidden="true">·</span>
+											<span>Presidente</span>
+										</>
+									</>
+								)
+							}
+						</p>
+					</header>
+
+					{
+						preseason ? (
+							<div class="player-profile__season-card">
+								<div>
+									<p class="c-eyebrow">Nueva temporada</p>
+									<h2>Preparado para escribir una nueva ficha.</h2>
+								</div>
+								<p>
+									El equipo, rol y posición se actualizarán automáticamente con los movimientos
+									oficiales del mercado.
+								</p>
+							</div>
+						) : (
+							<div class="player-profile__metrics" aria-label="Estadísticas del jugador">
+								<article>
+									<>
+										<small>Puntos</small>
+										<strong>{player.totalPoints}</strong>
+									</>
+								</article>
+								<article>
+									<>
+										<small>Victorias</small>
+										<strong>{player.wonGames}</strong>
+									</>
+								</article>
+								<article>
+									<>
+										<small>Partidos</small>
+										<strong>{played}</strong>
+									</>
+								</article>
+								<article>
+									<>
+										<small>Efectividad</small>
+										<strong>{winRate}</strong>
+									</>
+								</article>
+							</div>
+						)
+					}
+
+					<dl class="player-profile__facts">
+						<div><dt>Equipo</dt><dd>{player.teamName}</dd></div>
+						<div><dt>Lado preferente</dt><dd>{player.positionLabel}</dd></div>
+						<div>
+							<dt>Rol</dt><dd>{player.isPresident ? 'Presidente y jugador' : 'Jugador'}</dd>
+						</div>
+						<div><dt>Temporada</dt><dd>{PUBLIC_SEASON_NAME}</dd></div>
+					</dl>
+
+					<div class="player-profile__actions">
 						{
 							team ? (
-								<a class="c-button c-button--primary" href={`/equipos/${team.slug}`}>
-									Ver equipo
+								<a class="c-button c-button--primary c-button--lg" href={`/equipos/${team.slug}`}>
+									Ver {team.name}
 								</a>
 							) : (
-								<span class="c-chip">Asignación pendiente</span>
+								<span class="c-chip">Equipo por confirmar</span>
 							)
 						}
+						<a class="c-button c-button--outline c-button--lg" href="/jugadores">
+							Volver al directorio
+						</a>
 					</div>
 				</div>
 			</article>

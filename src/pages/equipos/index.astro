@@ -2,62 +2,125 @@
 import EmptyState from '../../components/EmptyState.astro';
 import PageHero from '../../components/PageHero.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+	isPublicPreseason,
+	PUBLIC_SEASON_NAME,
+	SEASON_STARTS_LABEL,
+} from '../../lib/league-presentation';
 import { loadPublicLeagueView } from '../../lib/public-view';
 
 const view = await loadPublicLeagueView();
+const preseason = isPublicPreseason();
+const playerCount = view.teams.reduce((total, team) => total + team.players.length, 0);
 ---
 
 <BaseLayout
-	title={`Equipos · ${view.season.name} · Kings Padel League`}
-	description="Equipos y plantillas de la Kings Padel League."
+	title={`Equipos · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
+	description={`Descubre los equipos, identidades y plantillas de ${PUBLIC_SEASON_NAME} en Kings Padel League.`}
 >
-	<main id="main-content" class="public-page">
-		<div class="o-container public-page__body">
+	<main id="main-content" class="public-page public-page--teams">
+		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow="Universo KPL"
-				title="Los equipos de la liga"
-				description="Descubre la identidad de cada club, su presidencia y la plantilla que defiende sus colores."
+				eyebrow={`${PUBLIC_SEASON_NAME} · Mercado KPL`}
+				title="La liga cambia de cara"
+				description="Nuevas identidades, plantillas renovadas y una escuadra más. Conoce a los clubes que van a definir la próxima temporada."
 				meta={[
-					view.season.name,
-					`${view.teams.length} equipos`,
-					`${view.players.length} jugadores`,
+					`${view.teams.length} equipos confirmados`,
+					`${playerCount} jugadores publicados`,
+					preseason ? 'Mercado en actualización' : 'Plantillas oficiales',
 				]}
+				mark="02"
 			>
-				<a slot="actions" class="c-button c-button--primary" href="/jugadores">Ver jugadores</a>
+				<a slot="actions" class="c-button c-button--primary" href="/jugadores">
+					Conocer jugadores
+				</a>
+				<a slot="actions" class="c-button c-button--outline" href="/calendario">
+					Próxima temporada
+				</a>
 			</PageHero>
 
 			{
-				view.teams.length ? (
-					<section class="team-grid" aria-label="Equipos de la liga">
-						{view.teams.map((team) => (
-							<a
-								class="team-card c-surface-card"
-								href={`/equipos/${team.slug}`}
-								style={`--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
-							>
-								<span class="team-card__logo" aria-hidden="true">
-									{team.logoPath ? (
-										<img src={team.logoPath} alt="" width="240" height="240" decoding="async" />
-									) : (
-										team.monogram
-									)}
-								</span>
-								<div class="team-card__copy">
-									<p class="c-eyebrow">{team.players.length} jugadores</p>
-									<h2>{team.name}</h2>
-									<p>Presidencia: {team.presidentLabel}</p>
-									<strong>Ver equipo →</strong>
-								</div>
-							</a>
-						))}
-					</section>
-				) : (
-					<EmptyState
-						title="No hay equipos disponibles"
-						description="El catálogo de equipos todavía no se ha publicado."
-					/>
+				preseason && (
+					<aside class="market-status" aria-label="Estado del mercado de equipos">
+						<span class="market-status__icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24">
+								<path d="M4 7h16M7 4v6m10-6v6M5 12h14v8H5zM9 16h6" />
+							</svg>
+						</span>
+						<div>
+							<p class="c-eyebrow">Mercado de {PUBLIC_SEASON_NAME}</p>
+							<h2>La nueva parrilla está tomando forma.</h2>
+							<p>
+								Las fichas se actualizan a medida que se confirman los movimientos. La competición
+								comienza el {SEASON_STARTS_LABEL}.
+							</p>
+						</div>
+						<span class="c-chip c-chip--tone-info">Datos en actualización</span>
+					</aside>
 				)
 			}
+
+			<section class="section-block team-catalog" aria-labelledby="team-catalog-title">
+				<header class="section-block__header section-block__header--editorial">
+					<div>
+						<p class="c-eyebrow">Escudos de la liga</p>
+						<h2 id="team-catalog-title">Una identidad para cada forma de competir.</h2>
+					</div>
+					<p>Entra en cada club para descubrir su carácter, presidencia y plantilla publicada.</p>
+				</header>
+
+				{
+					view.teams.length ? (
+						<ol class="team-grid team-grid--premium" aria-label="Equipos de la liga">
+							{view.teams.map((team, index) => (
+								<li>
+									<a
+										class="team-card team-card--premium"
+										href={`/equipos/${team.slug}`}
+										style={`--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
+									>
+										<span class="team-card__number" aria-hidden="true">
+											0{index + 1}
+										</span>
+										<span class="team-card__halo" aria-hidden="true" />
+										<span class="team-card__logo" aria-hidden="true">
+											{team.logoPath ? (
+												<img
+													src={team.logoPath}
+													alt=""
+													width="240"
+													height="240"
+													loading={index > 1 ? 'lazy' : 'eager'}
+													decoding="async"
+												/>
+											) : (
+												team.monogram
+											)}
+										</span>
+										<span class="team-card__copy">
+											<span class="team-card__meta">
+												<small>{team.players.length} jugadores</small>
+												<small>{preseason ? 'Nueva temporada' : 'Equipo oficial'}</small>
+											</span>
+											<strong class="team-card__name">{team.name}</strong>
+											<span class="team-card__tagline">{team.tagline}</span>
+											<span class="team-card__president">Presidencia · {team.presidentLabel}</span>
+											<span class="team-card__cta">
+												Explorar equipo <span aria-hidden="true">↗</span>
+											</span>
+										</span>
+									</a>
+								</li>
+							))}
+						</ol>
+					) : (
+						<EmptyState
+							title="La nueva parrilla se está preparando"
+							description="Los equipos aparecerán aquí a medida que se confirmen para la nueva temporada."
+						/>
+					)
+				}
+			</section>
 		</div>
 	</main>
 </BaseLayout>
