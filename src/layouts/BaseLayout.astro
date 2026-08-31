@@ -12,7 +12,7 @@ interface Props {
 const { description = 'Web oficial de Kings Padel League.', title } = Astro.props;
 const currentPath = Astro.url.pathname;
 const navigation = [
-	{ href: '/', label: 'Home' },
+	{ href: '/', label: 'Inicio' },
 	{ href: '/clasificacion', label: 'Clasificación' },
 	{ href: '/jornadas', label: 'Jornadas' },
 	...(PLAYOFFS_ENABLED ? [{ href: '/playoffs', label: 'Playoffs' }] : []),

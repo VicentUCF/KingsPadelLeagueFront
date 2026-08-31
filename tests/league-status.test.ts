@@ -120,6 +120,31 @@ describe('resolveHomeSeasonStatus', () => {
 		assert.equal(result.matchdayLabel, 'Copa de Oro · Final');
 		assert.equal(result.focusHref, '/playoffs');
 	});
+
+	it('no deja que un playoff futuro oculte una jornada regular en curso', () => {
+		const playoffs: HomePlayoff[] = [{ id: 'gold', seasonId: 'season-1', name: 'Copa de Oro' }];
+		const playoffMatches: HomePlayoffMatch[] = [
+			{
+				id: 'final',
+				playoffId: 'gold',
+				scheduledAt: '2026-06-28T18:00:00Z',
+				stage: 'final',
+				status: 'scheduled',
+			},
+		];
+		const result = resolveHomeSeasonStatus(
+			[seasonOne],
+			[matchday('current', 'Jornada 8', 'season-1', '2026-06-20T18:00:00Z', 'in_progress')],
+			new Date('2026-06-20T19:00:00Z'),
+			playoffs,
+			playoffMatches,
+		);
+
+		assert.equal(result.phaseLabel, 'Fase regular');
+		assert.equal(result.matchdayEyebrow, 'Jornada en curso');
+		assert.equal(result.matchdayLabel, 'Jornada 8');
+		assert.equal(result.focusHref, '/jornadas');
+	});
 });
 
 function matchday(

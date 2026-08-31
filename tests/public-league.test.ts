@@ -197,6 +197,33 @@ describe('createPublicLeagueView', () => {
 		assert.equal(view.focusPlayoffMatch?.id, 'semi-1');
 	});
 
+	it('mantiene la fase regular cuando hay una jornada activa y un playoff futuro', () => {
+		const activeRegularSeason = dataset();
+		activeRegularSeason.matchdays[1] = {
+			...activeRegularSeason.matchdays[1]!,
+			scheduledAt: '2026-09-10T10:00:00Z',
+			status: 'in_progress',
+		};
+		activeRegularSeason.playoffs = [{ id: 'playoff-1', seasonId: 'current', name: 'Copa de Oro' }];
+		activeRegularSeason.playoffMatches = [
+			{
+				id: 'final',
+				playoffId: 'playoff-1',
+				localTeamId: 'a',
+				awayTeamId: 'b',
+				localTeamScorePoints: 0,
+				awayTeamScorePoints: 0,
+				scheduledAt: '2026-09-20T10:00:00Z',
+				stage: 'final',
+				status: 'scheduled',
+			},
+		];
+
+		const view = createPublicLeagueView(activeRegularSeason, new Date('2026-09-10T12:00:00Z'));
+
+		assert.equal(view.phaseLabel, 'Fase regular');
+	});
+
 	it('ordena los resultados de parejas mediante el campo order', () => {
 		const orderedPairs = dataset();
 		orderedPairs.lineups = [

@@ -1,17 +1,17 @@
 ---
 import { getCollection } from 'astro:content';
 
+import TeamBadge from '../components/TeamBadge.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { selectPublishedAnnouncements } from '../lib/announcements';
 import { loadLeagueHomeData } from '../lib/kpl-api';
 import { resolveHomeSeasonStatus } from '../lib/league-status';
+import { loadPublicLeagueView } from '../lib/public-view';
 import '../styles/home.css';
 
 const buildDate = new Date();
-const [{ seasons, matchdays, playoffs, playoffMatches }, announcementEntries] = await Promise.all([
-	loadLeagueHomeData(),
-	getCollection('announcements'),
-]);
+const [{ seasons, matchdays, playoffs, playoffMatches }, view, announcementEntries] =
+	await Promise.all([loadLeagueHomeData(), loadPublicLeagueView(), getCollection('announcements')]);
 const seasonStatus = resolveHomeSeasonStatus(
 	seasons,
 	matchdays,
@@ -22,8 +22,8 @@ const seasonStatus = resolveHomeSeasonStatus(
 const announcements = selectPublishedAnnouncements(announcementEntries, buildDate);
 const announcementCategoryLabels = {
 	calendario: 'Calendario',
-	equipos: 'Equipos',
-	cartas: 'Competición',
+	equipos: 'Mercado',
+	cartas: 'Próximamente',
 } as const;
 const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 	day: 'numeric',
@@ -31,57 +31,138 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 	year: 'numeric',
 	timeZone: 'Europe/Madrid',
 });
+const snapshotFormatter = new Intl.DateTimeFormat('es-ES', {
+	day: 'numeric',
+	month: 'short',
+	hour: '2-digit',
+	minute: '2-digit',
+	timeZone: 'Europe/Madrid',
+});
+
+const currentMatchday = view.matchdays.find((matchday) => matchday.status === 'current') ?? null;
+const nextMatchday = view.matchdays.find((matchday) => matchday.status === 'upcoming') ?? null;
+const latestCompletedMatchday =
+	[...view.matchdays].reverse().find((matchday) => matchday.status === 'completed') ?? null;
+const focusMatchday = currentMatchday ?? nextMatchday ?? latestCompletedMatchday;
+const dashboardMatchday =
+	seasonStatus.phaseLabel === 'Playoffs'
+		? (latestCompletedMatchday ?? focusMatchday)
+		: focusMatchday;
+const focusEncounter =
+	focusMatchday?.encounters.find((encounter) => encounter.status === 'current') ??
+	focusMatchday?.encounters[0] ??
+	null;
+const playoffFocus =
+	seasonStatus.phaseLabel === 'Playoffs' ? (view.focusPlayoffMatch ?? null) : null;
+const spotlight =
+	seasonStatus.phaseLabel === 'Pretemporada'
+		? null
+		: playoffFocus
+			? {
+					awayScore: playoffFocus.awayScore,
+					awayTeam: playoffFocus.awayTeam,
+					homeScore: playoffFocus.homeScore,
+					homeTeam: playoffFocus.homeTeam,
+					href: '/playoffs',
+					label: playoffFocus.stageLabel,
+					scheduledAt: playoffFocus.scheduledAt,
+					scheduledAtLabel: playoffFocus.scheduledAtLabel,
+					status: playoffFocus.status,
+				}
+			: focusEncounter
+				? {
+						awayScore: focusEncounter.awayScore,
+						awayTeam: focusEncounter.awayTeam,
+						homeScore: focusEncounter.homeScore,
+						homeTeam: focusEncounter.homeTeam,
+						href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
+						label: focusMatchday?.label ?? 'Próximo cruce',
+						scheduledAt: focusEncounter.scheduledAt,
+						scheduledAtLabel: focusEncounter.scheduledAtLabel,
+						status: focusEncounter.status,
+					}
+				: null;
+
+const heroContent = {
+	Pretemporada: {
+		eyebrow: 'La nueva KPL ya se mueve',
+		title: 'La próxima temporada empieza fuera de pista.',
+		lead: 'El mercado ha renovado los equipos, la liga crece y se preparan nuevas cartas de acción para cambiar cada partido.',
+		primaryHref: '/equipos',
+		primaryLabel: 'Conocer los equipos',
+		secondaryHref: '/calendario',
+		secondaryLabel: 'Ver calendario',
+	},
+	'Fase regular': {
+		eyebrow: 'El pulso de la competición',
+		title: 'Toda la liga. En un vistazo.',
+		lead: 'Resultados, clasificación, jornadas y protagonistas: todo lo que pasa en Kings Padel League, en un mismo lugar.',
+		primaryHref: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
+		primaryLabel: currentMatchday ? 'Ver jornada y resultados' : 'Ver resultados',
+		secondaryHref: '/equipos',
+		secondaryLabel: 'Explorar equipos',
+	},
+	Playoffs: {
+		eyebrow: 'El camino a la corona',
+		title: 'La liga entra en su momento decisivo.',
+		lead: 'Sigue cada cruce de playoffs, consulta el cuadro y descubre quién mantiene vivo el sueño de levantar la corona.',
+		primaryHref: '/playoffs',
+		primaryLabel: 'Ver playoffs',
+		secondaryHref: '/equipos',
+		secondaryLabel: 'Explorar equipos',
+	},
+	'Temporada finalizada': {
+		eyebrow: 'Temporada completada',
+		title: 'Una temporada para volver a vivir.',
+		lead: 'Repasa todos los resultados, la clasificación final y los equipos que han escrito esta edición de Kings Padel League.',
+		primaryHref: '/jornadas',
+		primaryLabel: 'Ver todos los resultados',
+		secondaryHref: '/equipos',
+		secondaryLabel: 'Ver equipos',
+	},
+}[seasonStatus.phaseLabel];
+
+const completedMatchdays = view.matchdays.filter(
+	(matchday) => matchday.status === 'completed',
+).length;
+const hasStandingsData = view.standings.some(
+	(standing) => standing.points > 0 || standing.playedMatches > 0,
+);
+const standingsByTeamId = new Map(view.standings.map((standing) => [standing.team.id, standing]));
+const topStandings = view.standings.slice(0, 5);
+const resultPathMeta = currentMatchday
+	? `${currentMatchday.label} en curso`
+	: latestCompletedMatchday
+		? `Última: ${latestCompletedMatchday.label}`
+		: 'Jornadas y cruces';
+const calendarPathMeta = nextMatchday?.dateLabel ?? 'Próximas fechas';
 ---
 
 <BaseLayout
-	title="Kings Padel League | Liga amateur de pádel"
-	description="Sigue la temporada, las novedades y todos los canales oficiales de Kings Padel League."
+	title="Kings Padel League | Toda la liga, en un vistazo"
+	description="Estado de la Kings Padel League: pretemporada, resultados, clasificación, equipos, jornadas y novedades oficiales."
 >
 	<main class="home-page" id="main-content" tabindex="-1">
 		<section class="home-hero" aria-labelledby="home-title">
-			<div class="home-hero__layout o-container">
-				<div class="home-hero__content o-stack">
-					<img
-						class="home-hero__logo"
-						src="/kpl-logo-wordmark.png"
-						alt="Kings Padel League"
-						width="318"
-						height="135"
-						loading="eager"
-						decoding="async"
-					/>
-
-					<div class="home-hero__heading o-stack o-stack--compact">
-						<div class="o-cluster">
-							<span class="c-chip c-chip--tone-brand">{seasonStatus.seasonName}</span>
-							<span class="c-chip c-chip--tone-success">{seasonStatus.phaseLabel}</span>
-						</div>
-						<h1 id="home-title">La liga se vive dentro y fuera de la pista.</h1>
-						<p class="home-hero__lead">
-							Sigue cada jornada, conoce a los jugadores y descubre todo lo que viene en Kings Padel
-							League.
-						</p>
+			<div class="home-hero__noise" aria-hidden="true"></div>
+			<div class="home-hero__layout o-container o-container--xl">
+				<div class="home-hero__content">
+					<div class="home-hero__status-line">
+						<span class="home-live-dot" aria-hidden="true"></span>
+						<span>Estado de liga</span>
+						<span class="home-hero__status-separator" aria-hidden="true"></span>
+						<span>{seasonStatus.seasonName}</span>
 					</div>
 
-					<dl class="home-hero__status" aria-label="Estado actual de la temporada">
-						<div class="home-hero__status-item">
-							<dt>{seasonStatus.matchdayEyebrow}</dt>
-							<dd>{seasonStatus.matchdayLabel}</dd>
-						</div>
-						<div class="home-hero__status-item">
-							<dt>Fecha</dt>
-							<dd>{seasonStatus.dateLabel}</dd>
-						</div>
-					</dl>
+					<div class="home-hero__heading">
+						<p class="c-eyebrow">{heroContent.eyebrow}</p>
+						<h1 id="home-title">{heroContent.title}</h1>
+						<p class="home-hero__lead">{heroContent.lead}</p>
+					</div>
 
 					<div class="home-hero__actions">
-						<a
-							class="c-button c-button--primary c-button--lg"
-							href={seasonStatus.phaseLabel === 'Playoffs'
-								? seasonStatus.focusHref
-								: '/clasificacion'}
-						>
-							{seasonStatus.phaseLabel === 'Playoffs' ? 'Ver playoffs' : 'Ver clasificación'}
+						<a class="c-button c-button--primary c-button--lg" href={heroContent.primaryHref}>
+							{heroContent.primaryLabel}
 							<svg aria-hidden="true" viewBox="0 0 20 20">
 								<path
 									d="m7 4 6 6-6 6"
@@ -92,14 +173,32 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 									stroke-width="2"></path>
 							</svg>
 						</a>
-						<a class="c-button c-button--outline c-button--lg" href="/jugadores">
-							Conocer jugadores
+						<a class="c-button c-button--outline c-button--lg" href={heroContent.secondaryHref}>
+							{heroContent.secondaryLabel}
 						</a>
 					</div>
+
+					<dl class="home-hero__facts" aria-label="Resumen de la temporada">
+						<div>
+							<dt>Fase actual</dt>
+							<dd>{seasonStatus.phaseLabel}</dd>
+						</div>
+						<div>
+							<dt>Equipos</dt>
+							<dd>{view.teams.length} confirmados</dd>
+						</div>
+						<div>
+							<dt>Jornadas</dt>
+							<dd>{completedMatchdays} / {view.matchdays.length} disputadas</dd>
+						</div>
+					</dl>
 				</div>
 
-				<div class="home-hero__art" aria-hidden="true">
-					<div class="home-hero__orb">
+				<div class="home-hero__visual" aria-label="Evento destacado de la liga">
+					<div class="home-hero__arena" aria-hidden="true">
+						<span class="home-hero__orbit home-hero__orbit--outer"></span>
+						<span class="home-hero__orbit home-hero__orbit--inner"></span>
+						<span class="home-hero__court"></span>
 						<img
 							class="home-hero__trophy"
 							src="/kpl-trophy.png"
@@ -109,54 +208,372 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 							decoding="async"
 						/>
 					</div>
-					<p class="home-hero__art-caption">
-						<strong>KPL</strong><span>Una pista. Una corona.</span>
-					</p>
+
+					<article class="home-spotlight">
+						<header class="home-spotlight__header">
+							<div>
+								<span
+									class:list={[
+										'c-chip',
+										seasonStatus.phaseLabel === 'Pretemporada'
+											? 'c-chip--tone-brand'
+											: currentMatchday || spotlight?.status === 'current'
+												? 'c-chip--tone-warning'
+												: 'c-chip--tone-info',
+									]}
+								>
+									{seasonStatus.matchdayEyebrow}
+								</span>
+								<h2>{seasonStatus.matchdayLabel}</h2>
+							</div>
+							<span class="home-spotlight__mark" aria-hidden="true">KPL</span>
+						</header>
+
+						{
+							spotlight ? (
+								<div class="home-spotlight__match">
+									<div class="home-spotlight__team">
+										<TeamBadge team={spotlight.homeTeam} meta="Local" />
+									</div>
+									{spotlight.status === 'upcoming' ? (
+										<strong
+											class="home-spotlight__versus"
+											aria-label={`${spotlight.homeTeam.name} contra ${spotlight.awayTeam?.name ?? 'rival por determinar'}`}
+										>
+											VS
+										</strong>
+									) : (
+										<strong
+											class="home-spotlight__score"
+											aria-label={`${spotlight.homeTeam.name}, ${spotlight.homeScore}; ${spotlight.awayTeam?.name ?? 'rival'}, ${spotlight.awayScore ?? 0}`}
+										>
+											<span>{spotlight.homeScore}</span>
+											<span>:</span>
+											<span>{spotlight.awayScore ?? 0}</span>
+										</strong>
+									)}
+									<div class="home-spotlight__team home-spotlight__team--away">
+										{spotlight.awayTeam ? (
+											<TeamBadge team={spotlight.awayTeam} meta="Visitante" />
+										) : (
+											<span class="home-team-placeholder">
+												<span aria-hidden="true">?</span>
+												<strong>Por determinar</strong>
+											</span>
+										)}
+									</div>
+								</div>
+							) : (
+								<div class="home-spotlight__preseason">
+									<p>El mercado ha cambiado el mapa de la liga.</p>
+									<ul>
+										<li>Plantillas renovadas</li>
+										<li>Un nuevo equipo</li>
+										<li>Cartas de acción, próximamente</li>
+									</ul>
+								</div>
+							)
+						}
+
+						<footer class="home-spotlight__footer">
+							<div>
+								<span>{spotlight?.label ?? seasonStatus.phaseLabel}</span>
+								{
+									spotlight ? (
+										<time datetime={spotlight.scheduledAt}>{spotlight.scheduledAtLabel}</time>
+									) : (
+										<span>{seasonStatus.dateLabel}</span>
+									)
+								}
+							</div>
+							<a
+								class="home-spotlight__link"
+								href={spotlight?.href ??
+									(seasonStatus.phaseLabel === 'Pretemporada'
+										? '/equipos'
+										: seasonStatus.focusHref)}
+							>
+								{spotlight ? 'Abrir detalle' : 'Ver equipos'}
+								<span aria-hidden="true">↗</span>
+							</a>
+						</footer>
+					</article>
 				</div>
 			</div>
 		</section>
 
+		<nav class="home-shortcuts o-container o-container--xl" aria-label="Accesos de la liga">
+			<a class="home-shortcut" href="/jornadas">
+				<span class="home-shortcut__icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24"
+						><path d="M4 5h16v14H4zM8 3v4m8-4v4M4 10h16m-12 4h3m2 0h3"></path></svg
+					>
+				</span>
+				<span><strong>Resultados</strong><small>{resultPathMeta}</small></span>
+				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
+			</a>
+			<a class="home-shortcut" href="/clasificacion">
+				<span class="home-shortcut__icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18"></path></svg>
+				</span>
+				<span
+					><strong>Clasificación</strong><small
+						>{
+							hasStandingsData
+								? `${topStandings[0]?.team.name ?? 'Liga'} lidera`
+								: 'La carrera por la corona'
+						}</small
+					></span
+				>
+				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
+			</a>
+			<a class="home-shortcut" href="/equipos">
+				<span class="home-shortcut__icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24"
+						><path
+							d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-1a2.5 2.5 0 1 0 0-5m-8 8c-3 0-5 1.6-5 4v2h10v-2c0-2.4-2-4-5-4Zm7 0c2.4 0 4 1.4 4 3.5V19h-5"
+						></path></svg
+					>
+				</span>
+				<span><strong>Equipos</strong><small>{view.teams.length} identidades, una liga</small></span
+				>
+				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
+			</a>
+			<a class="home-shortcut" href="/calendario">
+				<span class="home-shortcut__icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24"
+						><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Zm2-2v4m10-4v4M3 9h18"></path></svg
+					>
+				</span>
+				<span><strong>Calendario</strong><small>{calendarPathMeta}</small></span>
+				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
+			</a>
+		</nav>
+
+		<section
+			class="home-league o-container o-container--xl o-region"
+			aria-labelledby="league-title"
+		>
+			<header class="home-section-heading">
+				<div>
+					<p class="c-eyebrow">Estado de la competición</p>
+					<h2 id="league-title">
+						{
+							seasonStatus.phaseLabel === 'Pretemporada'
+								? 'Todo lo que cambia antes del primer saque.'
+								: 'La liga, jornada a jornada.'
+						}
+					</h2>
+				</div>
+				<p>
+					Consulta rápida del calendario y la tabla. Los datos corresponden a la última publicación
+					del portal, el {snapshotFormatter.format(buildDate)}.
+				</p>
+			</header>
+
+			<div class="home-dashboard">
+				<article class="home-competition-panel">
+					<header class="home-panel-heading">
+						<div>
+							<p class="c-eyebrow">
+								{
+									dashboardMatchday?.status === 'completed'
+										? 'Últimos resultados'
+										: dashboardMatchday?.status === 'current'
+											? 'Jornada en curso'
+											: 'Próxima jornada'
+								}
+							</p>
+							<h3>{dashboardMatchday?.label ?? 'Calendario en preparación'}</h3>
+						</div>
+						{
+							dashboardMatchday && (
+								<time datetime={dashboardMatchday.date}>{dashboardMatchday.dateLabel}</time>
+							)
+						}
+					</header>
+
+					{
+						dashboardMatchday?.encounters.length ? (
+							<div class="home-fixtures">
+								{dashboardMatchday.encounters.slice(0, 3).map((encounter) => (
+									<div class="home-fixture">
+										<TeamBadge team={encounter.homeTeam} />
+										{encounter.status === 'upcoming' ? (
+											<strong class="home-fixture__versus" aria-label="contra">
+												VS
+											</strong>
+										) : (
+											<strong
+												class="home-fixture__score"
+												aria-label={`${encounter.homeTeam.name}, ${encounter.homeScore}; ${encounter.awayTeam.name}, ${encounter.awayScore}`}
+											>
+												{encounter.homeScore}
+												<span>:</span>
+												{encounter.awayScore}
+											</strong>
+										)}
+										<div class="home-fixture__away">
+											<TeamBadge team={encounter.awayTeam} />
+										</div>
+									</div>
+								))}
+							</div>
+						) : (
+							<div class="home-panel-empty">
+								<strong>Los cruces se están preparando.</strong>
+								<p>Publicaremos aquí los enfrentamientos en cuanto el calendario sea oficial.</p>
+							</div>
+						)
+					}
+
+					<footer class="home-panel-footer">
+						<span>{dashboardMatchday?.encounters.length ?? 0} cruces publicados</span>
+						<a
+							class="c-button c-button--outline c-button--sm"
+							href={dashboardMatchday ? `/jornadas/${dashboardMatchday.id}` : '/calendario'}
+						>
+							{dashboardMatchday ? 'Ver jornada' : 'Ver calendario'} →
+						</a>
+					</footer>
+				</article>
+
+				<aside class="home-standings" aria-labelledby="standings-title">
+					<header class="home-panel-heading">
+						<div>
+							<p class="c-eyebrow">{hasStandingsData ? 'Clasificación' : 'Equipos confirmados'}</p>
+							<h3 id="standings-title">
+								{hasStandingsData ? 'La carrera por la corona' : 'La nueva parrilla'}
+							</h3>
+						</div>
+						{hasStandingsData && <span class="home-standings__pts">PTS</span>}
+					</header>
+
+					<ol class="home-standings__list">
+						{
+							topStandings.map((standing) => (
+								<li
+									class:list={[
+										'home-standing',
+										{ 'home-standing--leader': standing.rank === 1 && hasStandingsData },
+									]}
+								>
+									<span class="home-standing__rank">{hasStandingsData ? standing.rank : '—'}</span>
+									<TeamBadge team={standing.team} />
+									{hasStandingsData ? (
+										<strong>{standing.points}</strong>
+									) : (
+										<small>Confirmado</small>
+									)}
+								</li>
+							))
+						}
+					</ol>
+
+					<a class="home-standings__link" href={hasStandingsData ? '/clasificacion' : '/equipos'}>
+						{hasStandingsData ? 'Ver clasificación completa' : 'Conocer todos los equipos'}
+						<span aria-hidden="true">→</span>
+					</a>
+				</aside>
+			</div>
+		</section>
+
+		{
+			view.teams.length > 0 && (
+				<section
+					class="home-teams o-container o-container--xl o-region"
+					aria-labelledby="teams-title"
+				>
+					<header class="home-section-heading">
+						<div>
+							<p class="c-eyebrow">La nueva parrilla</p>
+							<h2 id="teams-title">Nuevos equipos. Nuevas rivalidades.</h2>
+						</div>
+						<a class="c-button c-button--outline" href="/equipos">
+							Ver todos los equipos →
+						</a>
+					</header>
+
+					<ul class="home-teams__reel" aria-label="Equipos de Kings Padel League">
+						{view.teams.map((team) => {
+							const standing = standingsByTeamId.get(team.id);
+							return (
+								<li>
+									<a
+										class="home-team-card"
+										href={`/equipos/${team.slug}`}
+										style={`--team-accent:${team.palette.primary};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
+									>
+										<span class="home-team-card__glow" aria-hidden="true" />
+										<span class="home-team-card__logo" aria-hidden="true">
+											{team.logoPath ? (
+												<img
+													src={team.logoPath}
+													alt=""
+													width="160"
+													height="160"
+													loading="lazy"
+													decoding="async"
+												/>
+											) : (
+												team.monogram
+											)}
+										</span>
+										<span class="home-team-card__copy">
+											<small>
+												{hasStandingsData && standing
+													? `#${standing.rank} · ${standing.points} pts`
+													: 'Equipo KPL'}
+											</small>
+											<strong>{team.name}</strong>
+											<span>Ver plantilla →</span>
+										</span>
+									</a>
+								</li>
+							);
+						})}
+					</ul>
+				</section>
+			)
+		}
+
 		{
 			announcements.length > 0 && (
 				<section
-					class="home-section o-container o-region o-stack"
+					class="home-news o-container o-container--xl o-region"
 					aria-labelledby="announcements-title"
 				>
-					<header class="c-section-heading">
-						<div class="c-section-heading__copy">
-							<p class="c-section-heading__eyebrow">Última hora</p>
-							<h2 id="announcements-title">Lo nuevo en la liga</h2>
+					<header class="home-section-heading">
+						<div>
+							<p class="c-eyebrow">Última hora</p>
+							<h2 id="announcements-title">Lo que está cambiando en la liga.</h2>
 						</div>
-						<p class="home-section__intro">
-							Calendario, equipos y novedades que cambiarán la próxima temporada.
-						</p>
+						<p>Mercado, calendario y las novedades que definirán la próxima temporada.</p>
 					</header>
 
-					<div class="home-announcements o-grid o-grid--cards">
+					<div class="home-news__grid">
 						{announcements.map(({ data }, index) => (
-							<article
-								class:list={[
-									'home-announcement',
-									'c-surface-card',
-									'c-surface-card--padded',
-									{ 'home-announcement--featured': index === 0 },
-								]}
-							>
-								<div class="home-announcement__meta">
-									<span class="c-chip c-chip--tone-brand">
+							<article class:list={['home-news-card', { 'home-news-card--featured': index === 0 }]}>
+								<div class="home-news-card__top">
+									<span
+										class:list={[
+											'c-chip',
+											data.category === 'cartas' ? 'c-chip--tone-info' : 'c-chip--tone-brand',
+										]}
+									>
 										{announcementCategoryLabels[data.category]}
 									</span>
 									<time datetime={data.publishedAt.toISOString()}>
 										{announcementDateFormatter.format(data.publishedAt)}
 									</time>
 								</div>
-								<div class="home-announcement__copy">
+								<div class="home-news-card__copy">
+									<span class="home-news-card__number" aria-hidden="true">
+										0{index + 1}
+									</span>
 									<h3>{data.title}</h3>
 									<p>{data.summary}</p>
 								</div>
-								<span class="home-announcement__number" aria-hidden="true">
-									0{index + 1}
-								</span>
 							</article>
 						))}
 					</div>
@@ -164,10 +581,13 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 			)
 		}
 
-		<section class="home-social o-container o-region" aria-labelledby="social-title">
-			<div class="home-social__panel c-panel c-panel--accent">
+		<section
+			class="home-social o-container o-container--xl o-region"
+			aria-labelledby="social-title"
+		>
+			<div class="home-social__panel">
 				<div class="home-social__copy">
-					<p class="c-eyebrow">Dentro de la liga</p>
+					<p class="c-eyebrow">La liga continúa fuera de la web</p>
 					<h2 id="social-title">No te pierdas ningún punto.</h2>
 					<p>Highlights, anuncios, mejores jugadas y todo lo que sucede detrás de cada jornada.</p>
 				</div>
@@ -181,18 +601,9 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 						aria-label="Seguir Kings Padel League en Instagram (se abre en una pestaña nueva)"
 					>
 						<svg aria-hidden="true" viewBox="0 0 24 24">
-							<rect
-								x="3"
-								y="3"
-								width="18"
-								height="18"
-								rx="5"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"></rect>
-							<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"
-							></circle>
-							<circle cx="17.5" cy="6.5" r="1" fill="currentColor"></circle>
+							<rect x="3" y="3" width="18" height="18" rx="5"></rect>
+							<circle cx="12" cy="12" r="4"></circle>
+							<circle class="home-social__dot" cx="17.5" cy="6.5" r="1"></circle>
 						</svg>
 						<span><small>Síguenos en</small><strong>Instagram</strong></span>
 						<span aria-hidden="true">↗</span>
@@ -208,10 +619,8 @@ const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 						<svg aria-hidden="true" viewBox="0 0 24 24">
 							<path
 								d="M21 8.2a3 3 0 0 0-2.1-2.1C17 5.6 12 5.6 12 5.6s-5 0-6.9.5A3 3 0 0 0 3 8.2 31 31 0 0 0 2.6 12c0 1.3.1 2.6.4 3.8a3 3 0 0 0 2.1 2.1c1.9.5 6.9.5 6.9.5s5 0 6.9-.5a3 3 0 0 0 2.1-2.1c.3-1.2.4-2.5.4-3.8s-.1-2.6-.4-3.8Z"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"></path>
-							<path d="m10 9 5 3-5 3V9Z" fill="currentColor"></path>
+							></path>
+							<path class="home-social__play" d="m10 9 5 3-5 3V9Z"></path>
 						</svg>
 						<span><small>Vídeos en</small><strong>YouTube</strong></span>
 						<span aria-hidden="true">↗</span>

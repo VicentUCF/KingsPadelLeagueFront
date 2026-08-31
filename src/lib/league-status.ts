@@ -91,9 +91,20 @@ export function resolveHomeSeasonStatus(
 	const seasonPlayoffMatches = playoffMatches
 		.filter((match) => seasonPlayoffIds.has(match.playoffId))
 		.sort(byScheduledAtAsc);
+	const focusedInProgress = seasonMatchdays.find((matchday) => matchday.status === 'in_progress');
+	const focusedScheduled = seasonMatchdays.find((matchday) => matchday.status === 'scheduled');
+	const focusedFinished = [...seasonMatchdays]
+		.filter((matchday) => matchday.status === 'finished')
+		.sort(byScheduledAtDesc)[0];
 	const playoffInProgress = seasonPlayoffMatches.find((match) => match.status === 'in_progress');
 	const playoffScheduled = seasonPlayoffMatches.find((match) => match.status === 'scheduled');
-	const focusPlayoff = playoffInProgress ?? playoffScheduled;
+	const focusPlayoff = !focusedInProgress
+		? (playoffInProgress ??
+			(playoffScheduled &&
+			(!focusedScheduled || byScheduledAtAsc(playoffScheduled, focusedScheduled) <= 0)
+				? playoffScheduled
+				: undefined))
+		: undefined;
 	if (focusPlayoff) {
 		const playoff = seasonPlayoffs.find((item) => item.id === focusPlayoff.playoffId);
 		return {
@@ -105,11 +116,6 @@ export function resolveHomeSeasonStatus(
 			focusHref: '/playoffs',
 		};
 	}
-	const focusedInProgress = seasonMatchdays.find((matchday) => matchday.status === 'in_progress');
-	const focusedScheduled = seasonMatchdays.find((matchday) => matchday.status === 'scheduled');
-	const focusedFinished = [...seasonMatchdays]
-		.filter((matchday) => matchday.status === 'finished')
-		.sort(byScheduledAtDesc)[0];
 	const focusMatchday = focusedInProgress ?? focusedScheduled ?? focusedFinished;
 
 	return {

@@ -82,7 +82,26 @@ function resolvePhase(
 	now: Date,
 ): PublicLeagueView['phaseLabel'] {
 	if (now.getTime() < Date.parse(season.startsAt)) return 'Pretemporada';
-	if (playoffMatches.some((match) => match.status !== 'completed')) return 'Playoffs';
+	if (matchdays.some((matchday) => matchday.status === 'in_progress')) return 'Fase regular';
+	if (playoffMatches.some((match) => match.status === 'current')) return 'Playoffs';
+
+	const nextRegularMatchday = matchdays
+		.filter(
+			(matchday) =>
+				matchday.status === 'scheduled' && Date.parse(matchday.scheduledAt) >= now.getTime(),
+		)
+		.sort(byScheduledAt)[0];
+	const nextPlayoffMatch = playoffMatches
+		.filter(
+			(match) => match.status === 'upcoming' && Date.parse(match.scheduledAt) >= now.getTime(),
+		)
+		.sort(byScheduledAt)[0];
+	if (
+		nextPlayoffMatch &&
+		(!nextRegularMatchday || byScheduledAt(nextPlayoffMatch, nextRegularMatchday) <= 0)
+	) {
+		return 'Playoffs';
+	}
 	if (
 		now.getTime() > Date.parse(season.endsAt) ||
 		(matchdays.length > 0 &&
