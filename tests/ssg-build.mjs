@@ -14,19 +14,19 @@ const fixture = spawn(process.execPath, ['tests/fixtures/kpl-api-server.mjs'], {
 try {
 	await waitForFixture(fixture);
 	await runBuild(port, outDir);
-	const [home, playoffs, standings, matchday] = await Promise.all([
+	const [home, standings, matchday] = await Promise.all([
 		readFile(join(outDir, 'index.html'), 'utf8'),
-		readFile(join(outDir, 'playoffs/index.html'), 'utf8'),
 		readFile(join(outDir, 'clasificacion/index.html'), 'utf8'),
 		readFile(join(outDir, 'jornadas/jornada-1/index.html'), 'utf8'),
 	]);
 
-	assert.match(home, /Playoffs/);
-	assert.match(playoffs, /Copa de Oro/);
-	assert.match(playoffs, /Por determinar/);
-	assert.match(standings, /Clasificación general/);
+	assert.doesNotMatch(home, /Playoffs/);
+	assert.match(home, /Pretemporada/);
+	assert.match(home, /Temporada 2/);
+	assert.match(standings, /Todos empiezan desde cero/);
+	assert.match(standings, /La tabla espera al primer punto/);
 	assert.match(matchday, /Jornada 1/);
-	console.log('SSG fixture build verified: existing routes and /playoffs generated successfully.');
+	console.log('SSG fixture build verified: Temporada 2 preseason routes generated successfully.');
 } finally {
 	fixture.kill('SIGTERM');
 	await rm(outDir, { recursive: true, force: true });
@@ -66,7 +66,8 @@ function runBuild(port, outDir) {
 			env: {
 				...process.env,
 				KPL_API_BASE_URL: `http://127.0.0.1:${port}`,
-				KPL_PLAYOFFS_ENABLED: 'true',
+				KPL_PLAYOFFS_ENABLED: 'false',
+				KPL_PRESEASON_MODE: 'true',
 			},
 			stdio: 'inherit',
 		});
