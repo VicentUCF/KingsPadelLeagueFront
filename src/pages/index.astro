@@ -38,6 +38,11 @@ const announcementCategoryLabels = {
 	equipos: 'Mercado',
 	cartas: 'Próximamente',
 } as const;
+const announcementDestinations = {
+	calendario: { href: '/calendario', label: 'Consultar el calendario' },
+	equipos: { href: '/equipos', label: 'Conocer los equipos' },
+	cartas: { href: '/jornadas', label: 'Seguir la competición' },
+} as const;
 const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 	day: 'numeric',
 	month: 'short',
@@ -97,40 +102,40 @@ const spotlight = preseason
 
 const heroContent = {
 	Pretemporada: {
-		eyebrow: 'La nueva KPL ya se mueve',
-		title: 'La próxima temporada empieza fuera de pista.',
-		lead: 'El mercado ha renovado los equipos, la liga crece y se preparan nuevas cartas de acción para cambiar cada partido.',
+		eyebrow: `${displaySeasonName} · Liga amateur de pádel`,
+		title: 'Sigue la Kings Padel League desde el primer partido.',
+		lead: 'Consulta los equipos, jugadores y fechas confirmadas de la nueva temporada. La competición comienza el 20 de septiembre.',
 		primaryHref: '/equipos',
-		primaryLabel: 'Conocer los equipos',
+		primaryLabel: 'Ver equipos y plantillas',
 		secondaryHref: '/calendario',
-		secondaryLabel: 'Ver calendario',
+		secondaryLabel: 'Consultar calendario',
 	},
 	'Fase regular': {
-		eyebrow: 'El pulso de la competición',
-		title: 'Toda la liga. En un vistazo.',
-		lead: 'Resultados, clasificación, jornadas y protagonistas: todo lo que pasa en Kings Padel League, en un mismo lugar.',
+		eyebrow: `${displaySeasonName} · Competición en curso`,
+		title: 'Resultados y clasificación de Kings Padel League.',
+		lead: 'Consulta los marcadores de cada jornada, la clasificación, los próximos partidos y las fichas de equipos y jugadores.',
 		primaryHref: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
-		primaryLabel: currentMatchday ? 'Ver jornada y resultados' : 'Ver resultados',
-		secondaryHref: '/equipos',
-		secondaryLabel: 'Explorar equipos',
+		primaryLabel: currentMatchday ? 'Ver jornada en curso' : 'Consultar resultados',
+		secondaryHref: '/clasificacion',
+		secondaryLabel: 'Ver clasificación',
 	},
 	Playoffs: {
-		eyebrow: 'El camino a la corona',
-		title: 'La liga entra en su momento decisivo.',
-		lead: 'Sigue cada cruce de playoffs, consulta el cuadro y descubre quién mantiene vivo el sueño de levantar la corona.',
+		eyebrow: `${displaySeasonName} · Fase final`,
+		title: 'Playoffs de Kings Padel League.',
+		lead: 'Sigue cada eliminatoria, consulta el cuadro y comprueba los resultados que deciden al campeón de la temporada.',
 		primaryHref: '/playoffs',
-		primaryLabel: 'Ver playoffs',
-		secondaryHref: '/equipos',
-		secondaryLabel: 'Explorar equipos',
+		primaryLabel: 'Ver cuadro y resultados',
+		secondaryHref: '/clasificacion',
+		secondaryLabel: 'Ver clasificación',
 	},
 	'Temporada finalizada': {
-		eyebrow: 'Temporada completada',
-		title: 'Una temporada para volver a vivir.',
-		lead: 'Repasa todos los resultados, la clasificación final y los equipos que han escrito esta edición de Kings Padel League.',
+		eyebrow: `${displaySeasonName} · Temporada finalizada`,
+		title: `Resultados finales de la ${displaySeasonName}.`,
+		lead: 'Repasa todos los marcadores, la clasificación final y los equipos y jugadores que compitieron en Kings Padel League.',
 		primaryHref: '/jornadas',
-		primaryLabel: 'Ver todos los resultados',
-		secondaryHref: '/equipos',
-		secondaryLabel: 'Ver equipos',
+		primaryLabel: 'Consultar todos los resultados',
+		secondaryHref: '/clasificacion',
+		secondaryLabel: 'Ver clasificación final',
 	},
 }[displayPhase];
 
@@ -157,11 +162,39 @@ const focusLabel = preseason ? displaySeasonName : seasonStatus.matchdayLabel;
 const focusDateLabel = preseason
 	? `La competición empieza el ${SEASON_STARTS_LABEL}`
 	: seasonStatus.dateLabel;
+const homeUrl = Astro.site ? new URL('/', Astro.site).href : null;
+const homeStructuredData = homeUrl
+	? [
+			{
+				'@context': 'https://schema.org',
+				'@type': 'WebSite',
+				name: 'Kings Padel League',
+				alternateName: 'KPL',
+				url: homeUrl,
+				inLanguage: 'es-ES',
+			},
+			{
+				'@context': 'https://schema.org',
+				'@type': 'SportsOrganization',
+				name: 'Kings Padel League',
+				alternateName: 'KPL',
+				description:
+					'Liga amateur de pádel con resultados, clasificación, calendario, equipos y jugadores.',
+				url: homeUrl,
+				logo: new URL('/kpl-logo-wordmark.png', Astro.site!).href,
+				sameAs: [
+					'https://www.instagram.com/kingspadel.league/',
+					'https://www.youtube.com/@KPLeague',
+				],
+			},
+		]
+	: undefined;
 ---
 
 <BaseLayout
-	title="Kings Padel League | Toda la liga, en un vistazo"
-	description="Estado de la Kings Padel League: pretemporada, resultados, clasificación, equipos, jornadas y novedades oficiales."
+	title="Kings Padel League: resultados, clasificación y calendario"
+	description={`Sigue la ${displaySeasonName} de Kings Padel League: consulta resultados, clasificación, calendario, equipos y jugadores de la liga amateur de pádel.`}
+	structuredData={homeStructuredData}
 >
 	<main class="home-page" id="main-content" tabindex="-1">
 		<section class="home-hero" aria-labelledby="home-title">
@@ -170,7 +203,7 @@ const focusDateLabel = preseason
 				<div class="home-hero__content">
 					<div class="home-hero__status-line">
 						<span class="home-live-dot" aria-hidden="true"></span>
-						<span>Estado de liga</span>
+						<span>Información de la temporada</span>
 						<span class="home-hero__status-separator" aria-hidden="true"></span>
 						<span>{displaySeasonName}</span>
 					</div>
@@ -317,7 +350,7 @@ const focusDateLabel = preseason
 								class="home-spotlight__link"
 								href={spotlight?.href ?? (preseason ? '/equipos' : seasonStatus.focusHref)}
 							>
-								{spotlight ? 'Abrir detalle' : 'Ver equipos'}
+								{spotlight ? 'Ver jornada' : 'Ver equipos y plantillas'}
 								<span aria-hidden="true">↗</span>
 							</a>
 						</footer>
@@ -380,18 +413,20 @@ const focusDateLabel = preseason
 		>
 			<header class="home-section-heading">
 				<div>
-					<p class="c-eyebrow">Estado de la competición</p>
+					<p class="c-eyebrow">Resultados y próximos partidos</p>
 					<h2 id="league-title">
 						{
 							preseason
-								? 'Todo lo que cambia antes del primer saque.'
-								: 'La liga, jornada a jornada.'
+								? `Así llega la ${displaySeasonName}.`
+								: 'La competición, jornada a jornada.'
 						}
 					</h2>
 				</div>
 				<p>
-					Consulta rápida del calendario y la tabla. Los datos corresponden a la última publicación
-					del portal, el {snapshotFormatter.format(buildDate)}.
+					Consulta los próximos cruces, los últimos marcadores y la clasificación publicada hasta el{
+						' '
+					}
+					<time datetime={buildDate.toISOString()}>{snapshotFormatter.format(buildDate)}</time>.
 				</p>
 			</header>
 
@@ -452,7 +487,7 @@ const focusDateLabel = preseason
 					}
 
 					<footer class="home-panel-footer">
-						<span>{dashboardMatchday?.encounters.length ?? 0} cruces publicados</span>
+						<span>{dashboardMatchday?.encounters.length ?? 0} enfrentamientos</span>
 						<a
 							class="c-button c-button--outline c-button--sm"
 							href={dashboardMatchday ? `/jornadas/${dashboardMatchday.id}` : '/calendario'}
@@ -510,8 +545,8 @@ const focusDateLabel = preseason
 				>
 					<header class="home-section-heading">
 						<div>
-							<p class="c-eyebrow">La nueva parrilla</p>
-							<h2 id="teams-title">Nuevos equipos. Nuevas rivalidades.</h2>
+							<p class="c-eyebrow">Equipos de {displaySeasonName}</p>
+							<h2 id="teams-title">Conoce las plantillas de Kings Padel League.</h2>
 						</div>
 						<a class="c-button c-button--outline" href="/equipos">
 							Ver todos los equipos →
@@ -569,8 +604,8 @@ const focusDateLabel = preseason
 				>
 					<header class="home-section-heading">
 						<div>
-							<p class="c-eyebrow">Última hora</p>
-							<h2 id="announcements-title">Lo que está cambiando en la liga.</h2>
+							<p class="c-eyebrow">Novedades de la liga</p>
+							<h2 id="announcements-title">Calendario, equipos y reglas de {displaySeasonName}.</h2>
 						</div>
 						<p>Mercado, calendario y las novedades que definirán la próxima temporada.</p>
 					</header>
@@ -597,6 +632,9 @@ const focusDateLabel = preseason
 									</span>
 									<h3>{data.title}</h3>
 									<p>{data.summary}</p>
+									<a href={announcementDestinations[data.category].href}>
+										{announcementDestinations[data.category].label} →
+									</a>
 								</div>
 							</article>
 						))}

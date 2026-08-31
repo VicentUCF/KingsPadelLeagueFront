@@ -14,18 +14,33 @@ const fixture = spawn(process.execPath, ['tests/fixtures/kpl-api-server.mjs'], {
 try {
 	await waitForFixture(fixture);
 	await runBuild(port, outDir);
-	const [home, standings, matchday] = await Promise.all([
+	const [home, standings, matchday, team, player, sitemap, robots] = await Promise.all([
 		readFile(join(outDir, 'index.html'), 'utf8'),
 		readFile(join(outDir, 'clasificacion/index.html'), 'utf8'),
 		readFile(join(outDir, 'jornadas/jornada-1/index.html'), 'utf8'),
+		readFile(join(outDir, 'equipos/kings-of-favar/index.html'), 'utf8'),
+		readFile(join(outDir, 'jugadores/king/index.html'), 'utf8'),
+		readFile(join(outDir, 'sitemap.xml'), 'utf8'),
+		readFile(join(outDir, 'robots.txt'), 'utf8'),
 	]);
 
 	assert.doesNotMatch(home, /Playoffs/);
 	assert.match(home, /Pretemporada/);
 	assert.match(home, /Temporada 2/);
+	assert.match(home, /Sigue la Kings Padel League desde el primer partido/);
 	assert.match(standings, /Todos empiezan desde cero/);
 	assert.match(standings, /La tabla espera al primer punto/);
-	assert.match(matchday, /Jornada 1/);
+	assert.match(standings, /Clasificación de la Temporada 2/);
+	assert.match(matchday, /Jornada 1 de la Temporada 2/);
+	assert.match(home, /<link rel="canonical" href="https:\/\/kpl\.example\//);
+	assert.match(home, /property="og:title"/);
+	assert.match(home, /application\/ld\+json/);
+	assert.match(team, /"@type":"SportsTeam"/);
+	assert.match(player, /"@type":"Person"/);
+	assert.match(matchday, /name="robots" content="noindex, follow"/);
+	assert.match(sitemap, /https:\/\/kpl\.example\/equipos\/kings-of-favar/);
+	assert.doesNotMatch(sitemap, /https:\/\/kpl\.example\/jornadas\/jornada-1/);
+	assert.match(robots, /Sitemap: https:\/\/kpl\.example\/sitemap\.xml/);
 	console.log('SSG fixture build verified: Temporada 2 preseason routes generated successfully.');
 } finally {
 	fixture.kill('SIGTERM');
@@ -68,6 +83,7 @@ function runBuild(port, outDir) {
 				KPL_API_BASE_URL: `http://127.0.0.1:${port}`,
 				KPL_PLAYOFFS_ENABLED: 'false',
 				KPL_PRESEASON_MODE: 'true',
+				KPL_SITE_URL: 'https://kpl.example',
 			},
 			stdio: 'inherit',
 		});

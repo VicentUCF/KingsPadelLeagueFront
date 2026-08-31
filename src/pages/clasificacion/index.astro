@@ -14,17 +14,17 @@ const preseason = isPublicPreseason();
 ---
 
 <BaseLayout
-	title={`Clasificación · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Clasificación oficial de ${PUBLIC_SEASON_NAME} en Kings Padel League.`}
+	title={`Clasificación Kings Padel League | ${PUBLIC_SEASON_NAME}`}
+	description="Consulta la clasificación de Kings Padel League: posición, puntos, partidos jugados y diferencia de juegos de cada equipo."
 >
 	<main id="main-content" class="public-page public-page--standings">
 		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow={`${PUBLIC_SEASON_NAME} · Clasificación`}
-				title={preseason ? 'Todos empiezan desde cero' : 'La carrera por la corona'}
+				eyebrow="Tabla de Kings Padel League"
+				title={`Clasificación de la ${PUBLIC_SEASON_NAME}`}
 				description={preseason
-					? 'La clasificación se activará con la primera jornada. Hasta entonces, la nueva parrilla comparte el mismo punto de partida.'
-					: 'Puntos, partidos jugados y diferencia de juegos: la lectura más clara del pulso de la temporada.'}
+					? 'La clasificación empezará con la primera jornada. Todos los equipos parten de cero.'
+					: 'Consulta la posición, los puntos, los partidos jugados y la diferencia de juegos de cada equipo.'}
 				meta={preseason
 					? ['Pretemporada', `${view.teams.length} equipos`, `Inicio · ${SEASON_STARTS_LABEL}`]
 					: [
@@ -34,8 +34,8 @@ const preseason = isPublicPreseason();
 						]}
 				mark="#"
 			>
-				<a slot="actions" class="c-button c-button--primary" href="/equipos">Ver equipos</a>
-				<a slot="actions" class="c-button c-button--outline" href="/jornadas">Jornadas</a>
+				<a slot="actions" class="c-button c-button--primary" href="/jornadas">Ver resultados</a>
+				<a slot="actions" class="c-button c-button--outline" href="/equipos">Ver equipos</a>
 			</PageHero>
 
 			{
@@ -45,8 +45,8 @@ const preseason = isPublicPreseason();
 							<p class="c-eyebrow">Parrilla confirmada</p>
 							<h2 id="standings-preseason-title">La tabla espera al primer punto.</h2>
 							<p>
-								No heredamos posiciones ni estadísticas anteriores. {PUBLIC_SEASON_NAME} empieza el{' '}
-								{SEASON_STARTS_LABEL} con una clasificación limpia.
+								Todos empiezan desde cero. {PUBLIC_SEASON_NAME} comienza el {SEASON_STARTS_LABEL}
+								con la misma puntuación.
 							</p>
 							<div class="standings-preseason__key">
 								<span>
@@ -86,11 +86,13 @@ const preseason = isPublicPreseason();
 								<p class="c-eyebrow">Tabla oficial</p>
 								<h2 id="standings-title">Clasificación general</h2>
 							</div>
-							<p>Ordenada por puntos oficiales y diferencia de juegos.</p>
+							<p>Ordenada por puntos, partidos jugados y diferencia de juegos.</p>
 						</header>
 						<div class="c-table-wrap standings-table-wrap">
 							<table class="c-table standings-table">
-								<caption class="u-visually-hidden">Clasificación de {PUBLIC_SEASON_NAME}</caption>
+								<caption class="u-visually-hidden">
+									Clasificación de la {PUBLIC_SEASON_NAME}
+								</caption>
 								<thead>
 									<tr>
 										<>

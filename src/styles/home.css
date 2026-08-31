@@ -1015,6 +1015,21 @@
 		line-height: var(--kpl-line-height-loose);
 	}
 
+	.home-news-card__copy a {
+		position: relative;
+		z-index: 2;
+		inline-size: fit-content;
+		color: var(--kpl-color-brand-strong);
+		font-size: var(--kpl-font-size-100);
+		font-weight: 800;
+		text-decoration: none;
+	}
+
+	.home-news-card__copy a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.22em;
+	}
+
 	.home-news-card__number {
 		position: absolute;
 		inset-block-end: -0.55em;

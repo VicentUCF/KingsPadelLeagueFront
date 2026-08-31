@@ -44,17 +44,17 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 ---
 
 <BaseLayout
-	title={`Calendario · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Fechas y agenda oficial de ${PUBLIC_SEASON_NAME} en Kings Padel League.`}
+	title={`Calendario Kings Padel League | ${PUBLIC_SEASON_NAME}`}
+	description={`Consulta las fechas, horarios y enfrentamientos de la ${PUBLIC_SEASON_NAME} de Kings Padel League. Filtra los partidos por estado o equipo.`}
 >
 	<main id="main-content" class="public-page public-page--calendar">
 		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow={`${PUBLIC_SEASON_NAME} · Agenda oficial`}
-				title={preseason ? 'El calendario se descubre pronto' : 'Toda la temporada, fecha a fecha'}
+				eyebrow="Fechas y horarios de Kings Padel League"
+				title={`Calendario de la ${PUBLIC_SEASON_NAME}`}
 				description={preseason
-					? 'Estamos cerrando jornadas, cruces y horarios. Hasta entonces, descubre los equipos y jugadores que preparan la nueva temporada.'
-					: 'Consulta fechas, horarios y enfrentamientos oficiales sin perder el contexto de cada jornada.'}
+					? 'El calendario aún no está publicado. Aquí encontrarás las fechas, los horarios y los enfrentamientos cuando se confirmen.'
+					: 'Consulta todas las fechas, horarios y enfrentamientos. Filtra los partidos por estado o equipo.'}
 				meta={preseason
 					? ['Pretemporada', `Inicio · ${SEASON_STARTS_LABEL}`, 'Publicación próximamente']
 					: [
@@ -71,16 +71,16 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 			{
 				preseason ? (
 					<SeasonReveal
-						eyebrow="Agenda en preparación"
-						title="La primera fecha empieza antes de entrar en pista."
-						description="La liga está ordenando el nuevo mapa de equipos y jugadores. Publicaremos el calendario cuando cada cruce esté confirmado, sin adelantar horarios provisionales."
+						eyebrow="Calendario próximamente"
+						title={`La competición comienza el ${SEASON_STARTS_LABEL}.`}
+						description="Publicaremos aquí las jornadas, los cruces y los horarios cuando estén confirmados. Mientras tanto, conoce los equipos y jugadores de la temporada."
 						items={['Mercado actualizado', 'Cruces confirmados', 'Calendario publicado']}
 					>
 						<a class="c-button c-button--primary" href="/equipos">
 							Explorar la nueva parrilla
 						</a>
 						<a class="c-button c-button--outline" href="/">
-							Volver al estado de liga
+							Volver al inicio
 						</a>
 					</SeasonReveal>
 				) : (

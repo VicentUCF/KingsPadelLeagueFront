@@ -41,6 +41,14 @@ jugadores, partidos, alineaciones, puntuaciones oficiales y playoffs:
 KPL_API_BASE_URL=https://kings-league-api.esteveep.dev npm run build
 ```
 
+El despliegue también debe definir `KPL_SITE_URL` con el dominio público final, sin rutas. Esta
+URL alimenta las etiquetas canonical, el sitemap, las vistas previas sociales y los datos
+estructurados:
+
+```sh
+KPL_SITE_URL=https://liga.example KPL_API_BASE_URL=https://kings-league-api.esteveep.dev npm run build
+```
+
 Los playoffs permanecen ocultos mientras sus endpoints públicos requieran autenticación. Para
 probarlos expresamente cuando el backend esté preparado:
 
@@ -62,6 +70,10 @@ Rutas incluidas:
 - `/calendario` y la página `404`
 
 Las rutas de autenticación, perfil y backoffice quedan fuera de este cliente público.
+
+La build genera `/sitemap.xml` y `/robots.txt`. Las fichas de jornada sin cruces confirmados se
+mantienen accesibles, pero no se indexan ni se incluyen en el sitemap hasta disponer de contenido
+útil para jugadores y seguidores.
 
 Los anuncios se editan como Markdown en `src/content/announcements`. Se publican hasta tres
 entradas que no sean borradores y cuya fecha no sea futura.

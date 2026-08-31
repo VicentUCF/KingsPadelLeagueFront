@@ -32,11 +32,45 @@ const palette = team?.palette ?? {
 const profileStyle = `--team-primary:${palette.primary};--team-accent:${palette.accent};--team-surface:${palette.surface};--team-glow:${palette.glow}`;
 const played = player.wonGames + player.lostGames;
 const winRate = played ? `${Math.round((player.wonGames / played) * 100)}%` : '—';
+const playerUrl = Astro.site ? new URL(`/jugadores/${player.slug}`, Astro.site).href : null;
+const playerStructuredData = playerUrl
+	? [
+			{
+				'@context': 'https://schema.org',
+				'@type': 'Person',
+				name: player.displayName,
+				url: playerUrl,
+				...(player.profileImage ? { image: new URL(player.profileImage, Astro.site!).href } : {}),
+				memberOf: {
+					'@type': 'SportsTeam',
+					name: player.teamName,
+					...(team ? { url: new URL(`/equipos/${team.slug}`, Astro.site!).href } : {}),
+				},
+			},
+			{
+				'@context': 'https://schema.org',
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{
+						'@type': 'ListItem',
+						position: 1,
+						name: 'Jugadores',
+						item: new URL('/jugadores', Astro.site!).href,
+					},
+					{ '@type': 'ListItem', position: 2, name: player.displayName, item: playerUrl },
+				],
+			},
+		]
+	: undefined;
 ---
 
 <BaseLayout
-	title={`${player.displayName} · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Perfil de ${player.displayName}, ${player.positionLabel.toLowerCase()} de ${player.teamName}, en ${PUBLIC_SEASON_NAME}.`}
+	title={`${player.displayName}: equipo, posición y estadísticas | KPL`}
+	description={`Consulta el perfil de ${player.displayName}: equipo, posición, rol y estadísticas en la ${PUBLIC_SEASON_NAME} de Kings Padel League.`}
+	image={player.profileImage ?? undefined}
+	imageAlt={player.profileImage ? `Retrato de ${player.displayName}` : undefined}
+	pageType="profile"
+	structuredData={playerStructuredData}
 >
 	<main id="main-content" class="public-page public-page--player-detail" style={profileStyle}>
 		<div class="o-container o-container--xl public-page__body">
@@ -82,9 +116,7 @@ const winRate = played ? `${Math.round((player.wonGames / played) * 100)}%` : '�
 				<div class="player-profile__detail">
 					<div class="player-profile__status">
 						<span class="c-chip c-chip--tone-brand">{PUBLIC_SEASON_NAME}</span>
-						<span class="c-chip"
-							>{preseason ? 'Ficha en actualización' : `Ranking #${player.rank}`}</span
-						>
+						<span class="c-chip">{preseason ? 'Pretemporada' : `Ranking #${player.rank}`}</span>
 					</div>
 
 					<header class="player-profile__header">
@@ -111,12 +143,14 @@ const winRate = played ? `${Math.round((player.wonGames / played) * 100)}%` : '�
 						preseason ? (
 							<div class="player-profile__season-card">
 								<div>
-									<p class="c-eyebrow">Nueva temporada</p>
-									<h2>Preparado para escribir una nueva ficha.</h2>
+									<p class="c-eyebrow">Perfil de la {PUBLIC_SEASON_NAME}</p>
+									<h2>
+										{player.displayName} jugará con {player.teamName}.
+									</h2>
 								</div>
 								<p>
-									El equipo, rol y posición se actualizarán automáticamente con los movimientos
-									oficiales del mercado.
+									Posición: {player.positionLabel}. Consulta de nuevo este perfil para conocer sus
+									estadísticas cuando empiece la competición.
 								</p>
 							</div>
 						) : (
@@ -169,7 +203,7 @@ const winRate = played ? `${Math.round((player.wonGames / played) * 100)}%` : '�
 							)
 						}
 						<a class="c-button c-button--outline c-button--lg" href="/jugadores">
-							Volver al directorio
+							Ver todos los jugadores
 						</a>
 					</div>
 				</div>

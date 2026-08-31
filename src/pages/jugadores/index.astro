@@ -14,23 +14,22 @@ const view = await loadPublicLeagueView();
 const preseason = isPublicPreseason();
 const teamById = new Map(view.teams.map((team) => [team.id, team]));
 const presidents = view.players.filter((player) => player.isPresident).length;
-const profiledPlayers = view.players.filter((player) => player.profileImage).length;
 ---
 
 <BaseLayout
-	title={`Jugadores · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Directorio de jugadores, posiciones y equipos de ${PUBLIC_SEASON_NAME}.`}
+	title={`Jugadores de Kings Padel League | ${PUBLIC_SEASON_NAME}`}
+	description="Busca jugadores de Kings Padel League por nombre, equipo o posición y consulta su perfil y estadísticas de la temporada."
 >
 	<main id="main-content" class="public-page public-page--players">
 		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow={`${PUBLIC_SEASON_NAME} · Jugadores`}
-				title="Los nombres de la nueva temporada"
-				description="Descubre quién compite, en qué lado juega y qué equipo representa. Un directorio vivo, preparado para reflejar cada movimiento del mercado."
+				eyebrow="Jugadores de Kings Padel League"
+				title={`Jugadores de la ${PUBLIC_SEASON_NAME}`}
+				description="Busca por nombre, equipo o posición —drive o revés— y abre cada perfil para conocer su rol y sus estadísticas."
 				meta={[
-					`${view.players.length} jugadores publicados`,
+					`${view.players.length} jugadores`,
 					`${view.teams.length} equipos`,
-					preseason ? 'Fichas en actualización' : 'Temporada en curso',
+					preseason ? 'Plantillas de pretemporada' : 'Temporada en curso',
 				]}
 				mark="T2"
 			>
@@ -48,7 +47,7 @@ const profiledPlayers = view.players.filter((player) => player.profileImage).len
 					<span>03</span><small>Presidencias</small><strong>{presidents}</strong>
 				</article>
 				<article>
-					<span>04</span><small>Retratos publicados</small><strong>{profiledPlayers}</strong>
+					<span>04</span><small>Inicio de liga</small><strong>{SEASON_STARTS_LABEL}</strong>
 				</article>
 			</section>
 
@@ -58,7 +57,7 @@ const profiledPlayers = view.players.filter((player) => player.profileImage).len
 						<div>
 							<span class="roster-status__pulse" aria-hidden="true" />
 							<p class="c-eyebrow">Mercado de jugadores</p>
-							<h2>Las plantillas de {PUBLIC_SEASON_NAME} siguen actualizándose.</h2>
+							<h2>Consulta los jugadores confirmados de la {PUBLIC_SEASON_NAME}.</h2>
 						</div>
 						<p>
 							Los cambios de equipo y nuevas incorporaciones aparecerán aquí antes del inicio, el
@@ -78,11 +77,11 @@ const profiledPlayers = view.players.filter((player) => player.profileImage).len
 						>
 							<div class="filters-panel__heading">
 								<div>
-									<p class="c-eyebrow">Encuentra tu jugador</p>
-									<h2 id="player-filters-title">Filtra la parrilla</h2>
+									<p class="c-eyebrow">Encuentra un jugador</p>
+									<h2 id="player-filters-title">Busca por equipo y posición</h2>
 								</div>
 								<p role="status" aria-live="polite" data-player-count>
-									{view.players.length} jugadores publicados
+									{view.players.length} jugadores
 								</p>
 							</div>
 							<div class="filters-panel__grid">
@@ -131,10 +130,10 @@ const profiledPlayers = view.players.filter((player) => player.profileImage).len
 						<section class="section-block" aria-labelledby="players-results-title">
 							<header class="section-block__header section-block__header--editorial">
 								<div>
-									<p class="c-eyebrow">Directorio KPL</p>
-									<h2 id="players-results-title">Una ficha para cada protagonista.</h2>
+									<p class="c-eyebrow">Plantillas de la liga</p>
+									<h2 id="players-results-title">Todos los jugadores de la {PUBLIC_SEASON_NAME}</h2>
 								</div>
-								<p>Abre un perfil para consultar posición, equipo, rol y datos publicados.</p>
+								<p>Abre un perfil para consultar posición, equipo, rol y estadísticas.</p>
 							</header>
 							<ol class="player-list player-list--cards" data-player-list>
 								{view.players.map((player) => (
@@ -156,7 +155,7 @@ const profiledPlayers = view.players.filter((player) => player.profileImage).len
 				) : (
 					<EmptyState
 						title="Las nuevas plantillas se anunciarán pronto"
-						description={`Los perfiles aparecerán aquí conforme se confirme el mercado de ${PUBLIC_SEASON_NAME}.`}
+						description={`Los perfiles aparecerán aquí conforme se confirme el mercado de la ${PUBLIC_SEASON_NAME}.`}
 					/>
 				)
 			}
@@ -185,7 +184,7 @@ const profiledPlayers = view.players.filter((player) => player.profileImage).len
 				card.closest('li')!.hidden = !show;
 				if (show) visible += 1;
 			}
-			count.textContent = `${visible} ${visible === 1 ? 'jugador publicado' : 'jugadores publicados'}`;
+			count.textContent = `${visible} ${visible === 1 ? 'jugador' : 'jugadores'}`;
 			empty.hidden = visible !== 0;
 			clear.hidden = !(query || team.value || side.value);
 		};

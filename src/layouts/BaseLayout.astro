@@ -7,18 +7,44 @@ import { PLAYOFFS_ENABLED } from '../lib/features';
 
 interface Props {
 	description?: string;
+	image?: string;
+	imageAlt?: string;
+	noindex?: boolean;
+	pageType?: 'website' | 'profile' | 'article';
+	structuredData?: Record<string, unknown> | Record<string, unknown>[];
 	title: string;
 }
 
-const { description = 'Web oficial de Kings Padel League.', title } = Astro.props;
+const {
+	description = 'Resultados, clasificación, calendario, equipos y jugadores de Kings Padel League.',
+	image = '/kpl-trophy.png',
+	imageAlt = 'Trofeo de Kings Padel League',
+	noindex = false,
+	pageType = 'website',
+	structuredData,
+	title,
+} = Astro.props;
 const currentPath = Astro.url.pathname;
+const canonicalUrl = Astro.site ? new URL(currentPath, Astro.site) : null;
+const socialImageUrl = new URL(image, Astro.site ?? Astro.url.origin);
+const jsonLdItems = Array.isArray(structuredData)
+	? structuredData
+	: structuredData
+		? [structuredData]
+		: [];
+const jsonLd = jsonLdItems.length
+	? JSON.stringify(jsonLdItems.length === 1 ? jsonLdItems[0] : jsonLdItems).replaceAll(
+			'<',
+			'\\u003c',
+		)
+	: null;
 const navigation = [
 	{ href: '/', label: 'Inicio' },
-	{ href: '/equipos', label: 'Equipos' },
-	{ href: '/jugadores', label: 'Jugadores' },
-	{ href: '/jornadas', label: 'Jornadas' },
+	{ href: '/jornadas', label: 'Resultados' },
 	{ href: '/clasificacion', label: 'Clasificación' },
 	{ href: '/calendario', label: 'Calendario' },
+	{ href: '/equipos', label: 'Equipos' },
+	{ href: '/jugadores', label: 'Jugadores' },
 	...(PLAYOFFS_ENABLED ? [{ href: '/playoffs', label: 'Playoffs' }] : []),
 ] as const;
 const isCurrent = (href: string) =>
@@ -30,13 +56,36 @@ const isCurrent = (href: string) =>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
+		<meta
+			name="robots"
+			content={noindex
+				? 'noindex, follow'
+				: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+		/>
 		<meta name="viewport" content="width=device-width" />
 		<meta name="theme-color" content="#0b0b0b" />
 		<meta name="color-scheme" content="dark" />
+		<meta property="og:locale" content="es_ES" />
+		<meta property="og:site_name" content="Kings Padel League" />
+		<meta property="og:type" content={pageType} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+		<meta property="og:image" content={socialImageUrl} />
+		<meta property="og:image:alt" content={imageAlt} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={socialImageUrl} />
+		<meta name="twitter:image:alt" content={imageAlt} />
+		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+		{canonicalUrl && <link rel="alternate" hreflang="es-ES" href={canonicalUrl} />}
+		{Astro.site && <link rel="sitemap" href={new URL('/sitemap.xml', Astro.site)} />}
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		{jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} />}
 	</head>
 	<body data-kpl-root>
 		<a class="c-skip-link u-visually-hidden-focusable" href="#main-content"> Ir al contenido </a>
@@ -94,7 +143,7 @@ const isCurrent = (href: string) =>
 			<div class="site-shell__footer-inner o-container">
 				<div class="site-shell__footer-brand">
 					<strong>Kings Padel League</strong>
-					<span>Temporada 2 · Liga amateur de pádel</span>
+					<span>Resultados, calendario y protagonistas de la liga amateur de pádel</span>
 				</div>
 				<nav class="site-shell__footer-nav" aria-label="Pie de página">
 					{navigation.slice(1).map((item) => <a href={item.href}>{item.label}</a>)}

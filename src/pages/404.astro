@@ -5,7 +5,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <BaseLayout
 	title="Página no encontrada · Kings Padel League"
-	description="La página solicitada no existe."
+	description="La página solicitada no existe. Consulta los resultados, la clasificación o los equipos de Kings Padel League."
+	noindex
 >
 	<main id="main-content" class="public-page public-page--not-found">
 		<div class="o-container o-container--md public-page__body">
@@ -13,7 +14,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			<EmptyState
 				headingLevel="h1"
 				title="Esta bola se fue fuera"
-				description="La página que buscas no existe o ha cambiado de posición. Puedes volver al estado de liga o explorar la nueva temporada."
+				description="La página que buscas no existe o ha cambiado de dirección. Vuelve al inicio o consulta los equipos de la temporada."
 			>
 				<a class="c-button c-button--primary" href="/">Volver al inicio</a>
 				<a class="c-button c-button--outline" href="/equipos">Descubrir equipos</a>

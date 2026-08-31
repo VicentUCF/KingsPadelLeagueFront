@@ -27,11 +27,30 @@ const statusLabels = {
 	current: 'Jornada en curso',
 	upcoming: 'Jornada programada',
 } as const;
+const shouldIndex = !preseason && matchday.encounters.length > 0;
+const matchdayUrl = Astro.site ? new URL(`/jornadas/${matchday.id}`, Astro.site).href : null;
+const matchdayStructuredData = matchdayUrl
+	? {
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{
+					'@type': 'ListItem',
+					position: 1,
+					name: 'Jornadas y resultados',
+					item: new URL('/jornadas', Astro.site!).href,
+				},
+				{ '@type': 'ListItem', position: 2, name: matchday.label, item: matchdayUrl },
+			],
+		}
+	: undefined;
 ---
 
 <BaseLayout
-	title={`${matchday.label} · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Cruces y resultados de ${matchday.label} en ${PUBLIC_SEASON_NAME}.`}
+	title={`${matchday.label}: partidos y resultados | Kings Padel League`}
+	description={`Consulta horarios, equipos, parejas y resultados de ${matchday.label} de la ${PUBLIC_SEASON_NAME}.`}
+	noindex={!shouldIndex}
+	structuredData={matchdayStructuredData}
 >
 	<main id="main-content" class="public-page public-page--matchday-detail">
 		<div class="o-container o-container--xl public-page__body">
@@ -41,9 +60,9 @@ const statusLabels = {
 
 			<PageHero
 				eyebrow={preseason ? `${PUBLIC_SEASON_NAME} · Próximamente` : statusLabels[matchday.status]}
-				title={preseason ? 'Los cruces todavía no son oficiales' : matchday.label}
+				title={`${matchday.label} de la ${PUBLIC_SEASON_NAME}`}
 				description={preseason
-					? 'Esta ficha queda preparada para recibir equipos, horarios, parejas y marcadores cuando se publique el calendario definitivo.'
+					? 'Los enfrentamientos y horarios aún no están confirmados. Vuelve pronto para consultar los partidos y resultados de esta jornada.'
 					: 'Consulta horario, equipos, parejas inscritas y marcador oficial de cada cruce.'}
 				meta={preseason
 					? [PUBLIC_SEASON_NAME, 'Pretemporada', 'Publicación pendiente']
@@ -60,9 +79,9 @@ const statusLabels = {
 			{
 				preseason ? (
 					<SeasonReveal
-						eyebrow="Ficha de jornada preparada"
-						title="Sin cruces provisionales. Solo información oficial."
-						description="Cuando la liga publique esta jornada, la misma página mostrará automáticamente equipos, horarios, parejas y resultados sin cambiar su dirección."
+						eyebrow="Partidos por confirmar"
+						title={`Los cruces de ${matchday.label} se anunciarán próximamente.`}
+						description="Aquí podrás consultar los horarios, los equipos, las parejas y los resultados oficiales de esta jornada."
 						items={['Horario oficial', 'Equipos y parejas', 'Marcador de jornada']}
 					>
 						<a class="c-button c-button--primary" href="/equipos">

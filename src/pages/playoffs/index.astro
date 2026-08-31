@@ -18,18 +18,18 @@ const nextMatch =
 ---
 
 <BaseLayout
-	title={`Playoffs · ${view.season.name} · Kings Padel League`}
+	title={`Playoffs Kings Padel League: cuadro y resultados | ${view.season.name}`}
 	description="Cuadro, cruces y resultados oficiales de los playoffs de Kings Padel League."
 >
 	<main id="main-content" class="public-page">
 		<div class="o-container public-page__body">
 			<PageHero
-				eyebrow="Camino a la corona"
-				title="Playoffs"
-				description="Sigue cada eliminatoria, las parejas inscritas y los resultados que deciden al campeón."
+				eyebrow={`${view.season.name} · Fase final`}
+				title="Playoffs de Kings Padel League"
+				description="Consulta el cuadro, los cruces de cada ronda, las parejas y los resultados que deciden al campeón."
 				meta={[
 					view.season.name,
-					`${matches.length} cruces publicados`,
+					`${matches.length} cruces`,
 					nextMatch?.stageLabel ?? view.phaseLabel,
 				]}
 			>

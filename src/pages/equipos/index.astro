@@ -15,27 +15,27 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 ---
 
 <BaseLayout
-	title={`Equipos · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Descubre los equipos, identidades y plantillas de ${PUBLIC_SEASON_NAME} en Kings Padel League.`}
+	title={`Equipos de Kings Padel League | ${PUBLIC_SEASON_NAME}`}
+	description={`Conoce los equipos de la ${PUBLIC_SEASON_NAME} de Kings Padel League: presidencias, jugadores, posiciones y plantillas.`}
 >
 	<main id="main-content" class="public-page public-page--teams">
 		<div class="o-container o-container--xl public-page__body">
 			<PageHero
-				eyebrow={`${PUBLIC_SEASON_NAME} · Mercado KPL`}
-				title="La liga cambia de cara"
-				description="Nuevas identidades, plantillas renovadas y una escuadra más. Conoce a los clubes que van a definir la próxima temporada."
+				eyebrow="Equipos de Kings Padel League"
+				title={`Equipos y plantillas de la ${PUBLIC_SEASON_NAME}`}
+				description="Conoce los equipos, sus presidencias y los jugadores que competirán en la liga amateur de pádel."
 				meta={[
 					`${view.teams.length} equipos confirmados`,
-					`${playerCount} jugadores publicados`,
-					preseason ? 'Mercado en actualización' : 'Plantillas oficiales',
+					`${playerCount} jugadores`,
+					preseason ? 'Mercado abierto' : 'Plantillas de la temporada',
 				]}
 				mark="02"
 			>
 				<a slot="actions" class="c-button c-button--primary" href="/jugadores">
-					Conocer jugadores
+					Ver todos los jugadores
 				</a>
 				<a slot="actions" class="c-button c-button--outline" href="/calendario">
-					Próxima temporada
+					Consultar calendario
 				</a>
 			</PageHero>
 
@@ -48,14 +48,14 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 							</svg>
 						</span>
 						<div>
-							<p class="c-eyebrow">Mercado de {PUBLIC_SEASON_NAME}</p>
-							<h2>La nueva parrilla está tomando forma.</h2>
+							<p class="c-eyebrow">Mercado de la {PUBLIC_SEASON_NAME}</p>
+							<h2>Consulta los fichajes confirmados de la temporada.</h2>
 							<p>
-								Las fichas se actualizan a medida que se confirman los movimientos. La competición
-								comienza el {SEASON_STARTS_LABEL}.
+								La competición comienza el {SEASON_STARTS_LABEL}. Aquí encontrarás las altas,
+								cambios de equipo y plantillas confirmadas.
 							</p>
 						</div>
-						<span class="c-chip c-chip--tone-info">Datos en actualización</span>
+						<span class="c-chip c-chip--tone-info">Fichajes confirmados</span>
 					</aside>
 				)
 			}
@@ -63,10 +63,10 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 			<section class="section-block team-catalog" aria-labelledby="team-catalog-title">
 				<header class="section-block__header section-block__header--editorial">
 					<div>
-						<p class="c-eyebrow">Escudos de la liga</p>
-						<h2 id="team-catalog-title">Una identidad para cada forma de competir.</h2>
+						<p class="c-eyebrow">Clubes participantes</p>
+						<h2 id="team-catalog-title">Todos los equipos de Kings Padel League.</h2>
 					</div>
-					<p>Entra en cada club para descubrir su carácter, presidencia y plantilla publicada.</p>
+					<p>Abre cada equipo para conocer su identidad, presidencia y plantilla.</p>
 				</header>
 
 				{
@@ -115,8 +115,8 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 						</ol>
 					) : (
 						<EmptyState
-							title="La nueva parrilla se está preparando"
-							description="Los equipos aparecerán aquí a medida que se confirmen para la nueva temporada."
+							title="Los equipos se anunciarán próximamente"
+							description={`Aquí podrás conocer los clubes y plantillas confirmados para la ${PUBLIC_SEASON_NAME}.`}
 						/>
 					)
 				}

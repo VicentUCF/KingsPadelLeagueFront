@@ -19,11 +19,46 @@ const { team } = Astro.props;
 const preseason = isPublicPreseason();
 const teamStyle = `--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow};--team-contrast:${team.palette.contrast}`;
 const presidents = team.players.filter((player) => player.isPresident);
+const teamUrl = Astro.site ? new URL(`/equipos/${team.slug}`, Astro.site).href : null;
+const teamStructuredData = teamUrl
+	? [
+			{
+				'@context': 'https://schema.org',
+				'@type': 'SportsTeam',
+				name: team.name,
+				description: team.description,
+				sport: 'Pádel',
+				url: teamUrl,
+				...(team.logoPath ? { logo: new URL(team.logoPath, Astro.site!).href } : {}),
+				member: team.players.map((player) => ({
+					'@type': 'Person',
+					name: player.displayName,
+					url: new URL(`/jugadores/${player.slug}`, Astro.site!).href,
+				})),
+			},
+			{
+				'@context': 'https://schema.org',
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{
+						'@type': 'ListItem',
+						position: 1,
+						name: 'Equipos',
+						item: new URL('/equipos', Astro.site!).href,
+					},
+					{ '@type': 'ListItem', position: 2, name: team.name, item: teamUrl },
+				],
+			},
+		]
+	: undefined;
 ---
 
 <BaseLayout
-	title={`${team.name} · ${PUBLIC_SEASON_NAME} · Kings Padel League`}
-	description={`Identidad, presidencia y plantilla de ${team.name} para ${PUBLIC_SEASON_NAME}.`}
+	title={`${team.name}: plantilla y jugadores | Kings Padel League`}
+	description={`Consulta la plantilla de ${team.name} para la ${PUBLIC_SEASON_NAME}: presidencia, jugadores, posiciones y perfiles.`}
+	image={team.logoPath ?? undefined}
+	imageAlt={team.logoPath ? `Escudo de ${team.name}` : undefined}
+	structuredData={teamStructuredData}
 >
 	<main id="main-content" class="public-page public-page--team-detail" style={teamStyle}>
 		<div class="o-container o-container--xl public-page__body">
@@ -36,7 +71,8 @@ const presidents = team.players.filter((player) => player.isPresident);
 				<div class="team-profile-hero__identity">
 					<div class="team-profile-hero__status">
 						<span class="c-chip c-chip--tone-brand">{PUBLIC_SEASON_NAME}</span>
-						<span class="c-chip">{preseason ? 'Plantilla en actualización' : 'Perfil oficial'}</span
+						<span class="c-chip"
+							>{preseason ? 'Plantilla de pretemporada' : 'Equipo en competición'}</span
 						>
 					</div>
 					<div class="team-profile-hero__copy">
@@ -47,7 +83,7 @@ const presidents = team.players.filter((player) => player.isPresident);
 					</div>
 					<dl class="team-profile-hero__facts">
 						<div>
-							<dt>Plantilla publicada</dt>
+							<dt>Jugadores</dt>
 							<dd>{team.players.length} jugadores</dd>
 						</div>
 						<div>
@@ -79,12 +115,12 @@ const presidents = team.players.filter((player) => player.isPresident);
 				preseason && (
 					<aside class="team-update-note">
 						<div>
-							<p class="c-eyebrow">Mercado en curso</p>
-							<h2>Esta plantilla está preparada para seguir creciendo.</h2>
+							<p class="c-eyebrow">Plantilla de la {PUBLIC_SEASON_NAME}</p>
+							<h2>Fichajes y roles confirmados de {team.name}.</h2>
 						</div>
 						<p>
-							Las altas, cambios de equipo y roles se reflejarán automáticamente conforme se
-							confirmen en los datos oficiales de {PUBLIC_SEASON_NAME}.
+							Consulta aquí las incorporaciones, los cambios de equipo y los roles confirmados antes
+							del inicio de la competición.
 						</p>
 					</aside>
 				)
@@ -93,7 +129,7 @@ const presidents = team.players.filter((player) => player.isPresident);
 			<section class="section-block team-roster" aria-labelledby="roster-title">
 				<header class="section-block__header section-block__header--editorial">
 					<div>
-						<p class="c-eyebrow">{preseason ? 'Plantilla publicada' : 'Plantilla oficial'}</p>
+						<p class="c-eyebrow">{preseason ? 'Plantilla confirmada' : 'Plantilla oficial'}</p>
 						<h2 id="roster-title">Las caras de {team.name}</h2>
 					</div>
 					<div class="section-block__actions">
@@ -101,12 +137,13 @@ const presidents = team.players.filter((player) => player.isPresident);
 							presidents.length > 0 && (
 								<span class="c-chip c-chip--tone-brand">
 									{presidents.length === 1
-										? 'Presidencia identificada'
+										? team.presidentLabel
 										: `${presidents.length} presidentes`}
 								</span>
 							)
 						}
-						<a class="c-button c-button--outline" href="/jugadores">Todos los jugadores</a>
+						<a class="c-button c-button--outline" href="/calendario">Ver calendario</a>
+						<a class="c-button c-button--outline" href="/clasificacion">Ver clasificación</a>
 					</div>
 				</header>
 
@@ -122,7 +159,7 @@ const presidents = team.players.filter((player) => player.isPresident);
 					) : (
 						<EmptyState
 							title="La plantilla se anunciará pronto"
-							description={`Todavía no hay jugadores publicados para ${team.name}. La ficha se actualizará con el mercado de ${PUBLIC_SEASON_NAME}.`}
+							description={`Todavía no hay jugadores confirmados para ${team.name}. Vuelve pronto para conocer su plantilla de la ${PUBLIC_SEASON_NAME}.`}
 						/>
 					)
 				}
