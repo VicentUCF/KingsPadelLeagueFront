@@ -70,31 +70,48 @@
 	.page-hero__court {
 		position: absolute;
 		z-index: -1;
-		inset-block-start: 18%;
-		inset-inline-end: 8%;
-		inline-size: min(28rem, 42%);
-		aspect-ratio: 1.7;
-		border: 1px solid rgb(201 162 39 / 0.16);
-		transform: perspective(35rem) rotateX(56deg) rotateZ(-12deg);
+		inset-block-start: 17%;
+		inset-inline-end: 4%;
+		inline-size: min(34rem, 46%);
+		aspect-ratio: 2 / 1;
+		border: 1px solid rgb(201 162 39 / 0.24);
+		background: linear-gradient(
+			90deg,
+			transparent 0 calc(35% - 1px),
+			rgb(201 162 39 / 0.2) calc(35% - 1px) calc(35% + 1px),
+			transparent calc(35% + 1px) calc(50% - 1px),
+			rgb(201 162 39 / 0.34) calc(50% - 1px) calc(50% + 1px),
+			transparent calc(50% + 1px) calc(65% - 1px),
+			rgb(201 162 39 / 0.2) calc(65% - 1px) calc(65% + 1px),
+			transparent calc(65% + 1px)
+		);
+		box-shadow:
+			inset 0.6rem 0 rgb(52 216 255 / 0.018),
+			inset -0.6rem 0 rgb(52 216 255 / 0.018),
+			0 0 2.5rem rgb(201 162 39 / 0.035);
+		transform: perspective(35rem) rotateX(54deg) rotateZ(-10deg);
+		transform-origin: center;
 	}
 
 	.page-hero__court::before,
 	.page-hero__court::after {
 		position: absolute;
-		background: rgb(201 162 39 / 0.16);
 		content: '';
 	}
 
 	.page-hero__court::before {
-		inset-block: 0;
-		inset-inline-start: 50%;
-		inline-size: 1px;
+		inset-block-start: 50%;
+		inset-inline: 35%;
+		block-size: 1px;
+		background: rgb(201 162 39 / 0.2);
 	}
 
 	.page-hero__court::after {
-		inset-block-start: 50%;
-		inset-inline: 0;
-		block-size: 1px;
+		inset-block: -0.25rem;
+		inset-inline-start: 50%;
+		inline-size: 2px;
+		background: rgb(201 162 39 / 0.42);
+		box-shadow: 0 0 0.7rem rgb(201 162 39 / 0.18);
 	}
 
 	.page-hero .c-page-header__copy {
@@ -264,8 +281,8 @@
 		position: relative;
 		isolation: isolate;
 		display: grid;
-		min-block-size: 34rem;
-		grid-template-rows: minmax(16rem, 1fr) auto;
+		block-size: 34rem;
+		grid-template-rows: minmax(0, 1fr) 14rem;
 		overflow: hidden;
 		padding: clamp(var(--kpl-space-5), 3vw, var(--kpl-space-7));
 		border: var(--kpl-border-width) solid
@@ -331,6 +348,7 @@
 
 	.team-card--premium .team-card__logo {
 		position: relative;
+		max-block-size: 100%;
 		inline-size: min(14rem, 72%);
 		transition: scale 520ms var(--kpl-ease-emphasized);
 	}
@@ -340,12 +358,15 @@
 	}
 
 	.team-card--premium .team-card__logo img {
+		display: block;
 		filter: drop-shadow(0 1.4rem 1.8rem rgb(0 0 0 / 0.58)) drop-shadow(0 0 1.5rem var(--team-glow));
 	}
 
 	.team-card--premium .team-card__copy {
 		position: relative;
 		display: grid;
+		min-inline-size: 0;
+		grid-template-rows: auto auto minmax(0, 1fr) auto auto;
 		gap: var(--kpl-space-3);
 		padding-block-start: var(--kpl-space-5);
 		border-block-start: var(--kpl-border-width) solid
@@ -363,18 +384,40 @@
 		text-transform: uppercase;
 	}
 
+	.team-card__meta small {
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.team-card__meta small:last-child {
+		text-align: end;
+	}
+
 	.team-card__name {
+		display: -webkit-box;
+		min-inline-size: 0;
+		overflow: hidden;
 		color: var(--kpl-color-text-strong);
 		font-family: var(--kpl-font-family-heading);
-		font-size: clamp(1.8rem, 4vw, 3.1rem);
+		font-size: clamp(1.7rem, 2.7vw, 2.45rem);
 		line-height: 1;
 		letter-spacing: -0.045em;
+		overflow-wrap: anywhere;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
 	}
 
 	.team-card__tagline,
 	.team-card__president {
+		min-inline-size: 0;
+		overflow: hidden;
 		color: var(--kpl-color-text-muted);
 		font-size: var(--kpl-font-size-100);
+		overflow-wrap: anywhere;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.team-card__tagline {
@@ -625,11 +668,18 @@
 
 	.player-overview strong,
 	.calendar-overview strong {
+		min-inline-size: 0;
 		color: var(--kpl-color-text-strong);
 		font-family: var(--kpl-font-family-heading);
 		font-size: clamp(2.1rem, 5vw, 4rem);
 		font-variant-numeric: tabular-nums;
 		line-height: 1;
+	}
+
+	.player-overview .player-overview__date {
+		font-size: clamp(1.35rem, 2.5vw, 2.5rem);
+		line-height: 1.05;
+		overflow-wrap: normal;
 	}
 
 	.roster-status {
@@ -710,10 +760,10 @@
 		isolation: isolate;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: auto minmax(12rem, 1fr) auto auto auto;
+		grid-template-rows: auto 12rem minmax(0, 1fr) auto auto;
 		align-items: stretch;
 		gap: var(--kpl-space-4);
-		min-block-size: 29rem;
+		block-size: 32rem;
 		overflow: hidden;
 		padding: var(--kpl-space-5);
 		border: var(--kpl-border-width) solid
@@ -758,7 +808,7 @@
 		position: relative;
 		display: grid;
 		inline-size: 100%;
-		aspect-ratio: 1.2;
+		block-size: 12rem;
 		place-items: end center;
 		overflow: hidden;
 		border: 0;
@@ -773,32 +823,50 @@
 		position: absolute;
 		inset: 10%;
 		border: 1px solid color-mix(in srgb, var(--player-accent) 22%, transparent);
-		border-radius: 50%;
+		border-radius: calc(var(--kpl-radius-lg) - var(--kpl-space-2));
 		box-shadow: 0 0 0 2rem color-mix(in srgb, var(--player-accent) 3%, transparent);
 	}
 
 	.player-card__avatar img {
-		position: relative;
+		position: absolute;
 		z-index: 1;
+		inset: 0;
 		inline-size: 100%;
 		block-size: 100%;
 		object-fit: cover;
 		object-position: center top;
 	}
 
-	.player-card__initials {
+	.player-card__placeholder {
 		position: relative;
 		z-index: 1;
+		display: grid;
+		place-items: center;
 		align-self: center;
+		gap: var(--kpl-space-1);
+	}
+
+	.player-card__placeholder svg {
+		inline-size: 4.5rem;
+		fill: none;
+		stroke: currentcolor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 2;
+	}
+
+	.player-card__placeholder strong {
 		font-family: var(--kpl-font-family-heading);
-		font-size: clamp(4rem, 10vw, 7rem);
+		font-size: var(--kpl-font-size-300);
 		font-weight: 700;
-		letter-spacing: -0.08em;
+		letter-spacing: 0.08em;
 		text-shadow: 0 0 2rem var(--player-glow);
 	}
 
 	.player-card__identity {
 		display: grid;
+		min-inline-size: 0;
+		align-content: start;
 		gap: var(--kpl-space-1);
 	}
 
@@ -809,18 +877,32 @@
 	}
 
 	.player-card__identity small {
+		overflow: hidden;
 		color: var(--player-accent);
 		font-weight: 800;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.player-card__identity strong {
+		display: -webkit-box;
+		overflow: hidden;
 		color: var(--kpl-color-text-strong);
 		font-family: var(--kpl-font-family-heading);
-		font-size: clamp(1.55rem, 3vw, 2.3rem);
+		font-size: clamp(1.5rem, 2.2vw, 2rem);
 		line-height: 1;
 		letter-spacing: -0.04em;
+		overflow-wrap: anywhere;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+	}
+
+	.player-card__identity > span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.player-card__preseason-note {
@@ -880,7 +962,12 @@
 	}
 
 	.player-card--compact {
-		min-block-size: 25rem;
+		block-size: 30rem;
+		grid-template-rows: auto 10rem minmax(0, 1fr) auto auto;
+	}
+
+	.player-card--compact .player-card__avatar {
+		block-size: 10rem;
 	}
 
 	.directory-empty {
@@ -907,6 +994,7 @@
 		position: relative;
 		display: grid;
 		grid-template-columns: minmax(22rem, 0.78fr) minmax(0, 1.22fr);
+		align-items: start;
 		gap: var(--kpl-space-5);
 	}
 
@@ -922,7 +1010,7 @@
 		position: relative;
 		isolation: isolate;
 		display: grid;
-		min-block-size: 47rem;
+		block-size: 47rem;
 		place-items: end center;
 		overflow: hidden;
 		padding: 0;
@@ -934,9 +1022,9 @@
 	.player-profile__watermark {
 		position: absolute;
 		z-index: -1;
-		inset-block-start: 8%;
-		inset-inline-start: 50%;
-		translate: -50% 0;
+		top: 50%;
+		left: var(--kpl-space-2);
+		translate: 0 -50%;
 		color: rgb(255 255 255 / 0.035);
 		font-family: var(--kpl-font-family-heading);
 		font-size: clamp(5rem, 13vw, 10rem);
@@ -950,33 +1038,47 @@
 	.player-profile__orbit {
 		position: absolute;
 		z-index: -1;
-		inset-block-start: 16%;
-		inset-inline-start: 50%;
-		inline-size: 78%;
-		aspect-ratio: 1;
-		translate: -50% 0;
+		inset-block: 7% 5rem;
+		inset-inline: 7%;
 		border: 1px solid color-mix(in srgb, var(--team-primary) 30%, transparent);
-		border-radius: 50%;
+		border-radius: calc(2rem - var(--kpl-space-3));
 		box-shadow: 0 0 0 3rem color-mix(in srgb, var(--team-primary) 4%, transparent);
 	}
 
 	.player-profile--premium .player-profile__visual > img {
-		position: relative;
+		position: absolute;
 		z-index: 1;
+		inset: 0;
 		inline-size: 100%;
 		block-size: 100%;
 		object-fit: cover;
 		object-position: center top;
 	}
 
-	.player-profile--premium .player-profile__initials {
+	.player-profile__placeholder {
 		position: relative;
 		z-index: 1;
+		display: grid;
+		place-items: center;
 		align-self: center;
+		gap: var(--kpl-space-3);
 		color: var(--team-accent);
-		font-size: clamp(7rem, 18vw, 15rem);
+	}
+
+	.player-profile__placeholder svg {
+		inline-size: clamp(7rem, 15vw, 11rem);
+		fill: none;
+		stroke: currentcolor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1.35;
+	}
+
+	.player-profile__placeholder strong {
+		font-family: var(--kpl-font-family-heading);
+		font-size: clamp(3rem, 8vw, 6rem);
 		font-weight: 700;
-		letter-spacing: -0.1em;
+		letter-spacing: 0.04em;
 		text-shadow: 0 0 3rem var(--team-glow);
 	}
 
@@ -1162,7 +1264,11 @@
 
 	.season-reveal__orbit {
 		position: absolute;
-		inset: 16%;
+		inset-block-start: 50%;
+		inset-inline-start: 50%;
+		inline-size: min(76%, 24rem);
+		aspect-ratio: 1;
+		translate: -50% -50%;
 		border: 1px solid rgb(201 162 39 / 0.25);
 		border-radius: 50%;
 		box-shadow:
@@ -1576,7 +1682,7 @@
 		}
 
 		.player-profile--premium .player-profile__visual {
-			min-block-size: 38rem;
+			block-size: 38rem;
 		}
 
 		.season-reveal__visual {
@@ -1604,7 +1710,10 @@
 		}
 
 		.page-hero__court {
-			display: none;
+			inset-block-start: 14%;
+			inset-inline-end: -6rem;
+			inline-size: 24rem;
+			opacity: 0.58;
 		}
 
 		.page-hero .c-page-header__actions {
@@ -1653,7 +1762,7 @@
 		}
 
 		.player-profile--premium .player-profile__visual {
-			min-block-size: 31rem;
+			block-size: 31rem;
 		}
 
 		.player-profile--premium .player-profile__detail {

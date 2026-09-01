@@ -101,9 +101,15 @@ const playerStructuredData = playerUrl
 								decoding="async"
 							/>
 						) : (
-							<span class="player-profile__initials" aria-hidden="true">
-								{player.firstName[0]}
-								{player.lastName[0]}
+							<span class="player-profile__placeholder" aria-hidden="true">
+								<svg viewBox="0 0 64 64" focusable="false">
+									<circle cx="32" cy="23" r="10" />
+									<path d="M13 53c2.5-11.5 9-17 19-17s16.5 5.5 19 17" />
+								</svg>
+								<strong>
+									{player.firstName[0]}
+									{player.lastName[0]}
+								</strong>
 							</span>
 						)
 					}
