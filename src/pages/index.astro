@@ -564,7 +564,11 @@ const homeStructuredData = homeUrl
 										style={`--team-accent:${team.palette.primary};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
 									>
 										<span class="home-team-card__glow" aria-hidden="true" />
-										<span class="home-team-card__logo" aria-hidden="true">
+										<span
+											class="home-team-card__logo"
+											aria-hidden="true"
+											transition:name={`kpl-team-${team.slug}-crest`}
+										>
 											{team.logoPath ? (
 												<img
 													src={team.logoPath}
@@ -584,7 +588,7 @@ const homeStructuredData = homeUrl
 													? `#${standing.rank} · ${standing.points} pts`
 													: 'Equipo KPL'}
 											</small>
-											<strong>{team.name}</strong>
+											<strong transition:name={`kpl-team-${team.slug}-name`}>{team.name}</strong>
 											<span>Ver plantilla →</span>
 										</span>
 									</a>

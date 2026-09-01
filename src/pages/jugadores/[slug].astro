@@ -99,9 +99,14 @@ const playerStructuredData = playerUrl
 								width="680"
 								height="840"
 								decoding="async"
+								transition:name={`kpl-player-${player.slug}-portrait`}
 							/>
 						) : (
-							<span class="player-profile__placeholder" aria-hidden="true">
+							<span
+								class="player-profile__placeholder"
+								aria-hidden="true"
+								transition:name={`kpl-player-${player.slug}-portrait`}
+							>
 								<svg viewBox="0 0 64 64" focusable="false">
 									<circle cx="32" cy="23" r="10" />
 									<path d="M13 53c2.5-11.5 9-17 19-17s16.5 5.5 19 17" />
@@ -127,7 +132,9 @@ const playerStructuredData = playerUrl
 
 					<header class="player-profile__header">
 						<p class="c-eyebrow">Perfil del jugador</p>
-						<h1>{player.displayName}</h1>
+						<h1 transition:name={`kpl-player-${player.slug}-name`}>
+							{player.displayName}
+						</h1>
 						<p>
 							<span>{player.teamName}</span>
 							<span aria-hidden="true">·</span>

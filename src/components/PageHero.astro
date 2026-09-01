@@ -5,9 +5,10 @@ interface Props {
 	description: string;
 	meta?: string[];
 	mark?: string;
+	titleTransitionName?: string;
 }
 
-const { eyebrow, title, description, meta = [], mark = 'KPL' } = Astro.props;
+const { eyebrow, title, description, meta = [], mark = 'KPL', titleTransitionName } = Astro.props;
 ---
 
 <header class="page-hero c-page-header">
@@ -15,7 +16,13 @@ const { eyebrow, title, description, meta = [], mark = 'KPL' } = Astro.props;
 	<span class="page-hero__court" aria-hidden="true"></span>
 	<div class="c-page-header__copy">
 		<p class="c-page-header__eyebrow">{eyebrow}</p>
-		<h1>{title}</h1>
+		{
+			titleTransitionName ? (
+				<h1 transition:name={titleTransitionName}>{title}</h1>
+			) : (
+				<h1>{title}</h1>
+			)
+		}
 		<p class="c-page-header__description">{description}</p>
 		{
 			meta.length > 0 && (

@@ -77,7 +77,7 @@ const teamStructuredData = teamUrl
 					</div>
 					<div class="team-profile-hero__copy">
 						<p class="c-eyebrow">Identidad del club</p>
-						<h1>{team.name}</h1>
+						<h1 transition:name={`kpl-team-${team.slug}-name`}>{team.name}</h1>
 						<p class="team-profile-hero__tagline">{team.tagline}</p>
 						<p class="team-profile-hero__description">{team.description}</p>
 					</div>
@@ -99,7 +99,7 @@ const teamStructuredData = teamUrl
 
 				<div class="team-profile-hero__visual" aria-hidden="true">
 					<span class="team-profile-hero__orbit"></span>
-					<span class="team-profile-hero__logo">
+					<span class="team-profile-hero__logo" transition:name={`kpl-team-${team.slug}-crest`}>
 						{
 							team.logoPath ? (
 								<img src={team.logoPath} alt="" width="440" height="440" decoding="async" />

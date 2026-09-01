@@ -1182,6 +1182,14 @@
 		animation-delay: 180ms;
 	}
 
+	body[data-kpl-client-navigation] .home-hero__status-line,
+	body[data-kpl-client-navigation] .home-hero__heading,
+	body[data-kpl-client-navigation] .home-hero__actions,
+	body[data-kpl-client-navigation] .home-hero__facts,
+	body[data-kpl-client-navigation] .home-spotlight {
+		animation: none;
+	}
+
 	@keyframes home-enter {
 		from {
 			opacity: 0;

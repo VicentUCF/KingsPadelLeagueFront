@@ -3,6 +3,8 @@ import '@kpl/design-system/css';
 import '../styles/site-shell.css';
 import '../styles/public-pages.css';
 import '../styles/premium-pages.css';
+import { ClientRouter } from 'astro:transitions';
+import type { TransitionDirectionalAnimations } from 'astro';
 import { PLAYOFFS_ENABLED } from '../lib/features';
 
 interface Props {
@@ -49,10 +51,40 @@ const navigation = [
 ] as const;
 const isCurrent = (href: string) =>
 	href === '/' ? currentPath === href : currentPath === href || currentPath.startsWith(`${href}/`);
+const pageTransition: TransitionDirectionalAnimations = {
+	forwards: {
+		old: {
+			name: 'kpl-page-out-forward',
+			duration: '120ms',
+			easing: 'cubic-bezier(0.4, 0, 1, 1)',
+			fillMode: 'both',
+		},
+		new: {
+			name: 'kpl-page-in-forward',
+			duration: '200ms',
+			easing: 'cubic-bezier(0.2, 0, 0, 1)',
+			fillMode: 'both',
+		},
+	},
+	backwards: {
+		old: {
+			name: 'kpl-page-out-back',
+			duration: '120ms',
+			easing: 'cubic-bezier(0.4, 0, 1, 1)',
+			fillMode: 'both',
+		},
+		new: {
+			name: 'kpl-page-in-back',
+			duration: '200ms',
+			easing: 'cubic-bezier(0.2, 0, 0, 1)',
+			fillMode: 'both',
+		},
+	},
+};
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" transition:name="root" transition:animate="none">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
@@ -86,10 +118,15 @@ const isCurrent = (href: string) =>
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		{jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} />}
+		<ClientRouter fallback="animate" />
 	</head>
 	<body data-kpl-root>
 		<a class="c-skip-link u-visually-hidden-focusable" href="#main-content"> Ir al contenido </a>
-		<header class="c-site-header site-shell__header">
+		<header
+			class="c-site-header site-shell__header"
+			transition:name="site-header"
+			transition:animate="none"
+		>
 			<div class="c-site-header__inner o-container">
 				<a class="c-brand site-shell__brand" href="/" aria-label="Kings Padel League, inicio">
 					<img
@@ -138,7 +175,13 @@ const isCurrent = (href: string) =>
 				</details>
 			</div>
 		</header>
-		<slot />
+		<div
+			class="site-shell__page"
+			transition:name="page-content"
+			transition:animate={pageTransition}
+		>
+			<slot />
+		</div>
 		<footer class="site-shell__footer">
 			<div class="site-shell__footer-inner o-container">
 				<div class="site-shell__footer-brand">
@@ -150,5 +193,19 @@ const isCurrent = (href: string) =>
 				</nav>
 			</div>
 		</footer>
+		<script>
+			const prepareMainContent = (moveFocus = false) => {
+				const main = document.querySelector<HTMLElement>('#main-content');
+				if (!main) return;
+				if (!main.hasAttribute('tabindex')) main.tabIndex = -1;
+				if (moveFocus) main.focus({ preventScroll: true });
+			};
+
+			document.addEventListener('astro:before-swap', (event) => {
+				event.newDocument.body.dataset.kplClientNavigation = 'true';
+			});
+			document.addEventListener('astro:after-swap', () => prepareMainContent(true));
+			document.addEventListener('astro:page-load', () => prepareMainContent());
+		</script>
 	</body>
 </html>

@@ -43,9 +43,13 @@ const cardStyle = team
 					height="380"
 					loading="lazy"
 					decoding="async"
+					transition:name={`kpl-player-${player.slug}-portrait`}
 				/>
 			) : (
-				<span class="player-card__placeholder">
+				<span
+					class="player-card__placeholder"
+					transition:name={`kpl-player-${player.slug}-portrait`}
+				>
 					<svg viewBox="0 0 64 64" focusable="false">
 						<circle cx="32" cy="23" r="10" />
 						<path d="M13 53c2.5-11.5 9-17 19-17s16.5 5.5 19 17" />
@@ -61,7 +65,7 @@ const cardStyle = team
 
 	<span class="player-card__identity">
 		<small>{player.teamName}</small>
-		<strong>{player.displayName}</strong>
+		<strong transition:name={`kpl-player-${player.slug}-name`}>{player.displayName}</strong>
 		<span>{player.positionLabel}{player.isPresident ? ' · Presidente' : ''}</span>
 	</span>
 

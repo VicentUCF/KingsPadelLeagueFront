@@ -90,18 +90,18 @@ const statusLabels = {
 											</span>
 											<time datetime={matchday.date}>{matchday.dateLabel}</time>
 										</div>
-										<h2>{matchday.label}</h2>
+										<h2 transition:name={`kpl-matchday-${matchday.id}-title`}>{matchday.label}</h2>
 										<div class="matchday-card__encounters">
 											{matchday.encounters.slice(0, 3).map((encounter) => (
 												<div class="matchday-card__encounter">
-													<TeamBadge team={encounter.homeTeam} />
+													<TeamBadge team={encounter.homeTeam} linked={false} />
 													<strong>
 														{encounter.status === 'upcoming'
 															? 'VS'
 															: `${encounter.homeScore} : ${encounter.awayScore}`}
 													</strong>
 													<div class="matchday-card__away">
-														<TeamBadge team={encounter.awayTeam} />
+														<TeamBadge team={encounter.awayTeam} linked={false} />
 													</div>
 												</div>
 											))}

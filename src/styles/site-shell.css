@@ -1,6 +1,35 @@
 @layer app {
-	.site-shell__header {
-		view-transition-name: site-header;
+	@keyframes kpl-page-out-forward {
+		to {
+			opacity: 0;
+			translate: -0.75rem 0;
+		}
+	}
+
+	@keyframes kpl-page-in-forward {
+		from {
+			opacity: 0;
+			translate: 0.75rem 0;
+		}
+	}
+
+	@keyframes kpl-page-out-back {
+		to {
+			opacity: 0;
+			translate: 0.75rem 0;
+		}
+	}
+
+	@keyframes kpl-page-in-back {
+		from {
+			opacity: 0;
+			translate: -0.75rem 0;
+		}
+	}
+
+	::view-transition-old(page-content),
+	::view-transition-new(page-content) {
+		mix-blend-mode: normal;
 	}
 
 	.site-shell__brand-image {
@@ -103,6 +132,14 @@
 	@media (width < 30rem) {
 		.site-shell__brand .c-brand__copy {
 			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-group(*),
+		::view-transition-old(*),
+		::view-transition-new(*) {
+			animation: none !important;
 		}
 	}
 }

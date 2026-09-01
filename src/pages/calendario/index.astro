@@ -215,35 +215,37 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 </BaseLayout>
 
 <script>
-	const filters = document.querySelector<HTMLElement>('[data-calendar-filters]');
-	if (filters) {
-		const status = filters.querySelector<HTMLSelectElement>('[data-calendar-status]')!;
-		const team = filters.querySelector<HTMLSelectElement>('[data-calendar-team]')!;
-		const count = filters.querySelector<HTMLElement>('[data-calendar-count]')!;
-		const clear = filters.querySelector<HTMLButtonElement>('[data-calendar-clear]')!;
-		const empty = document.querySelector<HTMLElement>('[data-calendar-empty]')!;
-		const matches = [...document.querySelectorAll<HTMLElement>('[data-calendar-match]')];
-		const update = () => {
-			let visible = 0;
-			for (const match of matches) {
-				const show =
-					(!status.value || match.dataset.status === status.value) &&
-					(!team.value || match.dataset.home === team.value || match.dataset.away === team.value);
-				match.hidden = !show;
-				if (show) visible += 1;
-			}
-			for (const day of document.querySelectorAll<HTMLElement>('[data-calendar-day]'))
-				day.hidden = !day.querySelector('[data-calendar-match]:not([hidden])');
-			count.textContent = `${visible} ${visible === 1 ? 'partido' : 'partidos'}`;
-			empty.hidden = visible !== 0;
-			clear.hidden = !(status.value || team.value);
-		};
-		filters.addEventListener('change', update);
-		clear.addEventListener('click', () => {
-			status.value = '';
-			team.value = '';
-			update();
-			status.focus();
-		});
-	}
+	document.addEventListener('astro:page-load', () => {
+		const filters = document.querySelector<HTMLElement>('[data-calendar-filters]');
+		if (filters) {
+			const status = filters.querySelector<HTMLSelectElement>('[data-calendar-status]')!;
+			const team = filters.querySelector<HTMLSelectElement>('[data-calendar-team]')!;
+			const count = filters.querySelector<HTMLElement>('[data-calendar-count]')!;
+			const clear = filters.querySelector<HTMLButtonElement>('[data-calendar-clear]')!;
+			const empty = document.querySelector<HTMLElement>('[data-calendar-empty]')!;
+			const matches = [...document.querySelectorAll<HTMLElement>('[data-calendar-match]')];
+			const update = () => {
+				let visible = 0;
+				for (const match of matches) {
+					const show =
+						(!status.value || match.dataset.status === status.value) &&
+						(!team.value || match.dataset.home === team.value || match.dataset.away === team.value);
+					match.hidden = !show;
+					if (show) visible += 1;
+				}
+				for (const day of document.querySelectorAll<HTMLElement>('[data-calendar-day]'))
+					day.hidden = !day.querySelector('[data-calendar-match]:not([hidden])');
+				count.textContent = `${visible} ${visible === 1 ? 'partido' : 'partidos'}`;
+				empty.hidden = visible !== 0;
+				clear.hidden = !(status.value || team.value);
+			};
+			filters.addEventListener('change', update);
+			clear.addEventListener('click', () => {
+				status.value = '';
+				team.value = '';
+				update();
+				status.focus();
+			});
+		}
+	});
 </script>

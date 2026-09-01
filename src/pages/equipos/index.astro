@@ -83,7 +83,11 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 											0{index + 1}
 										</span>
 										<span class="team-card__halo" aria-hidden="true" />
-										<span class="team-card__logo" aria-hidden="true">
+										<span
+											class="team-card__logo"
+											aria-hidden="true"
+											transition:name={`kpl-team-${team.slug}-crest`}
+										>
 											{team.logoPath ? (
 												<img
 													src={team.logoPath}
@@ -102,7 +106,12 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 												<small>{team.players.length} jugadores</small>
 												<small>{preseason ? 'Nueva temporada' : 'Equipo oficial'}</small>
 											</span>
-											<strong class="team-card__name">{team.name}</strong>
+											<strong
+												class="team-card__name"
+												transition:name={`kpl-team-${team.slug}-name`}
+											>
+												{team.name}
+											</strong>
 											<span class="team-card__tagline">{team.tagline}</span>
 											<span class="team-card__president">Presidencia · {team.presidentLabel}</span>
 											<span class="team-card__cta">
