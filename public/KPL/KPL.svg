@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1920"
+     height="800"
+     viewBox="0 0 1920 800"
+     role="img"
+     aria-labelledby="title description">
+  <title id="title">KPL</title>
+  <desc id="description">Logotipo vectorial KPL en sus colores originales sobre fondo transparente.</desc>
+
+  <defs>
+    <linearGradient id="accent" x1="0" y1="50" x2="0" y2="757"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5D060"/>
+      <stop offset="1" stop-color="#C9A227"/>
+    </linearGradient>
+  </defs>
+
+  <!-- El marco queda centrado en el trazo para replicar sus radios exterior e interior. -->
+  <rect x="69" y="69" width="1792" height="669" rx="164"
+        fill="none" stroke="url(#accent)" stroke-width="38"/>
+
+  <!--
+    Letras convertidas a contornos editables. El hueco de la P y el
+    contragrafismo de la K son geometria real: no se usa texto ni raster.
+  -->
+  <g fill="#F5F5F5">
+    <!-- K: diagonales y terminales reconstruidos como geometria limpia. -->
+    <path d="M466 161H646L615 304 735 161H906L740 379 824 584 816 625H651L582 440 541 625H362Z"/>
+
+    <!-- P: el segundo subtrazado recorta su contraforma interior. -->
+    <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M735 161H1154C1248 161 1294 211 1282 301 1267 415 1172 489 1042 489H993L964 625H799L806 532 872 227ZM1039 279 1018 375H1050C1089 375 1110 359 1117 326 1124 295 1108 279 1074 279Z"/>
+
+    <!-- L -->
+    <path d="M1296 161H1484L1402 496H1592L1562 622H1190Z"/>
+  </g>
+</svg>
