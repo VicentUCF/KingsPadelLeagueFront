@@ -587,6 +587,160 @@
 		gap: var(--kpl-space-7);
 	}
 
+	.team-roster__heading {
+		display: grid;
+		gap: var(--kpl-space-2);
+	}
+
+	.team-roster__summary {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--kpl-space-2);
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-100);
+	}
+
+	.team-roster__summary span {
+		color: var(--team-primary);
+	}
+
+	.team-roster__actions {
+		align-items: center;
+	}
+
+	.team-roster-board {
+		position: relative;
+		isolation: isolate;
+		display: grid;
+		grid-template-columns: minmax(17rem, 35fr) minmax(0, 65fr);
+		gap: clamp(var(--kpl-space-5), 3vw, var(--kpl-space-7));
+		padding: clamp(var(--kpl-space-4), 3vw, var(--kpl-space-6));
+		overflow: hidden;
+		border: var(--kpl-border-width) solid
+			color-mix(in srgb, var(--team-primary) 24%, var(--kpl-color-border-subtle));
+		border-radius: var(--kpl-radius-xl);
+		background:
+			radial-gradient(circle at 18% 12%, var(--team-glow), transparent 28rem),
+			color-mix(in srgb, var(--team-surface) 36%, transparent);
+	}
+
+	.team-roster-board::before {
+		position: absolute;
+		z-index: -1;
+		inset: var(--kpl-space-4);
+
+		content: '';
+		pointer-events: none;
+	}
+
+	.team-roster-board--players-only,
+	.team-roster-board--presidents-only {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.team-roster__group {
+		display: grid;
+		grid-template-rows: auto minmax(0, 1fr);
+		gap: var(--kpl-space-4);
+		min-inline-size: 0;
+	}
+
+	.team-roster__group-header {
+		display: flex;
+		align-items: end;
+		justify-content: space-between;
+		gap: var(--kpl-space-3);
+		padding-block-end: var(--kpl-space-3);
+		border-block-end: var(--kpl-border-width) solid
+			color-mix(in srgb, var(--team-primary) 24%, var(--kpl-color-border-subtle));
+	}
+
+	.team-roster__group-header > div {
+		display: grid;
+		gap: var(--kpl-space-1);
+	}
+
+	.team-roster__group-header h3 {
+		color: var(--kpl-color-text-strong);
+		font-family: var(--kpl-font-family-heading);
+		font-size: clamp(1.55rem, 2.8vw, 2.35rem);
+		line-height: 1;
+	}
+
+	.team-roster__group-header > span {
+		color: color-mix(in srgb, var(--team-accent) 48%, transparent);
+		font-family: var(--kpl-font-family-heading);
+		font-size: clamp(2rem, 4vw, 3.75rem);
+		font-weight: 700;
+		line-height: 0.8;
+	}
+
+	.team-roster__list,
+	.team-roster__list > li {
+		min-block-size: 0;
+	}
+
+	.team-roster__list > li,
+	.team-roster__list .player-card {
+		block-size: 100%;
+	}
+
+	.team-roster__presidents .team-roster__list {
+		grid-template-rows: repeat(var(--roster-president-count, 1), minmax(0, 1fr));
+		gap: var(--kpl-space-4);
+	}
+
+	.team-roster__presidents[data-count='2'] .team-roster__list {
+		--roster-president-count: 2;
+
+		grid-template-rows: repeat(2, auto);
+	}
+
+	.team-roster__presidents[data-count='2'],
+	.team-roster__players[data-count='4'] {
+		align-self: start;
+		grid-template-rows: auto auto;
+	}
+
+	.team-roster__presidents[data-count='2'] .team-roster__list,
+	.team-roster__players[data-count='4'] .team-roster__list {
+		align-content: start;
+		align-items: start;
+	}
+
+	.team-roster__presidents[data-count='2'] .team-roster__list > li,
+	.team-roster__presidents[data-count='2'] .team-roster__list .player-card,
+	.team-roster__players[data-count='4'] .team-roster__list > li,
+	.team-roster__players[data-count='4'] .team-roster__list .player-card {
+		block-size: auto;
+	}
+
+	.team-roster__players .team-roster__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr));
+		gap: var(--kpl-space-4);
+	}
+
+	.team-roster__players[data-count='5'] .team-roster__list {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+	}
+
+	.team-roster__players[data-count='5'] .team-roster__list > li {
+		grid-column: span 2;
+	}
+
+	.team-roster__players[data-count='5'] .team-roster__list > li:nth-child(4) {
+		grid-column: 2 / span 2;
+	}
+
+	.team-roster__players[data-count='5'] .team-roster__list > li:nth-child(5) {
+		grid-column: 4 / span 2;
+	}
+
+	.team-roster__players[data-count='4'] .team-roster__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.player-overview,
 	.calendar-overview {
 		display: grid;
@@ -789,14 +943,32 @@
 		box-shadow: 0 0 0 2rem color-mix(in srgb, var(--player-accent) 3%, transparent);
 	}
 
-	.player-card__avatar img {
+	.player-card__avatar-image,
+	.player-card__avatar-backdrop {
 		position: absolute;
-		z-index: 1;
 		inset: 0;
 		inline-size: 100%;
 		block-size: 100%;
+	}
+
+	.player-card__avatar-image {
+		z-index: 1;
 		object-fit: cover;
 		object-position: center top;
+	}
+
+	.player-card__avatar-backdrop {
+		z-index: 0;
+		object-fit: cover;
+		object-position: center;
+		filter: blur(0.65rem) brightness(0.42) saturate(0.72);
+		transform: scale(1.12);
+	}
+
+	.player-card__avatar-image--roster {
+		object-fit: contain;
+		object-position: center;
+		filter: drop-shadow(0 0.5rem 1rem rgb(0 0 0 / 0.42));
 	}
 
 	.player-card__placeholder {
@@ -806,6 +978,32 @@
 		place-items: center;
 		align-self: center;
 		gap: var(--kpl-space-1);
+	}
+
+	.player-card__placeholder-mark {
+		position: absolute;
+		z-index: -1;
+		inset: 50% auto auto 50%;
+		display: grid;
+		inline-size: min(8rem, 78%);
+		aspect-ratio: 1;
+		translate: -50% -50%;
+		place-items: center;
+		color: currentcolor;
+		font-family: var(--kpl-font-family-heading);
+		font-size: 3.5rem;
+		font-weight: 800;
+		opacity: 0.12;
+	}
+
+	.player-card__placeholder-mark img {
+		position: static;
+		z-index: auto;
+		inset: auto;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: contain;
+		filter: saturate(0.55);
 	}
 
 	.player-card__placeholder svg {
@@ -930,6 +1128,80 @@
 
 	.player-card--compact .player-card__avatar {
 		block-size: 10rem;
+	}
+
+	.player-card--roster {
+		grid-template-rows: auto 9rem minmax(3.5rem, 1fr) auto;
+		min-block-size: 22rem;
+		block-size: auto;
+		gap: var(--kpl-space-3);
+		padding: var(--kpl-space-4);
+	}
+
+	.player-card--roster:focus-visible {
+		outline: 3px solid var(--team-accent, var(--kpl-color-brand));
+		outline-offset: 3px;
+	}
+
+	.player-card--roster .player-card__topline {
+		justify-content: flex-start;
+	}
+
+	.player-card--roster .player-card__identity strong {
+		font-size: clamp(1.25rem, 1.9vw, 1.65rem);
+	}
+
+	.player-card--roster .player-card__avatar-image--roster {
+		transition: transform var(--kpl-duration-slow) var(--kpl-ease-standard);
+	}
+
+	.player-card--roster:is(:hover, :focus-visible) .player-card__avatar-image--roster {
+		transform: scale(1.035);
+	}
+
+	.player-card--roster .player-card__placeholder svg {
+		inline-size: 3.25rem;
+		opacity: 0.72;
+	}
+
+	.player-card--roster .player-card__placeholder strong {
+		font-size: clamp(1.4rem, 2vw, 1.85rem);
+	}
+
+	.player-card--president {
+		grid-template-rows: auto minmax(15rem, 1fr) auto auto;
+		min-block-size: 30rem;
+		padding: var(--kpl-space-5);
+	}
+
+	.player-card--president .player-card__avatar {
+		block-size: 100%;
+		min-block-size: 15rem;
+	}
+
+	.player-card--president .player-card__identity strong {
+		font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+	}
+
+	.team-roster__presidents[data-count='2'] .player-card--president {
+		grid-template-rows: auto 8.5rem auto auto;
+		min-block-size: 0;
+		padding: var(--kpl-space-4);
+	}
+
+	.team-roster__presidents[data-count='2'] .player-card--president .player-card__avatar {
+		block-size: 8.5rem;
+		min-block-size: 8.5rem;
+	}
+
+	.team-roster__players[data-count='4'] .player-card--squad-player {
+		grid-template-rows: auto 8.5rem auto auto;
+		min-block-size: 0;
+	}
+
+	.team-roster__players[data-count='4'] .player-card--squad-player .player-card__avatar {
+		block-size: 8.5rem;
+		min-block-size: 8.5rem;
 	}
 
 	.directory-empty {
@@ -1647,6 +1919,45 @@
 			grid-template-columns: minmax(0, 1fr);
 		}
 
+		.team-roster-board {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.team-roster__presidents .team-roster__list {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-rows: none;
+		}
+
+		.team-roster__presidents[data-count='2'] .team-roster__list {
+			grid-template-rows: none;
+		}
+
+		.team-roster__presidents[data-count='1'] .team-roster__list {
+			grid-template-columns: minmax(0, min(28rem, 100%));
+		}
+
+		.player-card--president,
+		.team-roster__presidents[data-count='2'] .player-card--president {
+			grid-template-rows: auto minmax(13rem, 1fr) auto auto;
+			min-block-size: 28rem;
+		}
+
+		.player-card--president .player-card__avatar,
+		.team-roster__presidents[data-count='2'] .player-card--president .player-card__avatar {
+			min-block-size: 13rem;
+		}
+
+		.team-roster__presidents[data-count='2'] .player-card--president {
+			grid-template-rows: auto 11rem auto auto;
+			min-block-size: 0;
+			block-size: auto;
+		}
+
+		.team-roster__presidents[data-count='2'] .player-card--president .player-card__avatar {
+			block-size: 11rem;
+			min-block-size: 11rem;
+		}
+
 		.player-profile--premium .player-profile__visual {
 			block-size: 38rem;
 		}
@@ -1734,6 +2045,56 @@
 			grid-template-columns: minmax(0, 1fr);
 		}
 
+		.team-roster__actions {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			inline-size: 100%;
+		}
+
+		.team-roster__actions .c-chip {
+			grid-column: 1 / -1;
+			justify-self: start;
+		}
+
+		.team-roster-board {
+			padding: var(--kpl-space-3);
+		}
+
+		.team-roster__presidents .team-roster__list,
+		.team-roster__presidents[data-count='1'] .team-roster__list,
+		.team-roster__players .team-roster__list,
+		.team-roster__players[data-count='4'] .team-roster__list,
+		.team-roster__players[data-count='5'] .team-roster__list {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.team-roster__players[data-count='5'] .team-roster__list > li,
+		.team-roster__players[data-count='5'] .team-roster__list > li:nth-child(4),
+		.team-roster__players[data-count='5'] .team-roster__list > li:nth-child(5) {
+			grid-column: auto;
+		}
+
+		.player-card--president,
+		.team-roster__presidents[data-count='2'] .player-card--president {
+			min-block-size: 24rem;
+			padding: var(--kpl-space-4);
+		}
+
+		.team-roster__presidents[data-count='2'] .team-roster__list {
+			grid-template-rows: none;
+		}
+
+		.team-roster__presidents[data-count='2'] .player-card--president {
+			grid-template-rows: auto 9rem auto auto;
+			min-block-size: 0;
+			block-size: auto;
+		}
+
+		.team-roster__presidents[data-count='2'] .player-card--president .player-card__avatar {
+			block-size: 9rem;
+			min-block-size: 9rem;
+		}
+
 		.player-profile--premium .player-profile__visual {
 			block-size: 31rem;
 		}
@@ -1814,6 +2175,14 @@
 			grid-template-columns: minmax(0, 1fr);
 		}
 
+		.team-roster__actions {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.team-roster__actions .c-chip {
+			grid-column: auto;
+		}
+
 		.player-overview strong,
 		.calendar-overview strong {
 			font-size: 2.4rem;
@@ -1836,6 +2205,57 @@
 		}
 	}
 
+	@media (width < 32rem) {
+		.team-roster__presidents .team-roster__list,
+		.team-roster__presidents[data-count='1'] .team-roster__list,
+		.team-roster__players .team-roster__list,
+		.team-roster__players[data-count='4'] .team-roster__list,
+		.team-roster__players[data-count='5'] .team-roster__list {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.player-card--roster,
+		.player-card--president,
+		.team-roster__presidents[data-count='2'] .player-card--president,
+		.team-roster__players[data-count='4'] .player-card--squad-player {
+			grid-template-columns: 7.5rem minmax(0, 1fr);
+			grid-template-rows: auto minmax(0, 1fr) auto;
+			min-block-size: 11.5rem;
+			gap: var(--kpl-space-2) var(--kpl-space-3);
+			padding: var(--kpl-space-3);
+		}
+
+		.player-card--president,
+		.team-roster__presidents[data-count='2'] .player-card--president {
+			grid-template-columns: 9rem minmax(0, 1fr);
+		}
+
+		.player-card--roster .player-card__topline {
+			grid-column: 2;
+			grid-row: 1;
+		}
+
+		.player-card--roster .player-card__avatar,
+		.player-card--president .player-card__avatar,
+		.team-roster__presidents[data-count='2'] .player-card--president .player-card__avatar,
+		.team-roster__players[data-count='4'] .player-card--squad-player .player-card__avatar {
+			grid-column: 1;
+			grid-row: 1 / -1;
+			block-size: 100%;
+			min-block-size: 0;
+		}
+
+		.player-card--roster .player-card__identity {
+			grid-column: 2;
+			grid-row: 2;
+		}
+
+		.player-card--roster .player-card__cta {
+			grid-column: 2;
+			grid-row: 3;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.team-card--premium,
 		.team-card__halo,
@@ -1843,6 +2263,14 @@
 		.player-card,
 		.matchday-card--premium {
 			transition: none;
+		}
+
+		.player-card--roster .player-card__avatar-image--roster {
+			transition: none;
+		}
+
+		.player-card--roster:is(:hover, :focus-visible) .player-card__avatar-image--roster {
+			transform: none;
 		}
 	}
 

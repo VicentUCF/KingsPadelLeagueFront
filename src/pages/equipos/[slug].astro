@@ -20,6 +20,7 @@ const { team } = Astro.props;
 const preseason = isPublicPreseason();
 const teamStyle = teamThemeStyle(team);
 const presidents = team.players.filter((player) => player.isPresident);
+const squadPlayers = team.players.filter((player) => !player.isPresident);
 const teamUrl = Astro.site ? new URL(`/equipos/${team.slug}`, Astro.site).href : null;
 const teamStructuredData = teamUrl
 	? [
@@ -160,34 +161,102 @@ const teamStructuredData = teamUrl
 
 			<section class="section-block team-roster" aria-labelledby="roster-title">
 				<header class="section-block__header section-block__header--editorial">
-					<div>
+					<div class="team-roster__heading">
 						<p class="c-eyebrow">{preseason ? 'Plantilla confirmada' : 'Plantilla oficial'}</p>
 						<h2 id="roster-title">Las caras de {team.name}</h2>
+						<p class="team-roster__summary">
+							{
+								presidents.length
+									? `${presidents.length} ${presidents.length === 1 ? 'presidente' : 'presidentes'}`
+									: 'Presidencia pendiente'
+							}
+							<span aria-hidden="true">·</span>
+							{squadPlayers.length}
+							{squadPlayers.length === 1 ? 'jugador' : 'jugadores'}
+						</p>
 					</div>
-					<div class="section-block__actions">
-						{
-							presidents.length > 0 && (
-								<span class="c-chip c-chip--tone-brand">
-									{presidents.length === 1
-										? team.presidentLabel
-										: `${presidents.length} presidentes`}
-								</span>
-							)
-						}
+					<nav
+						class="section-block__actions team-roster__actions"
+						aria-label={`Explorar ${team.name}`}
+					>
+						<span class="c-chip c-chip--tone-brand">Plantilla · {team.players.length}/6</span>
 						<a class="c-button c-button--outline" href="/calendario">Ver calendario</a>
 						<a class="c-button c-button--outline" href="/clasificacion">Ver clasificación</a>
-					</div>
+					</nav>
 				</header>
 
 				{
 					team.players.length ? (
-						<ol class="player-list player-list--cards">
-							{team.players.map((player) => (
-								<li>
-									<PlayerCard player={player} team={team} preseason={preseason} compact />
-								</li>
-							))}
-						</ol>
+						<div
+							class:list={[
+								'team-roster-board',
+								!presidents.length && 'team-roster-board--players-only',
+								!squadPlayers.length && 'team-roster-board--presidents-only',
+							]}
+						>
+							{presidents.length > 0 && (
+								<section
+									class="team-roster__group team-roster__presidents"
+									aria-labelledby="presidents-title"
+									data-count={presidents.length}
+								>
+									<header class="team-roster__group-header">
+										<div>
+											<p class="c-eyebrow">Liderazgo</p>
+											<h3 id="presidents-title">Presidencia</h3>
+										</div>
+										<span>{presidents.length.toString().padStart(2, '0')}</span>
+									</header>
+									<ol
+										class="player-list team-roster__list"
+										aria-label={`Presidencia de ${team.name}`}
+									>
+										{presidents.map((player) => (
+											<li>
+												<PlayerCard
+													player={player}
+													team={team}
+													preseason={preseason}
+													rosterRole="president"
+												/>
+											</li>
+										))}
+									</ol>
+								</section>
+							)}
+
+							{squadPlayers.length > 0 && (
+								<section
+									class="team-roster__group team-roster__players"
+									aria-labelledby="squad-players-title"
+									data-count={squadPlayers.length}
+								>
+									<header class="team-roster__group-header">
+										<div>
+											<p class="c-eyebrow">Competición</p>
+											<h3 id="squad-players-title">Jugadores</h3>
+										</div>
+										<span>{squadPlayers.length.toString().padStart(2, '0')}</span>
+									</header>
+									<ol
+										class="player-list team-roster__list"
+										aria-label={`Jugadores de ${team.name}`}
+									>
+										{squadPlayers.map((player) => (
+											<li>
+												<PlayerCard
+													player={player}
+													team={team}
+													preseason={preseason}
+													compact
+													rosterRole="player"
+												/>
+											</li>
+										))}
+									</ol>
+								</section>
+							)}
+						</div>
 					) : (
 						<EmptyState
 							title="La plantilla se anunciará pronto"

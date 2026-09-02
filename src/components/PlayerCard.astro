@@ -7,14 +7,16 @@ interface Props {
 	team?: PublicTeam;
 	compact?: boolean;
 	preseason?: boolean;
+	rosterRole?: 'president' | 'player';
 }
 
-const { player, team, compact = false, preseason = false } = Astro.props;
+const { player, team, compact = false, preseason = false, rosterRole } = Astro.props;
 const cardStyle = team ? teamThemeStyle(team) : undefined;
 const fullName = [player.firstName, player.lastName].filter(Boolean).join(' ');
 const secondaryIdentity = player.alias
 	? `“${player.alias}” · ${player.positionLabel}`
 	: player.positionLabel;
+const rosterSecondaryIdentity = player.alias ? `“${player.alias}”` : null;
 ---
 
 <a
@@ -23,6 +25,9 @@ const secondaryIdentity = player.alias
 		compact && 'player-card--compact',
 		preseason && 'player-card--preseason',
 		team && 'player-card--team',
+		rosterRole && 'player-card--roster',
+		rosterRole === 'president' && 'player-card--president',
+		rosterRole === 'player' && 'player-card--squad-player',
 	]}
 	href={`/jugadores/${player.slug}`}
 	style={cardStyle}
@@ -34,27 +39,54 @@ const secondaryIdentity = player.alias
 	{team && <span class="player-card__team-accent" aria-hidden="true" />}
 	<span class="player-card__topline">
 		<span>{player.isPresident ? 'Presidencia' : player.positionLabel}</span>
-		<span>{preseason ? 'T2' : `#${player.rank}`}</span>
+		{!rosterRole && <span>{preseason ? 'T2' : `#${player.rank}`}</span>}
 	</span>
 
 	<span class="player-card__avatar" aria-hidden="true">
 		<span class="player-card__avatar-glow"></span>
 		{
 			player.profileImage ? (
-				<img
-					src={player.profileImage}
-					alt=""
-					width="320"
-					height="380"
-					loading="lazy"
-					decoding="async"
-					transition:name={`kpl-player-${player.slug}-portrait`}
-				/>
+				<>
+					{rosterRole && (
+						<img
+							class="player-card__avatar-backdrop"
+							src={player.profileImage}
+							alt=""
+							aria-hidden="true"
+							width="320"
+							height="380"
+							loading="lazy"
+							decoding="async"
+						/>
+					)}
+					<img
+						class:list={[
+							'player-card__avatar-image',
+							rosterRole && 'player-card__avatar-image--roster',
+						]}
+						src={player.profileImage}
+						alt=""
+						width="320"
+						height="380"
+						loading="lazy"
+						decoding="async"
+						transition:name={`kpl-player-${player.slug}-portrait`}
+					/>
+				</>
 			) : (
 				<span
 					class="player-card__placeholder"
 					transition:name={`kpl-player-${player.slug}-portrait`}
 				>
+					{team && (
+						<span class="player-card__placeholder-mark">
+							{team.logoPath ? (
+								<img src={team.logoPath} alt="" width="120" height="120" decoding="async" />
+							) : (
+								team.monogram
+							)}
+						</span>
+					)}
 					<svg viewBox="0 0 64 64" focusable="false">
 						<circle cx="32" cy="23" r="10" />
 						<path d="M13 53c2.5-11.5 9-17 19-17s16.5 5.5 19 17" />
@@ -69,13 +101,22 @@ const secondaryIdentity = player.alias
 	</span>
 
 	<span class="player-card__identity">
-		<small>{player.teamName}</small>
+		{!rosterRole && <small>{player.teamName}</small>}
 		<strong transition:name={`kpl-player-${player.slug}-name`}>{fullName}</strong>
-		<span>{secondaryIdentity}{player.isPresident ? ' · Presidente' : ''}</span>
+		{
+			rosterRole ? (
+				rosterSecondaryIdentity && <span>{rosterSecondaryIdentity}</span>
+			) : (
+				<span>
+					{secondaryIdentity}
+					{player.isPresident ? ' · Presidente' : ''}
+				</span>
+			)
+		}
 	</span>
 
 	{
-		preseason ? (
+		rosterRole ? null : preseason ? (
 			<span class="player-card__preseason-note">
 				<small>Temporada 2</small>
 				<strong>Jugador confirmado</strong>
