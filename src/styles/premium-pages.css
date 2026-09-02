@@ -230,7 +230,7 @@
 	}
 
 	.team-grid--premium {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: var(--kpl-space-5);
 		margin: 0;
 		padding: 0;
@@ -357,6 +357,7 @@
 
 	.team-card__name {
 		display: -webkit-box;
+		min-block-size: 2lh;
 		min-inline-size: 0;
 		overflow: hidden;
 		color: var(--kpl-color-text-strong);
@@ -365,6 +366,7 @@
 		line-height: 1;
 		letter-spacing: -0.045em;
 		overflow-wrap: anywhere;
+		text-wrap: balance;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
 	}
@@ -1619,6 +1621,10 @@
 	}
 
 	@media (width < 64rem) {
+		.team-grid--premium {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
 		.page-hero {
 			min-block-size: 32rem;
 		}
@@ -1660,6 +1666,10 @@
 	}
 
 	@media (width < 48rem) {
+		.team-grid--premium {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
 		.page-hero {
 			min-block-size: 31rem;
 			padding: var(--kpl-space-6);
