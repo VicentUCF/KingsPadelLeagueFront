@@ -11,7 +11,17 @@ const { eyebrow, title, description, meta = [], titleTransitionName } = Astro.pr
 ---
 
 <header class="page-hero c-page-header">
-	<span class="page-hero__artwork" aria-hidden="true"> </span>
+	<span class="page-hero__artwork" aria-hidden="true">
+		<img
+			src="/textures/backgournd_pelota.png"
+			alt=""
+			width="1672"
+			height="941"
+			loading="eager"
+			decoding="async"
+			fetchpriority="high"
+		/>
+	</span>
 	<div class="c-page-header__copy">
 		<p class="c-page-header__eyebrow">{eyebrow}</p>
 		{

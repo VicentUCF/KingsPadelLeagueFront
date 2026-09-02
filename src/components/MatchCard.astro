@@ -1,6 +1,7 @@
 ---
 import type { PublicEncounter } from '../lib/public-league';
 import TeamBadge from './TeamBadge.astro';
+import TeamIdentityBands from './TeamIdentityBands.astro';
 
 interface Props {
 	encounter: PublicEncounter;
@@ -33,6 +34,7 @@ const labels = {
 		<time datetime={encounter.scheduledAt}>{encounter.scheduledAtLabel}</time>
 	</header>
 	<div class="c-match-card__teams">
+		<TeamIdentityBands homeTeam={encounter.homeTeam} awayTeam={encounter.awayTeam} />
 		<div class="c-match-card__team"><TeamBadge team={encounter.homeTeam} meta="Local" /></div>
 		{
 			encounter.status === 'upcoming' ? (

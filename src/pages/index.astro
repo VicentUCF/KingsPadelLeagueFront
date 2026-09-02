@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 
 import TeamBadge from '../components/TeamBadge.astro';
+import TeamIdentityBands from '../components/TeamIdentityBands.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { selectPublishedAnnouncements } from '../lib/announcements';
 import { PLAYOFFS_ENABLED } from '../lib/features';
@@ -13,6 +14,7 @@ import {
 } from '../lib/league-presentation';
 import { resolveHomeSeasonStatus } from '../lib/league-status';
 import { loadPublicLeagueView } from '../lib/public-view';
+import { teamThemeStyle } from '../lib/team-identity';
 import '../styles/home.css';
 
 const buildDate = new Date();
@@ -291,6 +293,12 @@ const homeStructuredData = homeUrl
 						{
 							spotlight ? (
 								<div class="home-spotlight__match">
+									{spotlight.awayTeam && (
+										<TeamIdentityBands
+											homeTeam={spotlight.homeTeam}
+											awayTeam={spotlight.awayTeam}
+										/>
+									)}
 									<div class="home-spotlight__team">
 										<TeamBadge team={spotlight.homeTeam} meta="Local" />
 									</div>
@@ -456,6 +464,10 @@ const homeStructuredData = homeUrl
 							<div class="home-fixtures">
 								{dashboardMatchday.encounters.slice(0, 3).map((encounter) => (
 									<div class="home-fixture">
+										<TeamIdentityBands
+											homeTeam={encounter.homeTeam}
+											awayTeam={encounter.awayTeam}
+										/>
 										<TeamBadge team={encounter.homeTeam} />
 										{encounter.status === 'upcoming' ? (
 											<strong class="home-fixture__versus" aria-label="contra">
@@ -560,9 +572,9 @@ const homeStructuredData = homeUrl
 									<a
 										class="home-team-card"
 										href={`/equipos/${team.slug}`}
-										style={`--team-accent:${team.palette.primary};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
+										style={teamThemeStyle(team)}
 									>
-										<span class="home-team-card__glow" aria-hidden="true" />
+										<span class="home-team-card__identity-accent" aria-hidden="true" />
 										<span
 											class="home-team-card__logo"
 											aria-hidden="true"

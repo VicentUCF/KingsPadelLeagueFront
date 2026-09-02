@@ -134,6 +134,24 @@ function dataset(): PublicLeagueData {
 }
 
 describe('createPublicLeagueView', () => {
+	it('aplica el branding y la firma opcional sin alterar el fallback de la liga', () => {
+		const branded = dataset();
+		branded.teams[0] = { ...branded.teams[0]!, name: 'Kings of Favar' };
+
+		const view = createPublicLeagueView(branded, new Date('2026-08-27T12:00:00Z'));
+		const kings = view.teams.find((team) => team.slug === 'kings-of-favar');
+		const fallback = view.teams.find((team) => team.id === 'b');
+
+		assert.equal(kings?.logoPath, '/team-identities/kings-of-favar/logo.svg');
+		assert.equal(kings?.palette.primary, '#D1007A');
+		assert.deepEqual(kings?.signature, {
+			secondaryMarkPath: '/team-identities/kings-of-favar/crown.svg',
+			motto: 'Born in Favar, built to win',
+			edition: '2026',
+		});
+		assert.equal(fallback?.signature, undefined);
+	});
+
 	it('mantiene todas las vistas dentro de la temporada seleccionada', () => {
 		const view = createPublicLeagueView(dataset(), new Date('2026-08-27T12:00:00Z'));
 

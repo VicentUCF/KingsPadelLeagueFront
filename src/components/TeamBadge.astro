@@ -1,5 +1,6 @@
 ---
 import type { PublicTeam } from '../lib/public-league';
+import { teamThemeStyle } from '../lib/team-identity';
 
 interface Props {
 	team: PublicTeam;
@@ -9,10 +10,12 @@ interface Props {
 
 const { team, linked = true, meta } = Astro.props;
 const Tag = linked ? 'a' : 'span';
+const identityStyle = teamThemeStyle(team);
 ---
 
 <Tag
 	class="c-team-badge"
+	style={identityStyle}
 	{...linked ? { href: `/equipos/${team.slug}`, 'aria-label': `Ver equipo ${team.name}` } : {}}
 >
 	<span class="c-team-badge__crest" aria-hidden="true">

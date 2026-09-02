@@ -5,6 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { isPublicPreseason, PUBLIC_SEASON_NAME } from '../../lib/league-presentation';
 import type { PublicTeam } from '../../lib/public-league';
 import { loadPublicLeagueView } from '../../lib/public-view';
+import { teamThemeStyle } from '../../lib/team-identity';
 
 export async function getStaticPaths() {
 	const view = await loadPublicLeagueView();
@@ -17,7 +18,7 @@ interface Props {
 
 const { team } = Astro.props;
 const preseason = isPublicPreseason();
-const teamStyle = `--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow};--team-contrast:${team.palette.contrast}`;
+const teamStyle = teamThemeStyle(team);
 const presidents = team.players.filter((player) => player.isPresident);
 const teamUrl = Astro.site ? new URL(`/equipos/${team.slug}`, Astro.site).href : null;
 const teamStructuredData = teamUrl
@@ -67,6 +68,7 @@ const teamStructuredData = teamUrl
 			</nav>
 
 			<article class="team-profile-hero">
+				<span class="team-profile-hero__identity-accent" aria-hidden="true"></span>
 				<span class="team-profile-hero__number" aria-hidden="true">KPL</span>
 				<div class="team-profile-hero__identity">
 					<div class="team-profile-hero__status">
@@ -81,6 +83,20 @@ const teamStructuredData = teamUrl
 						<p class="team-profile-hero__tagline">{team.tagline}</p>
 						<p class="team-profile-hero__description">{team.description}</p>
 					</div>
+					{
+						team.signature && (
+							<aside class="team-profile-hero__signature" aria-label="Firma del equipo">
+								{team.signature.secondaryMarkPath && (
+									<img src={team.signature.secondaryMarkPath} alt="" width="56" height="38" />
+								)}
+								<span>
+									<small>Team issue</small>
+									<strong>{team.signature.edition}</strong>
+								</span>
+								<p>{team.signature.motto}</p>
+							</aside>
+						)
+					}
 					<dl class="team-profile-hero__facts">
 						<div>
 							<dt>Jugadores</dt>

@@ -8,6 +8,7 @@ import {
 	SEASON_STARTS_LABEL,
 } from '../../lib/league-presentation';
 import { loadPublicLeagueView } from '../../lib/public-view';
+import { teamThemeStyle } from '../../lib/team-identity';
 
 const view = await loadPublicLeagueView();
 const preseason = isPublicPreseason();
@@ -76,8 +77,9 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 									<a
 										class="team-card team-card--premium"
 										href={`/equipos/${team.slug}`}
-										style={`--team-primary:${team.palette.primary};--team-accent:${team.palette.accent};--team-surface:${team.palette.surface};--team-glow:${team.palette.glow}`}
+										style={teamThemeStyle(team)}
 									>
+										<span class="team-card__identity-accent" aria-hidden="true" />
 										<span class="team-card__number" aria-hidden="true">
 											0{index + 1}
 										</span>

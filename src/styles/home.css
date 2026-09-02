@@ -836,12 +836,12 @@
 		overflow: hidden;
 		padding: var(--kpl-space-5);
 		border: var(--kpl-border-width) solid
-			color-mix(in oklch, var(--team-accent) 24%, var(--kpl-color-border-subtle));
+			color-mix(in oklch, var(--team-primary) 24%, var(--kpl-color-border-subtle));
 		border-radius: var(--kpl-radius-xl);
 		background:
 			linear-gradient(
 				155deg,
-				color-mix(in srgb, var(--team-accent) 9%, transparent),
+				color-mix(in srgb, var(--team-primary) 9%, transparent),
 				transparent 42%
 			),
 			linear-gradient(180deg, var(--team-surface), var(--kpl-color-surface));
@@ -854,9 +854,9 @@
 			box-shadow var(--kpl-duration-slow) var(--kpl-ease-standard);
 	}
 
-	.home-team-card:hover {
+	.home-team-card:is(:hover, :focus-visible) {
 		translate: 0 -0.35rem;
-		border-color: color-mix(in oklch, var(--team-accent) 64%, transparent);
+		border-color: color-mix(in oklch, var(--team-primary) 64%, transparent);
 		box-shadow: 0 2rem 4rem -1rem var(--team-glow);
 		color: inherit;
 	}
@@ -876,7 +876,7 @@
 		transition: scale var(--kpl-duration-slow) var(--kpl-ease-standard);
 	}
 
-	.home-team-card:hover .home-team-card__glow {
+	.home-team-card:is(:hover, :focus-visible) .home-team-card__glow {
 		scale: 1.18;
 	}
 
@@ -886,14 +886,14 @@
 		aspect-ratio: 1;
 		place-items: center;
 		margin-inline: auto;
-		color: var(--team-accent);
+		color: var(--team-primary);
 		font-family: var(--kpl-font-family-heading);
 		font-size: 3rem;
 		font-weight: 700;
 		transition: scale 420ms var(--kpl-ease-emphasized);
 	}
 
-	.home-team-card:hover .home-team-card__logo {
+	.home-team-card:is(:hover, :focus-visible) .home-team-card__logo {
 		scale: 1.06;
 	}
 
@@ -910,7 +910,7 @@
 	}
 
 	.home-team-card__copy small {
-		color: var(--team-accent);
+		color: var(--team-primary);
 		font-size: 0.68rem;
 		font-weight: 800;
 		letter-spacing: 0.08em;

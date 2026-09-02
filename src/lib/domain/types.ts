@@ -11,6 +11,12 @@ export interface TeamPalette {
 	contrast: string;
 }
 
+export interface TeamSignature {
+	secondaryMarkPath?: string;
+	motto: string;
+	edition: string;
+}
+
 export interface PublicPlayer {
 	id: string;
 	slug: string;
@@ -41,6 +47,7 @@ export interface PublicTeam {
 	logoPath: string | null;
 	monogram: string;
 	palette: TeamPalette;
+	signature?: TeamSignature;
 	players: PublicPlayer[];
 }
 

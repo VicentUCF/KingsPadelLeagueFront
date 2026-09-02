@@ -58,7 +58,7 @@ try {
 	for (const page of [matchdays, activeMatchday]) {
 		assertTransitionNames(page, ['kpl-matchday-jornada-1-title']);
 	}
-	assert.match(matchdays, /<span class="c-team-badge">/);
+	assert.match(matchdays, /<span class="c-team-badge"[^>]*>/);
 	assert.doesNotMatch(matchdays, /<a class="c-team-badge"/);
 	assert.match(home, /Pretemporada/);
 	assert.match(home, /Temporada 2/);
@@ -71,6 +71,14 @@ try {
 	assert.match(home, /property="og:title"/);
 	assert.match(home, /application\/ld\+json/);
 	assert.match(team, /"@type":"SportsTeam"/);
+	assert.match(team, /Born in Favar, built to win/);
+	assert.match(team, /team-identities\/kings-of-favar\/logo\.svg/);
+	assert.doesNotMatch(team, /pattern-carbon/);
+	assert.doesNotMatch(team, /Kings_of_Favar_no_bg\.webp/);
+	assert.match(teams, /team-card__identity-accent/);
+	assert.match(teams, /--team-primary:#69f6d1/);
+	assert.match(home, /home-team-card__identity-accent/);
+	assert.match(activeMatchday, /team-identity-bands/);
 	assert.match(player, /"@type":"Person"/);
 	assert.match(matchday, /name="robots" content="noindex, follow"/);
 	assert.match(sitemap, /https:\/\/kpl\.example\/equipos\/kings-of-favar/);

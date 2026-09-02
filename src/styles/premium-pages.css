@@ -266,7 +266,7 @@
 			box-shadow var(--kpl-duration-slow) var(--kpl-ease-standard);
 	}
 
-	.team-card--premium:hover {
+	.team-card--premium:is(:hover, :focus-visible) {
 		translate: 0 -0.4rem;
 		border-color: color-mix(in oklch, var(--team-primary) 66%, transparent);
 		box-shadow: 0 2.5rem 5rem -1.5rem var(--team-glow);
@@ -302,7 +302,7 @@
 		transition: scale 520ms var(--kpl-ease-standard);
 	}
 
-	.team-card--premium:hover .team-card__halo {
+	.team-card--premium:is(:hover, :focus-visible) .team-card__halo {
 		scale: 1.08;
 	}
 
@@ -313,7 +313,7 @@
 		transition: scale 520ms var(--kpl-ease-emphasized);
 	}
 
-	.team-card--premium:hover .team-card__logo {
+	.team-card--premium:is(:hover, :focus-visible) .team-card__logo {
 		scale: 1.055;
 	}
 
@@ -712,9 +712,9 @@
 	}
 
 	.player-card {
-		--player-accent: var(--kpl-color-brand);
-		--player-surface: var(--kpl-color-surface-raised);
-		--player-glow: rgb(201 162 39 / 0.34);
+		--player-accent: var(--team-primary, var(--kpl-color-brand));
+		--player-surface: var(--team-surface, var(--kpl-color-surface-raised));
+		--player-glow: var(--team-glow, rgb(201 162 39 / 0.34));
 
 		position: relative;
 		isolation: isolate;
@@ -745,7 +745,7 @@
 			box-shadow var(--kpl-duration-slow) var(--kpl-ease-standard);
 	}
 
-	.player-card:hover {
+	.player-card:is(:hover, :focus-visible) {
 		translate: 0 -0.3rem;
 		border-color: color-mix(in srgb, var(--player-accent) 58%, transparent);
 		box-shadow: 0 2rem 4rem -1.5rem var(--player-glow);

@@ -1,6 +1,6 @@
 import type { PlayerHttp, PublicLeagueData, TeamHttp } from '../api/types';
 import { groupBy, normalizeSlug } from './shared.ts';
-import type { PublicPlayer, PublicTeam, TeamPalette } from './types';
+import type { PublicPlayer, PublicTeam, TeamPalette, TeamSignature } from './types';
 
 export interface LeagueParticipants {
 	players: PublicPlayer[];
@@ -17,15 +17,26 @@ const DEFAULT_PALETTE: TeamPalette = {
 	contrast: '#0b0b0b',
 };
 
-const TEAM_BRANDING: Record<string, { logoPath: string | null; palette: TeamPalette }> = {
+interface TeamBranding {
+	logoPath: string | null;
+	palette: TeamPalette;
+	signature?: TeamSignature;
+}
+
+const TEAM_BRANDING: Record<string, TeamBranding> = {
 	'kings-of-favar': {
-		logoPath: '/teams_logos/Kings_of_Favar_no_bg.webp',
+		logoPath: '/team-identities/kings-of-favar/logo.svg',
 		palette: {
-			primary: '#f3c84b',
-			accent: '#f9e9a7',
-			surface: '#24150b',
-			glow: 'rgb(243 200 75 / 0.46)',
-			contrast: '#0d0904',
+			primary: '#D1007A',
+			accent: '#efe2cc',
+			surface: '#16181a',
+			glow: 'rgb(209 0 122 / 0.42)',
+			contrast: '#0b0b10',
+		},
+		signature: {
+			secondaryMarkPath: '/team-identities/kings-of-favar/crown.svg',
+			motto: 'Born in Favar, built to win',
+			edition: '2026',
 		},
 	},
 	titanics: {
@@ -193,6 +204,7 @@ function createTeam(
 		logoPath: branding?.logoPath ?? resolveImage(team.logo),
 		monogram: monogram(team.name),
 		palette: branding?.palette ?? DEFAULT_PALETTE,
+		signature: branding?.signature,
 		players: roster,
 	};
 }

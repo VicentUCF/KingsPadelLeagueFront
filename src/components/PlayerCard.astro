@@ -1,5 +1,6 @@
 ---
 import type { PublicPlayer, PublicTeam } from '../lib/public-league';
+import { teamThemeStyle } from '../lib/team-identity';
 
 interface Props {
 	player: PublicPlayer;
@@ -9,9 +10,7 @@ interface Props {
 }
 
 const { player, team, compact = false, preseason = false } = Astro.props;
-const cardStyle = team
-	? `--player-accent:${team.palette.primary};--player-surface:${team.palette.surface};--player-glow:${team.palette.glow}`
-	: undefined;
+const cardStyle = team ? teamThemeStyle(team) : undefined;
 ---
 
 <a
@@ -19,6 +18,7 @@ const cardStyle = team
 		'player-card',
 		compact && 'player-card--compact',
 		preseason && 'player-card--preseason',
+		team && 'player-card--team',
 	]}
 	href={`/jugadores/${player.slug}`}
 	style={cardStyle}
@@ -27,6 +27,7 @@ const cardStyle = team
 	data-team={player.teamId ?? ''}
 	data-side={player.preferredPosition}
 >
+	{team && <span class="player-card__team-accent" aria-hidden="true" />}
 	<span class="player-card__topline">
 		<span>{player.isPresident ? 'Presidencia' : player.positionLabel}</span>
 		<span>{preseason ? 'T2' : `#${player.rank}`}</span>
