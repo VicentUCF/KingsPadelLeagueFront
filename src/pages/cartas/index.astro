@@ -162,6 +162,43 @@ const structuredData = cardsUrl
 						<div><dt>Activación</dt><dd>Un solo uso</dd></div>
 					</dl>
 				</div>
+				<div class="cards-hero__animation" data-cards-animation aria-hidden="true">
+					<div class="cards-hero__video-crop">
+						<video
+							class="cards-hero__case-video"
+							data-case-video
+							autoplay
+							muted
+							playsinline
+							preload="metadata"
+							disablepictureinpicture
+						>
+							<source
+								src="/My_first_board_A_sleek_black_and_silver_briefcase_is_shown_from_7q6F1r45.mp4"
+								type="video/mp4"
+							/>
+						</video>
+					</div>
+					<div class="cards-hero__fan">
+						{
+							fanCards.map((card) => (
+								<img
+									class="cards-hero__card"
+									src={card.image}
+									alt=""
+									width="447"
+									height="559"
+									loading="eager"
+									decoding="async"
+								/>
+							))
+						}
+					</div>
+					<p class="cards-hero__animation-label">
+						<span></span>
+						El maletín KPL · Siete cartas, una oportunidad
+					</p>
+				</div>
 			</div>
 		</section>
 
@@ -325,68 +362,35 @@ const structuredData = cardsUrl
 </BaseLayout>
 
 <script>
-	const initializeCardIntro = () => {
-		document.querySelectorAll('[data-card-intro]').forEach((intro) => {
-			if (!(intro instanceof HTMLElement) || intro.dataset.ready === 'true') return;
-			intro.dataset.ready = 'true';
-			const skip = intro.querySelector('[data-skip-intro]');
-			const caseTrigger = intro.querySelector('[data-case-trigger]');
-			if (!(caseTrigger instanceof HTMLButtonElement) || !(skip instanceof HTMLButtonElement)) return;
+	const initializeCardsAnimation = () => {
+		document.querySelectorAll('[data-cards-animation]').forEach((animation) => {
+			if (!(animation instanceof HTMLElement) || animation.dataset.ready === 'true') return;
+			animation.dataset.ready = 'true';
 
-			const rememberIntro = () => {
-				try {
-					sessionStorage.setItem('kpl-cards-intro', 'seen');
-				} catch {
-					// Storage is optional; the animation remains fully usable without it.
-				}
-			};
-			const hasSeenIntro = () => {
-				try {
-					return sessionStorage.getItem('kpl-cards-intro') === 'seen';
-				} catch {
-					return false;
-				}
-			};
-			let completionTimer: number | undefined;
-			const markComplete = () => {
-				intro.classList.add('is-complete');
-				caseTrigger.disabled = false;
-				rememberIntro();
+			const video = animation.querySelector('[data-case-video]');
+			if (!(video instanceof HTMLVideoElement)) return;
+
+			const revealCards = () => animation.classList.add('is-revealed');
+			const showStaticComposition = () => {
+				video.pause();
+				animation.classList.remove('is-playing');
+				animation.classList.add('is-static', 'is-revealed');
 			};
 
-			caseTrigger.disabled = true;
-			if (hasSeenIntro() || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-				intro.classList.add('is-skipped', 'is-complete');
-				caseTrigger.disabled = false;
-			} else {
-				completionTimer = window.setTimeout(markComplete, 3150);
+			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				showStaticComposition();
+				return;
 			}
 
-			skip.addEventListener('click', () => {
-				window.clearTimeout(completionTimer);
-				intro.classList.remove('is-replaying', 'is-closing');
-				intro.classList.add('is-skipped', 'is-complete');
-				caseTrigger.disabled = false;
-				rememberIntro();
+			animation.classList.add('is-playing');
+			video.addEventListener('timeupdate', () => {
+				if (video.currentTime >= 3.85) revealCards();
 			});
-			caseTrigger.addEventListener('click', () => {
-				if (caseTrigger.disabled) return;
-				window.clearTimeout(completionTimer);
-				caseTrigger.disabled = true;
-				intro.classList.remove('is-skipped', 'is-complete');
-				intro.classList.remove('is-replaying', 'is-closing');
-				void intro.offsetWidth;
-				intro.classList.add('is-closing');
-				completionTimer = window.setTimeout(() => {
-					intro.classList.remove('is-closing');
-					void intro.offsetWidth;
-					intro.classList.add('is-replaying');
-					completionTimer = window.setTimeout(markComplete, 3150);
-				}, 1450);
-			});
+			video.addEventListener('ended', revealCards, { once: true });
+			void video.play().catch(showStaticComposition);
 		});
 	};
 
-	initializeCardIntro();
-	document.addEventListener('astro:page-load', initializeCardIntro);
+	initializeCardsAnimation();
+	document.addEventListener('astro:page-load', initializeCardsAnimation);
 </script>

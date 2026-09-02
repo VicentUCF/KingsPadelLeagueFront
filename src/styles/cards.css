@@ -140,6 +140,295 @@
 		font-weight: 800;
 	}
 
+	.cards-hero__animation {
+		position: relative;
+		isolation: isolate;
+		min-inline-size: 0;
+		block-size: clamp(25rem, 37vw, 34rem);
+		pointer-events: none;
+	}
+
+	.cards-hero__animation::before,
+	.cards-hero__animation::after {
+		position: absolute;
+		z-index: -1;
+		content: '';
+		pointer-events: none;
+	}
+
+	.cards-hero__animation::before {
+		inset: 16% 2% 8%;
+		border: 1px solid rgb(201 162 39 / 0.1);
+		border-radius: 50%;
+		background: radial-gradient(circle, rgb(201 162 39 / 0.13), transparent 68%);
+		filter: blur(0.2rem);
+	}
+
+	.cards-hero__animation::after {
+		inset-inline: 9%;
+		inset-block-end: 8%;
+		block-size: 13%;
+		border-radius: 50%;
+		background: #000;
+		filter: blur(1.3rem);
+		opacity: 0.8;
+	}
+
+	.cards-hero__video-crop {
+		position: absolute;
+		z-index: 1;
+		inset-inline: -4%;
+		inset-block-end: 9%;
+		aspect-ratio: 3.6;
+		overflow: hidden;
+		-webkit-mask-image:
+			linear-gradient(transparent, black 32%, black 82%, transparent),
+			linear-gradient(90deg, black, black 68%, transparent 100%);
+		-webkit-mask-composite: source-in;
+		mask-image:
+			linear-gradient(transparent, black 32%, black 82%, transparent),
+			linear-gradient(90deg, black, black 68%, transparent 100%);
+		mask-composite: intersect;
+	}
+
+	.cards-hero__case-video {
+		display: block;
+		inline-size: 100%;
+		max-inline-size: none;
+		block-size: auto;
+		translate: 0 -18%;
+		filter: contrast(1.08) saturate(0.78);
+	}
+
+	.cards-hero__fan {
+		position: absolute;
+		z-index: 3;
+		inset: 0;
+	}
+
+	.cards-hero__fan::before,
+	.cards-hero__fan::after {
+		position: absolute;
+		inset-inline-start: 50%;
+		content: '';
+		pointer-events: none;
+		opacity: 0;
+		mix-blend-mode: screen;
+	}
+
+	.cards-hero__fan::before {
+		z-index: 8;
+		inset-block-start: 67%;
+		inline-size: 74%;
+		block-size: 18%;
+		border-radius: 50%;
+		background:
+			linear-gradient(90deg, transparent, rgb(255 224 110 / 0.38), transparent),
+			radial-gradient(ellipse, rgb(255 205 56 / 0.9), transparent 67%);
+		filter: blur(0.55rem);
+		transform: translate(-50%, -50%) scaleX(0.2);
+	}
+
+	.cards-hero__fan::after {
+		z-index: 9;
+		inset-block-start: 60%;
+		inline-size: 62%;
+		block-size: 35%;
+		background:
+			radial-gradient(circle at 12% 64%, rgb(255 222 105 / 0.9) 0 0.12rem, transparent 0.18rem),
+			radial-gradient(circle at 26% 24%, rgb(255 255 255 / 0.8) 0 0.1rem, transparent 0.16rem),
+			radial-gradient(circle at 42% 72%, rgb(255 201 40 / 0.85) 0 0.13rem, transparent 0.19rem),
+			radial-gradient(circle at 58% 20%, rgb(255 235 155 / 0.85) 0 0.1rem, transparent 0.16rem),
+			radial-gradient(circle at 73% 69%, rgb(255 201 40 / 0.85) 0 0.13rem, transparent 0.19rem),
+			radial-gradient(circle at 88% 35%, rgb(255 255 255 / 0.75) 0 0.1rem, transparent 0.16rem);
+		filter: drop-shadow(0 0 0.4rem rgb(255 205 56 / 0.85));
+		transform: translate(-50%, -20%) scale(0.55);
+	}
+
+	.cards-hero__card {
+		position: absolute;
+		z-index: var(--fan-depth);
+		inset-block-start: 75%;
+		inset-inline-start: 50%;
+		inline-size: clamp(4.75rem, 8.5vw, 8.75rem);
+		block-size: auto;
+		filter: drop-shadow(0 1.2rem 0.85rem rgb(0 0 0 / 0.82));
+		opacity: 1;
+		transform: translate(calc(-50% + var(--fan-x)), calc(-50% + var(--fan-y)))
+			rotate(var(--fan-rotation)) scale(var(--fan-scale));
+		transform-origin: 50% 115%;
+	}
+
+	.cards-hero__card:nth-child(1) {
+		--fan-x: -170%;
+		--fan-y: -5%;
+		--fan-start-x: -22%;
+		--fan-rotation: -18deg;
+		--fan-scale: 0.88;
+		--fan-depth: 4;
+		--fan-delay: 360ms;
+	}
+
+	.cards-hero__card:nth-child(2) {
+		--fan-x: -112%;
+		--fan-y: -55%;
+		--fan-start-x: -14%;
+		--fan-rotation: -13deg;
+		--fan-scale: 0.94;
+		--fan-depth: 5;
+		--fan-delay: 240ms;
+	}
+
+	.cards-hero__card:nth-child(3) {
+		--fan-x: -56%;
+		--fan-y: -95%;
+		--fan-start-x: -7%;
+		--fan-rotation: -7deg;
+		--fan-scale: 1;
+		--fan-depth: 6;
+		--fan-delay: 80ms;
+	}
+
+	.cards-hero__card:nth-child(4) {
+		--fan-x: 0%;
+		--fan-y: -120%;
+		--fan-start-x: 0%;
+		--fan-rotation: 0deg;
+		--fan-scale: 1.08;
+		--fan-depth: 7;
+		--fan-delay: 0ms;
+	}
+
+	.cards-hero__card:nth-child(5) {
+		--fan-x: 56%;
+		--fan-y: -95%;
+		--fan-start-x: 7%;
+		--fan-rotation: 7deg;
+		--fan-scale: 1;
+		--fan-depth: 6;
+		--fan-delay: 80ms;
+	}
+
+	.cards-hero__card:nth-child(6) {
+		--fan-x: 112%;
+		--fan-y: -55%;
+		--fan-start-x: 14%;
+		--fan-rotation: 13deg;
+		--fan-scale: 0.94;
+		--fan-depth: 5;
+		--fan-delay: 240ms;
+	}
+
+	.cards-hero__card:nth-child(7) {
+		--fan-x: 170%;
+		--fan-y: -5%;
+		--fan-start-x: 22%;
+		--fan-rotation: 18deg;
+		--fan-scale: 0.88;
+		--fan-depth: 4;
+		--fan-delay: 360ms;
+	}
+
+	.cards-hero__animation.is-playing .cards-hero__card {
+		opacity: 0;
+		transform: translate(calc(-50% + var(--fan-start-x)), 38%) rotate(0) scale(0.7);
+	}
+
+	.cards-hero__animation.is-playing.is-revealed .cards-hero__card {
+		animation: cards-hero-deal 820ms var(--kpl-ease-emphasized) var(--fan-delay) both;
+	}
+
+	.cards-hero__animation.is-playing.is-revealed .cards-hero__fan::before {
+		animation: cards-hero-flash 720ms ease-out both;
+	}
+
+	.cards-hero__animation.is-playing.is-revealed .cards-hero__fan::after {
+		animation: cards-hero-particles 940ms ease-out 90ms both;
+	}
+
+	.cards-hero__animation-label {
+		position: absolute;
+		z-index: 4;
+		inset-inline-start: 50%;
+		inset-block-end: 0;
+		display: flex;
+		align-items: center;
+		gap: var(--kpl-space-2);
+		inline-size: max-content;
+		max-inline-size: 88%;
+		translate: -50% 0;
+		color: rgb(255 255 255 / 0.52);
+		font-size: var(--kpl-font-size-50);
+		font-weight: 800;
+		letter-spacing: 0.11em;
+		text-align: center;
+		text-transform: uppercase;
+	}
+
+	.cards-hero__animation-label span {
+		inline-size: 0.4rem;
+		aspect-ratio: 1;
+		flex: 0 0 auto;
+		border-radius: 50%;
+		background: var(--kpl-color-brand-strong);
+		box-shadow: 0 0 0.75rem rgb(201 162 39 / 0.7);
+	}
+
+	@keyframes cards-hero-deal {
+		0% {
+			opacity: 0;
+			filter: blur(0.45rem) brightness(1.8) drop-shadow(0 0.4rem 0.5rem rgb(255 204 53 / 0.72));
+			transform: translate(calc(-50% + var(--fan-start-x)), 38%) rotate(0) scale(0.7);
+		}
+
+		38% {
+			opacity: 0.65;
+		}
+
+		68% {
+			opacity: 1;
+			filter: blur(0.12rem) brightness(1.16) drop-shadow(0 1rem 0.8rem rgb(0 0 0 / 0.76));
+		}
+
+		100% {
+			opacity: 1;
+			filter: drop-shadow(0 1.2rem 0.85rem rgb(0 0 0 / 0.82));
+			transform: translate(calc(-50% + var(--fan-x)), calc(-50% + var(--fan-y)))
+				rotate(var(--fan-rotation)) scale(var(--fan-scale));
+		}
+	}
+
+	@keyframes cards-hero-flash {
+		0% {
+			opacity: 0;
+			transform: translate(-50%, -50%) scaleX(0.16);
+		}
+
+		32% {
+			opacity: 0.9;
+		}
+
+		100% {
+			opacity: 0;
+			transform: translate(-50%, -50%) scaleX(1.2);
+		}
+	}
+
+	@keyframes cards-hero-particles {
+		0% {
+			opacity: 0;
+			transform: translate(-50%, 18%) scale(0.48);
+		}
+
+		28% {
+			opacity: 0.95;
+		}
+
+		100% {
+			opacity: 0;
+			transform: translate(-50%, -54%) scale(1.15);
+		}
+	}
 
 	.cards-page__body {
 		display: grid;
@@ -687,6 +976,12 @@
 			max-inline-size: 50rem;
 		}
 
+		.cards-hero__animation {
+			inline-size: min(100%, 49rem);
+			block-size: clamp(23rem, 62vw, 31rem);
+			justify-self: center;
+		}
+
 		.cards-steps {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
@@ -726,6 +1021,17 @@
 			font-size: clamp(3.15rem, 15vw, 5.6rem);
 		}
 
+		.cards-hero__animation {
+			block-size: clamp(18rem, 74vw, 25rem);
+			margin-block-start: calc(var(--kpl-space-4) * -1);
+		}
+
+		.cards-hero__animation-label {
+			max-inline-size: 100%;
+			font-size: 0.64rem;
+			letter-spacing: 0.07em;
+		}
+
 		.cards-hero__facts {
 			grid-template-columns: minmax(0, 1fr);
 		}
@@ -742,7 +1048,6 @@
 			border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
 			border-inline-start: 0;
 		}
-
 
 		.cards-section-heading {
 			grid-template-columns: minmax(0, 1fr);
@@ -801,9 +1106,11 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.cards-hero__card,
 		.action-card,
 		.action-card__visual::before,
 		.action-card__visual img {
+			animation: none;
 			transition: none;
 		}
 	}
