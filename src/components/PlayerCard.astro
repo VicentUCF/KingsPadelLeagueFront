@@ -11,6 +11,10 @@ interface Props {
 
 const { player, team, compact = false, preseason = false } = Astro.props;
 const cardStyle = team ? teamThemeStyle(team) : undefined;
+const fullName = [player.firstName, player.lastName].filter(Boolean).join(' ');
+const secondaryIdentity = player.alias
+	? `“${player.alias}” · ${player.positionLabel}`
+	: player.positionLabel;
 ---
 
 <a
@@ -23,7 +27,7 @@ const cardStyle = team ? teamThemeStyle(team) : undefined;
 	href={`/jugadores/${player.slug}`}
 	style={cardStyle}
 	data-player-card
-	data-name={`${player.displayName} ${player.alias ?? ''}`.toLocaleLowerCase('es')}
+	data-name={`${fullName} ${player.alias ?? ''}`.toLocaleLowerCase('es')}
 	data-team={player.teamId ?? ''}
 	data-side={player.preferredPosition}
 >
@@ -66,8 +70,8 @@ const cardStyle = team ? teamThemeStyle(team) : undefined;
 
 	<span class="player-card__identity">
 		<small>{player.teamName}</small>
-		<strong transition:name={`kpl-player-${player.slug}-name`}>{player.displayName}</strong>
-		<span>{player.positionLabel}{player.isPresident ? ' · Presidente' : ''}</span>
+		<strong transition:name={`kpl-player-${player.slug}-name`}>{fullName}</strong>
+		<span>{secondaryIdentity}{player.isPresident ? ' · Presidente' : ''}</span>
 	</span>
 
 	{

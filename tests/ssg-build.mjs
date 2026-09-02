@@ -80,6 +80,8 @@ try {
 	assert.match(home, /home-team-card__identity-accent/);
 	assert.match(activeMatchday, /team-identity-bands/);
 	assert.match(player, /"@type":"Person"/);
+	assert.match(players, /<strong[^>]*>Alex Rey<\/strong>/);
+	assert.match(players, /“King” · Revés · Presidente/);
 	assert.match(matchday, /name="robots" content="noindex, follow"/);
 	assert.match(sitemap, /https:\/\/kpl\.example\/equipos\/kings-of-favar/);
 	assert.doesNotMatch(sitemap, /https:\/\/kpl\.example\/jornadas\/jornada-1/);
