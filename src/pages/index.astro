@@ -201,6 +201,28 @@ const homeStructuredData = homeUrl
 	<main class="home-page" id="main-content" tabindex="-1">
 		<section class="home-hero" aria-labelledby="home-title">
 			<div class="home-hero__noise" aria-hidden="true"></div>
+			<div class="home-hero__team-marquee" aria-hidden="true">
+				<div class="home-hero__team-marquee-track">
+					{
+						Array.from({ length: 2 }, () => (
+							<div class="home-hero__team-marquee-group">
+								{view.teams.map((team) => (
+									<span class="home-hero__team-marquee-item" style={teamThemeStyle(team)}>
+										<span class="home-hero__team-marquee-crest">
+											{team.logoPath ? (
+												<img src={team.logoPath} alt="" width="40" height="40" decoding="async" />
+											) : (
+												team.monogram
+											)}
+										</span>
+										<span>{team.name}</span>
+									</span>
+								))}
+							</div>
+						))
+					}
+				</div>
+			</div>
 			<div class="home-hero__layout o-container o-container--xl">
 				<div class="home-hero__content">
 					<div class="home-hero__status-line">
