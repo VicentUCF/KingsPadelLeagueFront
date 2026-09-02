@@ -1,0 +1,392 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/cards.css';
+
+const levels = [
+	{
+		id: 'verde',
+		name: 'Nivel verde',
+		number: '01',
+		tone: 'green',
+		title: 'Ajustes tácticos',
+		description:
+			'Cartas para cambiar una decisión concreta sin alterar por completo el siguiente juego.',
+		cards: [
+			{
+				id: 'restas-tu',
+				name: 'Restas tú',
+				image: '/cards/restas-tu.png',
+				duration: 'Hasta el próximo punto de oro',
+				activation: 'Entre juegos',
+				effect: 'La pareja que activa la carta elige quién resta en el próximo punto de oro.',
+			},
+			{
+				id: 'cambiate',
+				name: 'Cámbiate',
+				image: '/cards/cambiate.png',
+				duration: '1 juego, al resto',
+				activation: 'Entre juegos',
+				effect: 'La pareja rival tiene que cambiar de lado durante el siguiente juego al resto.',
+			},
+		],
+	},
+	{
+		id: 'azul',
+		name: 'Nivel azul',
+		number: '02',
+		tone: 'blue',
+		title: 'Presión al servicio',
+		description:
+			'Dos cartas que convierten el saque en una decisión estratégica durante el siguiente juego.',
+		cards: [
+			{
+				id: 'robo-saque',
+				name: 'Robo saque',
+				image: '/cards/robo-saque.png',
+				duration: '1 juego',
+				activation: 'Entre juegos',
+				effect: 'La pareja que activa la carta roba el saque a la pareja rival durante un juego.',
+			},
+			{
+				id: 'solo-un-saque',
+				name: 'Solo un saque',
+				image: '/cards/solo-un-saque.png',
+				duration: '1 juego, al resto',
+				activation: 'Entre juegos',
+				effect: 'La pareja rival juega sin segundo servicio durante el siguiente juego.',
+			},
+		],
+	},
+	{
+		id: 'oro',
+		name: 'Nivel oro',
+		number: '03',
+		tone: 'gold',
+		title: 'Máximo impacto',
+		description:
+			'Las cartas capaces de provocar el giro más grande en el momento decisivo del partido.',
+		cards: [
+			{
+				id: '2-vs-1',
+				name: '2 vs 1',
+				image: '/cards/2-vs-1.png',
+				duration: '1 juego',
+				activation: 'Entre juegos',
+				effect:
+					'La pareja que activa la carta juega con superioridad numérica y toda la pista disponible durante un juego.',
+			},
+			{
+				id: 'comodin',
+				name: 'Comodín',
+				image: '/cards/comodin.png',
+				duration: 'Canje inmediato',
+				activation: 'Antes del partido',
+				effect: 'Permite cambiarla por cualquier otra carta disponible en el maletín.',
+			},
+			{
+				id: 'robo-carta',
+				name: 'Robo carta',
+				image: '/cards/robo-carta.png',
+				duration: 'Uso único',
+				activation: 'En respuesta al rival',
+				effect: 'Solo puede canjearse cuando el equipo rival activa su carta.',
+			},
+		],
+	},
+] as const;
+
+const cards = levels.flatMap((level) =>
+	level.cards.map((card) => ({ ...card, level: level.name })),
+);
+const fanCards = [
+	cards.find((card) => card.id === 'restas-tu'),
+	cards.find((card) => card.id === 'robo-saque'),
+	cards.find((card) => card.id === '2-vs-1'),
+	cards.find((card) => card.id === 'comodin'),
+	cards.find((card) => card.id === 'robo-carta'),
+	cards.find((card) => card.id === 'solo-un-saque'),
+	cards.find((card) => card.id === 'cambiate'),
+].filter((card): card is (typeof cards)[number] => Boolean(card));
+
+const cardsUrl = Astro.site ? new URL('/cartas', Astro.site).href : null;
+const structuredData = cardsUrl
+	? {
+			'@context': 'https://schema.org',
+			'@type': 'CollectionPage',
+			name: 'Cartas de Kings Padel League',
+			description:
+				'Las siete cartas, sus niveles y las reglas para activarlas durante los partidos de Kings Padel League.',
+			url: cardsUrl,
+			mainEntity: {
+				'@type': 'ItemList',
+				itemListElement: cards.map((card, index) => ({
+					'@type': 'ListItem',
+					position: index + 1,
+					name: card.name,
+				})),
+			},
+		}
+	: undefined;
+---
+
+<BaseLayout
+	title="Cartas KPL: reglas, niveles y efectos | Kings Padel League"
+	description="Descubre las siete cartas de Kings Padel League, cómo se reparten desde el maletín y cuándo puede activarse cada efecto durante un partido."
+	image="/cards/2-vs-1.png"
+	imageAlt="Carta 2 vs 1 de Kings Padel League"
+	structuredData={structuredData}
+>
+	<main id="main-content" class="cards-page" tabindex="-1">
+		<section class="cards-hero" aria-labelledby="cards-title">
+			<div class="cards-hero__glow" aria-hidden="true"></div>
+			<div class="cards-hero__inner o-container o-container--xl">
+				<div class="cards-hero__copy">
+					<p class="c-eyebrow">El factor sorpresa de Kings Padel League</p>
+					<h1 id="cards-title">Una carta.<br /><span>Un giro de partido.</span></h1>
+					<p class="cards-hero__lead">
+						Antes de cada partido se abre el maletín y cada presidente roba una carta. Tiene una
+						sola oportunidad para cambiar el guion desde la pista.
+					</p>
+					<div class="cards-hero__actions">
+						<a class="c-button c-button--primary c-button--lg" href="#baraja">
+							Descubrir las 7 cartas
+							<span aria-hidden="true">↓</span>
+						</a>
+						<a class="c-button c-button--outline c-button--lg" href="#como-funciona">
+							Cómo se juega
+						</a>
+					</div>
+					<dl class="cards-hero__facts" aria-label="Datos de las cartas KPL">
+						<div><dt>Maletín</dt><dd>Antes del partido</dd></div>
+						<div><dt>Reparto</dt><dd>1 por presidente</dd></div>
+						<div><dt>Activación</dt><dd>Un solo uso</dd></div>
+					</dl>
+				</div>
+			</div>
+		</section>
+
+		<div class="cards-page__body o-container o-container--xl">
+			<section id="como-funciona" class="cards-rules" aria-labelledby="rules-title">
+				<header class="cards-section-heading">
+					<div>
+						<p class="c-eyebrow">Del maletín a la pista</p>
+						<h2 id="rules-title">Cómo entran las cartas en juego.</h2>
+					</div>
+					<p>
+						La carta añade estrategia sin interrumpir el ritmo natural del partido. El momento de
+						activación forma parte de la regla.
+					</p>
+				</header>
+
+				<ol class="cards-steps" aria-label="Funcionamiento de las cartas">
+					<li>
+						<span>01</span>
+						<div>
+							<strong>Se abre el maletín</strong><p>Siempre antes de empezar el partido.</p>
+						</div>
+					</li>
+					<li>
+						<span>02</span>
+						<div>
+							<strong>Cada presidente roba una</strong><p>Una carta al azar para su equipo.</p>
+						</div>
+					</li>
+					<li>
+						<span>03</span>
+						<div>
+							<strong>Se guarda el momento</strong><p>La carta solo puede utilizarse una vez.</p>
+						</div>
+					</li>
+					<li>
+						<span>04</span>
+						<div>
+							<strong>Se activa entre juegos</strong><p>Nunca mientras un juego está en curso.</p>
+						</div>
+					</li>
+				</ol>
+
+				<div class="cards-timing" aria-labelledby="timing-title">
+					<div class="cards-timing__copy">
+						<p class="c-eyebrow">La regla que no puede fallar</p>
+						<h3 id="timing-title">Primero termina el juego. Después, juega tu carta.</h3>
+						<p>
+							Puede activarse justo después de cerrar un juego, también coincidiendo con un cambio
+							de lado. La carta debe anunciarse antes de empezar el siguiente.
+						</p>
+					</div>
+					<div class="cards-timing__examples">
+						<div class="cards-timing__example cards-timing__example--yes">
+							<span aria-hidden="true">✓</span>
+							<div><strong>Sí se puede</strong><p>Con juegos cerrados: 1–0, 1–1, 2–1…</p></div>
+						</div>
+						<div class="cards-timing__example cards-timing__example--no">
+							<span aria-hidden="true">×</span>
+							<div><strong>No se puede</strong><p>En mitad de un juego: 40–15, 30–30…</p></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<nav class="cards-level-nav" aria-label="Niveles de las cartas">
+				<span class="cards-level-nav__label">Explora la baraja</span>
+				{
+					levels.map((level) => (
+						<a href={`#nivel-${level.id}`} data-tone={level.tone}>
+							<span>{level.number}</span>
+							<strong>{level.name}</strong>
+							<small>{level.cards.length} cartas</small>
+						</a>
+					))
+				}
+			</nav>
+
+			<section id="baraja" class="cards-deck" aria-labelledby="deck-title">
+				<header class="cards-section-heading cards-section-heading--deck">
+					<div>
+						<p class="c-eyebrow">La baraja completa</p>
+						<h2 id="deck-title">Siete formas de romper el guion.</h2>
+					</div>
+					<p>Cada color anticipa el tipo de ventaja. Abre cada nivel y prepara el momento.</p>
+				</header>
+
+				{
+					levels.map((level) => (
+						<section
+							id={`nivel-${level.id}`}
+							class="cards-level"
+							data-tone={level.tone}
+							aria-labelledby={`level-${level.id}-title`}
+						>
+							<header class="cards-level__header">
+								<div class="cards-level__number" aria-hidden="true">
+									{level.number}
+								</div>
+								<div>
+									<p>{level.name}</p>
+									<h3 id={`level-${level.id}-title`}>{level.title}</h3>
+									<span>{level.description}</span>
+								</div>
+							</header>
+							<div class="cards-grid">
+								{level.cards.map((card, index) => (
+									<article id={`carta-${card.id}`} class="action-card">
+										<div class="action-card__visual">
+											<span class="action-card__index" aria-hidden="true">
+												{String(index + 1).padStart(2, '0')}
+											</span>
+											<img
+												src={card.image}
+												alt=""
+												width="447"
+												height="559"
+												loading="lazy"
+												decoding="async"
+											/>
+										</div>
+										<div class="action-card__body">
+											<div class="action-card__heading">
+												<span>{level.name}</span>
+												<h4>{card.name}</h4>
+											</div>
+											<p class="action-card__effect">{card.effect}</p>
+											<dl class="action-card__meta">
+												<div>
+													<dt>Duración</dt>
+													<dd>{card.duration}</dd>
+												</div>
+												<div>
+													<dt>Activación</dt>
+													<dd>{card.activation}</dd>
+												</div>
+											</dl>
+										</div>
+									</article>
+								))}
+							</div>
+						</section>
+					))
+				}
+			</section>
+
+			<aside class="cards-finale" aria-labelledby="finale-title">
+				<div>
+					<p class="c-eyebrow">La emoción también se juega</p>
+					<h2 id="finale-title">La carta está en tu mano.<br />El momento lo eliges tú.</h2>
+					<p>
+						Sigue las jornadas para ver qué presidentes arriesgan, cuándo activan su ventaja y cómo
+						responde la pista.
+					</p>
+				</div>
+				<a class="c-button c-button--primary c-button--lg" href="/jornadas">Seguir la competición</a
+				>
+			</aside>
+		</div>
+	</main>
+</BaseLayout>
+
+<script>
+	const initializeCardIntro = () => {
+		document.querySelectorAll('[data-card-intro]').forEach((intro) => {
+			if (!(intro instanceof HTMLElement) || intro.dataset.ready === 'true') return;
+			intro.dataset.ready = 'true';
+			const skip = intro.querySelector('[data-skip-intro]');
+			const caseTrigger = intro.querySelector('[data-case-trigger]');
+			if (!(caseTrigger instanceof HTMLButtonElement) || !(skip instanceof HTMLButtonElement)) return;
+
+			const rememberIntro = () => {
+				try {
+					sessionStorage.setItem('kpl-cards-intro', 'seen');
+				} catch {
+					// Storage is optional; the animation remains fully usable without it.
+				}
+			};
+			const hasSeenIntro = () => {
+				try {
+					return sessionStorage.getItem('kpl-cards-intro') === 'seen';
+				} catch {
+					return false;
+				}
+			};
+			let completionTimer: number | undefined;
+			const markComplete = () => {
+				intro.classList.add('is-complete');
+				caseTrigger.disabled = false;
+				rememberIntro();
+			};
+
+			caseTrigger.disabled = true;
+			if (hasSeenIntro() || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				intro.classList.add('is-skipped', 'is-complete');
+				caseTrigger.disabled = false;
+			} else {
+				completionTimer = window.setTimeout(markComplete, 3150);
+			}
+
+			skip.addEventListener('click', () => {
+				window.clearTimeout(completionTimer);
+				intro.classList.remove('is-replaying', 'is-closing');
+				intro.classList.add('is-skipped', 'is-complete');
+				caseTrigger.disabled = false;
+				rememberIntro();
+			});
+			caseTrigger.addEventListener('click', () => {
+				if (caseTrigger.disabled) return;
+				window.clearTimeout(completionTimer);
+				caseTrigger.disabled = true;
+				intro.classList.remove('is-skipped', 'is-complete');
+				intro.classList.remove('is-replaying', 'is-closing');
+				void intro.offsetWidth;
+				intro.classList.add('is-closing');
+				completionTimer = window.setTimeout(() => {
+					intro.classList.remove('is-closing');
+					void intro.offsetWidth;
+					intro.classList.add('is-replaying');
+					completionTimer = window.setTimeout(markComplete, 3150);
+				}, 1450);
+			});
+		});
+	};
+
+	initializeCardIntro();
+	document.addEventListener('astro:page-load', initializeCardIntro);
+</script>

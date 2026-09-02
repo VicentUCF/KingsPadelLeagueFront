@@ -15,11 +15,12 @@ const fixture = spawn(process.execPath, ['tests/fixtures/kpl-api-server.mjs'], {
 try {
 	await waitForFixture(fixture);
 	await runBuild(port, outDir);
-	const [home, standings, matchday, teams, team, players, player, sitemap, robots] =
+	const [home, standings, matchday, cards, teams, team, players, player, sitemap, robots] =
 		await Promise.all([
 			readFile(join(outDir, 'index.html'), 'utf8'),
 			readFile(join(outDir, 'clasificacion/index.html'), 'utf8'),
 			readFile(join(outDir, 'jornadas/jornada-1/index.html'), 'utf8'),
+			readFile(join(outDir, 'cartas/index.html'), 'utf8'),
 			readFile(join(outDir, 'equipos/index.html'), 'utf8'),
 			readFile(join(outDir, 'equipos/kings-of-favar/index.html'), 'utf8'),
 			readFile(join(outDir, 'jugadores/index.html'), 'utf8'),
@@ -34,7 +35,7 @@ try {
 	]);
 
 	assert.doesNotMatch(home, /Playoffs/);
-	for (const page of [home, standings, matchday, team, player]) {
+	for (const page of [home, standings, matchday, cards, team, player]) {
 		assert.match(page, /name="astro-view-transitions-enabled" content="true"/);
 		assert.match(page, /name="astro-view-transitions-fallback" content="animate"/);
 	}
@@ -67,6 +68,11 @@ try {
 	assert.match(standings, /La tabla espera al primer punto/);
 	assert.match(standings, /Clasificación de la Temporada 2/);
 	assert.match(matchday, /Jornada 1 de la Temporada 2/);
+	assert.match(cards, /Una carta/);
+	assert.match(cards, /Cada presidente roba una/);
+	assert.match(cards, /40–15/);
+	assert.match(cards, /Las siete cartas/);
+	assert.match(cards, /data-card-intro/);
 	assert.match(home, /<link rel="canonical" href="https:\/\/kpl\.example\//);
 	assert.match(home, /property="og:title"/);
 	assert.match(home, /application\/ld\+json/);
@@ -84,6 +90,7 @@ try {
 	assert.match(players, /“King” · Revés · Presidente/);
 	assert.match(matchday, /name="robots" content="noindex, follow"/);
 	assert.match(sitemap, /https:\/\/kpl\.example\/equipos\/kings-of-favar/);
+	assert.match(sitemap, /https:\/\/kpl\.example\/cartas/);
 	assert.doesNotMatch(sitemap, /https:\/\/kpl\.example\/jornadas\/jornada-1/);
 	assert.match(robots, /Sitemap: https:\/\/kpl\.example\/sitemap\.xml/);
 	console.log('SSG fixture builds verified: routes and shared view transitions are valid.');

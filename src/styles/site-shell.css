@@ -119,7 +119,7 @@
 		}
 	}
 
-	@media (width < 64rem) {
+	@media (width < 72rem) {
 		.site-shell__desktop-nav {
 			display: none;
 		}

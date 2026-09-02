@@ -14,6 +14,7 @@ export const GET: APIRoute = async ({ site }) => {
 		'/jornadas',
 		'/clasificacion',
 		'/calendario',
+		'/cartas',
 		'/equipos',
 		'/jugadores',
 		...(PLAYOFFS_ENABLED ? ['/playoffs'] : []),

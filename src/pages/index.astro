@@ -38,12 +38,12 @@ const announcements = selectPublishedAnnouncements(announcementEntries, buildDat
 const announcementCategoryLabels = {
 	calendario: 'Calendario',
 	equipos: 'Mercado',
-	cartas: 'Próximamente',
+	cartas: 'Nuevas reglas',
 } as const;
 const announcementDestinations = {
 	calendario: { href: '/calendario', label: 'Consultar el calendario' },
 	equipos: { href: '/equipos', label: 'Conocer los equipos' },
-	cartas: { href: '/jornadas', label: 'Seguir la competición' },
+	cartas: { href: '/cartas', label: 'Descubrir las siete cartas' },
 } as const;
 const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
 	day: 'numeric',
@@ -195,7 +195,7 @@ const homeStructuredData = homeUrl
 
 <BaseLayout
 	title="Kings Padel League: resultados, clasificación y calendario"
-	description={`Sigue la ${displaySeasonName} de Kings Padel League: consulta resultados, clasificación, calendario, equipos y jugadores de la liga amateur de pádel.`}
+	description={`Sigue la ${displaySeasonName} de Kings Padel League: consulta resultados, clasificación, calendario, cartas, equipos y jugadores de la liga amateur de pádel.`}
 	structuredData={homeStructuredData}
 >
 	<main class="home-page" id="main-content" tabindex="-1">
@@ -358,7 +358,7 @@ const homeStructuredData = homeUrl
 									<ul>
 										<li>Plantillas renovadas</li>
 										<li>Un nuevo equipo</li>
-										<li>Cartas de acción, próximamente</li>
+										<li>Maletín de cartas en cada partido</li>
 									</ul>
 								</div>
 							)
