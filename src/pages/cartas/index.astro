@@ -178,6 +178,16 @@ const structuredData = cardsUrl
 								type="video/mp4"
 							/>
 						</video>
+						<img
+							class="cards-hero__case-still"
+							data-case-still
+							src="/cards/maletin-abierto.png"
+							alt=""
+							width="1568"
+							height="1003"
+							loading="eager"
+							decoding="async"
+						/>
 					</div>
 					<div class="cards-hero__fan">
 						{
@@ -371,10 +381,11 @@ const structuredData = cardsUrl
 			if (!(video instanceof HTMLVideoElement)) return;
 
 			const revealCards = () => animation.classList.add('is-revealed');
+			const showOpenCase = () => animation.classList.add('is-open');
 			const showStaticComposition = () => {
 				video.pause();
 				animation.classList.remove('is-playing');
-				animation.classList.add('is-static', 'is-revealed');
+				animation.classList.add('is-static', 'is-revealed', 'is-open');
 			};
 
 			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -385,8 +396,16 @@ const structuredData = cardsUrl
 			animation.classList.add('is-playing');
 			video.addEventListener('timeupdate', () => {
 				if (video.currentTime >= 3.85) revealCards();
+				if (video.currentTime >= 4.72) showOpenCase();
 			});
-			video.addEventListener('ended', revealCards, { once: true });
+			video.addEventListener(
+				'ended',
+				() => {
+					revealCards();
+					showOpenCase();
+				},
+				{ once: true },
+			);
 			void video.play().catch(showStaticComposition);
 		});
 	};
