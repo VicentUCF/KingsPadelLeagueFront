@@ -69,6 +69,23 @@ const teamStructuredData = teamUrl
 
 			<article class="team-profile-hero">
 				<span class="team-profile-hero__identity-accent" aria-hidden="true"></span>
+				<span class="team-profile-hero__light-sweep" aria-hidden="true"></span>
+				<span class="team-profile-hero__motion-ribbon" aria-hidden="true">
+					<span class="team-profile-hero__motion-ribbon-track">
+						{
+							Array.from({ length: 2 }, () => (
+								<span class="team-profile-hero__motion-ribbon-group">
+									<span>{team.name}</span>
+									<span>Kings Padel League</span>
+									<span>{PUBLIC_SEASON_NAME}</span>
+									<span>{team.name}</span>
+									<span>Kings Padel League</span>
+									<span>{PUBLIC_SEASON_NAME}</span>
+								</span>
+							))
+						}
+					</span>
+				</span>
 				<span class="team-profile-hero__number" aria-hidden="true">KPL</span>
 				<div class="team-profile-hero__identity">
 					<div class="team-profile-hero__status">
@@ -114,7 +131,6 @@ const teamStructuredData = teamUrl
 				</div>
 
 				<div class="team-profile-hero__visual" aria-hidden="true">
-					<span class="team-profile-hero__orbit"></span>
 					<span class="team-profile-hero__logo" transition:name={`kpl-team-${team.slug}-crest`}>
 						{
 							team.logoPath ? (

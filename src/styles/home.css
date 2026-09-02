@@ -1003,10 +1003,9 @@
 	.home-news-card {
 		position: relative;
 		display: flex;
-		min-block-size: 20rem;
 		flex-direction: column;
 		justify-content: space-between;
-		gap: var(--kpl-space-8);
+		gap: var(--kpl-space-4);
 		overflow: hidden;
 		padding: clamp(var(--kpl-space-5), 3vw, var(--kpl-space-7));
 		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
@@ -1071,17 +1070,6 @@
 		text-underline-offset: 0.22em;
 	}
 
-	.home-news-card__number {
-		position: absolute;
-		inset-block-end: -0.55em;
-		inset-inline-end: -0.1em;
-		color: rgb(255 255 255 / 0.025);
-		font-family: var(--kpl-font-family-heading);
-		font-size: 8rem;
-		font-weight: 700;
-		letter-spacing: -0.08em;
-		line-height: 1;
-	}
 
 	.home-social {
 		padding-block-start: 0;
