@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { NEWS_CATEGORY_CHIP_TONES, NEWS_CATEGORY_LABELS, NEWS_DATE_FORMATTER } from '../lib/news';
+
+interface Props {
+	entry: CollectionEntry<'news'>;
+	variant?: 'featured' | 'standard';
+}
+
+const { entry, variant = 'standard' } = Astro.props;
+const { data } = entry;
+---
+
+<a class:list={['news-card', `news-card--${variant}`]} href={`/noticias/${entry.id}`}>
+	<span class="news-card__top">
+		<span class:list={['c-chip', NEWS_CATEGORY_CHIP_TONES[data.category]]}>
+			{NEWS_CATEGORY_LABELS[data.category]}
+		</span>
+		<time datetime={data.publishedAt.toISOString()}>
+			{NEWS_DATE_FORMATTER.format(data.publishedAt)}
+		</time>
+	</span>
+	<span class="news-card__copy">
+		<strong class="news-card__title">{data.title}</strong>
+		<span class="news-card__summary">{data.summary}</span>
+		<span class="news-card__cta">
+			Leer noticia
+			<span aria-hidden="true">→</span>
+		</span>
+	</span>
+</a>

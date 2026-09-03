@@ -1,10 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 
+import NewsCard from '../components/NewsCard.astro';
 import TeamBadge from '../components/TeamBadge.astro';
 import TeamIdentityBands from '../components/TeamIdentityBands.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { selectPublishedAnnouncements } from '../lib/announcements';
 import { PLAYOFFS_ENABLED } from '../lib/features';
 import { loadLeagueHomeData } from '../lib/kpl-api';
 import {
@@ -13,13 +13,17 @@ import {
 	SEASON_STARTS_LABEL,
 } from '../lib/league-presentation';
 import { resolveHomeSeasonStatus } from '../lib/league-status';
+import { selectHomeNews } from '../lib/news';
 import { loadPublicLeagueView } from '../lib/public-view';
 import { teamThemeStyle } from '../lib/team-identity';
 import '../styles/home.css';
 
 const buildDate = new Date();
-const [{ seasons, matchdays, playoffs, playoffMatches }, view, announcementEntries] =
-	await Promise.all([loadLeagueHomeData(), loadPublicLeagueView(), getCollection('announcements')]);
+const [{ seasons, matchdays, playoffs, playoffMatches }, view, newsEntries] = await Promise.all([
+	loadLeagueHomeData(),
+	loadPublicLeagueView(),
+	getCollection('news'),
+]);
 const seasonStatus = resolveHomeSeasonStatus(
 	seasons,
 	matchdays,
@@ -34,23 +38,7 @@ const displayPhase = preseason
 		? 'Fase regular'
 		: seasonStatus.phaseLabel;
 const displaySeasonName = PUBLIC_SEASON_NAME;
-const announcements = selectPublishedAnnouncements(announcementEntries, buildDate);
-const announcementCategoryLabels = {
-	calendario: 'Calendario',
-	equipos: 'Mercado',
-	cartas: 'Nuevas reglas',
-} as const;
-const announcementDestinations = {
-	calendario: { href: '/calendario', label: 'Consultar el calendario' },
-	equipos: { href: '/equipos', label: 'Conocer los equipos' },
-	cartas: { href: '/cartas', label: 'Descubrir las siete cartas' },
-} as const;
-const announcementDateFormatter = new Intl.DateTimeFormat('es-ES', {
-	day: 'numeric',
-	month: 'short',
-	year: 'numeric',
-	timeZone: 'Europe/Madrid',
-});
+const homeNews = selectHomeNews(newsEntries, buildDate);
 const snapshotFormatter = new Intl.DateTimeFormat('es-ES', {
 	day: 'numeric',
 	month: 'short',
@@ -628,43 +616,24 @@ const homeStructuredData = homeUrl
 		}
 
 		{
-			announcements.length > 0 && (
+			homeNews.length > 0 && (
 				<section
 					class="home-news o-container o-container--xl o-region"
-					aria-labelledby="announcements-title"
+					aria-labelledby="news-title"
 				>
 					<header class="home-section-heading">
 						<div>
 							<p class="c-eyebrow">Novedades de la liga</p>
-							<h2 id="announcements-title">Calendario, equipos y reglas de {displaySeasonName}.</h2>
+							<h2 id="news-title">Calendario, equipos y reglas de {displaySeasonName}.</h2>
 						</div>
-						<p>Mercado, calendario y las novedades que definirán la próxima temporada.</p>
+						<a class="c-button c-button--outline" href="/noticias">
+							Ver todas las noticias →
+						</a>
 					</header>
 
-					<div class="home-news__grid">
-						{announcements.map(({ data }, index) => (
-							<article class:list={['home-news-card', { 'home-news-card--featured': index === 0 }]}>
-								<div class="home-news-card__top">
-									<span
-										class:list={[
-											'c-chip',
-											data.category === 'cartas' ? 'c-chip--tone-info' : 'c-chip--tone-brand',
-										]}
-									>
-										{announcementCategoryLabels[data.category]}
-									</span>
-									<time datetime={data.publishedAt.toISOString()}>
-										{announcementDateFormatter.format(data.publishedAt)}
-									</time>
-								</div>
-								<div class="home-news-card__copy">
-									<h3>{data.title}</h3>
-									<p>{data.summary}</p>
-									<a href={announcementDestinations[data.category].href}>
-										{announcementDestinations[data.category].label} →
-									</a>
-								</div>
-							</article>
+					<div class="news-grid">
+						{homeNews.map((entry) => (
+							<NewsCard entry={entry} variant={entry.data.featured ? 'featured' : 'standard'} />
 						))}
 					</div>
 				</section>

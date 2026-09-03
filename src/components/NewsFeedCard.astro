@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { NEWS_CATEGORY_LABELS, NEWS_DATE_FORMATTER } from '../lib/news';
+
+interface Props {
+	entry: CollectionEntry<'news'>;
+	size: 'hero' | 'wide' | 'tall' | 'standard';
+}
+
+const { entry, size } = Astro.props;
+const { data } = entry;
+const isCompact = size === 'standard';
+const isPriority = size === 'hero';
+const eyebrow = `${NEWS_DATE_FORMATTER.format(data.publishedAt)} · ${NEWS_CATEGORY_LABELS[data.category]}`;
+---
+
+<a
+	class:list={['news-mosaic-cell', 'news-mosaic-cell--article', `news-mosaic-cell--${size}`]}
+	href={`/noticias/${entry.id}`}
+>
+	<span class="news-mosaic-cell__media" aria-hidden="true">
+		{
+			data.cover ? (
+				<img
+					src={data.cover.image}
+					alt=""
+					loading={isPriority ? 'eager' : 'lazy'}
+					decoding="async"
+				/>
+			) : (
+				<img
+					src="/textures/backgournd_pelota.png"
+					alt=""
+					width="1672"
+					height="941"
+					loading={isPriority ? 'eager' : 'lazy'}
+					decoding="async"
+				/>
+			)
+		}
+	</span>
+	<span class="news-mosaic-cell__scrim" aria-hidden="true"></span>
+	{
+		data.cover?.credit && (
+			<span class="news-mosaic-cell__credit" aria-hidden="true">
+				{data.cover.credit}
+			</span>
+		)
+	}
+	<span class="news-mosaic-cell__body">
+		{
+			isPriority && data.featured && (
+				<span class="news-mosaic-cell__flag">
+					Destacada <span aria-hidden="true">—</span>
+				</span>
+			)
+		}
+		<span class="news-mosaic-cell__eyebrow">{eyebrow}</span>
+		<strong class="news-mosaic-cell__title">{data.title}</strong>
+		{!isCompact && <span class="news-mosaic-cell__summary">{data.summary}</span>}
+		<span class="news-mosaic-cell__link">
+			Abrir noticia <span aria-hidden="true">→</span>
+		</span>
+	</span>
+</a>

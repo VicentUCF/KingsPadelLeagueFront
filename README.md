@@ -27,7 +27,7 @@ npm run build    # build de producción
 npm run preview  # previsualización del build
 npm run check    # validación estricta de Astro y TypeScript
 npm run format   # formato automático del código
-npm test         # pruebas de dominio, temporada y anuncios
+npm test         # pruebas de dominio, temporada y noticias
 npm run test:ssg # build aislada contra una API fixture; no modifica dist/
 ```
 
@@ -68,6 +68,7 @@ Rutas incluidas:
 - `/equipos` y `/equipos/:slug`
 - `/jugadores` y `/jugadores/:slug`
 - `/calendario` y la página `404`
+- `/noticias` (portada editorial con lead, secundarias y breves) y `/noticias/:slug`
 
 Las rutas de autenticación, perfil y backoffice quedan fuera de este cliente público.
 
@@ -75,8 +76,11 @@ La build genera `/sitemap.xml` y `/robots.txt`. Las fichas de jornada sin cruces
 mantienen accesibles, pero no se indexan ni se incluyen en el sitemap hasta disponer de contenido
 útil para jugadores y seguidores.
 
-Los anuncios se editan como Markdown en `src/content/announcements`. Se publican hasta tres
-entradas que no sean borradores y cuya fecha no sea futura.
+Las noticias se editan como Markdown en `src/content/news`. No hay backoffice ni API de
+publicación: "publicar" es crear o editar un archivo y desplegar el build. Solo las entradas que
+no sean borradores y cuya fecha no sea futura generan una URL real (`src/lib/news.ts`); marcar una
+entrada con `featured: true` la promociona a la portada, ordenada opcionalmente por
+`homePriority`.
 
 ## Arquitectura de `src/lib`
 

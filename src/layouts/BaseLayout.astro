@@ -4,6 +4,7 @@ import '../styles/site-shell.css';
 import '../styles/public-pages.css';
 import '../styles/premium-pages.css';
 import '../styles/team-identity.css';
+import '../styles/news.css';
 import { ClientRouter } from 'astro:transitions';
 import type { TransitionDirectionalAnimations } from 'astro';
 import { PLAYOFFS_ENABLED } from '../lib/features';
@@ -43,6 +44,7 @@ const jsonLd = jsonLdItems.length
 	: null;
 const navigation = [
 	{ href: '/', label: 'Inicio' },
+	{ href: '/noticias', label: 'Noticias' },
 	{ href: '/jornadas', label: 'Resultados' },
 	{ href: '/clasificacion', label: 'Clasificación' },
 	{ href: '/calendario', label: 'Calendario' },

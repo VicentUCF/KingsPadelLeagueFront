@@ -1,0 +1,189 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+import NewsCard from '../../components/NewsCard.astro';
+import TeamBadge from '../../components/TeamBadge.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+	NEWS_CATEGORY_CHIP_TONES,
+	NEWS_CATEGORY_DESTINATIONS,
+	NEWS_CATEGORY_LABELS,
+	NEWS_DATE_FORMATTER,
+	selectPublishedNews,
+} from '../../lib/news';
+import { loadPublicLeagueView } from '../../lib/public-view';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('news');
+	const published = selectPublishedNews(entries, new Date());
+	return published.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+interface Props {
+	entry: CollectionEntry<'news'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const [view, allEntries] = await Promise.all([loadPublicLeagueView(), getCollection('news')]);
+
+const relatedTeams = data.relatedTeamSlugs
+	.map((slug) => view.teams.find((team) => team.slug === slug))
+	.filter((team): team is NonNullable<typeof team> => Boolean(team));
+
+const moreNews = selectPublishedNews(allEntries, new Date())
+	.filter((candidate) => candidate.id !== entry.id)
+	.slice(0, 3);
+
+const hasRelatedContent = relatedTeams.length > 0 || Boolean(data.relatedMatchdayId);
+const destination = NEWS_CATEGORY_DESTINATIONS[data.category];
+const categoryLabel = NEWS_CATEGORY_LABELS[data.category];
+
+const articleUrl = Astro.site ? new URL(`/noticias/${entry.id}`, Astro.site).href : null;
+const articleStructuredData = articleUrl
+	? [
+			{
+				'@context': 'https://schema.org',
+				'@type': 'NewsArticle',
+				headline: data.title,
+				description: data.summary,
+				datePublished: data.publishedAt.toISOString(),
+				...(data.updatedAt ? { dateModified: data.updatedAt.toISOString() } : {}),
+				url: articleUrl,
+				...(data.cover ? { image: new URL(data.cover.image, Astro.site!).href } : {}),
+			},
+			{
+				'@context': 'https://schema.org',
+				'@type': 'BreadcrumbList',
+				itemListElement: [
+					{
+						'@type': 'ListItem',
+						position: 1,
+						name: 'Noticias',
+						item: new URL('/noticias', Astro.site!).href,
+					},
+					{ '@type': 'ListItem', position: 2, name: data.title, item: articleUrl },
+				],
+			},
+		]
+	: undefined;
+---
+
+<BaseLayout
+	title={`${data.title} | Kings Padel League`}
+	description={data.summary}
+	image={data.cover?.image}
+	imageAlt={data.cover?.alt}
+	pageType="article"
+	structuredData={articleStructuredData}
+>
+	<main id="main-content" class="public-page public-page--news-detail">
+		<div class="o-container o-container--md public-page__body">
+			<nav class="c-breadcrumbs" aria-label="Migas de pan">
+				<a class="c-breadcrumbs__item" href="/noticias">← Todas las noticias</a>
+			</nav>
+
+			<article class="news-article">
+				{
+					data.cover ? (
+						<p class="news-article__cover">
+							<img src={data.cover.image} alt={data.cover.alt} loading="eager" decoding="async" />
+							{data.cover.credit && (
+								<span class="news-article__credit" aria-hidden="true">
+									{data.cover.credit}
+								</span>
+							)}
+						</p>
+					) : (
+						<p class="news-article__cover-fallback" aria-hidden="true">
+							<img
+								src="/textures/backgournd_pelota.png"
+								alt=""
+								width="1672"
+								height="941"
+								loading="eager"
+								decoding="async"
+							/>
+						</p>
+					)
+				}
+
+				<header class="news-article__header">
+					<p class="news-article__meta">
+						<span class:list={['c-chip', NEWS_CATEGORY_CHIP_TONES[data.category]]}>
+							{categoryLabel}
+						</span>
+						<time datetime={data.publishedAt.toISOString()}>
+							{NEWS_DATE_FORMATTER.format(data.publishedAt)}
+						</time>
+					</p>
+					<h1 class="news-article__title">{data.title}</h1>
+					{
+						data.updatedAt && (
+							<p class="news-article__updated">
+								Actualizado el{' '}
+								<time datetime={data.updatedAt.toISOString()}>
+									{NEWS_DATE_FORMATTER.format(data.updatedAt)}
+								</time>
+							</p>
+						)
+					}
+				</header>
+
+				<div class="news-article__body">
+					<Content />
+				</div>
+
+				<a class="c-button c-button--outline news-article__destination" href={destination.href}>
+					{destination.label} →
+				</a>
+
+				{
+					hasRelatedContent && (
+						<section class="news-article__related" aria-labelledby="news-related-title">
+							<h2 id="news-related-title">Contenido relacionado</h2>
+
+							{relatedTeams.length > 0 && (
+								<div>
+									<h3>Equipos relacionados</h3>
+									<div class="news-article__related-teams">
+										{relatedTeams.map((team) => (
+											<TeamBadge team={team} />
+										))}
+									</div>
+								</div>
+							)}
+
+							{data.relatedMatchdayId && (
+								<a
+									class="c-panel news-article__matchday"
+									href={`/jornadas/${data.relatedMatchdayId}`}
+								>
+									Ver jornada relacionada →
+								</a>
+							)}
+						</section>
+					)
+				}
+			</article>
+
+			{
+				moreNews.length > 0 && (
+					<section class="news-article__more" aria-labelledby="news-more-title">
+						<h2 id="news-more-title">Más noticias</h2>
+						<div class="o-reel" aria-label="Más noticias">
+							{moreNews.map((newsEntry) => (
+								<NewsCard
+									entry={newsEntry}
+									variant={newsEntry.data.featured ? 'featured' : 'standard'}
+								/>
+							))}
+						</div>
+					</section>
+				)
+			}
+		</div>
+	</main>
+</BaseLayout>

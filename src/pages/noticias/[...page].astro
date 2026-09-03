@@ -1,0 +1,278 @@
+---
+import type { GetStaticPathsOptions, Page } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+import EmptyState from '../../components/EmptyState.astro';
+import NewsFeedCard from '../../components/NewsFeedCard.astro';
+import NewsPagination from '../../components/NewsPagination.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { selectNewsFeed } from '../../lib/news';
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+	const entries = await getCollection('news');
+	const feed = selectNewsFeed(entries, new Date());
+	return paginate(feed, { pageSize: 12 });
+}
+
+interface Props {
+	page: Page<CollectionEntry<'news'>>;
+}
+
+type MosaicSize = 'hero' | 'wide' | 'tall' | 'standard';
+type MastheadKind = 'masthead-date' | 'masthead-brand' | 'masthead-social' | 'masthead-tagline';
+
+interface ArticleCell {
+	kind: 'article';
+	entry: CollectionEntry<'news'>;
+	size: MosaicSize;
+}
+
+interface MastheadCell {
+	kind: MastheadKind;
+	size: MosaicSize;
+}
+
+type MosaicCell = ArticleCell | MastheadCell;
+
+// Size cycle applied to articles beyond the hero so the mosaic keeps varying shapes as the feed
+// grows, instead of repeating a uniform row.
+const ARTICLE_VARIETY_CYCLE: MosaicSize[] = ['wide', 'standard', 'tall', 'standard'];
+
+// Non-editorial "edition" cells, in the order they get introduced as the mosaic gains masthead
+// slots. `date` and `brand` are kept for small feeds (today's build date, a way back home); the
+// full set — plus `social` and `tagline` — only joins once there is enough real editorial content
+// that they read as seasoning rather than filler.
+const MASTHEAD_ORDER: MastheadKind[] = [
+	'masthead-date',
+	'masthead-brand',
+	'masthead-social',
+	'masthead-tagline',
+];
+
+const MASTHEAD_SIZES: Record<MastheadKind, MosaicSize> = {
+	'masthead-date': 'wide',
+	'masthead-brand': 'tall',
+	'masthead-social': 'standard',
+	'masthead-tagline': 'wide',
+};
+
+/**
+ * Builds the bento-style mosaic order from the already-edited `selectNewsFeed` order: the first
+ * article is always the visual "hero" cell, and a handful of non-editorial masthead cells are
+ * spread evenly through the rest for "edition" character. This only ever assigns a
+ * `grid-column`/`grid-row` span per cell — the DOM order below matches this same order, so visual
+ * position never diverges from reading order.
+ */
+function buildMosaicCells(articles: CollectionEntry<'news'>[]): MosaicCell[] {
+	if (articles.length === 0) return [];
+
+	const mastheadsToPlace =
+		articles.length >= 6 ? MASTHEAD_ORDER : MASTHEAD_ORDER.slice(0, Math.min(2, articles.length));
+
+	const cells: MosaicCell[] = [{ kind: 'article', entry: articles[0]!, size: 'hero' }];
+	const remaining = articles.slice(1);
+	const step = Math.max(2, Math.ceil(remaining.length / (mastheadsToPlace.length + 1)));
+
+	let mastheadIndex = 0;
+	remaining.forEach((article, index) => {
+		const size = ARTICLE_VARIETY_CYCLE[index % ARTICLE_VARIETY_CYCLE.length]!;
+		cells.push({ kind: 'article', entry: article, size });
+
+		const position = index + 1;
+		if (mastheadIndex < mastheadsToPlace.length && position % step === 0) {
+			const kind = mastheadsToPlace[mastheadIndex]!;
+			cells.push({ kind, size: MASTHEAD_SIZES[kind] });
+			mastheadIndex += 1;
+		}
+	});
+
+	while (mastheadIndex < mastheadsToPlace.length) {
+		const kind = mastheadsToPlace[mastheadIndex]!;
+		cells.push({ kind, size: MASTHEAD_SIZES[kind] });
+		mastheadIndex += 1;
+	}
+
+	return cells;
+}
+
+const { page } = Astro.props;
+const mosaicCells = buildMosaicCells(page.data);
+const headlineTicker = page.data.slice(0, 8);
+
+const buildDate = new Date();
+const buildDateParts = Object.fromEntries(
+	new Intl.DateTimeFormat('es-ES', {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+		timeZone: 'Europe/Madrid',
+	})
+		.formatToParts(buildDate)
+		.map((part) => [part.type, part.value]),
+);
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+const mastheadDay = buildDateParts.day;
+const mastheadMonth = capitalize(buildDateParts.month ?? '');
+const mastheadYear = buildDateParts.year;
+const mastheadWeekday = capitalize(buildDateParts.weekday ?? '');
+---
+
+<BaseLayout
+	title="Última hora | Noticias de Kings Padel League"
+	description="Última hora de Kings Padel League: fichajes, calendario oficial, cartas y cada movimiento de la competición."
+>
+	<main id="main-content" class="news-feed-page" tabindex="-1">
+		<header class="news-feed-hero" aria-labelledby="news-feed-title">
+			<div class="news-feed-hero__noise" aria-hidden="true"></div>
+			<div class="news-feed-hero__content o-container o-container--xl">
+				<p class="news-feed-hero__status">
+					<span class="news-feed-hero__live-dot" aria-hidden="true"></span>
+					Última hora · Kings Padel League
+				</p>
+				<h1 id="news-feed-title" class="news-feed-hero__title">Todas las noticias de la liga</h1>
+				<p class="news-feed-hero__lead">
+					Fichajes, calendario oficial, cartas y cada movimiento de la competición, en un único
+					sitio.
+				</p>
+			</div>
+
+			{
+				headlineTicker.length > 0 && (
+					<div class="news-feed-hero__ticker" aria-hidden="true">
+						<div class="news-feed-hero__ticker-track">
+							{Array.from({ length: 2 }, () => (
+								<div class="news-feed-hero__ticker-group">
+									{headlineTicker.map((entry) => (
+										<span class="news-feed-hero__ticker-item">
+											<span class="news-feed-hero__ticker-dot" />
+											{entry.data.title}
+										</span>
+									))}
+								</div>
+							))}
+						</div>
+					</div>
+				)
+			}
+		</header>
+
+		<div class="o-container o-container--xl news-feed-page__body">
+			{
+				mosaicCells.length > 0 ? (
+					<div class="news-mosaic">
+						{mosaicCells.map((cell) => {
+							if (cell.kind === 'article') {
+								return <NewsFeedCard entry={cell.entry} size={cell.size} />;
+							}
+
+							if (cell.kind === 'masthead-date') {
+								return (
+									<div
+										class:list={[
+											'news-mosaic-cell',
+											'news-mosaic-cell--masthead-date',
+											`news-mosaic-cell--${cell.size}`,
+										]}
+										aria-hidden="true"
+									>
+										<span class="news-mosaic-masthead-date__day">{mastheadDay}</span>
+										<span class="news-mosaic-masthead-date__month">
+											{mastheadMonth} {mastheadYear}
+										</span>
+										<span class="news-mosaic-masthead-date__weekday">{mastheadWeekday}</span>
+										<span class="news-mosaic-masthead-date__tagline">
+											Últimas noticias de Kings Padel League
+										</span>
+									</div>
+								);
+							}
+
+							if (cell.kind === 'masthead-brand') {
+								return (
+									<a
+										class:list={[
+											'news-mosaic-cell',
+											'news-mosaic-cell--masthead-brand',
+											`news-mosaic-cell--${cell.size}`,
+										]}
+										href="/"
+										aria-label="Kings Padel League, inicio"
+									>
+										<img src="/KPL/KPL.svg" alt="" width="1920" height="800" loading="lazy" />
+									</a>
+								);
+							}
+
+							if (cell.kind === 'masthead-social') {
+								return (
+									<div
+										class:list={[
+											'news-mosaic-cell',
+											'news-mosaic-cell--masthead-social',
+											`news-mosaic-cell--${cell.size}`,
+										]}
+									>
+										<p class="news-mosaic-masthead-social__eyebrow">Síguenos</p>
+										<a
+											class="news-mosaic-masthead-social__link"
+											href="https://www.instagram.com/kingspadel.league/"
+											target="_blank"
+											rel="noopener noreferrer"
+											aria-label="Seguir Kings Padel League en Instagram (se abre en una pestaña nueva)"
+										>
+											<svg aria-hidden="true" viewBox="0 0 24 24">
+												<rect x="3" y="3" width="18" height="18" rx="5" />
+												<circle cx="12" cy="12" r="4" />
+												<circle cx="17.5" cy="6.5" r="1" />
+											</svg>
+											<span>Instagram</span>
+										</a>
+										<a
+											class="news-mosaic-masthead-social__link"
+											href="https://www.youtube.com/@KPLeague"
+											target="_blank"
+											rel="noopener noreferrer"
+											aria-label="Ver Kings Padel League en YouTube (se abre en una pestaña nueva)"
+										>
+											<svg aria-hidden="true" viewBox="0 0 24 24">
+												<path d="M21 8.2a3 3 0 0 0-2.1-2.1C17 5.6 12 5.6 12 5.6s-5 0-6.9.5A3 3 0 0 0 3 8.2 31 31 0 0 0 2.6 12c0 1.3.1 2.6.4 3.8a3 3 0 0 0 2.1 2.1c1.9.5 6.9.5 6.9.5s5 0 6.9-.5a3 3 0 0 0 2.1-2.1c.3-1.2.4-2.5.4-3.8s-.1-2.6-.4-3.8Z" />
+												<path d="m10 9 5 3-5 3V9Z" />
+											</svg>
+											<span>YouTube</span>
+										</a>
+									</div>
+								);
+							}
+
+							return (
+								<div
+									class:list={[
+										'news-mosaic-cell',
+										'news-mosaic-cell--masthead-tagline',
+										`news-mosaic-cell--${cell.size}`,
+									]}
+									aria-hidden="true"
+								>
+									<span class="news-mosaic-masthead-tagline__mark">—</span>
+									<p class="news-mosaic-masthead-tagline__text">
+										Una liga. Siete cartas.
+										<br />
+										Un solo trofeo.
+									</p>
+								</div>
+							);
+						})}
+					</div>
+				) : (
+					<EmptyState
+						title="Todavía no hay noticias publicadas"
+						description="Vuelve pronto para conocer las novedades de equipos, calendario, cartas y partidos de la liga."
+					/>
+				)
+			}
+
+			<NewsPagination page={page} baseHref="/noticias" />
+		</div>
+	</main>
+</BaseLayout>

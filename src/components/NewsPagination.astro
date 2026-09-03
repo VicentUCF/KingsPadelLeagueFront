@@ -1,0 +1,47 @@
+---
+import type { Page } from 'astro';
+
+interface Props {
+	page: Page<unknown>;
+	baseHref: string;
+}
+
+const { page, baseHref } = Astro.props;
+const pageNumbers = Array.from({ length: page.lastPage }, (_, index) => index + 1);
+const hrefForPage = (number: number) => (number === 1 ? baseHref : `${baseHref}/${number}`);
+---
+
+{
+	page.lastPage > 1 && (
+		<nav class="c-pagination" aria-label="Paginación de noticias">
+			{page.url.prev ? (
+				<a class="c-pagination__item" href={page.url.prev} aria-label="Página anterior">
+					‹
+				</a>
+			) : (
+				<span class="c-pagination__item" aria-disabled="true">
+					‹
+				</span>
+			)}
+			{pageNumbers.map((number) => (
+				<a
+					class="c-pagination__item"
+					href={hrefForPage(number)}
+					aria-current={number === page.currentPage ? 'page' : undefined}
+					aria-label={`Página ${number}`}
+				>
+					{number}
+				</a>
+			))}
+			{page.url.next ? (
+				<a class="c-pagination__item" href={page.url.next} aria-label="Página siguiente">
+					›
+				</a>
+			) : (
+				<span class="c-pagination__item" aria-disabled="true">
+					›
+				</span>
+			)}
+		</nav>
+	)
+}

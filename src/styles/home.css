@@ -994,82 +994,9 @@
 		font-weight: 700;
 	}
 
-	.home-news__grid {
-		display: grid;
+	.home-news .news-grid {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: var(--kpl-space-4);
 	}
-
-	.home-news-card {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		gap: var(--kpl-space-4);
-		overflow: hidden;
-		padding: clamp(var(--kpl-space-5), 3vw, var(--kpl-space-7));
-		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
-		border-radius: var(--kpl-radius-xl);
-		background:
-			linear-gradient(145deg, rgb(255 255 255 / 0.045), transparent 45%), var(--kpl-color-surface);
-		box-shadow: var(--kpl-shadow-md);
-	}
-
-	.home-news-card--featured {
-		border-color: var(--kpl-color-border-strong);
-		background:
-			radial-gradient(circle at 100% 0, rgb(201 162 39 / 0.16), transparent 42%),
-			linear-gradient(145deg, rgb(255 255 255 / 0.055), transparent 48%),
-			var(--kpl-color-surface-emphasis);
-	}
-
-	.home-news-card__top {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--kpl-space-3);
-	}
-
-	.home-news-card__top time {
-		color: var(--kpl-color-text-muted);
-		font-size: var(--kpl-font-size-50);
-		font-variant-numeric: tabular-nums;
-		text-transform: capitalize;
-	}
-
-	.home-news-card__copy {
-		position: relative;
-		display: grid;
-		gap: var(--kpl-space-3);
-	}
-
-	.home-news-card__copy h3 {
-		max-inline-size: 13ch;
-		font-size: clamp(var(--kpl-font-size-400), 3vw, var(--kpl-font-size-600));
-	}
-
-	.home-news-card__copy p {
-		position: relative;
-		z-index: 1;
-		color: var(--kpl-color-text-muted);
-		line-height: var(--kpl-line-height-loose);
-	}
-
-	.home-news-card__copy a {
-		position: relative;
-		z-index: 2;
-		inline-size: fit-content;
-		color: var(--kpl-color-brand-strong);
-		font-size: var(--kpl-font-size-100);
-		font-weight: 800;
-		text-decoration: none;
-	}
-
-	.home-news-card__copy a:hover {
-		text-decoration: underline;
-		text-underline-offset: 0.22em;
-	}
-
 
 	.home-social {
 		padding-block-start: 0;
@@ -1381,12 +1308,8 @@
 			inline-size: 100%;
 		}
 
-		.home-news__grid {
+		.home-news .news-grid {
 			grid-template-columns: minmax(0, 1fr);
-		}
-
-		.home-news-card {
-			min-block-size: 17rem;
 		}
 
 		.home-teams__reel {
@@ -1535,7 +1458,6 @@
 		.home-competition-panel,
 		.home-standings,
 		.home-team-card,
-		.home-news-card,
 		.home-social__panel {
 			border-color: CanvasText;
 		}
