@@ -80,7 +80,6 @@
 		font-size: clamp(3.5rem, 6.7vw, 7.4rem);
 		letter-spacing: -0.075em;
 		line-height: 0.87;
-		text-transform: uppercase;
 	}
 
 	.cards-hero__copy h1 span {
@@ -191,8 +190,7 @@
 		mask-composite: intersect;
 	}
 
-	.cards-hero__case-video,
-	.cards-hero__case-still {
+	.cards-hero__case-video {
 		display: block;
 		inline-size: 100%;
 		max-inline-size: none;
@@ -202,19 +200,6 @@
 	}
 
 	.cards-hero__case-video {
-		opacity: 1;
-	}
-
-	.cards-hero__case-still {
-		position: absolute;
-		z-index: 1;
-		inset-block-start: 0;
-		inset-inline-start: 0;
-		opacity: 0;
-		transition: opacity 280ms ease-out;
-	}
-
-	.cards-hero__animation.is-open .cards-hero__case-still {
 		opacity: 1;
 	}
 

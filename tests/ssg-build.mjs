@@ -69,7 +69,7 @@ try {
 	assert.match(standings, /Clasificación de la Temporada 2/);
 	assert.match(matchday, /Jornada 1 de la Temporada 2/);
 	assert.match(cards, /Una carta/);
-	assert.match(cards, /Cada presidente roba una/);
+	assert.match(cards, /Cada <a href="\/equipos">presidente<\/a> roba una/);
 	assert.match(cards, /40–15/);
 	assert.match(cards, /Las siete cartas/);
 	assert.match(cards, /data-card-intro/);

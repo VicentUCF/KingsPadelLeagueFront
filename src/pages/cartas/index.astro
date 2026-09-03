@@ -80,7 +80,7 @@ const levels = [
 				name: 'Comodín',
 				image: '/cards/comodin.png',
 				duration: 'Canje inmediato',
-				activation: 'Antes del partido',
+				activation: 'Entre juegos',
 				effect: 'Permite cambiarla por cualquier otra carta disponible en el maletín.',
 			},
 			{
@@ -94,6 +94,12 @@ const levels = [
 		],
 	},
 ] as const;
+
+const toneLabels: Record<(typeof levels)[number]['tone'], string> = {
+	green: 'verde',
+	blue: 'azul',
+	gold: 'oro',
+};
 
 const cards = levels.flatMap((level) =>
 	level.cards.map((card) => ({ ...card, level: level.name })),
@@ -123,6 +129,8 @@ const structuredData = cardsUrl
 					'@type': 'ListItem',
 					position: index + 1,
 					name: card.name,
+					description: card.effect,
+					url: `${cardsUrl}#carta-${card.id}`,
 				})),
 			},
 		}
@@ -130,8 +138,8 @@ const structuredData = cardsUrl
 ---
 
 <BaseLayout
-	title="Cartas KPL: reglas, niveles y efectos | Kings Padel League"
-	description="Descubre las siete cartas de Kings Padel League, cómo se reparten desde el maletín y cuándo puede activarse cada efecto durante un partido."
+	title="Cartas de Kings Padel League: niveles, reglas y efectos"
+	description="Las 7 cartas de Kings Padel League: niveles verde, azul y oro, su efecto en pista y el momento exacto en que cada presidente puede activarlas."
 	image="/cards/2-vs-1.png"
 	imageAlt="Carta 2 vs 1 de Kings Padel League"
 	structuredData={structuredData}
@@ -142,7 +150,7 @@ const structuredData = cardsUrl
 			<div class="cards-hero__inner o-container o-container--xl">
 				<div class="cards-hero__copy">
 					<p class="c-eyebrow">El factor sorpresa de Kings Padel League</p>
-					<h1 id="cards-title">Una carta.<br /><span>Un giro de partido.</span></h1>
+					<h1 id="cards-title">Siete cartas.<br /><span>Un giro de partido.</span></h1>
 					<p class="cards-hero__lead">
 						Antes de cada partido se abre el maletín y cada presidente roba una carta. Tiene una
 						sola oportunidad para cambiar el guion desde la pista.
@@ -173,21 +181,8 @@ const structuredData = cardsUrl
 							preload="metadata"
 							disablepictureinpicture
 						>
-							<source
-								src="/My_first_board_A_sleek_black_and_silver_briefcase_is_shown_from_7q6F1r45.mp4"
-								type="video/mp4"
-							/>
+							<source src="/cards/maletin-cartas-apertura.mp4" type="video/mp4" />
 						</video>
-						<img
-							class="cards-hero__case-still"
-							data-case-still
-							src="/cards/maletin-abierto.png"
-							alt=""
-							width="1568"
-							height="1003"
-							loading="eager"
-							decoding="async"
-						/>
 					</div>
 					<div class="cards-hero__fan">
 						{
@@ -235,7 +230,7 @@ const structuredData = cardsUrl
 					<li>
 						<span>02</span>
 						<div>
-							<strong>Cada presidente roba una</strong><p>Una carta al azar para su equipo.</p>
+							<strong>Cada <a href="/equipos">presidente</a> roba una</strong><p>Una carta al azar para su equipo.</p>
 						</div>
 					</li>
 					<li>
@@ -291,7 +286,7 @@ const structuredData = cardsUrl
 				<header class="cards-section-heading cards-section-heading--deck">
 					<div>
 						<p class="c-eyebrow">La baraja completa</p>
-						<h2 id="deck-title">Siete formas de romper el guion.</h2>
+						<h2 id="deck-title">Siete cartas. Siete formas de romper el guion.</h2>
 					</div>
 					<p>Cada color anticipa el tipo de ventaja. Abre cada nivel y prepara el momento.</p>
 				</header>
@@ -323,7 +318,7 @@ const structuredData = cardsUrl
 											</span>
 											<img
 												src={card.image}
-												alt=""
+												alt={`Carta ${card.name} de Kings Padel League, nivel ${toneLabels[level.tone]}`}
 												width="447"
 												height="559"
 												loading="lazy"
@@ -364,7 +359,7 @@ const structuredData = cardsUrl
 						responde la pista.
 					</p>
 				</div>
-				<a class="c-button c-button--primary c-button--lg" href="/jornadas">Seguir la competición</a
+				<a class="c-button c-button--primary c-button--lg" href="/jornadas">Ver las jornadas</a
 				>
 			</aside>
 		</div>
