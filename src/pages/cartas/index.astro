@@ -230,7 +230,9 @@ const structuredData = cardsUrl
 					<li>
 						<span>02</span>
 						<div>
-							<strong>Cada <a href="/equipos">presidente</a> roba una</strong><p>Una carta al azar para su equipo.</p>
+							<strong>Cada <a href="/equipos">presidente</a> roba una</strong><p>
+								Una carta al azar para su equipo.
+							</p>
 						</div>
 					</li>
 					<li>
@@ -313,9 +315,6 @@ const structuredData = cardsUrl
 								{level.cards.map((card, index) => (
 									<article id={`carta-${card.id}`} class="action-card">
 										<div class="action-card__visual">
-											<span class="action-card__index" aria-hidden="true">
-												{String(index + 1).padStart(2, '0')}
-											</span>
 											<img
 												src={card.image}
 												alt={`Carta ${card.name} de Kings Padel League, nivel ${toneLabels[level.tone]}`}
@@ -359,8 +358,7 @@ const structuredData = cardsUrl
 						responde la pista.
 					</p>
 				</div>
-				<a class="c-button c-button--primary c-button--lg" href="/jornadas">Ver las jornadas</a
-				>
+				<a class="c-button c-button--primary c-button--lg" href="/jornadas">Ver las jornadas</a>
 			</aside>
 		</div>
 	</main>

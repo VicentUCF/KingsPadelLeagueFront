@@ -26,22 +26,6 @@ const statusLabels = {
 >
 	<main id="main-content" class="public-page public-page--matchdays">
 		<div class="o-container o-container--xl public-page__body">
-			<PageHero
-				eyebrow="Resultados de Kings Padel League"
-				title={`Jornadas y resultados de la ${PUBLIC_SEASON_NAME}`}
-				description={preseason
-					? `La competición empieza el ${SEASON_STARTS_LABEL}. Publicaremos los enfrentamientos y horarios cuando estén confirmados.`
-					: 'Consulta los partidos, horarios, parejas y resultados oficiales de cada jornada.'}
-				meta={preseason
-					? ['Pretemporada', `Inicio · ${SEASON_STARTS_LABEL}`, 'Cruces próximamente']
-					: [`${view.matchdays.length} jornadas`, view.phaseLabel, 'Resultados oficiales']}
-			>
-				<a slot="actions" class="c-button c-button--primary" href="/equipos">Ver equipos</a>
-				<a slot="actions" class="c-button c-button--outline" href="/calendario"
-					>Consultar calendario</a
-				>
-			</PageHero>
-
 			{
 				preseason ? (
 					<SeasonReveal

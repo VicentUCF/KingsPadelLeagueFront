@@ -21,24 +21,6 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 >
 	<main id="main-content" class="public-page public-page--teams">
 		<div class="o-container o-container--xl public-page__body">
-			<PageHero
-				eyebrow="Equipos de Kings Padel League"
-				title={`Equipos y plantillas de la ${PUBLIC_SEASON_NAME}`}
-				description="Conoce los equipos, sus presidencias y los jugadores que competirán en la liga amateur de pádel."
-				meta={[
-					`${view.teams.length} equipos confirmados`,
-					`${playerCount} jugadores`,
-					preseason ? 'Mercado abierto' : 'Plantillas de la temporada',
-				]}
-			>
-				<a slot="actions" class="c-button c-button--primary" href="/jugadores">
-					Ver todos los jugadores
-				</a>
-				<a slot="actions" class="c-button c-button--outline" href="/calendario">
-					Consultar calendario
-				</a>
-			</PageHero>
-
 			{
 				preseason && (
 					<aside class="market-status" aria-label="Estado del mercado de equipos">
@@ -64,9 +46,8 @@ const playerCount = view.teams.reduce((total, team) => total + team.players.leng
 				<header class="section-block__header section-block__header--editorial">
 					<div>
 						<p class="c-eyebrow">Clubes participantes</p>
-						<h2 id="team-catalog-title">Todos los equipos de Kings Padel League.</h2>
+						<h2 id="team-catalog-title">Equipos de la Kings Padel League.</h2>
 					</div>
-					<p>Abre cada equipo para conocer su identidad, presidencia y plantilla.</p>
 				</header>
 
 				{

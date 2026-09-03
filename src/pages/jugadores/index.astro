@@ -25,12 +25,7 @@ const presidents = view.players.filter((player) => player.isPresident).length;
 			<PageHero
 				eyebrow="Jugadores de Kings Padel League"
 				title={`Jugadores de la ${PUBLIC_SEASON_NAME}`}
-				description="Busca por nombre, equipo o posición —drive o revés— y abre cada perfil para conocer su rol y sus estadísticas."
-				meta={[
-					`${view.players.length} jugadores`,
-					`${view.teams.length} equipos`,
-					preseason ? 'Plantillas de pretemporada' : 'Temporada en curso',
-				]}
+				description="Consulta el perfil de cada jugador, su equipo, posición y estadísticas de la temporada."
 			>
 				<a slot="actions" class="c-button c-button--primary" href="/equipos">Explorar equipos</a>
 			</PageHero>

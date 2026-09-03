@@ -136,7 +136,7 @@ const hasStandingsData =
 	!preseason &&
 	view.standings.some((standing) => standing.points > 0 || standing.playedMatches > 0);
 const standingsByTeamId = new Map(view.standings.map((standing) => [standing.team.id, standing]));
-const topStandings = view.standings.slice(0, 5);
+const topStandings = view.standings.slice(0, 6);
 const resultPathMeta = preseason
 	? `Comienza el ${SEASON_STARTS_LABEL}`
 	: currentMatchday
@@ -517,7 +517,7 @@ const homeStructuredData = homeUrl
 						<div>
 							<p class="c-eyebrow">{hasStandingsData ? 'Clasificación' : 'Equipos confirmados'}</p>
 							<h3 id="standings-title">
-								{hasStandingsData ? 'La carrera por la corona' : 'La nueva parrilla'}
+								{hasStandingsData ? 'La carrera por la corona' : 'La liga'}
 							</h3>
 						</div>
 						{hasStandingsData && <span class="home-standings__pts">PTS</span>}
@@ -563,9 +563,6 @@ const homeStructuredData = homeUrl
 							<p class="c-eyebrow">Equipos de {displaySeasonName}</p>
 							<h2 id="teams-title">Conoce las plantillas de Kings Padel League.</h2>
 						</div>
-						<a class="c-button c-button--outline" href="/equipos">
-							Ver todos los equipos →
-						</a>
 					</header>
 
 					<ul class="home-teams__reel" aria-label="Equipos de Kings Padel League">

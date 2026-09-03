@@ -49,24 +49,6 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 >
 	<main id="main-content" class="public-page public-page--calendar">
 		<div class="o-container o-container--xl public-page__body">
-			<PageHero
-				eyebrow="Fechas y horarios de Kings Padel League"
-				title={`Calendario de la ${PUBLIC_SEASON_NAME}`}
-				description={preseason
-					? 'El calendario aún no está publicado. Aquí encontrarás las fechas, los horarios y los enfrentamientos cuando se confirmen.'
-					: 'Consulta todas las fechas, horarios y enfrentamientos. Filtra los partidos por estado o equipo.'}
-				meta={preseason
-					? ['Pretemporada', `Inicio · ${SEASON_STARTS_LABEL}`, 'Publicación próximamente']
-					: [
-							`${view.matchdays.length} jornadas`,
-							`${allEncounters.length} partidos`,
-							view.phaseLabel,
-						]}
-			>
-				<a slot="actions" class="c-button c-button--primary" href="/equipos">Ver equipos</a>
-				<a slot="actions" class="c-button c-button--outline" href="/jugadores">Ver jugadores</a>
-			</PageHero>
-
 			{
 				preseason ? (
 					<SeasonReveal

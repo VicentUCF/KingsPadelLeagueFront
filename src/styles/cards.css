@@ -846,18 +846,6 @@
 		transform: translateY(-0.45rem) rotate(1deg) scale(1.025);
 	}
 
-	.action-card__index {
-		position: absolute;
-		z-index: 0;
-		inset-block-start: var(--kpl-space-4);
-		inset-inline-end: var(--kpl-space-5);
-		color: color-mix(in srgb, var(--level-color) 16%, transparent);
-		font-family: var(--kpl-font-family-heading);
-		font-size: 5.5rem;
-		font-weight: 800;
-		letter-spacing: -0.08em;
-	}
-
 	.action-card__body {
 		display: grid;
 		align-content: start;
