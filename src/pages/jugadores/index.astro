@@ -22,26 +22,23 @@ const presidents = view.players.filter((player) => player.isPresident).length;
 >
 	<main id="main-content" class="public-page public-page--players">
 		<div class="o-container o-container--xl public-page__body">
-			<PageHero
-				eyebrow="Jugadores de Kings Padel League"
-				title={`Jugadores de la ${PUBLIC_SEASON_NAME}`}
-				description="Consulta el perfil de cada jugador, su equipo, posición y estadísticas de la temporada."
-			>
-				<a slot="actions" class="c-button c-button--primary" href="/equipos">Explorar equipos</a>
-			</PageHero>
-
 			{
 				preseason && (
-					<aside class="roster-status">
+					<aside class="market-status" aria-label="Estado del mercado de equipos">
+						<span class="market-status__icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24">
+								<path d="M4 7h16M7 4v6m10-6v6M5 12h14v8H5zM9 16h6" />
+							</svg>
+						</span>
 						<div>
-							<span class="roster-status__pulse" aria-hidden="true" />
-							<p class="c-eyebrow">Mercado de jugadores</p>
-							<h2>Consulta los jugadores confirmados de la {PUBLIC_SEASON_NAME}.</h2>
+							<p class="c-eyebrow">Mercado de la {PUBLIC_SEASON_NAME}</p>
+							<h2>Consulta los fichajes confirmados de la temporada.</h2>
+							<p>
+								La competición comienza el {SEASON_STARTS_LABEL}. Aquí encontrarás las altas,
+								cambios de equipo y plantillas confirmadas.
+							</p>
 						</div>
-						<p>
-							Los cambios de equipo y nuevas incorporaciones aparecerán aquí antes del inicio, el
-							{SEASON_STARTS_LABEL}.
-						</p>
+						<span class="c-chip c-chip--tone-info">Fichajes confirmados</span>
 					</aside>
 				)
 			}
