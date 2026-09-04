@@ -1,9 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 
+import '../styles/news.css';
 import NewsCard from '../components/NewsCard.astro';
 import TeamBadge from '../components/TeamBadge.astro';
-import TeamIdentityBands from '../components/TeamIdentityBands.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { PLAYOFFS_ENABLED } from '../lib/features';
 import { loadLeagueHomeData } from '../lib/kpl-api';
@@ -244,10 +244,6 @@ const homeStructuredData = homeUrl
 							<dd>{displayPhase}</dd>
 						</div>
 						<div>
-							<dt>Equipos</dt>
-							<dd>{view.teams.length} confirmados</dd>
-						</div>
-						<div>
 							<dt>Jornadas</dt>
 							<dd>
 								{
@@ -297,12 +293,6 @@ const homeStructuredData = homeUrl
 						{
 							spotlight ? (
 								<div class="home-spotlight__match">
-									{spotlight.awayTeam && (
-										<TeamIdentityBands
-											homeTeam={spotlight.homeTeam}
-											awayTeam={spotlight.awayTeam}
-										/>
-									)}
 									<div class="home-spotlight__team">
 										<TeamBadge team={spotlight.homeTeam} meta="Local" />
 									</div>
@@ -386,6 +376,13 @@ const homeStructuredData = homeUrl
 				>
 				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
 			</a>
+			<a class="home-shortcut" href="/noticias">
+				<span class="home-shortcut__icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18"></path></svg>
+				</span>
+				<span><strong>Noticias</strong><small> Que esta pasando? </small></span>
+				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
+			</a>
 			<a class="home-shortcut" href="/equipos">
 				<span class="home-shortcut__icon" aria-hidden="true">
 					<svg viewBox="0 0 24 24"
@@ -427,7 +424,10 @@ const homeStructuredData = homeUrl
 			</header>
 
 			<div class="home-dashboard">
-				<aside class="home-standings" aria-labelledby="standings-title">
+				<aside
+					class="home-standings c-surface-card c-surface-card--padded c-surface-card--raised"
+					aria-labelledby="standings-title"
+				>
 					<header class="home-panel-heading">
 						<div>
 							<p class="c-eyebrow">{hasStandingsData ? 'Clasificación' : 'Equipos confirmados'}</p>
@@ -447,7 +447,9 @@ const homeStructuredData = homeUrl
 										{ 'home-standing--leader': standing.rank === 1 && hasStandingsData },
 									]}
 								>
-									<span class="home-standing__rank">{hasStandingsData ? standing.rank : '—'}</span>
+									<span class="home-standing__rank c-rank">
+										{hasStandingsData ? standing.rank : '—'}
+									</span>
 									<TeamBadge team={standing.team} />
 									{hasStandingsData ? (
 										<strong>{standing.points}</strong>
@@ -480,7 +482,10 @@ const homeStructuredData = homeUrl
 						</div>
 					</header>
 
-					<ul class="home-teams__reel" aria-label="Equipos de Kings Padel League">
+					<ul
+						class="home-teams__reel o-grid o-grid--balanced"
+						aria-label="Equipos de Kings Padel League"
+					>
 						{view.teams.map((team) => {
 							const standing = standingsByTeamId.get(team.id);
 							return (
@@ -543,7 +548,7 @@ const homeStructuredData = homeUrl
 						</a>
 					</header>
 
-					<div class="news-grid">
+					<div class="news-grid o-grid">
 						{homeNews.map((entry) => (
 							<NewsCard entry={entry} variant={entry.data.featured ? 'featured' : 'standard'} />
 						))}

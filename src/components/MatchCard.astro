@@ -1,7 +1,6 @@
 ---
 import type { PairLineup, PublicEncounter } from '../lib/public-league';
 import TeamBadge from './TeamBadge.astro';
-import TeamIdentityBands from './TeamIdentityBands.astro';
 
 interface Props {
 	encounter: PublicEncounter;
@@ -52,12 +51,11 @@ function fullName(player: PairLineup['players'][number]) {
 		</div>
 	</header>
 	<div class="c-match-card__teams">
-		<TeamIdentityBands homeTeam={encounter.homeTeam} awayTeam={encounter.awayTeam} />
 		<div class="c-match-card__team"><TeamBadge team={encounter.homeTeam} meta="Local" /></div>
 		{
 			encounter.status === 'upcoming' ? (
 				<strong
-					class="c-score c-score--versus"
+					class="c-score match-score-versus"
 					aria-label={`${encounter.homeTeam.name} contra ${encounter.awayTeam.name}`}
 				>
 					VS

@@ -12,7 +12,10 @@ const { entry, variant = 'standard' } = Astro.props;
 const { data } = entry;
 ---
 
-<a class:list={['news-card', `news-card--${variant}`]} href={`/noticias/${entry.id}`}>
+<a
+	class:list={['news-card', 'c-surface-card', 'c-surface-card--padded', `news-card--${variant}`]}
+	href={`/noticias/${entry.id}`}
+>
 	<span class="news-card__top">
 		<span class:list={['c-chip', NEWS_CATEGORY_CHIP_TONES[data.category]]}>
 			{NEWS_CATEGORY_LABELS[data.category]}

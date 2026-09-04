@@ -42,14 +42,14 @@
 	.site-shell__menu {
 		position: relative;
 		display: none;
-	}
 
-	.site-shell__menu summary {
-		list-style: none;
-	}
+		& summary {
+			list-style: none;
 
-	.site-shell__menu summary::-webkit-details-marker {
-		display: none;
+			&::-webkit-details-marker {
+				display: none;
+			}
+		}
 	}
 
 	.site-shell__mobile-nav {
@@ -64,10 +64,10 @@
 		border-radius: var(--kpl-radius-lg);
 		background: var(--kpl-color-surface-raised);
 		box-shadow: var(--kpl-shadow-lg);
-	}
 
-	.site-shell__mobile-nav .c-nav__link {
-		inline-size: 100%;
+		& .c-nav__link {
+			inline-size: 100%;
+		}
 	}
 
 	.site-shell__footer {
@@ -84,14 +84,15 @@
 	.site-shell__footer-brand {
 		display: grid;
 		gap: var(--kpl-space-1);
+
+		& strong {
+			color: var(--kpl-color-text-strong);
+			font-family: var(--kpl-font-family-heading);
+			text-transform: uppercase;
+		}
 	}
 
-	.site-shell__footer-brand strong {
-		color: var(--kpl-color-text-strong);
-		font-family: var(--kpl-font-family-heading);
-		text-transform: uppercase;
-	}
-
+	/* Shared by two different blocks (footer brand copy + footer nav links), so it stays its own rule rather than nesting under either one. */
 	.site-shell__footer-brand span,
 	.site-shell__footer-nav a {
 		color: var(--kpl-color-text-muted);
@@ -102,10 +103,10 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--kpl-space-3) var(--kpl-space-5);
-	}
 
-	.site-shell__footer-nav a {
-		text-decoration: none;
+		& a {
+			text-decoration: none;
+		}
 	}
 
 	@media (width >= 64rem) {

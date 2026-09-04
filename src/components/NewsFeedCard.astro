@@ -41,13 +41,6 @@ const eyebrow = `${NEWS_DATE_FORMATTER.format(data.publishedAt)} · ${NEWS_CATEG
 		}
 	</span>
 	<span class="news-mosaic-cell__scrim" aria-hidden="true"></span>
-	{
-		data.cover?.credit && (
-			<span class="news-mosaic-cell__credit" aria-hidden="true">
-				{data.cover.credit}
-			</span>
-		)
-	}
 	<span class="news-mosaic-cell__body">
 		{
 			isPriority && data.featured && (

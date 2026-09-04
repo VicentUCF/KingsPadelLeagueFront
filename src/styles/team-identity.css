@@ -5,10 +5,10 @@
 		background:
 			radial-gradient(circle at 35% 25%, var(--team-glow), transparent 58%),
 			color-mix(in srgb, var(--team-surface) 88%, var(--team-primary));
-	}
 
-	.c-team-badge .c-team-badge__crest img {
-		filter: drop-shadow(0 0.35rem 0.5rem var(--team-glow));
+		& img {
+			filter: drop-shadow(0 0.35rem 0.5rem var(--team-glow));
+		}
 	}
 
 	.team-card,
@@ -17,19 +17,15 @@
 		border-color: color-mix(in srgb, var(--team-primary) 46%, var(--kpl-color-border-subtle));
 		background:
 			linear-gradient(180deg, transparent 44%, var(--team-surface) 72%), var(--team-surface);
-	}
 
-	.team-card:is(:hover, :focus-visible),
-	.home-team-card:is(:hover, :focus-visible),
-	.player-card--team:is(:hover, :focus-visible) {
-		border-color: var(--team-primary);
-		box-shadow: 0 2rem 4rem -1.25rem var(--team-glow);
-	}
+		&:is(:hover, :focus-visible) {
+			border-color: var(--team-primary);
+			box-shadow: 0 2rem 4rem -1.25rem var(--team-glow);
+		}
 
-	.team-card:focus-visible,
-	.home-team-card:focus-visible,
-	.player-card--team:focus-visible {
-		translate: 0 -0.3rem;
+		&:focus-visible {
+			translate: 0 -0.3rem;
+		}
 	}
 
 	.team-card__identity-accent,
@@ -52,54 +48,82 @@
 	.team-card__identity-accent {
 		inset: 0 0 13.5rem;
 		mask-image: linear-gradient(to bottom, black 76%, transparent);
+
+		&::after {
+			inset-block: 0 13%;
+			inset-inline-end: clamp(0.9rem, 4vw, 1.6rem);
+			inline-size: 2px;
+		}
 	}
 
-	.team-card__identity-accent::after {
-		inset-block: 0 13%;
-		inset-inline-end: clamp(0.9rem, 4vw, 1.6rem);
-		inline-size: 2px;
+	.team-card {
+		& .team-card__halo {
+			opacity: 0;
+		}
+
+		& .team-card__number {
+			z-index: 2;
+			color: color-mix(in srgb, var(--team-accent) 45%, transparent);
+		}
+
+		& :is(.team-card__logo, .team-card__copy) {
+			z-index: 1;
+		}
+
+		& .team-card__logo img {
+			filter: drop-shadow(0 1rem 1rem var(--team-glow));
+		}
 	}
 
-	.team-card .team-card__halo,
-	.home-team-card .home-team-card__glow {
-		opacity: 0;
+	.home-team-card {
+		& .home-team-card__glow {
+			opacity: 0;
+		}
+
+		& .home-team-card__identity-accent {
+			mask-image: linear-gradient(to bottom, black 68%, transparent);
+
+			&::after {
+				inset-block: 0 16%;
+				inset-inline-end: 1rem;
+				inline-size: 2px;
+			}
+		}
+
+		& > :not(.home-team-card__identity-accent) {
+			position: relative;
+			z-index: 1;
+		}
+
+		& .home-team-card__logo img {
+			filter: drop-shadow(0 0.8rem 0.9rem var(--team-glow));
+		}
 	}
 
-	.team-card .team-card__number {
-		z-index: 2;
-		color: color-mix(in srgb, var(--team-accent) 45%, transparent);
-	}
+	.public-page--team-detail {
+		& .team-profile-hero {
+			border-color: color-mix(in srgb, var(--team-primary) 58%, var(--kpl-color-border-subtle));
 
-	.team-card .team-card__logo,
-	.team-card .team-card__copy {
-		z-index: 1;
-	}
+			&::before {
+				display: none;
+			}
+		}
 
-	.team-card .team-card__logo img {
-		filter: drop-shadow(0 1rem 1rem var(--team-glow));
-	}
+		& :is(.team-profile-hero__identity, .team-profile-hero__number) {
+			z-index: 1;
+		}
 
-	.home-team-card__identity-accent {
-		mask-image: linear-gradient(to bottom, black 68%, transparent);
-	}
+		& .team-profile-hero__copy h1 {
+			color: var(--team-accent);
+		}
 
-	.home-team-card__identity-accent::after {
-		inset-block: 0 16%;
-		inset-inline-end: 1rem;
-		inline-size: 2px;
-	}
+		& .team-profile-hero__logo {
+			z-index: 1;
 
-	.home-team-card > :not(.home-team-card__identity-accent) {
-		position: relative;
-		z-index: 1;
-	}
-
-	.home-team-card .home-team-card__logo img {
-		filter: drop-shadow(0 0.8rem 0.9rem var(--team-glow));
-	}
-
-	.public-page--team-detail .team-profile-hero {
-		border-color: color-mix(in srgb, var(--team-primary) 58%, var(--kpl-color-border-subtle));
+			& img {
+				filter: drop-shadow(0 1.5rem 1.3rem var(--team-glow));
+			}
+		}
 	}
 
 	.team-profile-hero__light-sweep {
@@ -126,31 +150,14 @@
 		inset-inline-end: 0;
 		inline-size: 48%;
 		clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
-	}
 
-	.team-profile-hero__identity-accent::after {
-		inset-block: 0;
-		inset-inline-start: 10%;
-		inline-size: 3px;
-		rotate: 4deg;
-		transform-origin: top;
-	}
-
-	.public-page--team-detail .team-profile-hero::before {
-		display: none;
-	}
-
-	.public-page--team-detail .team-profile-hero__identity,
-	.public-page--team-detail .team-profile-hero__number {
-		z-index: 1;
-	}
-
-	.public-page--team-detail .team-profile-hero__copy h1 {
-		color: var(--team-accent);
-	}
-
-	.public-page--team-detail .team-profile-hero__logo img {
-		filter: drop-shadow(0 1.5rem 1.3rem var(--team-glow));
+		&::after {
+			inset-block: 0;
+			inset-inline-start: 10%;
+			inline-size: 3px;
+			rotate: 4deg;
+			transform-origin: top;
+		}
 	}
 
 	.team-profile-hero__motion-ribbon {
@@ -191,10 +198,6 @@
 		white-space: nowrap;
 	}
 
-	.public-page--team-detail .team-profile-hero__logo {
-		z-index: 1;
-	}
-
 	@keyframes team-profile-light-sweep {
 		0% {
 			opacity: 0;
@@ -229,44 +232,42 @@
 		border-radius: var(--kpl-radius-xs);
 		background: color-mix(in srgb, var(--team-contrast) 82%, transparent);
 		box-shadow: inset 0 0 0 2px var(--team-surface);
-	}
 
-	.team-profile-hero__signature img {
-		inline-size: 2.5rem;
-		block-size: auto;
-	}
+		& img {
+			inline-size: 2.5rem;
+			block-size: auto;
+		}
 
-	.team-profile-hero__signature > span {
-		display: grid;
-		padding-inline-end: var(--kpl-space-3);
-		border-inline-end: 1px solid color-mix(in srgb, var(--team-primary) 45%, transparent);
-	}
+		& > span {
+			display: grid;
+			padding-inline-end: var(--kpl-space-3);
+			border-inline-end: 1px solid color-mix(in srgb, var(--team-primary) 45%, transparent);
+		}
 
-	.team-profile-hero__signature small,
-	.team-profile-hero__signature p {
-		font-size: 0.63rem;
-		font-weight: 800;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-	}
+		& :is(small, p) {
+			font-size: 0.63rem;
+			font-weight: 800;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
 
-	.team-profile-hero__signature small {
-		color: var(--kpl-color-text-muted);
-	}
+		& small {
+			color: var(--kpl-color-text-muted);
+		}
 
-	.team-profile-hero__signature strong,
-	.team-profile-hero__signature p {
-		color: var(--team-primary);
-	}
+		& :is(strong, p) {
+			color: var(--team-primary);
+		}
 
-	.team-profile-hero__signature strong {
-		font-family: var(--kpl-font-family-heading);
-		font-size: var(--kpl-font-size-200);
-	}
+		& strong {
+			font-family: var(--kpl-font-family-heading);
+			font-size: var(--kpl-font-size-200);
+		}
 
-	.team-profile-hero__signature p {
-		min-inline-size: 0;
-		line-height: 1.4;
+		& p {
+			min-inline-size: 0;
+			line-height: 1.4;
+		}
 	}
 
 	.player-card__team-accent {
@@ -275,22 +276,24 @@
 		mask-image: linear-gradient(to bottom, black 76%, transparent);
 	}
 
-	.player-card--team > :not(.player-card__team-accent) {
-		position: relative;
-		z-index: 1;
-	}
+	.player-card--team {
+		& > :not(.player-card__team-accent) {
+			position: relative;
+			z-index: 1;
+		}
 
-	.player-card--team .player-card__avatar {
-		background: radial-gradient(circle at 50% 30%, var(--team-glow), transparent 62%);
-	}
+		& .player-card__avatar {
+			background: radial-gradient(circle at 50% 30%, var(--team-glow), transparent 62%);
+		}
 
-	.player-card--team .player-card__avatar-glow {
-		border-color: color-mix(in srgb, var(--team-primary) 42%, transparent);
-		box-shadow: none;
-	}
+		& .player-card__avatar-glow {
+			border-color: color-mix(in srgb, var(--team-primary) 42%, transparent);
+			box-shadow: none;
+		}
 
-	.player-card--team .player-card__placeholder {
-		color: var(--team-primary);
+		& .player-card__placeholder {
+			color: var(--team-primary);
+		}
 	}
 
 	.c-match-card__teams,
@@ -298,37 +301,6 @@
 	.home-fixture {
 		position: relative;
 		isolation: isolate;
-	}
-
-	.team-identity-bands {
-		position: absolute;
-		z-index: 0;
-		inset: 0;
-		pointer-events: none;
-	}
-
-	.team-identity-band {
-		position: absolute;
-		inset-block: 0;
-		inline-size: 0.3rem;
-		border-radius: var(--kpl-radius-pill);
-		background: linear-gradient(180deg, var(--team-accent), var(--team-primary));
-		box-shadow: 0 0 0.75rem var(--team-glow);
-	}
-
-	.team-identity-band--home {
-		inset-inline-start: 0;
-	}
-
-	.team-identity-band--away {
-		inset-inline-end: 0;
-	}
-
-	.c-match-card__teams > :not(.team-identity-bands),
-	.home-spotlight__match > :not(.team-identity-bands),
-	.home-fixture > :not(.team-identity-bands) {
-		position: relative;
-		z-index: 1;
 	}
 
 	@media (width < 64rem) {
@@ -381,9 +353,6 @@
 		.home-team-card__identity-accent,
 		.player-card__team-accent,
 		.team-profile-hero__identity-accent,
-		.team-identity-bands {
-			display: none;
-		}
 
 		.team-profile-hero__signature,
 		.c-team-badge .c-team-badge__crest {

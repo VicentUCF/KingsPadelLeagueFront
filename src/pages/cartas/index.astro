@@ -249,7 +249,10 @@ const structuredData = cardsUrl
 					</li>
 				</ol>
 
-				<div class="cards-timing" aria-labelledby="timing-title">
+				<div
+					class="cards-timing c-surface-card c-surface-card--accent"
+					aria-labelledby="timing-title"
+				>
 					<div class="cards-timing__copy">
 						<p class="c-eyebrow">La regla que no puede fallar</p>
 						<h3 id="timing-title">Primero termina el juego. Después, juega tu carta.</h3>
@@ -311,9 +314,9 @@ const structuredData = cardsUrl
 									<span>{level.description}</span>
 								</div>
 							</header>
-							<div class="cards-grid">
+							<div class="cards-grid o-grid">
 								{level.cards.map((card, index) => (
-									<article id={`carta-${card.id}`} class="action-card">
+									<article id={`carta-${card.id}`} class="action-card c-surface-card">
 										<div class="action-card__visual">
 											<img
 												src={card.image}
@@ -349,7 +352,10 @@ const structuredData = cardsUrl
 				}
 			</section>
 
-			<aside class="cards-finale" aria-labelledby="finale-title">
+			<aside
+				class="cards-finale c-surface-card c-surface-card--accent"
+				aria-labelledby="finale-title"
+			>
 				<div>
 					<p class="c-eyebrow">La emoción también se juega</p>
 					<h2 id="finale-title">La carta está en tu mano.<br />El momento lo eliges tú.</h2>
