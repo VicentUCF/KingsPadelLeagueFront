@@ -6,7 +6,11 @@ Nuevo cliente web público de Kings Padel League, construido con Astro. El backo
 
 - Node.js 22.12 o superior
 - npm 10 o superior
-- El repositorio local `kpl-design-system` en `../../Projects/kpl-design-system`
+
+No hace falta ningún checkout local adicional: `@kpl/design-system` se instala directamente desde
+[su repositorio en GitHub](https://github.com/VicentUCF/KPL-Design-System) (ver
+[Sistema de diseño](#sistema-de-diseño)), así que `npm install` es suficiente en cualquier máquina
+o entorno de CI/despliegue.
 
 ## Desarrollo
 
@@ -46,7 +50,7 @@ URL alimenta las etiquetas canonical, el sitemap, las vistas previas sociales y 
 estructurados:
 
 ```sh
-KPL_SITE_URL=https://liga.example KPL_API_BASE_URL=https://kings-league-api.esteveep.dev npm run build
+KPL_SITE_URL=https://kingspadelleague.com KPL_API_BASE_URL=https://kings-league-api.esteveep.dev npm run build
 ```
 
 Los playoffs permanecen ocultos mientras sus endpoints públicos requieran autenticación. Para
@@ -70,7 +74,11 @@ Rutas incluidas:
 - `/calendario` y la página `404`
 - `/noticias` (portada editorial con lead, secundarias y breves) y `/noticias/:slug`
 
-Las rutas de autenticación, perfil y backoffice quedan fuera de este cliente público.
+Las rutas de autenticación, perfil y backoffice quedan fuera de este cliente público: este
+proyecto se despliega en el dominio raíz y el panel de jugadores/presidentes vive aparte, en un
+subdominio propio. La única integración con ese panel es un enlace de salida en el header,
+controlado por la variable `KPL_PORTAL_URL` (URL completa del subdominio). Mientras no se defina,
+el sitio no muestra ninguna referencia al login.
 
 La build genera `/sitemap.xml` y `/robots.txt`. Las fichas de jornada sin cruces confirmados se
 mantienen accesibles, pero no se indexan ni se incluyen en el sitemap hasta disponer de contenido
@@ -97,7 +105,12 @@ y Extract Class/Module— sin modificar el comportamiento público.
 
 ## Sistema de diseño
 
-La dependencia `@kpl/design-system` está enlazada al repositorio local mediante `file:../../Projects/kpl-design-system`.
+La dependencia `@kpl/design-system` apunta al commit fijado de
+[`VicentUCF/KPL-Design-System`](https://github.com/VicentUCF/KPL-Design-System) en `package.json`
+(`git+https://github.com/VicentUCF/KPL-Design-System.git#<sha>`). El repositorio es público, así
+que `npm install` lo clona por HTTPS sin credenciales y ejecuta su propio `prepare` (`npm run
+build`) para generar `dist/` antes de enlazarlo aquí — no depende de ninguna ruta local ni de
+acceso SSH, por lo que funciona igual en CI o en cualquier plataforma de despliegue.
 
 El layout base importa la entrada CSS recomendada:
 
@@ -105,11 +118,11 @@ El layout base importa la entrada CSS recomendada:
 import '@kpl/design-system/css';
 ```
 
-Los cambios hechos en la librería se reflejan reinstalando la dependencia:
-
-```sh
-npm install
-```
+Para consumir una versión más reciente de la librería, actualiza el hash del commit en
+`package.json` y ejecuta `npm install`. Para desarrollar ambos repositorios a la vez (cambios en
+la librería reflejados al instante en este proyecto), sustituye temporalmente la dependencia por
+un `file:` local (por ejemplo `file:../kpl-design-system`) o usa `npm link`; revierte a la
+referencia de GitHub antes de hacer commit.
 
 La composición específica de las páginas vive en `src/styles`; colores, tipografía, espaciado,
 contenedores, botones, chips, tablas, métricas y superficies proceden del sistema de diseño.

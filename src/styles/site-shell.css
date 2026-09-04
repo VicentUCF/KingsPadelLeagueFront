@@ -39,6 +39,13 @@
 		object-fit: contain;
 	}
 
+	.site-shell__actions {
+		display: flex;
+		flex: none;
+		align-items: center;
+		gap: var(--kpl-space-3);
+	}
+
 	.site-shell__menu {
 		position: relative;
 		display: none;

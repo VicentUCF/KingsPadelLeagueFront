@@ -6,7 +6,7 @@ import '../styles/premium-pages.css';
 import '../styles/team-identity.css';
 import { ClientRouter } from 'astro:transitions';
 import type { TransitionDirectionalAnimations } from 'astro';
-import { PLAYOFFS_ENABLED } from '../lib/features';
+import { PLAYOFFS_ENABLED, PORTAL_URL } from '../lib/features';
 
 interface Props {
 	description?: string;
@@ -159,22 +159,31 @@ const pageTransition: TransitionDirectionalAnimations = {
 					}
 				</nav>
 
-				<details class="site-shell__menu">
-					<summary class="c-button c-button--outline c-button--sm">Menú</summary>
-					<nav class="site-shell__mobile-nav" aria-label="Principal móvil">
-						{
-							navigation.map((item) => (
-								<a
-									class="c-nav__link"
-									href={item.href}
-									aria-current={isCurrent(item.href) ? 'page' : undefined}
-								>
-									{item.label}
-								</a>
-							))
-						}
-					</nav>
-				</details>
+				<div class="site-shell__actions">
+					{
+						PORTAL_URL && (
+							<a class="c-button c-button--outline c-button--sm" href={PORTAL_URL}>
+								Área de jugadores
+							</a>
+						)
+					}
+					<details class="site-shell__menu">
+						<summary class="c-button c-button--outline c-button--sm">Menú</summary>
+						<nav class="site-shell__mobile-nav" aria-label="Principal móvil">
+							{
+								navigation.map((item) => (
+									<a
+										class="c-nav__link"
+										href={item.href}
+										aria-current={isCurrent(item.href) ? 'page' : undefined}
+									>
+										{item.label}
+									</a>
+								))
+							}
+						</nav>
+					</details>
+				</div>
 			</div>
 		</header>
 		<div

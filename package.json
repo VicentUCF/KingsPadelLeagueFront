@@ -23,7 +23,7 @@
 		"test:ssg": "node tests/ssg-build.mjs"
 	},
 	"dependencies": {
-		"@kpl/design-system": "file:../../Projects/kpl-design-system",
+		"@kpl/design-system": "git+https://github.com/VicentUCF/KPL-Design-System.git#74871a429cbca165dc3c7070e1d8c4195b8c6b2a",
 		"astro": "^7.2.8"
 	},
 	"allowScripts": {
