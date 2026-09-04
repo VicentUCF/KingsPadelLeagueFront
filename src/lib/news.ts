@@ -92,7 +92,7 @@ export const NEWS_CATEGORY_DESTINATIONS: Record<NewsCategory, { href: string; la
 	equipos: { href: '/equipos', label: 'Conocer los equipos' },
 	calendario: { href: '/calendario', label: 'Consultar el calendario oficial' },
 	cartas: { href: '/cartas', label: 'Descubrir las siete cartas' },
-	partidos: { href: '/jornadas', label: 'Ver jornadas y resultados' },
+	partidos: { href: '/calendario', label: 'Ver el calendario y los resultados' },
 };
 
 export const NEWS_DATE_FORMATTER = new Intl.DateTimeFormat('es-ES', {

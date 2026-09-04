@@ -169,6 +169,10 @@
 		padding: var(--kpl-space-5);
 	}
 
+	.match-card .c-match-card__header {
+		align-items: flex-start;
+	}
+
 	.match-card .c-team-badge__copy {
 		display: grid;
 	}
@@ -178,12 +182,76 @@
 		white-space: normal;
 	}
 
-	.match-card__away {
-		justify-content: flex-end;
+	.match-card__header-meta {
+		display: grid;
+		justify-items: end;
+		gap: 0.2rem;
 		text-align: end;
 	}
 
+	.match-card__header-meta time {
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-100);
+	}
+
+	.match-card__venue {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-50);
+	}
+
+	.match-card__venue svg {
+		inline-size: 0.85rem;
+		block-size: 0.85rem;
+		flex: none;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.6;
+	}
+
+	.match-card__breakdown {
+		border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		padding-block-start: var(--kpl-space-4);
+	}
+
+	.match-card__breakdown summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--kpl-space-2);
+		list-style: none;
+		color: var(--kpl-color-brand-strong);
+		font-size: var(--kpl-font-size-100);
+		font-weight: 800;
+		cursor: pointer;
+	}
+
+	.match-card__breakdown summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.match-card__breakdown summary svg {
+		inline-size: 1rem;
+		block-size: 1rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		transition: rotate var(--kpl-duration-normal) var(--kpl-ease-standard);
+	}
+
+	.match-card__breakdown[open] summary svg {
+		rotate: 180deg;
+	}
+
 	.match-card__pairs {
+		display: grid;
+		gap: var(--kpl-space-3);
+		margin-block-start: var(--kpl-space-4);
+	}
+
+	.match-card__pair {
 		display: grid;
 		gap: var(--kpl-space-2);
 		padding: var(--kpl-space-4);
@@ -191,16 +259,100 @@
 		background: color-mix(in oklch, var(--kpl-color-surface) 88%, black);
 	}
 
-	.match-card__pair {
+	.match-card__pair-label {
+		margin: 0;
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-50);
+		font-weight: 800;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.match-card__pair-row {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 		align-items: center;
 		gap: var(--kpl-space-3);
-		font-size: var(--kpl-font-size-100);
 	}
 
-	.match-card__pair span:last-child {
+	.match-card__pair-players {
+		display: grid;
+		gap: 0.2rem;
+		margin: 0;
+		padding: var(--kpl-space-2) var(--kpl-space-3);
+		border-radius: var(--kpl-radius-md);
+		list-style: none;
+	}
+
+	.match-card__pair-players[data-result='win'] {
+		background: linear-gradient(
+			to left,
+			color-mix(in srgb, var(--kpl-color-success) 26%, transparent),
+			transparent
+		);
+	}
+
+	.match-card__pair-players[data-result='lose'] {
+		background: linear-gradient(
+			to left,
+			color-mix(in srgb, var(--kpl-color-danger) 20%, transparent),
+			transparent
+		);
+	}
+
+	.match-card__pair-players--away[data-result='win'] {
+		background: linear-gradient(
+			to right,
+			color-mix(in srgb, var(--kpl-color-success) 26%, transparent),
+			transparent
+		);
+	}
+
+	.match-card__pair-players--away[data-result='lose'] {
+		background: linear-gradient(
+			to right,
+			color-mix(in srgb, var(--kpl-color-danger) 20%, transparent),
+			transparent
+		);
+	}
+
+	.match-card__pair-players[data-result='win'] a {
+		color: var(--kpl-color-success);
+	}
+
+	.match-card__pair-players[data-result='lose'] a {
+		color: var(--kpl-color-danger);
+	}
+
+	.match-card__pair-players a {
+		color: var(--kpl-color-text-strong);
+		font-size: var(--kpl-font-size-200);
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.match-card__pair-players a:hover,
+	.match-card__pair-players a:focus-visible {
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
+	}
+
+	.match-card__pair-players small {
+		display: block;
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-50);
+	}
+
+	.match-card__pair-players--away {
 		text-align: end;
+	}
+
+	.match-card__pair-score {
+		color: var(--kpl-color-text-strong);
+		font-family: var(--kpl-font-family-heading);
+		font-size: var(--kpl-font-size-200);
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
 	}
 
 	.playoff-bracket {
@@ -229,11 +381,6 @@
 
 	.playoff-match-card {
 		padding: var(--kpl-space-5);
-	}
-
-	.playoff-match-card__away {
-		justify-content: flex-end;
-		text-align: end;
 	}
 
 	.playoff-match-card__pending {
@@ -503,6 +650,7 @@
 		display: grid;
 		grid-template-columns: 9rem minmax(0, 1fr);
 		gap: var(--kpl-space-6);
+		scroll-margin-block-start: 6rem;
 	}
 
 	.calendar-day__date {
@@ -569,13 +717,50 @@
 			grid-template-columns: 1fr auto 1fr;
 		}
 
-		.match-card__pair {
+		.match-card__pair-row {
 			grid-template-columns: 1fr;
+			gap: var(--kpl-space-1);
 			text-align: center;
 		}
 
-		.match-card__pair span:last-child {
+		.match-card__pair-players--away {
 			text-align: center;
+		}
+
+		.match-card__pair-players[data-result='win']:not(.match-card__pair-players--away) {
+			background: linear-gradient(
+				to top,
+				color-mix(in srgb, var(--kpl-color-success) 26%, transparent),
+				transparent
+			);
+		}
+
+		.match-card__pair-players[data-result='lose']:not(.match-card__pair-players--away) {
+			background: linear-gradient(
+				to top,
+				color-mix(in srgb, var(--kpl-color-danger) 20%, transparent),
+				transparent
+			);
+		}
+
+		.match-card__pair-players--away[data-result='win'] {
+			background: linear-gradient(
+				to bottom,
+				color-mix(in srgb, var(--kpl-color-success) 26%, transparent),
+				transparent
+			);
+		}
+
+		.match-card__pair-players--away[data-result='lose'] {
+			background: linear-gradient(
+				to bottom,
+				color-mix(in srgb, var(--kpl-color-danger) 20%, transparent),
+				transparent
+			);
+		}
+
+		.match-card__pair-score {
+			justify-self: center;
 		}
 	}
 

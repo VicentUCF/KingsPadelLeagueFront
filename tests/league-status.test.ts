@@ -143,7 +143,7 @@ describe('resolveHomeSeasonStatus', () => {
 		assert.equal(result.phaseLabel, 'Fase regular');
 		assert.equal(result.matchdayEyebrow, 'Jornada en curso');
 		assert.equal(result.matchdayLabel, 'Jornada 8');
-		assert.equal(result.focusHref, '/jornadas');
+		assert.equal(result.focusHref, '/calendario');
 	});
 });
 

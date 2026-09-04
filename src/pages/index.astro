@@ -52,11 +52,6 @@ const nextMatchday = view.matchdays.find((matchday) => matchday.status === 'upco
 const latestCompletedMatchday =
 	[...view.matchdays].reverse().find((matchday) => matchday.status === 'completed') ?? null;
 const focusMatchday = currentMatchday ?? nextMatchday ?? latestCompletedMatchday;
-const dashboardMatchday = preseason
-	? null
-	: seasonStatus.phaseLabel === 'Playoffs'
-		? (latestCompletedMatchday ?? focusMatchday)
-		: focusMatchday;
 const focusEncounter =
 	focusMatchday?.encounters.find((encounter) => encounter.status === 'current') ??
 	focusMatchday?.encounters[0] ??
@@ -82,7 +77,7 @@ const spotlight = preseason
 					awayTeam: focusEncounter.awayTeam,
 					homeScore: focusEncounter.homeScore,
 					homeTeam: focusEncounter.homeTeam,
-					href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
+					href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/calendario',
 					label: focusMatchday?.label ?? 'Próximo cruce',
 					scheduledAt: focusEncounter.scheduledAt,
 					scheduledAtLabel: focusEncounter.scheduledAtLabel,
@@ -104,7 +99,7 @@ const heroContent = {
 		eyebrow: `${displaySeasonName} · Competición en curso`,
 		title: 'Resultados y clasificación de Kings Padel League.',
 		lead: 'Consulta los marcadores de cada jornada, la clasificación, los próximos partidos y las fichas de equipos y jugadores.',
-		primaryHref: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/jornadas',
+		primaryHref: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/calendario',
 		primaryLabel: currentMatchday ? 'Ver jornada en curso' : 'Consultar resultados',
 		secondaryHref: '/clasificacion',
 		secondaryLabel: 'Ver clasificación',
@@ -122,7 +117,7 @@ const heroContent = {
 		eyebrow: `${displaySeasonName} · Temporada finalizada`,
 		title: `Resultados finales de la ${displaySeasonName}.`,
 		lead: 'Repasa todos los marcadores, la clasificación final y los equipos y jugadores que compitieron en Kings Padel League.',
-		primaryHref: '/jornadas',
+		primaryHref: '/calendario',
 		primaryLabel: 'Consultar todos los resultados',
 		secondaryHref: '/clasificacion',
 		secondaryLabel: 'Ver clasificación final',
@@ -137,16 +132,15 @@ const hasStandingsData =
 	view.standings.some((standing) => standing.points > 0 || standing.playedMatches > 0);
 const standingsByTeamId = new Map(view.standings.map((standing) => [standing.team.id, standing]));
 const topStandings = view.standings.slice(0, 6);
-const resultPathMeta = preseason
-	? `Comienza el ${SEASON_STARTS_LABEL}`
-	: currentMatchday
-		? `${currentMatchday.label} en curso`
-		: latestCompletedMatchday
-			? `Última: ${latestCompletedMatchday.label}`
-			: 'Jornadas y cruces';
 const calendarPathMeta = preseason
 	? `Desde el ${SEASON_STARTS_LABEL}`
-	: (nextMatchday?.dateLabel ?? 'Próximas fechas');
+	: currentMatchday
+		? `${currentMatchday.label} en curso`
+		: nextMatchday
+			? `Próxima: ${nextMatchday.dateLabel}`
+			: latestCompletedMatchday
+				? `Última: ${latestCompletedMatchday.label}`
+				: 'Jornadas y resultados';
 const focusEyebrow = preseason ? 'Próximamente' : seasonStatus.matchdayEyebrow;
 const focusLabel = preseason ? displaySeasonName : seasonStatus.matchdayLabel;
 const focusDateLabel = preseason
@@ -377,15 +371,6 @@ const homeStructuredData = homeUrl
 		</section>
 
 		<nav class="home-shortcuts o-container o-container--xl" aria-label="Accesos de la liga">
-			<a class="home-shortcut" href="/jornadas">
-				<span class="home-shortcut__icon" aria-hidden="true">
-					<svg viewBox="0 0 24 24"
-						><path d="M4 5h16v14H4zM8 3v4m8-4v4M4 10h16m-12 4h3m2 0h3"></path></svg
-					>
-				</span>
-				<span><strong>Resultados</strong><small>{resultPathMeta}</small></span>
-				<span class="home-shortcut__arrow" aria-hidden="true">↗</span>
-			</a>
 			<a class="home-shortcut" href="/clasificacion">
 				<span class="home-shortcut__icon" aria-hidden="true">
 					<svg viewBox="0 0 24 24"><path d="M6 20V10h4v10M14 20V4h4v16M3 20h18"></path></svg>
@@ -442,76 +427,6 @@ const homeStructuredData = homeUrl
 			</header>
 
 			<div class="home-dashboard">
-				<article class="home-competition-panel">
-					<header class="home-panel-heading">
-						<div>
-							<p class="c-eyebrow">
-								{
-									dashboardMatchday?.status === 'completed'
-										? 'Últimos resultados'
-										: dashboardMatchday?.status === 'current'
-											? 'Jornada en curso'
-											: 'Próxima jornada'
-								}
-							</p>
-							<h3>{dashboardMatchday?.label ?? 'Calendario en preparación'}</h3>
-						</div>
-						{
-							dashboardMatchday && (
-								<time datetime={dashboardMatchday.date}>{dashboardMatchday.dateLabel}</time>
-							)
-						}
-					</header>
-
-					{
-						dashboardMatchday?.encounters.length ? (
-							<div class="home-fixtures">
-								{dashboardMatchday.encounters.slice(0, 3).map((encounter) => (
-									<div class="home-fixture">
-										<TeamIdentityBands
-											homeTeam={encounter.homeTeam}
-											awayTeam={encounter.awayTeam}
-										/>
-										<TeamBadge team={encounter.homeTeam} />
-										{encounter.status === 'upcoming' ? (
-											<strong class="home-fixture__versus" aria-label="contra">
-												VS
-											</strong>
-										) : (
-											<strong
-												class="home-fixture__score"
-												aria-label={`${encounter.homeTeam.name}, ${encounter.homeScore}; ${encounter.awayTeam.name}, ${encounter.awayScore}`}
-											>
-												{encounter.homeScore}
-												<span>:</span>
-												{encounter.awayScore}
-											</strong>
-										)}
-										<div class="home-fixture__away">
-											<TeamBadge team={encounter.awayTeam} />
-										</div>
-									</div>
-								))}
-							</div>
-						) : (
-							<div class="home-panel-empty">
-								<strong>Los cruces se están preparando.</strong>
-								<p>Publicaremos aquí los enfrentamientos en cuanto el calendario sea oficial.</p>
-							</div>
-						)
-					}
-
-					<footer class="home-panel-footer">
-						<span>{dashboardMatchday?.encounters.length ?? 0} enfrentamientos</span>
-						<a
-							class="c-button c-button--outline c-button--sm"
-							href={dashboardMatchday ? `/jornadas/${dashboardMatchday.id}` : '/calendario'}
-						>
-							{dashboardMatchday ? 'Ver jornada' : 'Ver calendario'} →
-						</a>
-					</footer>
-				</article>
-
 				<aside class="home-standings" aria-labelledby="standings-title">
 					<header class="home-panel-heading">
 						<div>

@@ -42,7 +42,7 @@ export interface HomeSeasonStatus {
 		| 'Próximo playoff';
 	matchdayLabel: string;
 	dateLabel: string;
-	focusHref: '/jornadas' | '/playoffs';
+	focusHref: '/calendario' | '/playoffs';
 }
 
 export function resolveHomeSeasonStatus(
@@ -132,7 +132,7 @@ export function resolveHomeSeasonStatus(
 		dateLabel: focusMatchday
 			? formatMatchdayDate(focusMatchday.scheduledAt)
 			: 'Fechas por confirmar',
-		focusHref: '/jornadas',
+		focusHref: '/calendario',
 	};
 }
 

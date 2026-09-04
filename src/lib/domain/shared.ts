@@ -15,11 +15,12 @@ export function createPairLineup(
 	return {
 		players: [player1Id, player2Id]
 			.map((id) => playerById.get(id)!)
-			.map(({ id, slug, displayName, positionLabel }) => ({
+			.map(({ id, slug, firstName, lastName, alias }) => ({
 				id,
 				slug,
-				displayName,
-				positionLabel,
+				firstName,
+				lastName,
+				alias,
 			})),
 	};
 }

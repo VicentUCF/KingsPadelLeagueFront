@@ -1,5 +1,5 @@
 ---
-import type { PublicEncounter } from '../lib/public-league';
+import type { PairLineup, PublicEncounter } from '../lib/public-league';
 import TeamBadge from './TeamBadge.astro';
 import TeamIdentityBands from './TeamIdentityBands.astro';
 
@@ -7,14 +7,21 @@ interface Props {
 	encounter: PublicEncounter;
 	matchdayHref?: string;
 	showPairs?: boolean;
+	openPairs?: boolean;
 }
 
-const { encounter, matchdayHref, showPairs = false } = Astro.props;
+const { encounter, matchdayHref, showPairs = true, openPairs = false } = Astro.props;
 const labels = {
 	completed: 'Finalizado',
 	current: 'En juego',
 	upcoming: 'Programado',
 } as const;
+const hasBreakdown =
+	showPairs && encounter.status !== 'upcoming' && encounter.pairResults.length > 0;
+
+function fullName(player: PairLineup['players'][number]) {
+	return [player.firstName, player.lastName].filter(Boolean).join(' ');
+}
 ---
 
 <article class="match-card c-match-card" data-status={encounter.status}>
@@ -31,7 +38,18 @@ const labels = {
 		>
 			{labels[encounter.status]}
 		</span>
-		<time datetime={encounter.scheduledAt}>{encounter.scheduledAtLabel}</time>
+		<div class="match-card__header-meta">
+			<time datetime={encounter.scheduledAt}>{encounter.scheduledAtLabel}</time>
+			<span class="match-card__venue">
+				<svg viewBox="0 0 24 24" aria-hidden="true"
+					><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"></path><circle
+						cx="12"
+						cy="9.5"
+						r="2.25"></circle></svg
+				>
+				Padel Mixto Xeresa
+			</span>
+		</div>
 	</header>
 	<div class="c-match-card__teams">
 		<TeamIdentityBands homeTeam={encounter.homeTeam} awayTeam={encounter.awayTeam} />
@@ -55,28 +73,65 @@ const labels = {
 				</strong>
 			)
 		}
-		<div class="c-match-card__team match-card__away">
+		<div class="c-match-card__team">
 			<TeamBadge team={encounter.awayTeam} meta="Visitante" />
 		</div>
 	</div>
 	{
-		showPairs && encounter.status !== 'upcoming' && encounter.pairResults.length > 0 && (
-			<div class="match-card__pairs">
-				{encounter.pairResults.map((pair) => (
-					<div class="match-card__pair">
-						<span>{pair.homePair.players.map((player) => player.displayName).join(' / ')}</span>
-						<strong>{pair.homeScoreLabel}</strong>
-						<span>{pair.awayPair.players.map((player) => player.displayName).join(' / ')}</span>
-					</div>
-				))}
-			</div>
+		hasBreakdown && (
+			<details class="match-card__breakdown" open={openPairs}>
+				<summary>
+					<span>Ver desglose por parejas</span>
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<path d="m6 9 6 6 6-6" />
+					</svg>
+				</summary>
+				<div class="match-card__pairs">
+					{encounter.pairResults.map((pair) => {
+						const homeWins = pair.winnerTeamId === encounter.homeTeam.id;
+						const awayWins = pair.winnerTeamId === encounter.awayTeam.id;
+						return (
+							<div class="match-card__pair">
+								<p class="match-card__pair-label">{pair.label}</p>
+								<div class="match-card__pair-row">
+									<ul
+										class="match-card__pair-players"
+										data-result={homeWins ? 'win' : awayWins ? 'lose' : undefined}
+									>
+										{pair.homePair.players.map((player) => (
+											<li>
+												<a href={`/jugadores/${player.slug}`}>{fullName(player)}</a>
+												{player.alias && <small>“{player.alias}”</small>}
+											</li>
+										))}
+										{homeWins && <span class="u-visually-hidden">Pareja ganadora</span>}
+									</ul>
+									<strong class="match-card__pair-score">{pair.homeScoreLabel}</strong>
+									<ul
+										class="match-card__pair-players match-card__pair-players--away"
+										data-result={awayWins ? 'win' : homeWins ? 'lose' : undefined}
+									>
+										{pair.awayPair.players.map((player) => (
+											<li>
+												<a href={`/jugadores/${player.slug}`}>{fullName(player)}</a>
+												{player.alias && <small>“{player.alias}”</small>}
+											</li>
+										))}
+										{awayWins && <span class="u-visually-hidden">Pareja ganadora</span>}
+									</ul>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</details>
 		)
 	}
 	{
 		matchdayHref && (
 			<footer class="c-match-card__footer">
 				<span class="c-match-card__meta">
-					{encounter.status === 'upcoming' ? 'Horario oficial' : 'Resultado oficial'}
+					{encounter.status === 'upcoming' ? 'Horario' : 'Resultado'}
 				</span>
 				<a class="c-button c-button--ghost c-button--sm" href={matchdayHref}>
 					Ver jornada →

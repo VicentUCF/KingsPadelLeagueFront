@@ -740,64 +740,6 @@
 	.team-roster__players[data-count='4'] .team-roster__list {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-
-	.player-overview,
-	.calendar-overview {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
-		border-radius: var(--kpl-radius-xl);
-		background: rgb(255 255 255 / 0.018);
-	}
-
-	.player-overview article,
-	.calendar-overview article {
-		position: relative;
-		display: grid;
-		gap: var(--kpl-space-2);
-		padding: clamp(var(--kpl-space-5), 4vw, var(--kpl-space-8));
-	}
-
-	.player-overview article + article,
-	.calendar-overview article + article {
-		border-inline-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
-	}
-
-	.player-overview article > span {
-		position: absolute;
-		inset-block-start: var(--kpl-space-3);
-		inset-inline-end: var(--kpl-space-4);
-		color: rgb(255 255 255 / 0.09);
-		font-family: var(--kpl-font-family-heading);
-		font-size: var(--kpl-font-size-50);
-		font-weight: 700;
-	}
-
-	.player-overview small,
-	.calendar-overview small {
-		color: var(--kpl-color-text-muted);
-		font-size: var(--kpl-font-size-50);
-		font-weight: 800;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-	}
-
-	.player-overview strong,
-	.calendar-overview strong {
-		min-inline-size: 0;
-		color: var(--kpl-color-text-strong);
-		font-family: var(--kpl-font-family-heading);
-		font-size: clamp(2.1rem, 5vw, 4rem);
-		font-variant-numeric: tabular-nums;
-		line-height: 1;
-	}
-
-	.player-overview .player-overview__date {
-		font-size: clamp(1.35rem, 2.5vw, 2.5rem);
-		line-height: 1.05;
-		overflow-wrap: normal;
-	}
-
 	.roster-status {
 		grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.8fr);
 	}
@@ -1666,6 +1608,207 @@
 		margin-block-end: var(--kpl-space-2);
 	}
 
+	.calendar-hero {
+		display: grid;
+		gap: var(--kpl-space-6);
+	}
+
+	.calendar-hero__intro {
+		display: grid;
+		gap: var(--kpl-space-3);
+		max-inline-size: 52rem;
+	}
+
+	.calendar-hero__intro h1 {
+		font-size: clamp(var(--kpl-font-size-600), 6vw, 4.5rem);
+		letter-spacing: -0.03em;
+	}
+
+	.calendar-hero__intro p {
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-200);
+		line-height: var(--kpl-line-height-loose);
+	}
+
+	.season-map {
+		display: grid;
+		gap: var(--kpl-space-6);
+		padding: clamp(var(--kpl-space-6), 5vw, var(--kpl-space-8));
+		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		border-radius: var(--kpl-radius-xl);
+		background:
+			radial-gradient(
+				circle at 10% 0%,
+				color-mix(in srgb, var(--kpl-color-brand) 14%, transparent),
+				transparent 38%
+			),
+			linear-gradient(160deg, rgb(255 255 255 / 0.04), transparent 45%), var(--kpl-color-surface);
+		box-shadow: var(--kpl-shadow-lg);
+	}
+
+	.season-map__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
+		justify-content: space-between;
+		gap: var(--kpl-space-4);
+	}
+
+	.season-map__head h2 {
+		font-size: clamp(var(--kpl-font-size-500), 4vw, var(--kpl-font-size-700));
+	}
+
+	.season-map__legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--kpl-space-4);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-50);
+	}
+
+	.season-map__legend li {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--kpl-space-2);
+	}
+
+	.season-map__legend-dot {
+		display: inline-block;
+		inline-size: 0.6rem;
+		block-size: 0.6rem;
+		border-radius: 50%;
+		background: currentcolor;
+	}
+
+	.season-map__legend-dot[data-status='upcoming'] {
+		color: var(--kpl-color-info);
+	}
+
+	.season-map__legend-dot[data-status='current'] {
+		color: var(--kpl-color-brand-strong);
+	}
+
+	.season-map__legend-dot[data-status='completed'] {
+		color: var(--kpl-color-success);
+	}
+
+	.season-map__grid {
+		display: grid;
+		gap: var(--kpl-space-3);
+	}
+
+	.season-map__month {
+		display: grid;
+		grid-template-columns: minmax(7.5rem, 9rem) minmax(0, 1fr);
+		align-items: center;
+		gap: var(--kpl-space-4);
+		padding-block: var(--kpl-space-2);
+	}
+
+	.season-map__month + .season-map__month {
+		border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+	}
+
+	.season-map__month-label {
+		margin: 0;
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-50);
+		font-weight: 800;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.season-map__days {
+		display: flex;
+		gap: 0.3rem;
+		margin: 0;
+		padding-block: var(--kpl-space-1);
+		list-style: none;
+		overflow-x: auto;
+		overscroll-behavior-inline: contain;
+		scrollbar-gutter: stable;
+	}
+
+	.season-map__days > li {
+		flex: none;
+	}
+
+	.season-map__day {
+		display: grid;
+		place-items: center;
+		inline-size: 1.6rem;
+		block-size: 1.6rem;
+		border-radius: var(--kpl-radius-pill);
+		color: rgb(255 255 255 / 0.28);
+		font-size: 0.65rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.season-map__day[data-today] {
+		box-shadow: inset 0 0 0 1px var(--kpl-color-border-strong);
+		color: var(--kpl-color-text-muted);
+	}
+
+	a.season-map__day {
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		inline-size: auto;
+		min-inline-size: 2.6rem;
+		gap: 0.3rem;
+		padding-inline: var(--kpl-space-2);
+		border: var(--kpl-border-width) solid transparent;
+		color: var(--kpl-color-text-strong);
+		font-weight: 700;
+		text-decoration: none;
+		transition:
+			translate var(--kpl-duration-normal) var(--kpl-ease-standard),
+			border-color var(--kpl-duration-normal) var(--kpl-ease-standard);
+	}
+
+	a.season-map__day .season-map__day-number {
+		font-size: 0.7rem;
+		opacity: 0.75;
+	}
+
+	a.season-map__day .season-map__day-tag {
+		font-family: var(--kpl-font-family-heading);
+		font-size: 0.7rem;
+	}
+
+	a.season-map__day[data-status='upcoming'] {
+		border-color: color-mix(in srgb, var(--kpl-color-info) 45%, transparent);
+		background: color-mix(in srgb, var(--kpl-color-info) 14%, transparent);
+		color: var(--kpl-color-info);
+	}
+
+	a.season-map__day[data-status='current'] {
+		border-color: var(--kpl-color-brand);
+		background: color-mix(in srgb, var(--kpl-color-brand) 20%, transparent);
+		color: var(--kpl-color-brand-strong);
+		box-shadow: 0 0 0.85rem color-mix(in srgb, var(--kpl-color-brand) 45%, transparent);
+	}
+
+	a.season-map__day[data-status='completed'] {
+		border-color: color-mix(in srgb, var(--kpl-color-success) 40%, transparent);
+		background: color-mix(in srgb, var(--kpl-color-success) 12%, transparent);
+		color: var(--kpl-color-success);
+	}
+
+	a.season-map__day:hover,
+	a.season-map__day:focus-visible {
+		translate: 0 -0.15rem;
+		border-color: var(--kpl-color-brand);
+	}
+
+	a.season-map__day[aria-current='date'] {
+		outline: var(--kpl-border-width) dashed var(--kpl-color-brand-strong);
+		outline-offset: 2px;
+	}
+
 	.matchday-grid--premium {
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
 		gap: var(--kpl-space-5);
@@ -1748,6 +1891,11 @@
 		background:
 			linear-gradient(145deg, rgb(255 255 255 / 0.055), transparent 42%), var(--kpl-color-surface);
 		box-shadow: var(--kpl-shadow-md);
+	}
+
+	.match-list--premium .c-team-badge,
+	.calendar-list .c-team-badge {
+		--kpl-team-crest-size: 3.25rem;
 	}
 
 	.c-score--versus {
@@ -2006,9 +2154,15 @@
 		}
 
 		.section-block__header--editorial,
-		.filters-panel__heading {
+		.filters-panel__heading,
+		.season-map__head {
 			align-items: start;
 			flex-direction: column;
+		}
+
+		.season-map__month {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--kpl-space-2);
 		}
 
 		.market-status {
@@ -2020,21 +2174,6 @@
 			justify-self: start;
 		}
 
-		.player-overview,
-		.calendar-overview {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.player-overview article:nth-child(3),
-		.calendar-overview article:nth-child(3) {
-			border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
-			border-inline-start: 0;
-		}
-
-		.player-overview article:nth-child(4),
-		.calendar-overview article:nth-child(4) {
-			border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
-		}
 
 		.filters-panel--players .filters-panel__grid,
 		.filters-panel__grid--calendar {
@@ -2181,11 +2320,6 @@
 
 		.team-roster__actions .c-chip {
 			grid-column: auto;
-		}
-
-		.player-overview strong,
-		.calendar-overview strong {
-			font-size: 2.4rem;
 		}
 
 		.player-profile__facts {

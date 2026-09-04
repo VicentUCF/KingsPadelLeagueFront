@@ -29,8 +29,8 @@ try {
 			readFile(join(outDir, 'robots.txt'), 'utf8'),
 		]);
 	await runBuild(port, activeOutDir, false);
-	const [matchdays, activeMatchday] = await Promise.all([
-		readFile(join(activeOutDir, 'jornadas/index.html'), 'utf8'),
+	const [calendarPage, activeMatchday] = await Promise.all([
+		readFile(join(activeOutDir, 'calendario/index.html'), 'utf8'),
 		readFile(join(activeOutDir, 'jornadas/jornada-1/index.html'), 'utf8'),
 	]);
 
@@ -45,7 +45,7 @@ try {
 		['detalle de equipo', team],
 		['jugadores', players],
 		['detalle de jugador', player],
-		['jornadas', matchdays],
+		['calendario', calendarPage],
 		['detalle de jornada', activeMatchday],
 	]) {
 		assertUniqueTransitionNames(label, page);
@@ -56,11 +56,14 @@ try {
 	for (const page of [players, team, player]) {
 		assertTransitionNames(page, ['kpl-player-king-portrait', 'kpl-player-king-name']);
 	}
-	for (const page of [matchdays, activeMatchday]) {
+	for (const page of [calendarPage, activeMatchday]) {
 		assertTransitionNames(page, ['kpl-matchday-jornada-1-title']);
 	}
-	assert.match(matchdays, /<span class="c-team-badge"[^>]*>/);
-	assert.doesNotMatch(matchdays, /<a class="c-team-badge"/);
+	assert.match(calendarPage, /<a class="c-team-badge"[^>]*href="\/equipos\//);
+	assert.match(calendarPage, /Padel Mixto Xeresa/);
+	assert.match(calendarPage, /season-map__day--match/);
+	assert.match(calendarPage, /Ver desglose por parejas/);
+	assert.match(calendarPage, /<a href="\/jugadores\/king">King<\/a>/);
 	assert.match(home, /Pretemporada/);
 	assert.match(home, /Temporada 2/);
 	assert.match(home, /Sigue la Kings Padel League desde el primer partido/);

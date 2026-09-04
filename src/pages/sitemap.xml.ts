@@ -11,7 +11,6 @@ export const GET: APIRoute = async ({ site }) => {
 	const view = await loadPublicLeagueView();
 	const paths = [
 		'/',
-		'/jornadas',
 		'/clasificacion',
 		'/calendario',
 		'/cartas',

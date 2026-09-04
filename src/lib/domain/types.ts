@@ -52,7 +52,7 @@ export interface PublicTeam {
 }
 
 export interface PairLineup {
-	players: Pick<PublicPlayer, 'id' | 'slug' | 'displayName' | 'positionLabel'>[];
+	players: Pick<PublicPlayer, 'id' | 'slug' | 'firstName' | 'lastName' | 'alias'>[];
 }
 
 export interface PairResult {

@@ -616,6 +616,7 @@
 	}
 
 	.news-article__related-teams {
+    padding: 1rem 0rem;
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--kpl-space-3);

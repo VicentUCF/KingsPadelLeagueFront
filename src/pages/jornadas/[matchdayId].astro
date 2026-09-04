@@ -37,8 +37,8 @@ const matchdayStructuredData = matchdayUrl
 				{
 					'@type': 'ListItem',
 					position: 1,
-					name: 'Jornadas y resultados',
-					item: new URL('/jornadas', Astro.site!).href,
+					name: 'Calendario',
+					item: new URL('/calendario', Astro.site!).href,
 				},
 				{ '@type': 'ListItem', position: 2, name: matchday.label, item: matchdayUrl },
 			],
@@ -55,7 +55,7 @@ const matchdayStructuredData = matchdayUrl
 	<main id="main-content" class="public-page public-page--matchday-detail">
 		<div class="o-container o-container--xl public-page__body">
 			<nav class="c-breadcrumbs" aria-label="Migas de pan">
-				<a class="c-breadcrumbs__item" href="/jornadas">← Todas las jornadas</a>
+				<a class="c-breadcrumbs__item" href="/calendario">← Volver al calendario</a>
 			</nav>
 
 			<PageHero
@@ -87,8 +87,8 @@ const matchdayStructuredData = matchdayUrl
 						<a class="c-button c-button--primary" href="/equipos">
 							Ver equipos
 						</a>
-						<a class="c-button c-button--outline" href="/jornadas">
-							Volver a jornadas
+						<a class="c-button c-button--outline" href="/calendario">
+							Volver al calendario
 						</a>
 					</SeasonReveal>
 				) : (
@@ -112,7 +112,7 @@ const matchdayStructuredData = matchdayUrl
 							{matchday.encounters.length ? (
 								<div class="match-list match-list--premium">
 									{matchday.encounters.map((encounter) => (
-										<MatchCard encounter={encounter} showPairs />
+										<MatchCard encounter={encounter} showPairs openPairs />
 									))}
 								</div>
 							) : (

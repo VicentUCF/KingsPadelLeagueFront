@@ -1,7 +1,7 @@
 ---
 import EmptyState from '../../components/EmptyState.astro';
 import MatchCard from '../../components/MatchCard.astro';
-import PageHero from '../../components/PageHero.astro';
+import SeasonMap from '../../components/SeasonMap.astro';
 import SeasonReveal from '../../components/SeasonReveal.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
@@ -17,12 +17,6 @@ const preseason = isPublicPreseason();
 const allEncounters = view.matchdays.flatMap((matchday) =>
 	matchday.encounters.map((encounter) => ({ encounter, matchday })),
 );
-const finishedCount = allEncounters.filter(
-	({ encounter }) => encounter.status === 'completed',
-).length;
-const upcomingCount = allEncounters.filter(
-	({ encounter }) => encounter.status !== 'completed',
-).length;
 const dateGroups = new Map<
 	string,
 	{ date: Date; items: { encounter: PublicEncounter; matchday: PublicMatchday }[] }
@@ -41,11 +35,19 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 	weekday: 'short',
 	timeZone: 'Europe/Madrid',
 });
+
+function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefined {
+	const [first, ...rest] = items;
+	if (!first) return undefined;
+	return rest.every((item) => item.matchday.id === first.matchday.id)
+		? first.matchday.id
+		: undefined;
+}
 ---
 
 <BaseLayout
-	title={`Calendario Kings Padel League | ${PUBLIC_SEASON_NAME}`}
-	description={`Consulta las fechas, horarios y enfrentamientos de la ${PUBLIC_SEASON_NAME} de Kings Padel League. Filtra los partidos por estado o equipo.`}
+	title={`Calendario y resultados Kings Padel League | ${PUBLIC_SEASON_NAME}`}
+	description={`Consulta cuándo se juega cada jornada y sigue los resultados y el desglose por parejas de la ${PUBLIC_SEASON_NAME} de Kings Padel League.`}
 >
 	<main id="main-content" class="public-page public-page--calendar">
 		<div class="o-container o-container--xl public-page__body">
@@ -54,7 +56,7 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 					<SeasonReveal
 						eyebrow="Calendario próximamente"
 						title={`La competición comienza el ${SEASON_STARTS_LABEL}.`}
-						description="Publicaremos aquí las jornadas, los cruces y los horarios cuando estén confirmados. Mientras tanto, conoce los equipos y jugadores de la temporada."
+						description="Publicaremos aquí las jornadas, los cruces, los horarios y los resultados cuando estén confirmados. Mientras tanto, conoce los equipos y jugadores de la temporada."
 						items={['Mercado actualizado', 'Cruces confirmados', 'Calendario publicado']}
 					>
 						<a class="c-button c-button--primary" href="/equipos">
@@ -66,32 +68,17 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 					</SeasonReveal>
 				) : (
 					<>
-						<section class="calendar-overview" aria-label="Resumen del calendario">
-							<article>
-								<>
-									<small>Jornadas</small>
-									<strong>{view.matchdays.length}</strong>
-								</>
-							</article>
-							<article>
-								<>
-									<small>Partidos</small>
-									<strong>{allEncounters.length}</strong>
-								</>
-							</article>
-							<article>
-								<>
-									<small>Finalizados</small>
-									<strong>{finishedCount}</strong>
-								</>
-							</article>
-							<article>
-								<>
-									<small>Pendientes</small>
-									<strong>{upcomingCount}</strong>
-								</>
-							</article>
-						</section>
+						<header class="calendar-hero">
+							<div class="calendar-hero__intro">
+								<p class="c-eyebrow">{PUBLIC_SEASON_NAME} · Calendario oficial</p>
+								<h1>Calendario y resultados de Kings Padel League</h1>
+								<p>
+									Consulta cuándo se juega cada jornada, entra en cualquier partido para ver su
+									marcador y abre el desglose por parejas para seguir a los jugadores.
+								</p>
+							</div>
+							<SeasonMap matchdays={view.matchdays} />
+						</header>
 
 						{allEncounters.length ? (
 							<>
@@ -143,39 +130,47 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 								</section>
 
 								<div class="calendar-list" data-calendar-list>
-									{groups.map(([, group]) => (
-										<section class="calendar-day" data-calendar-day>
-											<div class="calendar-day__date">
-												<span>{formatWeekday.format(group.date)}</span>
-												<strong>{formatDay.format(group.date)}</strong>
-												<span>{formatMonth.format(group.date)}</span>
-											</div>
-											<div class="match-list">
-												<header class="calendar-day__heading">
-													<p class="c-eyebrow">Agenda del día</p>
-													<h2>
-														{new Intl.DateTimeFormat('es-ES', {
-															dateStyle: 'long',
-															timeZone: 'Europe/Madrid',
-														}).format(group.date)}
-													</h2>
-												</header>
-												{group.items.map(({ encounter, matchday }) => (
-													<div
-														data-calendar-match
-														data-status={encounter.status}
-														data-home={encounter.homeTeam.id}
-														data-away={encounter.awayTeam.id}
-													>
-														<MatchCard
-															encounter={encounter}
-															matchdayHref={`/jornadas/${matchday.id}`}
-														/>
-													</div>
-												))}
-											</div>
-										</section>
-									))}
+									{groups.map(([key, group]) => {
+										const matchdayId = dayMatchdayId(group.items);
+										return (
+											<section
+												class="calendar-day"
+												id={`day-${key}`}
+												tabindex="-1"
+												data-calendar-day
+											>
+												<div class="calendar-day__date">
+													<span>{formatWeekday.format(group.date)}</span>
+													<strong>{formatDay.format(group.date)}</strong>
+													<span>{formatMonth.format(group.date)}</span>
+												</div>
+												<div class="match-list">
+													<header class="calendar-day__heading">
+														<p class="c-eyebrow">Agenda del día</p>
+														<h2 transition:name={matchdayId && `kpl-matchday-${matchdayId}-title`}>
+															{new Intl.DateTimeFormat('es-ES', {
+																dateStyle: 'long',
+																timeZone: 'Europe/Madrid',
+															}).format(group.date)}
+														</h2>
+													</header>
+													{group.items.map(({ encounter, matchday }) => (
+														<div
+															data-calendar-match
+															data-status={encounter.status}
+															data-home={encounter.homeTeam.id}
+															data-away={encounter.awayTeam.id}
+														>
+															<MatchCard
+																encounter={encounter}
+																matchdayHref={`/jornadas/${matchday.id}`}
+															/>
+														</div>
+													))}
+												</div>
+											</section>
+										);
+									})}
 								</div>
 								<div class="directory-empty" role="status" data-calendar-empty hidden>
 									<strong>No hay partidos con esos filtros.</strong>

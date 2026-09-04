@@ -1,0 +1,145 @@
+---
+import type { PublicMatchday, PublicStatus } from '../lib/public-league';
+
+interface Props {
+	matchdays: PublicMatchday[];
+}
+
+interface DayCell {
+	key: string;
+	day: number;
+	isToday: boolean;
+	matchday: PublicMatchday | null;
+}
+
+interface MonthGroup {
+	key: string;
+	label: string;
+	days: DayCell[];
+}
+
+const { matchdays } = Astro.props;
+
+const dayKeyFormatter = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' });
+const monthLabelFormatter = new Intl.DateTimeFormat('es-ES', {
+	month: 'long',
+	year: 'numeric',
+	timeZone: 'UTC',
+});
+const longDateFormatter = new Intl.DateTimeFormat('es-ES', {
+	weekday: 'long',
+	day: 'numeric',
+	month: 'long',
+	timeZone: 'UTC',
+});
+
+const statusLabels: Record<PublicStatus, string> = {
+	completed: 'Finalizada',
+	current: 'En juego',
+	upcoming: 'Programada',
+};
+
+function capitalize(value: string) {
+	return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+const matchdayByDay = new Map<string, PublicMatchday>();
+for (const matchday of matchdays) {
+	matchdayByDay.set(dayKeyFormatter.format(new Date(matchday.date)), matchday);
+}
+
+const todayKey = dayKeyFormatter.format(new Date());
+const monthKeys = [...matchdayByDay.keys()].map((key) => key.slice(0, 7)).sort();
+const months: MonthGroup[] = [];
+
+if (monthKeys.length > 0) {
+	const [firstYear, firstMonth] = monthKeys[0].split('-').map(Number);
+	const [lastYear, lastMonth] = monthKeys[monthKeys.length - 1].split('-').map(Number);
+	const start = firstYear * 12 + (firstMonth - 1);
+	const end = lastYear * 12 + (lastMonth - 1);
+
+	for (let cursor = start; cursor <= end; cursor += 1) {
+		const year = Math.floor(cursor / 12);
+		const month = (cursor % 12) + 1;
+		const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+		const monthKey = `${year}-${String(month).padStart(2, '0')}`;
+		const days: DayCell[] = Array.from({ length: daysInMonth }, (_, index) => {
+			const day = index + 1;
+			const key = `${monthKey}-${String(day).padStart(2, '0')}`;
+			return { key, day, isToday: key === todayKey, matchday: matchdayByDay.get(key) ?? null };
+		});
+		months.push({
+			key: monthKey,
+			label: capitalize(monthLabelFormatter.format(new Date(Date.UTC(year, month - 1, 1)))),
+			days,
+		});
+	}
+}
+---
+
+{
+	months.length > 0 && (
+		<div class="season-map" data-season-map>
+			<div class="season-map__head">
+				<p class="c-eyebrow">Mapa de la temporada</p>
+				<ul class="season-map__legend">
+					<li>
+						<span class="season-map__legend-dot" data-status="upcoming" aria-hidden="true" />
+						Programada
+					</li>
+					<li>
+						<span class="season-map__legend-dot" data-status="current" aria-hidden="true" />
+						En juego
+					</li>
+					<li>
+						<span class="season-map__legend-dot" data-status="completed" aria-hidden="true" />
+						Finalizada
+					</li>
+				</ul>
+			</div>
+			<div class="season-map__grid">
+				{months.map((month) => (
+					<section class="season-map__month" aria-label={month.label}>
+						<h3 class="season-map__month-label">{month.label}</h3>
+						<ol class="season-map__days">
+							{month.days.map((cell) =>
+								cell.matchday ? (
+									<li>
+										<a
+											class="season-map__day season-map__day--match"
+											data-status={cell.matchday.status}
+											href={`#day-${cell.key}`}
+											aria-current={cell.isToday ? 'date' : undefined}
+											title={`${cell.matchday.label} · ${capitalize(longDateFormatter.format(new Date(`${cell.key}T00:00:00Z`)))}`}
+										>
+											<span class="season-map__day-number" aria-hidden="true">
+												{cell.day}
+											</span>
+											<span class="season-map__day-tag" aria-hidden="true">
+												J{cell.matchday.number}
+											</span>
+											<span class="u-visually-hidden">
+												{capitalize(longDateFormatter.format(new Date(`${cell.key}T00:00:00Z`)))}:{' '}
+												{cell.matchday.label}, {statusLabels[cell.matchday.status]}
+											</span>
+										</a>
+									</li>
+								) : (
+									<li>
+										<span
+											class="season-map__day"
+											data-today={cell.isToday || undefined}
+											aria-hidden="true"
+										>
+											{cell.day}
+										</span>
+									</li>
+								),
+							)}
+						</ol>
+					</section>
+				))}
+			</div>
+		</div>
+	)
+}

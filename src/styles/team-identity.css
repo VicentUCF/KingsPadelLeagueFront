@@ -309,7 +309,7 @@
 
 	.team-identity-band {
 		position: absolute;
-		inset-block: 12%;
+		inset-block: 0;
 		inline-size: 0.3rem;
 		border-radius: var(--kpl-radius-pill);
 		background: linear-gradient(180deg, var(--team-accent), var(--team-primary));
@@ -355,10 +355,6 @@
 
 		.team-profile-hero__signature p {
 			grid-column: 1 / -1;
-		}
-
-		.team-identity-band {
-			inset-block: 18%;
 		}
 	}
 

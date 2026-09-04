@@ -30,23 +30,6 @@ const presidents = view.players.filter((player) => player.isPresident).length;
 				<a slot="actions" class="c-button c-button--primary" href="/equipos">Explorar equipos</a>
 			</PageHero>
 
-			<section class="player-overview" aria-label="Resumen de jugadores">
-				<article>
-					<span>01</span><small>Jugadores</small><strong>{view.players.length}</strong>
-				</article>
-				<article>
-					<span>02</span><small>Equipos</small><strong>{view.teams.length}</strong>
-				</article>
-				<article>
-					<span>03</span><small>Presidencias</small><strong>{presidents}</strong>
-				</article>
-				<article>
-					<span>04</span><small>Inicio de liga</small><strong class="player-overview__date"
-						>{SEASON_STARTS_LABEL}</strong
-					>
-				</article>
-			</section>
-
 			{
 				preseason && (
 					<aside class="roster-status">
