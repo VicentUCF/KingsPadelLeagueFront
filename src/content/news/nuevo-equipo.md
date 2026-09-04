@@ -6,6 +6,10 @@ publishedAt: 2026-08-27T14:00:00+02:00
 featured: true
 relatedTeamSlugs:
   - redlions
+cover:
+  image: /news/covers/padel-blue-court-match.jpg
+  alt: Jugadores de pádel disputando un partido en una pista azul al aire libre rodeada de vegetación.
+  credit: 'Foto: Nenad Stojković / Wikimedia Commons (CC BY 2.0)'
 ---
 
 El mercado de la próxima temporada ha cerrado con movimiento en todos los clubes. Las plantillas

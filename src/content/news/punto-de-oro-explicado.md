@@ -4,6 +4,10 @@ title: El punto de oro, la jugada que decide los cruces
 summary: Un solo punto puede cambiar el rumbo de un juego entero, y varias cartas del maletín están pensadas justo para ese momento.
 category: partidos
 publishedAt: 2026-08-25T12:00:00+02:00
+cover:
+  image: /news/covers/padel-rackets-balls.jpg
+  alt: Palas y bolas de pádel sobre la pista.
+  credit: 'Foto: Anton Gustafsson / Wikimedia Commons (CC BY 2.0)'
 ---
 
 En cada juego ajustado llega un momento en el que un solo punto puede decidirlo todo: el punto de

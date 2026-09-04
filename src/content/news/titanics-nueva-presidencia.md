@@ -8,6 +8,10 @@ featured: true
 homePriority: 1
 relatedTeamSlugs:
   - titanics
+cover:
+  image: /news/covers/padel-dubai-match.jpg
+  alt: Dos jugadores de pádel profesional compitiendo en una pista durante el Campeonato Mundial de Pádel en Dubái.
+  credit: 'Foto: PatoParadiso / Wikimedia Commons (CC BY-SA 4.0)'
 ---
 
 Titanics encara la nueva temporada con una presidencia renovada. El club confirma el relevo al

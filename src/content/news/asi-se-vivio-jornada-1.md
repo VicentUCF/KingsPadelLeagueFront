@@ -5,6 +5,10 @@ summary: El arranque de la fase regular dejó cruces reñidos y algún que otro 
 category: partidos
 publishedAt: 2026-09-01T20:00:00+02:00
 relatedMatchdayId: jornada-1
+cover:
+  image: /news/covers/padel-dubai-match.jpg
+  alt: Dos jugadores de pádel profesional compitiendo en una pista durante el Campeonato Mundial de Pádel en Dubái.
+  credit: 'Foto: PatoParadiso / Wikimedia Commons (CC BY-SA 4.0)'
 ---
 
 La Jornada 1 puso en pista a todos los equipos de la temporada por primera vez, y dejó cruces

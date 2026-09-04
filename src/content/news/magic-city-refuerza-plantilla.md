@@ -6,6 +6,10 @@ category: equipos
 publishedAt: 2026-08-30T09:00:00+02:00
 relatedTeamSlugs:
   - magic-city
+cover:
+  image: /news/covers/padel-vasko-mladenov.jpg
+  alt: Un jugador golpea la bola durante un partido de pádel.
+  credit: 'Foto: European Games 2023 in Krakow Poland / Wikimedia Commons (CC BY-SA 4.0)'
 ---
 
 Magic City cierra su participación en el mercado con una nueva incorporación a la plantilla. El

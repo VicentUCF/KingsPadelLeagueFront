@@ -5,6 +5,10 @@ summary: El club organizador ya tiene fecha y pista reservadas para el segundo c
 category: calendario
 publishedAt: 2026-08-29T11:00:00+02:00
 relatedMatchdayId: jornada-2
+cover:
+  image: /news/covers/padel-court-el-tucan.jpg
+  alt: Pista de pádel cubierta en un centro deportivo.
+  credit: 'Foto: Diegodlh / Wikimedia Commons (CC BY 4.0)'
 ---
 
 La Jornada 2 ya tiene sede y horario confirmados. El club organizador ha cerrado la reserva de

@@ -8,6 +8,10 @@ featured: true
 relatedTeamSlugs:
   - kings-of-favar
   - redlions
+cover:
+  image: /news/covers/padel-vigo-open.jpg
+  alt: Jugadores de pádel profesional compitiendo durante un torneo del World Padel Tour.
+  credit: 'Foto: Harpagornis / Wikimedia Commons (CC BY-SA 4.0)'
 ---
 
 El calendario ha querido que el debut de Redlions en la competición coincida con uno de los
