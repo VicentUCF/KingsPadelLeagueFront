@@ -168,7 +168,14 @@ const pageTransition: TransitionDirectionalAnimations = {
 						)
 					}
 					<details class="site-shell__menu">
-						<summary class="c-button c-button--outline c-button--sm">Menú</summary>
+						<summary
+							class="site-shell__menu-toggle c-icon-button"
+							aria-label="Abrir menú de navegación"
+						>
+							<span class="site-shell__burger" aria-hidden="true">
+								<span class="site-shell__burger-bar"></span>
+							</span>
+						</summary>
 						<nav class="site-shell__mobile-nav" aria-label="Principal móvil">
 							{
 								navigation.map((item) => (
@@ -217,6 +224,27 @@ const pageTransition: TransitionDirectionalAnimations = {
 			});
 			document.addEventListener('astro:after-swap', () => prepareMainContent(true));
 			document.addEventListener('astro:page-load', () => prepareMainContent());
+
+			const closeMobileMenu = (menu: HTMLDetailsElement, focusToggle = false) => {
+				menu.removeAttribute('open');
+				if (focusToggle) menu.querySelector('summary')?.focus();
+			};
+
+			document.addEventListener('click', (event) => {
+				const target = event.target instanceof Element ? event.target : null;
+				document.querySelectorAll<HTMLDetailsElement>('.site-shell__menu[open]').forEach((menu) => {
+					const clickedLink = target?.closest('.site-shell__mobile-nav a');
+					const clickedOutside = !!target && !menu.contains(target);
+					if (clickedLink || clickedOutside) closeMobileMenu(menu);
+				});
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key !== 'Escape') return;
+				document
+					.querySelectorAll<HTMLDetailsElement>('.site-shell__menu[open]')
+					.forEach((menu) => closeMobileMenu(menu, true));
+			});
 		</script>
 	</body>
 </html>

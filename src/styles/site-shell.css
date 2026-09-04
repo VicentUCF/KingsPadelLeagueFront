@@ -1,3 +1,15 @@
+/*
+ * Locks the cascade-layer order so `app` always loses to the design system's
+ * layers only where we don't override it, and wins where we do — regardless of
+ * which stylesheet a page happens to import first. Without this, a page that
+ * imports a local `@layer app {}` stylesheet before BaseLayout (e.g. a news.css
+ * import placed above the BaseLayout import) would register `app` before the
+ * design system's `kpl.*` layers, making low-specificity `:where()` rules like
+ * `.c-nav { display: flex }` beat our `display: none` override at narrow
+ * viewports — desktop nav and the mobile burger menu would show at once.
+ */
+@layer kpl.reset, kpl.theme, kpl.base, kpl.objects, kpl.components, kpl.utilities, app;
+
 @layer app {
 	@keyframes kpl-page-out-forward {
 		to {
@@ -57,6 +69,61 @@
 				display: none;
 			}
 		}
+	}
+
+	.site-shell__menu-toggle {
+		--kpl-icon-button-size: 2.75rem;
+
+		cursor: pointer;
+	}
+
+	.site-shell__burger {
+		position: relative;
+		display: block;
+		inline-size: 1.15rem;
+		block-size: 0.8rem;
+	}
+
+	.site-shell__burger::before,
+	.site-shell__burger::after,
+	.site-shell__burger-bar {
+		content: '';
+		position: absolute;
+		inset-inline: 0;
+		block-size: 0.125rem;
+		border-radius: var(--kpl-radius-pill);
+		background: currentColor;
+		transition:
+			translate var(--kpl-duration-normal) var(--kpl-ease-standard),
+			rotate var(--kpl-duration-normal) var(--kpl-ease-standard),
+			opacity var(--kpl-duration-normal) var(--kpl-ease-standard);
+	}
+
+	.site-shell__burger::before {
+		inset-block-start: 0;
+	}
+
+	.site-shell__burger-bar {
+		inset-block-start: 50%;
+		translate: 0 -50%;
+	}
+
+	.site-shell__burger::after {
+		inset-block-end: 0;
+	}
+
+	.site-shell__menu[open] .site-shell__burger::before {
+		translate: 0 0.34rem;
+		rotate: 45deg;
+	}
+
+	.site-shell__menu[open] .site-shell__burger-bar {
+		opacity: 0;
+	}
+
+	.site-shell__menu[open] .site-shell__burger::after {
+		translate: 0 -0.34rem;
+		rotate: -45deg;
 	}
 
 	.site-shell__mobile-nav {

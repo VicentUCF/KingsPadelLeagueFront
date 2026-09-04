@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 
-import '../styles/news.css';
 import NewsCard from '../components/NewsCard.astro';
 import TeamBadge from '../components/TeamBadge.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -16,6 +15,7 @@ import { resolveHomeSeasonStatus } from '../lib/league-status';
 import { selectHomeNews } from '../lib/news';
 import { loadPublicLeagueView } from '../lib/public-view';
 import { teamThemeStyle } from '../lib/team-identity';
+import '../styles/news.css';
 import '../styles/home.css';
 
 const buildDate = new Date();

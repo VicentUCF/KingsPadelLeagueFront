@@ -1,7 +1,6 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
-import '../../styles/news.css';
 import NewsCard from '../../components/NewsCard.astro';
 import TeamBadge from '../../components/TeamBadge.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -13,6 +12,7 @@ import {
 	selectPublishedNews,
 } from '../../lib/news';
 import { loadPublicLeagueView } from '../../lib/public-view';
+import '../../styles/news.css';
 
 export async function getStaticPaths() {
 	const entries = await getCollection('news');
