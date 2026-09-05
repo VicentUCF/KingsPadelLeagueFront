@@ -39,7 +39,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": ["node_modules/@kpl/design-system/dist/full.css", "src/styles.scss"],
             "stylePreprocessorOptions": {
               "includePaths": ["src"]
             }

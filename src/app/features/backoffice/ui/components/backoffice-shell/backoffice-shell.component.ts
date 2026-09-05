@@ -15,7 +15,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { ChevronRight, House, LogOut, LucideAngularModule, Menu, X } from 'lucide-angular';
+import { ChevronRight, LogOut, LucideAngularModule, Menu, X } from 'lucide-angular';
 import { filter } from 'rxjs';
 
 import { applicationMetadata } from '@core/config/application-metadata';
@@ -54,7 +54,6 @@ export class BackofficeShellComponent {
     return this.teamsStore.teams().find((t) => t.id === id)?.name ?? null;
   });
   protected readonly chevronRightIcon = ChevronRight;
-  protected readonly homeIcon = House;
   protected readonly menuIcon = Menu;
   protected readonly closeIcon = X;
   protected readonly logoutIcon = LogOut;

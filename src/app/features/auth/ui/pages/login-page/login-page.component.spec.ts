@@ -20,11 +20,11 @@ function makeAuthStoreMock(): Pick<AuthStore, 'error' | 'isLoading' | 'login'> {
 }
 
 describe('LoginPageComponent', () => {
-  it('redirects to home after a successful login', async () => {
+  it('redirects to the backoffice after a successful login', async () => {
     const authStore = makeAuthStoreMock();
     const { fixture } = await render(LoginPageComponent, {
       providers: [
-        provideRouter([{ path: '', component: DummyRouteComponent }]),
+        provideRouter([{ path: 'backoffice', component: DummyRouteComponent }]),
         { provide: AuthStore, useValue: authStore },
       ],
     });
@@ -42,7 +42,7 @@ describe('LoginPageComponent', () => {
 
     await waitFor(() => {
       expect(authStore.login).toHaveBeenCalledWith('ana@test.com', 'password123');
-      expect(navigateSpy).toHaveBeenCalledWith(['/']);
+      expect(navigateSpy).toHaveBeenCalledWith(['/backoffice']);
     });
   });
 });

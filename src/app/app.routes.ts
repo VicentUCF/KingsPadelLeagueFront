@@ -2,6 +2,7 @@ import { type Routes } from '@angular/router';
 
 import { authGuard } from '@core/guards/auth.guard';
 import { backofficeAccessGuard } from '@core/guards/backoffice-access.guard';
+import { publicSiteGuard } from '@core/guards/public-site.guard';
 import { provideLeagueHomeFeature } from '@features/league-home/ui/providers/league-home.providers';
 import { AppShellComponent } from '@layout/app-shell/app-shell.component';
 
@@ -81,6 +82,7 @@ export const routes: Routes = [
   },
   {
     path: '',
+    canMatch: [publicSiteGuard],
     component: AppShellComponent,
     children: publicSiteRoutes,
   },

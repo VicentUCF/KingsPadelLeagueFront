@@ -12,6 +12,6 @@ export const noAuthGuard: CanMatchFn = () => {
       return true;
     }
 
-    return router.createUrlTree(['/']);
+    return router.createUrlTree(['/backoffice']);
   });
 };

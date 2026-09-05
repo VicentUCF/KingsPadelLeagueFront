@@ -54,22 +54,22 @@ describe('noAuthGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('redirects USER accounts to profile', async () => {
+  it('redirects USER accounts to the backoffice', async () => {
     const { result, router } = await runGuard(true, 'USER');
 
-    expectRedirect(result, router, '/');
+    expectRedirect(result, router, '/backoffice');
   });
 
-  it('redirects PRESIDENT accounts to home', async () => {
+  it('redirects PRESIDENT accounts to the backoffice', async () => {
     const { result, router } = await runGuard(true, 'PRESIDENT');
 
-    expectRedirect(result, router, '/');
+    expectRedirect(result, router, '/backoffice');
   });
 
-  it('redirects ADMIN accounts to home', async () => {
+  it('redirects ADMIN accounts to the backoffice', async () => {
     const { result, router } = await runGuard(true, 'ADMIN');
 
-    expectRedirect(result, router, '/');
+    expectRedirect(result, router, '/backoffice');
   });
 
   it('waits for auth initialization before resolving the guard', async () => {
