@@ -9,4 +9,7 @@ const site =
 // https://astro.build/config
 export default defineConfig({
 	...(site ? { site } : {}),
+	prefetch: {
+		defaultStrategy: 'tap',
+	},
 });
