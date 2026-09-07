@@ -1,0 +1,96 @@
+backend:
+  name: github
+  # OJO: el remoto git de este working copy apunta hoy a
+  # VicentUCF/KingsPadelLeagueFront (el backoffice Angular), no a este proyecto
+  # Astro. Confirma el repo real en GitHub antes de desplegar esto — si
+  # `repo` queda apuntando al proyecto equivocado, Decap comiteará las
+  # noticias en el repo Angular en vez de aquí.
+  repo: VicentUCF/KingsPadelLeagueAstro
+  branch: main
+  # Dominio del proxy de autenticación OAuth (fuera de este repo, pendiente de
+  # desplegar). Sin esto el botón "Login" no funciona. Ver README para el
+  # detalle de qué falta configurar.
+  base_url: https://TU-PROXY-OAUTH-PENDIENTE.example.com
+
+# El bundle completo de Decap trae todos los idiomas de la UI ya incluidos;
+# con la app instalada como <script> (no vía bundler) basta con este valor
+# para que el gestor se muestre en castellano.
+locale: es
+
+media_folder: 'public/news/covers'
+public_folder: '/news/covers'
+
+collections:
+  - name: news
+    label: Noticias
+    label_singular: Noticia
+    description: Entradas de src/content/news. El nombre del archivo generado es la URL final en /noticias/<nombre>.
+    folder: src/content/news
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: title
+    extension: md
+    format: frontmatter
+    fields:
+      - label: Título
+        name: title
+        widget: string
+        pattern: ['^.{1,90}$', 'Máximo 90 caracteres']
+      - label: Resumen
+        name: summary
+        widget: text
+        pattern: ['^.{1,200}$', 'Máximo 200 caracteres']
+        hint: Se muestra en el mosaico de /noticias y en las vistas previas sociales.
+      - label: Categoría
+        name: category
+        widget: select
+        options:
+          - { label: Equipos, value: equipos }
+          - { label: Calendario, value: calendario }
+          - { label: Cartas, value: cartas }
+          - { label: Partidos, value: partidos }
+      - label: Fecha de publicación
+        name: publishedAt
+        widget: datetime
+        hint: Mientras sea futura, la noticia queda guardada pero no genera URL pública.
+      - label: Fecha de actualización
+        name: updatedAt
+        widget: datetime
+        required: false
+      - label: Borrador
+        name: draft
+        widget: boolean
+        default: true
+        hint: Actívalo (déjalo en Sí) mientras la noticia no esté lista para publicarse.
+      - label: Destacada en portada
+        name: featured
+        widget: boolean
+        default: false
+      - label: Prioridad en destacadas
+        name: homePriority
+        widget: number
+        value_type: int
+        required: false
+        hint: Solo aplica si está "Destacada en portada". Menor número = más arriba.
+      - label: Portada
+        name: cover
+        widget: object
+        required: false
+        fields:
+          - { label: Imagen, name: image, widget: image }
+          - { label: Texto alternativo, name: alt, widget: string }
+          - { label: Crédito, name: credit, widget: string, required: false }
+      - label: Equipos relacionados
+        name: relatedTeamSlugs
+        widget: list
+        required: false
+        hint: Slugs de equipo tal y como aparecen en /equipos/<slug>.
+      - label: Jornada relacionada
+        name: relatedMatchdayId
+        widget: string
+        required: false
+        hint: Id de jornada tal y como aparece en /jornadas/<id>.
+      - label: Cuerpo de la noticia
+        name: body
+        widget: markdown

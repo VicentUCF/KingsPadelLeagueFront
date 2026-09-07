@@ -90,6 +90,35 @@ no sean borradores y cuya fecha no sea futura generan una URL real (`src/lib/new
 entrada con `featured: true` la promociona a la portada, ordenada opcionalmente por
 `homePriority`.
 
+## Gestor de noticias (Decap CMS)
+
+Para no depender de que quien escribe noticias sepa Markdown/YAML/git, `/admin` sirve un editor
+[Decap CMS](https://decapcms.org/) (`public/admin/index.html` + `public/admin/config.yml`) que
+edita exactamente los mismos archivos de `src/content/news`, con los mismos campos que valida
+`src/content.config.ts`. No es un backend nuevo: sigue siendo "publicar = crear/editar un archivo
+y desplegar el build" — Decap solo hace ese commit por ti, con un formulario en vez de un editor de
+texto. El sitio público sigue siendo 100% estático; `/admin` no añade SSR ni cambia
+`astro.config.mjs`.
+
+Para que funcione en producción falta configurar, **fuera de este repo**:
+
+- **Repo real en `public/admin/config.yml`**: el `backend.repo` está puesto a
+  `VicentUCF/KingsPadelLeagueAstro`, pero el remoto git de este proyecto apunta hoy por error a
+  `VicentUCF/KingsPadelLeagueFront` (el backoffice Angular). Confirma cuál es el repo de GitHub
+  real de este sitio antes de desplegar el admin — si `repo` señala al proyecto equivocado, las
+  noticias se comitearían en el repo Angular.
+- **Proxy de autenticación OAuth**: el backend `github` de Decap necesita un servidor externo
+  (Cloudflare Worker, Netlify, u otro) que intercambie el login de GitHub por un token; su dominio
+  va en `backend.base_url` de `config.yml`. Sin él, el botón de login no funciona. No forma parte
+  de este repo porque es infraestructura, no código del sitio.
+- **Rebuild tras cada commit**: este repo no tiene `.github/workflows` ni configuración de ninguna
+  plataforma de despliegue, así que cada commit de Decap necesita un deploy hook configurado en el
+  hosting real (fuera del repo) para que la noticia llegue a producción. Sin eso, el commit se crea
+  en GitHub pero el sitio publicado no se actualiza hasta el siguiente build manual.
+
+En local, `npm run dev` sirve `/admin` igual que cualquier otra ruta estática, pero el backend
+`github` requiere igualmente el proxy OAuth — no hay modo de login sin él.
+
 ## Arquitectura de `src/lib`
 
 La integración está separada por responsabilidad para que los cambios de contrato no se mezclen
