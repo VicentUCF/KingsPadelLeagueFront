@@ -119,14 +119,13 @@ build". El sitio público sigue siendo 100% estático; no añade SSR ni cambia `
   frontend. Preparan el modelo de datos para una fase futura de generación automática de piezas
   para Instagram a partir de la misma noticia — de momento solo se guardan.
 
-Para que funcione en producción falta hacer, **fuera de este repo**:
+La GitHub App de Pages CMS ([app.pagescms.org](https://app.pagescms.org)) ya está instalada en
+`VicentUCF/KingsPadelLeagueFront`, el repositorio real de este sitio. A diferencia de Decap CMS,
+Pages CMS no requiere desplegar ni mantener un proxy OAuth propio: la autenticación la resuelve su
+GitHub App alojada.
 
-- **Instalar la GitHub App de Pages CMS** (desde [app.pagescms.org](https://app.pagescms.org)) en
-  el repositorio real de este sitio. El remoto git de esta copia local apunta hoy a
-  `VicentUCF/KingsPadelLeagueFront` (el backoffice Angular) en lugar de a este proyecto Astro:
-  confirma el repo de GitHub correcto antes de instalar la app o las noticias se comitearán en el
-  proyecto equivocado. A diferencia de Decap CMS, Pages CMS no requiere desplegar ni mantener un
-  proxy OAuth propio: la autenticación la resuelve su GitHub App alojada.
+Para que un commit de Pages CMS llegue a producción falta configurar, **fuera de este repo**:
+
 - **Rebuild tras cada commit**: este repo no tiene `.github/workflows` ni configuración de ninguna
   plataforma de despliegue, así que cada commit de Pages CMS necesita un deploy hook configurado en
   el hosting real (fuera del repo) para que la noticia llegue a producción. Sin eso, el commit se

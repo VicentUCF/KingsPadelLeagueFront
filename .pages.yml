@@ -3,13 +3,8 @@
 # Edita exactamente los mismos archivos que consume `src/content.config.ts`
 # (colección `news` de Astro Content Collections): no hay backend propio, base
 # de datos ni API — Pages CMS solo hace commits de Markdown a este repo de
-# GitHub, y el deploy existente del sitio se encarga del resto.
-#
-# Pendiente de confirmar en GitHub (ver README, sección "Gestión de
-# noticias"): el remoto git de esta copia local apunta hoy a
-# VicentUCF/KingsPadelLeagueFront (el backoffice Angular), no a este proyecto
-# Astro. Antes de instalar la GitHub App de Pages CMS, confirma cuál es el
-# repo real de este sitio para no editar el proyecto equivocado.
+# GitHub (VicentUCF/KingsPadelLeagueFront), y el deploy existente del sitio se
+# encarga del resto.
 
 media:
   - name: news
