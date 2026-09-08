@@ -39,13 +39,6 @@ const displayPhase = preseason
 		: seasonStatus.phaseLabel;
 const displaySeasonName = PUBLIC_SEASON_NAME;
 const homeNews = selectHomeNews(newsEntries, buildDate);
-const snapshotFormatter = new Intl.DateTimeFormat('es-ES', {
-	day: 'numeric',
-	month: 'short',
-	hour: '2-digit',
-	minute: '2-digit',
-	timeZone: 'Europe/Madrid',
-});
 
 const currentMatchday = view.matchdays.find((matchday) => matchday.status === 'current') ?? null;
 const nextMatchday = view.matchdays.find((matchday) => matchday.status === 'upcoming') ?? null;

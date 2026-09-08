@@ -58,7 +58,8 @@ function resolveSeason(
 	matchdays: readonly Matchday[],
 	now: Date,
 ): Season {
-	if (!seasons.length) throw new Error('La API no ha devuelto ninguna temporada.');
+	const [firstSeason] = seasons;
+	if (!firstSeason) throw new Error('La API no ha devuelto ninguna temporada.');
 	const orderedMatchdays = [...matchdays].sort(byScheduledAt);
 	const focus =
 		orderedMatchdays.find((item) => item.status === 'in_progress') ??
@@ -69,10 +70,11 @@ function resolveSeason(
 				Date.parse(season.startsAt) <= now.getTime() && now.getTime() <= Date.parse(season.endsAt),
 		)
 		.sort((left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt))[0];
-	const latest = [...seasons].sort(
-		(left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt),
-	)[0];
-	return seasons.find((season) => season.id === (focus?.seasonId ?? active?.id ?? latest?.id))!;
+	const latest =
+		[...seasons].sort((left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt))[0] ??
+		firstSeason;
+	const targetSeasonId = focus?.seasonId ?? active?.id ?? latest.id;
+	return seasons.find((season) => season.id === targetSeasonId) ?? latest;
 }
 
 function resolvePhase(

@@ -52,11 +52,14 @@ const todayKey = dayKeyFormatter.format(new Date());
 const monthKeys = [...matchdayByDay.keys()].map((key) => key.slice(0, 7)).sort();
 const months: MonthGroup[] = [];
 
-if (monthKeys.length > 0) {
-	const [firstYear, firstMonth] = monthKeys[0].split('-').map(Number);
-	const [lastYear, lastMonth] = monthKeys[monthKeys.length - 1].split('-').map(Number);
-	const start = firstYear * 12 + (firstMonth - 1);
-	const end = lastYear * 12 + (lastMonth - 1);
+const firstMonthKey = monthKeys[0];
+const lastMonthKey = monthKeys[monthKeys.length - 1];
+
+if (firstMonthKey && lastMonthKey) {
+	const [firstYear, firstMonth] = firstMonthKey.split('-');
+	const [lastYear, lastMonth] = lastMonthKey.split('-');
+	const start = Number(firstYear) * 12 + (Number(firstMonth) - 1);
+	const end = Number(lastYear) * 12 + (Number(lastMonth) - 1);
 
 	for (let cursor = start; cursor <= end; cursor += 1) {
 		const year = Math.floor(cursor / 12);

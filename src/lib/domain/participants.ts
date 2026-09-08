@@ -1,5 +1,5 @@
 import type { PlayerHttp, PublicLeagueData, TeamHttp } from '../api/types';
-import { groupBy, normalizeSlug } from './shared.ts';
+import { groupBy, normalizeSlug, requireById } from './shared.ts';
 import type { PublicPlayer, PublicTeam, TeamPalette, TeamSignature } from './types';
 
 export interface LeagueParticipants {
@@ -116,8 +116,10 @@ export function createLeagueParticipants(
 	seasonId: string,
 ): LeagueParticipants {
 	const rawPlayersByTeam = groupBy(
-		data.players.filter((player) => player.teamId),
-		(player) => player.teamId!,
+		data.players.filter((player): player is PlayerHttp & { teamId: string } =>
+			Boolean(player.teamId),
+		),
+		(player) => player.teamId,
 	);
 	const playerSlugById = createUniqueSlugs(
 		data.players.map((player) => ({ id: player.id, label: playerName(player) })),
@@ -136,7 +138,7 @@ export function createLeagueParticipants(
 		const team = player.teamId ? teamHttpById.get(player.teamId) : undefined;
 		return {
 			id: player.id,
-			slug: playerSlugById.get(player.id)!,
+			slug: requireById(playerSlugById, player.id, 'Slug del jugador'),
 			displayName: playerName(player),
 			firstName: player.firstName,
 			lastName: player.lastName,

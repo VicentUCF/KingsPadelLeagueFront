@@ -191,7 +191,8 @@ function resolveDatasetSeasonId(
 	seasons: readonly Season[],
 	matchdays: readonly Matchday[],
 ): string {
-	if (seasons.length === 0) throw new Error('La API no ha devuelto ninguna temporada.');
+	const [firstSeason] = seasons;
+	if (!firstSeason) throw new Error('La API no ha devuelto ninguna temporada.');
 
 	const now = Date.now();
 	const focusMatchday =
@@ -200,10 +201,10 @@ function resolveDatasetSeasonId(
 	const activeSeason = [...seasons]
 		.filter((season) => Date.parse(season.startsAt) <= now && now <= Date.parse(season.endsAt))
 		.sort((left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt))[0];
-	const latestSeason = [...seasons].sort(
-		(left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt),
-	)[0];
-	return focusMatchday?.seasonId ?? activeSeason?.id ?? latestSeason!.id;
+	const latestSeason =
+		[...seasons].sort((left, right) => Date.parse(right.startsAt) - Date.parse(left.startsAt))[0] ??
+		firstSeason;
+	return focusMatchday?.seasonId ?? activeSeason?.id ?? latestSeason.id;
 }
 
 function resetCacheAfterFailure<T>(request: Promise<T>, reset: () => void): Promise<T> {

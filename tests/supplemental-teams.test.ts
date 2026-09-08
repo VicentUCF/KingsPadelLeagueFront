@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import type { PublicLeagueData, TeamHttp } from '../src/lib/kpl-api.ts';
 import { includeSupplementalTeams } from '../src/lib/supplemental-teams.ts';
@@ -30,8 +29,8 @@ describe('includeSupplementalTeams', () => {
 
 		const supplemented = includeSupplementalTeams(data);
 
-		assert.equal(supplemented.teams.length, 1);
-		assert.deepEqual(supplemented.teams[0], {
+		expect(supplemented.teams.length).toBe(1);
+		expect(supplemented.teams[0]).toEqual({
 			id: 'team-red',
 			name: 'RedLions',
 			description: 'Orgullo y potencia competitiva.',
@@ -39,7 +38,7 @@ describe('includeSupplementalTeams', () => {
 			logo: '',
 			primaryColor: '#d62f35',
 		});
-		assert.equal(data.teams.length, 0, 'no modifica los datos recibidos de la API');
+		expect(data.teams.length).toBe(0);
 	});
 
 	it('conserva el registro del backend sin duplicarlo cuando ya existe', () => {
@@ -54,7 +53,7 @@ describe('includeSupplementalTeams', () => {
 
 		const supplemented = includeSupplementalTeams(data);
 
-		assert.equal(supplemented, data);
-		assert.deepEqual(supplemented.teams, [backendTeam]);
+		expect(supplemented).toBe(data);
+		expect(supplemented.teams).toEqual([backendTeam]);
 	});
 });

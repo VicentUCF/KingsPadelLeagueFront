@@ -13,6 +13,7 @@ import {
 	formatDateTime,
 	groupBy,
 	mapStatus,
+	requireById,
 } from './shared.ts';
 import type {
 	PairResult,
@@ -55,6 +56,7 @@ export function createRegularSeason(
 			encounters.flatMap((encounter) => [encounter.homeTeam.id, encounter.awayTeam.id]),
 		);
 		const resting = teams.filter((team) => !participating.has(team.id));
+		const [onlyRestingTeam] = resting;
 
 		return {
 			id: matchday.id,
@@ -64,7 +66,8 @@ export function createRegularSeason(
 			date: matchday.scheduledAt,
 			dateLabel: formatDate(matchday.scheduledAt),
 			encounters,
-			byeTeam: encounters.length > 0 && resting.length === 1 ? resting[0]! : null,
+			byeTeam:
+				encounters.length > 0 && resting.length === 1 && onlyRestingTeam ? onlyRestingTeam : null,
 		};
 	});
 }
@@ -78,8 +81,12 @@ function createEncounter(
 	playerById: ReadonlyMap<string, PublicPlayer>,
 	fallbackStatus: MatchdayStatus,
 ): PublicEncounter {
-	const homeTeam = teamById.get(match.localTeamId)!;
-	const awayTeam = teamById.get(match.awayTeamId)!;
+	const homeTeam = requireById(teamById, match.localTeamId, `Equipo local del partido ${match.id}`);
+	const awayTeam = requireById(
+		teamById,
+		match.awayTeamId,
+		`Equipo visitante del partido ${match.id}`,
+	);
 	const lineups = lineupsByMatch.get(match.id) ?? [];
 	const homeLineup = lineups.find((lineup) => lineup.teamId === match.localTeamId);
 	const awayLineup = lineups.find((lineup) => lineup.teamId === match.awayTeamId);

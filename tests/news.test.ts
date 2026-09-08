@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import { selectHomeNews, selectNewsFeed, selectPublishedNews } from '../src/lib/news.ts';
 
@@ -15,10 +14,7 @@ describe('selectPublishedNews', () => {
 
 		const result = selectPublishedNews(entries, new Date('2026-08-27T12:00:00Z'));
 
-		assert.deepEqual(
-			result.map(({ id }) => id),
-			['reciente', 'intermedio', 'antiguo'],
-		);
+		expect(result.map(({ id }) => id)).toEqual(['reciente', 'intermedio', 'antiguo']);
 	});
 
 	it('respeta un límite opcional tras ordenar', () => {
@@ -30,10 +26,7 @@ describe('selectPublishedNews', () => {
 
 		const result = selectPublishedNews(entries, new Date('2026-08-27T12:00:00Z'), 2);
 
-		assert.deepEqual(
-			result.map(({ id }) => id),
-			['reciente', 'intermedio'],
-		);
+		expect(result.map(({ id }) => id)).toEqual(['reciente', 'intermedio']);
 	});
 
 	it('sin límite devuelve todas las entradas publicadas', () => {
@@ -41,7 +34,7 @@ describe('selectPublishedNews', () => {
 
 		const result = selectPublishedNews(entries, new Date('2026-08-27T12:00:00Z'));
 
-		assert.equal(result.length, 2);
+		expect(result.length).toBe(2);
 	});
 });
 
@@ -56,15 +49,12 @@ describe('selectHomeNews', () => {
 
 		const result = selectHomeNews(entries, new Date('2026-08-27T12:00:00Z'), 4);
 
-		assert.deepEqual(
-			result.map(({ id }) => id),
-			[
-				'destacada-prioridad-1',
-				'destacada-prioridad-2',
-				'destacada-sin-prioridad',
-				'normal-reciente',
-			],
-		);
+		expect(result.map(({ id }) => id)).toEqual([
+			'destacada-prioridad-1',
+			'destacada-prioridad-2',
+			'destacada-sin-prioridad',
+			'normal-reciente',
+		]);
 	});
 
 	it('rellena con las últimas no destacadas cuando hay menos destacadas que el límite', () => {
@@ -77,10 +67,11 @@ describe('selectHomeNews', () => {
 
 		const result = selectHomeNews(entries, new Date('2026-08-27T12:00:00Z'), 3);
 
-		assert.deepEqual(
-			result.map(({ id }) => id),
-			['destacada', 'normal-mas-reciente', 'normal-intermedia'],
-		);
+		expect(result.map(({ id }) => id)).toEqual([
+			'destacada',
+			'normal-mas-reciente',
+			'normal-intermedia',
+		]);
 	});
 
 	it('cuando hay más destacadas que el límite, el sobrante no aparece en home pero sigue publicado', () => {
@@ -95,12 +86,9 @@ describe('selectHomeNews', () => {
 		const home = selectHomeNews(entries, new Date('2026-08-27T12:00:00Z'), 3);
 		const published = selectPublishedNews(entries, new Date('2026-08-27T12:00:00Z'));
 
-		assert.deepEqual(
-			home.map(({ id }) => id),
-			['destacada-1', 'destacada-2', 'destacada-3'],
-		);
-		assert.ok(published.some(({ id }) => id === 'destacada-4-sobrante'));
-		assert.ok(!home.some(({ id }) => id === 'destacada-4-sobrante'));
+		expect(home.map(({ id }) => id)).toEqual(['destacada-1', 'destacada-2', 'destacada-3']);
+		expect(published.some(({ id }) => id === 'destacada-4-sobrante')).toBe(true);
+		expect(home.some(({ id }) => id === 'destacada-4-sobrante')).toBe(false);
 	});
 
 	it('nunca se ve vacía cuando existen entradas publicadas, aunque ninguna sea destacada', () => {
@@ -108,7 +96,7 @@ describe('selectHomeNews', () => {
 
 		const result = selectHomeNews(entries, new Date('2026-08-27T12:00:00Z'), 3);
 
-		assert.equal(result.length, 2);
+		expect(result.length).toBe(2);
 	});
 });
 
@@ -123,10 +111,12 @@ describe('selectNewsFeed', () => {
 
 		const result = selectNewsFeed(entries, new Date('2026-08-27T12:00:00Z'));
 
-		assert.deepEqual(
-			result.map(({ id }) => id),
-			['destacada-prioridad-1', 'destacada-prioridad-2', 'normal-reciente', 'normal-antigua'],
-		);
+		expect(result.map(({ id }) => id)).toEqual([
+			'destacada-prioridad-1',
+			'destacada-prioridad-2',
+			'normal-reciente',
+			'normal-antigua',
+		]);
 	});
 
 	it('devuelve todas las entradas publicadas, sin límite (a diferencia de selectHomeNews)', () => {
@@ -140,8 +130,8 @@ describe('selectNewsFeed', () => {
 
 		const result = selectNewsFeed(entries, new Date('2026-08-27T12:00:00Z'));
 
-		assert.equal(result.length, 5);
-		assert.equal(result[result.length - 1]?.id, 'normal');
+		expect(result.length).toBe(5);
+		expect(result[result.length - 1]?.id).toBe('normal');
 	});
 
 	it('excluye borradores y publicaciones futuras igual que selectPublishedNews', () => {
@@ -153,10 +143,7 @@ describe('selectNewsFeed', () => {
 
 		const result = selectNewsFeed(entries, new Date('2026-08-27T12:00:00Z'));
 
-		assert.deepEqual(
-			result.map(({ id }) => id),
-			['publicada'],
-		);
+		expect(result.map(({ id }) => id)).toEqual(['publicada']);
 	});
 });
 

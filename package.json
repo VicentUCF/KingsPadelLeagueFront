@@ -17,10 +17,21 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"check": "astro check",
+		"typecheck": "astro check",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"test": "node --experimental-strip-types --test tests/*.test.ts",
-		"test:ssg": "node tests/ssg-build.mjs"
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:ssg": "node tests/ssg-build.mjs",
+		"test:e2e": "playwright test",
+		"knip": "knip",
+		"architecture": "depcruise src --config .dependency-cruiser.cjs",
+		"security": "npm audit --audit-level=high",
+		"quality": "npm run format:check && npm run lint && npm run typecheck && npm run knip && npm run architecture && npm run test:run && npm run test:ssg && npm run security",
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"@kpl/design-system": "git+https://github.com/VicentUCF/KPL-Design-System.git#74871a429cbca165dc3c7070e1d8c4195b8c6b2a",
@@ -31,9 +42,23 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.8.0",
+		"@eslint/js": "^10.0.1",
+		"@playwright/test": "^1.63.0",
 		"@types/node": "^26.4.0",
+		"@vitest/coverage-v8": "^5.0.0",
+		"dependency-cruiser": "^18.2.0",
+		"eslint": "^10.10.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-astro": "^3.1.0",
+		"globals": "^17.12.0",
+		"husky": "^9.1.7",
+		"knip": "^6.34.0",
+		"lint-staged": "^17.5.0",
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^0.14.1",
-		"typescript": "^6.0.3"
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.70.0",
+		"vitest": "^5.0.0"
 	}
 }

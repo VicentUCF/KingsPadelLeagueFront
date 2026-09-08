@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 import { parsePlayer } from '../src/lib/api/parsers.ts';
 
 describe('parsePlayer', () => {
@@ -14,6 +13,6 @@ describe('parsePlayer', () => {
 			0,
 		);
 
-		assert.equal(player.lastName, '');
+		expect(player.lastName).toBe('');
 	});
 });

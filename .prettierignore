@@ -2,3 +2,14 @@
 .vscode/
 dist/
 node_modules/
+coverage/
+playwright-report/
+test-results/
+
+# Not web app source: a separate Blender asset project vendored in-repo.
+design/
+
+# Edited via Decap CMS by non-technical writers (see README "Gestor de
+# noticias"); reformatting their Markdown style creates noise unrelated to
+# their edits.
+src/content/

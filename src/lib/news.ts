@@ -69,9 +69,7 @@ export function selectNewsFeed<T extends PublishableNews>(
 	return orderFeaturedFirst(selectPublishedNews(entries, now));
 }
 
-export const NEWS_CATEGORIES = ['equipos', 'calendario', 'cartas', 'partidos'] as const;
-
-export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
+export type NewsCategory = 'equipos' | 'calendario' | 'cartas' | 'partidos';
 
 export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string> = {
 	equipos: 'Equipos',

@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import {
 	resolveHomeSeasonStatus,
@@ -37,10 +36,10 @@ describe('resolveHomeSeasonStatus', () => {
 			new Date('2026-06-20T19:00:00Z'),
 		);
 
-		assert.equal(result.seasonName, 'Temporada 1');
-		assert.equal(result.phaseLabel, 'Fase regular');
-		assert.equal(result.matchdayEyebrow, 'Jornada en curso');
-		assert.equal(result.matchdayLabel, 'Jornada 7');
+		expect(result.seasonName).toBe('Temporada 1');
+		expect(result.phaseLabel).toBe('Fase regular');
+		expect(result.matchdayEyebrow).toBe('Jornada en curso');
+		expect(result.matchdayLabel).toBe('Jornada 7');
 	});
 
 	it('selecciona la próxima jornada por fecha', () => {
@@ -55,19 +54,19 @@ describe('resolveHomeSeasonStatus', () => {
 			new Date('2026-08-27T10:00:00Z'),
 		);
 
-		assert.equal(result.seasonName, 'Temporada 2');
-		assert.equal(result.phaseLabel, 'Pretemporada');
-		assert.equal(result.matchdayEyebrow, 'Próxima jornada');
-		assert.equal(result.matchdayLabel, 'Jornada 1');
+		expect(result.seasonName).toBe('Temporada 2');
+		expect(result.phaseLabel).toBe('Pretemporada');
+		expect(result.matchdayEyebrow).toBe('Próxima jornada');
+		expect(result.matchdayLabel).toBe('Jornada 1');
 	});
 
 	it('muestra pretemporada y calendario pendiente cuando no hay jornadas', () => {
 		const result = resolveHomeSeasonStatus([seasonTwo], [], new Date('2026-10-01T10:00:00Z'));
 
-		assert.equal(result.phaseLabel, 'Pretemporada');
-		assert.equal(result.matchdayEyebrow, 'Calendario');
-		assert.equal(result.matchdayLabel, 'Calendario pendiente');
-		assert.equal(result.dateLabel, 'Fechas por confirmar');
+		expect(result.phaseLabel).toBe('Pretemporada');
+		expect(result.matchdayEyebrow).toBe('Calendario');
+		expect(result.matchdayLabel).toBe('Calendario pendiente');
+		expect(result.dateLabel).toBe('Fechas por confirmar');
 	});
 
 	it('muestra la última jornada de una temporada finalizada', () => {
@@ -80,20 +79,18 @@ describe('resolveHomeSeasonStatus', () => {
 			new Date('2026-07-01T10:00:00Z'),
 		);
 
-		assert.equal(result.phaseLabel, 'Temporada finalizada');
-		assert.equal(result.matchdayEyebrow, 'Última jornada');
-		assert.equal(result.matchdayLabel, 'Jornada 8');
+		expect(result.phaseLabel).toBe('Temporada finalizada');
+		expect(result.matchdayEyebrow).toBe('Última jornada');
+		expect(result.matchdayLabel).toBe('Jornada 8');
 	});
 
 	it('rechaza jornadas que referencian temporadas inexistentes', () => {
-		assert.throws(
-			() =>
-				resolveHomeSeasonStatus(
-					[seasonOne],
-					[matchday('orphan', 'Jornada 1', 'missing', '2026-02-01T18:00:00Z', 'finished')],
-				),
-			/temporada inexistente/,
-		);
+		expect(() =>
+			resolveHomeSeasonStatus(
+				[seasonOne],
+				[matchday('orphan', 'Jornada 1', 'missing', '2026-02-01T18:00:00Z', 'finished')],
+			),
+		).toThrow(/temporada inexistente/);
 	});
 
 	it('prioriza un playoff activo y enlaza su sección pública', () => {
@@ -115,10 +112,10 @@ describe('resolveHomeSeasonStatus', () => {
 			playoffMatches,
 		);
 
-		assert.equal(result.phaseLabel, 'Playoffs');
-		assert.equal(result.matchdayEyebrow, 'Próximo playoff');
-		assert.equal(result.matchdayLabel, 'Copa de Oro · Final');
-		assert.equal(result.focusHref, '/playoffs');
+		expect(result.phaseLabel).toBe('Playoffs');
+		expect(result.matchdayEyebrow).toBe('Próximo playoff');
+		expect(result.matchdayLabel).toBe('Copa de Oro · Final');
+		expect(result.focusHref).toBe('/playoffs');
 	});
 
 	it('no deja que un playoff futuro oculte una jornada regular en curso', () => {
@@ -140,10 +137,10 @@ describe('resolveHomeSeasonStatus', () => {
 			playoffMatches,
 		);
 
-		assert.equal(result.phaseLabel, 'Fase regular');
-		assert.equal(result.matchdayEyebrow, 'Jornada en curso');
-		assert.equal(result.matchdayLabel, 'Jornada 8');
-		assert.equal(result.focusHref, '/calendario');
+		expect(result.phaseLabel).toBe('Fase regular');
+		expect(result.matchdayEyebrow).toBe('Jornada en curso');
+		expect(result.matchdayLabel).toBe('Jornada 8');
+		expect(result.focusHref).toBe('/calendario');
 	});
 });
 

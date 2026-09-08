@@ -1,6 +1,5 @@
 ---
 import EmptyState from '../../components/EmptyState.astro';
-import PageHero from '../../components/PageHero.astro';
 import PlayerCard from '../../components/PlayerCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
@@ -13,7 +12,6 @@ import { loadPublicLeagueView } from '../../lib/public-view';
 const view = await loadPublicLeagueView();
 const preseason = isPublicPreseason();
 const teamById = new Map(view.teams.map((team) => [team.id, team]));
-const presidents = view.players.filter((player) => player.isPresident).length;
 ---
 
 <BaseLayout

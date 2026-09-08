@@ -63,7 +63,10 @@ try {
 	assert.match(calendarPage, /Padel Mixto Xeresa/);
 	assert.match(calendarPage, /season-map__day--match/);
 	assert.match(calendarPage, /Ver desglose por parejas/);
-	assert.match(calendarPage, /<a href="\/jugadores\/king">King<\/a>/);
+	// MatchCard shows the player's full name with the alias as a secondary
+	// badge (see PlayerCard's "full name + secondary identity" convention,
+	// commit d3495eb) — "King" is player-0-0's alias, not their link text.
+	assert.match(calendarPage, /<a href="\/jugadores\/king">Alex Rey<\/a>/);
 	assert.match(home, /Pretemporada/);
 	assert.match(home, /Temporada 2/);
 	assert.match(home, /Sigue la Kings Padel League desde el primer partido/);
@@ -75,7 +78,10 @@ try {
 	assert.match(cards, /Cada <a href="\/equipos">presidente<\/a> roba una/);
 	assert.match(cards, /40–15/);
 	assert.match(cards, /Las siete cartas/);
-	assert.match(cards, /data-card-intro/);
+	// The old skip-button intro (data-card-intro) was replaced by the
+	// video-based reveal (data-cards-animation); this assertion was never
+	// updated when that happened.
+	assert.match(cards, /data-cards-animation/);
 	assert.match(home, /<link rel="canonical" href="https:\/\/kpl\.example\//);
 	assert.match(home, /property="og:title"/);
 	assert.match(home, /application\/ld\+json/);
@@ -87,7 +93,9 @@ try {
 	assert.match(teams, /team-card__identity-accent/);
 	assert.match(teams, /--team-primary:#69f6d1/);
 	assert.match(home, /home-team-card__identity-accent/);
-	assert.match(activeMatchday, /team-identity-bands/);
+	// TeamIdentityBands (and its `team-identity-bands` class) was removed in
+	// the CSS consolidation (see docs/css-audit.md) — MatchCard now renders
+	// team identity through TeamBadge alone, with no direct replacement marker.
 	assert.match(player, /"@type":"Person"/);
 	assert.match(players, /<strong[^>]*>Alex Rey<\/strong>/);
 	assert.match(players, /“King” · Revés · Presidente/);

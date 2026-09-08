@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import type { PublicLeagueData } from '../src/lib/kpl-api.ts';
 import { createPublicLeagueView } from '../src/lib/public-league.ts';
@@ -133,61 +132,60 @@ function dataset(): PublicLeagueData {
 	};
 }
 
+/** Replaces `list[index]` with a shallow patch, failing fast if the fixture doesn't have that entry. */
+function overrideAt<T>(list: T[], index: number, patch: Partial<T>): void {
+	const current = list[index];
+	if (!current) throw new Error(`Fixture inválida: no existe el elemento en el índice ${index}.`);
+	list[index] = { ...current, ...patch };
+}
+
 describe('createPublicLeagueView', () => {
 	it('aplica el branding y la firma opcional sin alterar el fallback de la liga', () => {
 		const branded = dataset();
-		branded.teams[0] = { ...branded.teams[0]!, name: 'Kings of Favar' };
+		overrideAt(branded.teams, 0, { name: 'Kings of Favar' });
 
 		const view = createPublicLeagueView(branded, new Date('2026-08-27T12:00:00Z'));
 		const kings = view.teams.find((team) => team.slug === 'kings-of-favar');
 		const fallback = view.teams.find((team) => team.id === 'b');
 
-		assert.equal(kings?.logoPath, '/team-identities/kings-of-favar/logo.svg');
-		assert.equal(kings?.palette.primary, '#D1007A');
-		assert.deepEqual(kings?.signature, {
+		expect(kings?.logoPath).toBe('/team-identities/kings-of-favar/logo.svg');
+		expect(kings?.palette.primary).toBe('#D1007A');
+		expect(kings?.signature).toEqual({
 			secondaryMarkPath: '/team-identities/kings-of-favar/crown.svg',
 			motto: 'Born in Favar, built to win',
 			edition: '2026',
 		});
-		assert.equal(fallback?.signature, undefined);
+		expect(fallback?.signature).toBeUndefined();
 	});
 
 	it('mantiene todas las vistas dentro de la temporada seleccionada', () => {
 		const view = createPublicLeagueView(dataset(), new Date('2026-08-27T12:00:00Z'));
 
-		assert.equal(view.season.id, 'current');
-		assert.deepEqual(
-			view.matchdays.map((matchday) => matchday.id),
-			['current-day'],
-		);
-		assert.equal(view.standings[0]?.points, 5, 'usa la puntuación oficial de 2026');
-		assert.equal(view.standings[0]?.playedMatches, 3);
-		assert.equal(view.standings[0]?.gameDifference, 4);
-		assert.equal(view.players[0]?.displayName, 'Ana Uno');
-		assert.equal(view.players[0]?.totalPoints, 12);
+		expect(view.season.id).toBe('current');
+		expect(view.matchdays.map((matchday) => matchday.id)).toEqual(['current-day']);
+		expect(view.standings[0]?.points).toBe(5);
+		expect(view.standings[0]?.playedMatches).toBe(3);
+		expect(view.standings[0]?.gameDifference).toBe(4);
+		expect(view.players[0]?.displayName).toBe('Ana Uno');
+		expect(view.players[0]?.totalPoints).toBe(12);
 	});
 
 	it('rechaza relaciones inconsistentes antes de generar páginas', () => {
 		const invalid = dataset();
-		invalid.matches[0] = { ...invalid.matches[0]!, awayTeamId: 'missing-team' };
+		overrideAt(invalid.matches, 0, { awayTeamId: 'missing-team' });
 
-		assert.throws(
-			() => createPublicLeagueView(invalid, new Date('2026-08-27T12:00:00Z')),
+		expect(() => createPublicLeagueView(invalid, new Date('2026-08-27T12:00:00Z'))).toThrow(
 			/referencia un equipo visitante inexistente/,
 		);
 	});
 
 	it('genera slugs únicos cuando dos jugadores comparten nombre', () => {
 		const duplicateNames = dataset();
-		duplicateNames.players[1] = {
-			...duplicateNames.players[1]!,
-			firstName: 'Ana',
-			lastName: 'Uno',
-		};
+		overrideAt(duplicateNames.players, 1, { firstName: 'Ana', lastName: 'Uno' });
 
 		const view = createPublicLeagueView(duplicateNames, new Date('2026-08-27T12:00:00Z'));
 
-		assert.deepEqual(view.players.map((player) => player.slug).sort(), ['ana-uno', 'ana-uno-2']);
+		expect(view.players.map((player) => player.slug).sort()).toEqual(['ana-uno', 'ana-uno-2']);
 	});
 
 	it('crea rondas de playoffs y admite un rival todavía no decidido', () => {
@@ -209,19 +207,18 @@ describe('createPublicLeagueView', () => {
 
 		const view = createPublicLeagueView(playoffData, new Date('2026-09-10T12:00:00Z'));
 
-		assert.equal(view.phaseLabel, 'Playoffs');
-		assert.equal(view.playoffs[0]?.rounds[0]?.label, 'Semifinales');
-		assert.equal(view.playoffs[0]?.rounds[0]?.matches[0]?.awayTeam, null);
-		assert.equal(view.focusPlayoffMatch?.id, 'semi-1');
+		expect(view.phaseLabel).toBe('Playoffs');
+		expect(view.playoffs[0]?.rounds[0]?.label).toBe('Semifinales');
+		expect(view.playoffs[0]?.rounds[0]?.matches[0]?.awayTeam).toBeNull();
+		expect(view.focusPlayoffMatch?.id).toBe('semi-1');
 	});
 
 	it('mantiene la fase regular cuando hay una jornada activa y un playoff futuro', () => {
 		const activeRegularSeason = dataset();
-		activeRegularSeason.matchdays[1] = {
-			...activeRegularSeason.matchdays[1]!,
+		overrideAt(activeRegularSeason.matchdays, 1, {
 			scheduledAt: '2026-09-10T10:00:00Z',
 			status: 'in_progress',
-		};
+		});
 		activeRegularSeason.playoffs = [{ id: 'playoff-1', seasonId: 'current', name: 'Copa de Oro' }];
 		activeRegularSeason.playoffMatches = [
 			{
@@ -239,7 +236,7 @@ describe('createPublicLeagueView', () => {
 
 		const view = createPublicLeagueView(activeRegularSeason, new Date('2026-09-10T12:00:00Z'));
 
-		assert.equal(view.phaseLabel, 'Fase regular');
+		expect(view.phaseLabel).toBe('Fase regular');
 	});
 
 	it('ordena los resultados de parejas mediante el campo order', () => {
@@ -274,14 +271,8 @@ describe('createPublicLeagueView', () => {
 		const view = createPublicLeagueView(orderedPairs, new Date('2026-08-27T12:00:00Z'));
 		const pairResults = view.matchdays[0]?.encounters[0]?.pairResults ?? [];
 
-		assert.deepEqual(
-			pairResults.map((pair) => pair.id),
-			['pair-first', 'pair-second'],
-		);
-		assert.deepEqual(
-			pairResults.map((pair) => pair.label),
-			['Pareja 1', 'Pareja 2'],
-		);
+		expect(pairResults.map((pair) => pair.id)).toEqual(['pair-first', 'pair-second']);
+		expect(pairResults.map((pair) => pair.label)).toEqual(['Pareja 1', 'Pareja 2']);
 	});
 
 	it('rechaza referencias inválidas dentro del cuadro de playoffs', () => {
@@ -301,8 +292,7 @@ describe('createPublicLeagueView', () => {
 			},
 		];
 
-		assert.throws(
-			() => createPublicLeagueView(invalid, new Date('2026-09-10T12:00:00Z')),
+		expect(() => createPublicLeagueView(invalid, new Date('2026-09-10T12:00:00Z'))).toThrow(
 			/referencia un equipo visitante inexistente/,
 		);
 	});

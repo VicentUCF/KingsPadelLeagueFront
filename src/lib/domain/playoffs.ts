@@ -6,7 +6,14 @@ import type {
 	PlayoffStage,
 	PublicLeagueData,
 } from '../api/types';
-import { byId, createPairLineup, formatDateTime, groupBy, mapStatus } from './shared.ts';
+import {
+	byId,
+	createPairLineup,
+	formatDateTime,
+	groupBy,
+	mapStatus,
+	requireById,
+} from './shared.ts';
 import type {
 	PairResult,
 	PublicPlayer,
@@ -96,8 +103,14 @@ function createPlayoffMatch(
 	teamById: ReadonlyMap<string, PublicTeam>,
 	playerById: ReadonlyMap<string, PublicPlayer>,
 ): PublicPlayoffMatch {
-	const homeTeam = teamById.get(match.localTeamId)!;
-	const awayTeam = match.awayTeamId ? teamById.get(match.awayTeamId)! : null;
+	const homeTeam = requireById(
+		teamById,
+		match.localTeamId,
+		`Equipo local del partido de playoff ${match.id}`,
+	);
+	const awayTeam = match.awayTeamId
+		? requireById(teamById, match.awayTeamId, `Equipo visitante del partido de playoff ${match.id}`)
+		: null;
 	const lineups = lineupsByMatch.get(match.id) ?? [];
 	const homeLineup = lineups.find((lineup) => lineup.teamId === match.localTeamId);
 	const awayLineup = match.awayTeamId

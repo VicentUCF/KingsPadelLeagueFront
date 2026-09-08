@@ -7,6 +7,18 @@ export function groupBy<T>(values: readonly T[], key: (value: T) => string): Map
 	return groups;
 }
 
+/**
+ * Reads `id` from `byId` or throws. Referential integrity between the
+ * collections that feed these maps is checked once in domain/validation.ts;
+ * this is the runtime backstop if that invariant is ever violated, instead
+ * of silently continuing with `undefined`.
+ */
+export function requireById<T>(byId: ReadonlyMap<string, T>, id: string, context: string): T {
+	const value = byId.get(id);
+	if (value === undefined) throw new Error(`${context}: no se encontró "${id}".`);
+	return value;
+}
+
 export function createPairLineup(
 	player1Id: string,
 	player2Id: string,
@@ -14,7 +26,7 @@ export function createPairLineup(
 ): PairLineup {
 	return {
 		players: [player1Id, player2Id]
-			.map((id) => playerById.get(id)!)
+			.map((id) => requireById(playerById, id, 'Jugador de la pareja'))
 			.map(({ id, slug, firstName, lastName, alias }) => ({
 				id,
 				slug,

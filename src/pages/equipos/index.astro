@@ -1,6 +1,5 @@
 ---
 import EmptyState from '../../components/EmptyState.astro';
-import PageHero from '../../components/PageHero.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
 	isPublicPreseason,
@@ -12,7 +11,6 @@ import { teamThemeStyle } from '../../lib/team-identity';
 
 const view = await loadPublicLeagueView();
 const preseason = isPublicPreseason();
-const playerCount = view.teams.reduce((total, team) => total + team.players.length, 0);
 ---
 
 <BaseLayout

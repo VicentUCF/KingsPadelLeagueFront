@@ -31,9 +31,15 @@ npm run build    # build de producción
 npm run preview  # previsualización del build
 npm run check    # validación estricta de Astro y TypeScript
 npm run format   # formato automático del código
-npm test         # pruebas de dominio, temporada y noticias
+npm run lint     # ESLint (.ts, .astro)
+npm test         # pruebas de dominio, temporada y noticias (Vitest)
 npm run test:ssg # build aislada contra una API fixture; no modifica dist/
+npm run test:e2e # smoke tests de Playwright contra dev:fixture
+npm run quality  # gate completo: format, lint, typecheck, knip, arquitectura, tests, build, security
 ```
+
+Pipeline de calidad completo (hooks de git, CI, Sonar, cobertura, arquitectura): ver
+[`docs/quality.md`](docs/quality.md).
 
 ## Generación del sitio público
 
