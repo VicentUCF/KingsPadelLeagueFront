@@ -49,7 +49,7 @@ const articleStructuredData = articleUrl
 				'@context': 'https://schema.org',
 				'@type': 'NewsArticle',
 				headline: data.title,
-				description: data.summary,
+				description: data.subtitle,
 				datePublished: data.publishedAt.toISOString(),
 				...(data.updatedAt ? { dateModified: data.updatedAt.toISOString() } : {}),
 				url: articleUrl,
@@ -74,7 +74,7 @@ const articleStructuredData = articleUrl
 
 <BaseLayout
 	title={`${data.title} | Kings Padel League`}
-	description={data.summary}
+	description={data.subtitle}
 	image={data.cover?.image}
 	imageAlt={data.cover?.alt}
 	pageType="article"

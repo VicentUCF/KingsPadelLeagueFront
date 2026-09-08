@@ -1,6 +1,6 @@
 ---
 title: Así funciona Robo saque
-summary: La carta del nivel azul convierte el servicio en un arma de doble filo durante un juego completo.
+subtitle: La carta del nivel azul convierte el servicio en un arma de doble filo durante un juego completo.
 category: cartas
 publishedAt: 2026-08-28T16:00:00+02:00
 cover:

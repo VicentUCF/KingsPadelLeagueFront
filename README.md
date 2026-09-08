@@ -96,34 +96,41 @@ no sean borradores y cuya fecha no sea futura generan una URL real (`src/lib/new
 entrada con `featured: true` la promociona a la portada, ordenada opcionalmente por
 `homePriority`.
 
-## Gestor de noticias (Decap CMS)
+## Gestión de noticias (Pages CMS)
 
-Para no depender de que quien escribe noticias sepa Markdown/YAML/git, `/admin` sirve un editor
-[Decap CMS](https://decapcms.org/) (`public/admin/index.html` + `public/admin/config.yml`) que
-edita exactamente los mismos archivos de `src/content/news`, con los mismos campos que valida
-`src/content.config.ts`. No es un backend nuevo: sigue siendo "publicar = crear/editar un archivo
-y desplegar el build" — Decap solo hace ese commit por ti, con un formulario en vez de un editor de
-texto. El sitio público sigue siendo 100% estático; `/admin` no añade SSR ni cambia
-`astro.config.mjs`.
+Para que alguien sin conocimientos técnicos pueda crear y publicar noticias sin tocar
+Markdown/YAML/git, las noticias se editan con [Pages CMS](https://pagescms.org/) a partir de
+`.pages.yml` (raíz del repo). No es un backend nuevo: Pages CMS solo hace commits de Markdown a
+este mismo repo de GitHub — sigue siendo "publicar = crear/editar un archivo y desplegar el
+build". El sitio público sigue siendo 100% estático; no añade SSR ni cambia `astro.config.mjs`.
 
-Para que funcione en producción falta configurar, **fuera de este repo**:
+- **Dónde están los archivos**: cada noticia es un fichero Markdown en `src/content/news/`
+  (Astro Content Collections, `src/content.config.ts`), la misma fuente que consumen
+  `src/pages/noticias/[...page].astro` y `src/pages/noticias/[slug].astro`. Pages CMS no introduce
+  una fuente de datos paralela.
+- **Dónde están las imágenes**: la imagen principal (`cover.image`) se sube a
+  `public/news/covers/` y se referencia como `/news/covers/<archivo>`.
+- **Qué hace `published`**: `published: true` hace visible la noticia en `/noticias` y genera su
+  página de detalle; `published: false` la deja como borrador, sin listado ni URL pública
+  (`selectPublishedNews` en `src/lib/news.ts` es la única puerta de esta regla).
+- **`subtitle`**: la entradilla/bajada corta de la noticia. Se muestra en las tarjetas del listado
+  y en la cabecera del detalle, y también se usa como `description` para SEO y redes (Open Graph).
+- **`socialTitle`, `socialSubtitle` y `socialTemplate`**: campos opcionales, todavía sin uso en el
+  frontend. Preparan el modelo de datos para una fase futura de generación automática de piezas
+  para Instagram a partir de la misma noticia — de momento solo se guardan.
 
-- **Repo real en `public/admin/config.yml`**: el `backend.repo` está puesto a
-  `VicentUCF/KingsPadelLeagueAstro`, pero el remoto git de este proyecto apunta hoy por error a
-  `VicentUCF/KingsPadelLeagueFront` (el backoffice Angular). Confirma cuál es el repo de GitHub
-  real de este sitio antes de desplegar el admin — si `repo` señala al proyecto equivocado, las
-  noticias se comitearían en el repo Angular.
-- **Proxy de autenticación OAuth**: el backend `github` de Decap necesita un servidor externo
-  (Cloudflare Worker, Netlify, u otro) que intercambie el login de GitHub por un token; su dominio
-  va en `backend.base_url` de `config.yml`. Sin él, el botón de login no funciona. No forma parte
-  de este repo porque es infraestructura, no código del sitio.
+Para que funcione en producción falta hacer, **fuera de este repo**:
+
+- **Instalar la GitHub App de Pages CMS** (desde [app.pagescms.org](https://app.pagescms.org)) en
+  el repositorio real de este sitio. El remoto git de esta copia local apunta hoy a
+  `VicentUCF/KingsPadelLeagueFront` (el backoffice Angular) en lugar de a este proyecto Astro:
+  confirma el repo de GitHub correcto antes de instalar la app o las noticias se comitearán en el
+  proyecto equivocado. A diferencia de Decap CMS, Pages CMS no requiere desplegar ni mantener un
+  proxy OAuth propio: la autenticación la resuelve su GitHub App alojada.
 - **Rebuild tras cada commit**: este repo no tiene `.github/workflows` ni configuración de ninguna
-  plataforma de despliegue, así que cada commit de Decap necesita un deploy hook configurado en el
-  hosting real (fuera del repo) para que la noticia llegue a producción. Sin eso, el commit se crea
-  en GitHub pero el sitio publicado no se actualiza hasta el siguiente build manual.
-
-En local, `npm run dev` sirve `/admin` igual que cualquier otra ruta estática, pero el backend
-`github` requiere igualmente el proxy OAuth — no hay modo de login sin él.
+  plataforma de despliegue, así que cada commit de Pages CMS necesita un deploy hook configurado en
+  el hosting real (fuera del repo) para que la noticia llegue a producción. Sin eso, el commit se
+  crea en GitHub pero el sitio publicado no se actualiza hasta el siguiente build manual.
 
 ## Arquitectura de `src/lib`
 

@@ -1,0 +1,164 @@
+# Configuración de Pages CMS (https://pagescms.org) para el gestor de noticias.
+#
+# Edita exactamente los mismos archivos que consume `src/content.config.ts`
+# (colección `news` de Astro Content Collections): no hay backend propio, base
+# de datos ni API — Pages CMS solo hace commits de Markdown a este repo de
+# GitHub, y el deploy existente del sitio se encarga del resto.
+#
+# Pendiente de confirmar en GitHub (ver README, sección "Gestión de
+# noticias"): el remoto git de esta copia local apunta hoy a
+# VicentUCF/KingsPadelLeagueFront (el backoffice Angular), no a este proyecto
+# Astro. Antes de instalar la GitHub App de Pages CMS, confirma cuál es el
+# repo real de este sitio para no editar el proyecto equivocado.
+
+media:
+  - name: news
+    label: Imágenes de noticias
+    input: public/news/covers
+    output: /news/covers
+    categories: [image]
+    extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: news
+    label: Noticias
+    type: collection
+    path: src/content/news
+    format: yaml-frontmatter
+    extension: md
+    filename: '{primary}.md'
+    view:
+      primary: title
+      sort: publishedAt
+      order: desc
+      fields: [title, category, publishedAt, published, featured]
+    fields:
+      - name: title
+        label: Titular
+        type: string
+        description: Título principal de la noticia (máximo 90 caracteres).
+        required: true
+
+      - name: subtitle
+        label: Subtítulo
+        type: text
+        description: >-
+          Entradilla o bajada corta. Se muestra en el listado de noticias y en
+          la cabecera de la noticia, y también se usa como descripción para
+          buscadores y redes sociales (máximo 200 caracteres).
+        required: true
+
+      - name: category
+        label: Categoría
+        type: select
+        required: true
+        options:
+          values:
+            - { name: equipos, label: Equipos }
+            - { name: calendario, label: Calendario }
+            - { name: cartas, label: Cartas }
+            - { name: partidos, label: Partidos }
+
+      - name: publishedAt
+        label: Fecha de publicación
+        type: date
+        description: >-
+          Mientras sea una fecha futura, la noticia queda guardada pero no
+          aparece todavía en la web.
+        options:
+          time: true
+        required: true
+
+      - name: updatedAt
+        label: Fecha de actualización
+        type: date
+        description: Opcional. Solo si la noticia se corrige o amplía tras publicarse.
+        options:
+          time: true
+        required: false
+
+      - name: published
+        label: Publicada
+        type: boolean
+        description: >-
+          Actívalo cuando la noticia esté lista para verse en la web.
+          Mientras esté desactivado, queda guardada como borrador y no
+          aparece en el listado ni tiene página pública.
+        default: true
+
+      - name: featured
+        label: Destacada en portada
+        type: boolean
+        default: false
+
+      - name: homePriority
+        label: Prioridad en destacadas
+        type: number
+        description: >-
+          Solo aplica si está "Destacada en portada". Cuanto menor sea el
+          número, más arriba aparece.
+        required: false
+
+      - name: cover
+        label: Imagen principal
+        type: object
+        required: false
+        fields:
+          - name: image
+            label: Imagen
+            type: image
+            options:
+              media: news
+          - name: alt
+            label: Texto alternativo
+            type: string
+            description: Descripción de la foto para lectores de pantalla.
+          - name: credit
+            label: Crédito
+            type: string
+            required: false
+
+      - name: relatedTeamSlugs
+        label: Equipos relacionados
+        type: string
+        list: true
+        required: false
+        description: Slugs de equipo tal y como aparecen en /equipos/<slug>.
+
+      - name: relatedMatchdayId
+        label: Jornada relacionada
+        type: string
+        required: false
+        description: Id de jornada tal y como aparece en /jornadas/<id>.
+
+      - name: socialTemplate
+        label: 'Plantilla social (fase futura)'
+        type: select
+        required: false
+        description: >-
+          Reservado para una futura fase de generación automática de piezas
+          para Instagram. Todavía no se usa en la web.
+        options:
+          values:
+            - { name: official, label: Oficial }
+            - { name: alert, label: Alerta }
+            - { name: profile, label: Perfil }
+
+      - name: socialTitle
+        label: 'Titular para redes (fase futura)'
+        type: string
+        required: false
+        description: Reservado para la futura generación automática de piezas sociales.
+
+      - name: socialSubtitle
+        label: 'Subtítulo para redes (fase futura)'
+        type: string
+        required: false
+        description: Reservado para la futura generación automática de piezas sociales.
+
+      - name: body
+        label: Contenido
+        type: rich-text
+        description: Cuerpo principal de la noticia.
+        options:
+          media: news

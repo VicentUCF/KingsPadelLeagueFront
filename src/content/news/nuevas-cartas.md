@@ -1,6 +1,6 @@
 ---
 title: 'Nuevas cartas'
-summary: Antes de cada partido se abrirá el maletín y cada presidente robará una carta de uso único capaz de cambiar el ritmo desde la pista.
+subtitle: Antes de cada partido se abrirá el maletín y cada presidente robará una carta de uso único capaz de cambiar el ritmo desde la pista.
 category: cartas
 publishedAt: 2026-08-27T13:00:00+02:00
 cover:

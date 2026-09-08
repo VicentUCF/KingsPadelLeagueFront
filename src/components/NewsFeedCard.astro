@@ -51,7 +51,7 @@ const eyebrow = `${NEWS_DATE_FORMATTER.format(data.publishedAt)} · ${NEWS_CATEG
 		}
 		<span class="news-mosaic-cell__eyebrow">{eyebrow}</span>
 		<strong class="news-mosaic-cell__title">{data.title}</strong>
-		{!isCompact && <span class="news-mosaic-cell__summary">{data.summary}</span>}
+		{!isCompact && <span class="news-mosaic-cell__summary">{data.subtitle}</span>}
 		<span class="news-mosaic-cell__link">
 			Abrir noticia <span aria-hidden="true">→</span>
 		</span>

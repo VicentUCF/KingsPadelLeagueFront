@@ -8,7 +8,7 @@ describe('selectPublishedNews', () => {
 			entry('antiguo', '2026-08-20T10:00:00Z'),
 			entry('reciente', '2026-08-27T08:00:00Z'),
 			entry('intermedio', '2026-08-25T08:00:00Z'),
-			entry('borrador', '2026-08-26T08:00:00Z', { draft: true }),
+			entry('borrador', '2026-08-26T08:00:00Z', { published: false }),
 			entry('futuro', '2026-09-01T08:00:00Z'),
 		];
 
@@ -137,7 +137,7 @@ describe('selectNewsFeed', () => {
 	it('excluye borradores y publicaciones futuras igual que selectPublishedNews', () => {
 		const entries = [
 			entry('publicada', '2026-08-20T08:00:00Z'),
-			entry('borrador', '2026-08-21T08:00:00Z', { draft: true }),
+			entry('borrador', '2026-08-21T08:00:00Z', { published: false }),
 			entry('futura', '2026-09-01T08:00:00Z'),
 		];
 
@@ -150,8 +150,8 @@ describe('selectNewsFeed', () => {
 function entry(
 	id: string,
 	publishedAt: string,
-	options: { draft?: boolean; featured?: boolean; homePriority?: number } = {},
+	options: { published?: boolean; featured?: boolean; homePriority?: number } = {},
 ) {
-	const { draft = false, featured = false, homePriority } = options;
-	return { id, data: { draft, featured, homePriority, publishedAt: new Date(publishedAt) } };
+	const { published = true, featured = false, homePriority } = options;
+	return { id, data: { published, featured, homePriority, publishedAt: new Date(publishedAt) } };
 }

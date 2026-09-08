@@ -1,16 +1,16 @@
 ---
-# PLANTILLA — no es una noticia real. draft: true la mantiene fuera de /noticias.
+# PLANTILLA — no es una noticia real. published: false la mantiene fuera de /noticias.
 #
 # Cómo usarla:
 # 1. Duplica este archivo con un nombre nuevo (el nombre del archivo es la URL: /noticias/<nombre>).
 # 2. Rellena todos los campos entre < >.
 # 3. Pon la foto de portada en public/news/covers/ y referencia su ruta en cover.image.
-# 4. Cuando esté lista, cambia draft a false (o bórralo, el valor por defecto ya es false).
+# 4. Cuando esté lista, cambia published a true.
 title: 'Resultados de la Jornada <número>: <titular breve, 90 caracteres máx.>'
-summary: '<Resumen de 1-2 frases sobre lo más destacado de la jornada, 200 caracteres máx.>'
+subtitle: '<Entradilla de 1-2 frases sobre lo más destacado de la jornada, 200 caracteres máx.>'
 category: partidos
 publishedAt: 2026-01-01T20:00:00+02:00 # <- cambia esta fecha por la real
-draft: true
+published: false
 featured: false
 relatedMatchdayId: jornada-<número>
 relatedTeamSlugs:

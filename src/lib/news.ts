@@ -1,6 +1,6 @@
 export interface PublishableNews {
 	data: {
-		draft: boolean;
+		published: boolean;
 		publishedAt: Date;
 		featured: boolean;
 		homePriority?: number;
@@ -8,9 +8,9 @@ export interface PublishableNews {
 }
 
 /**
- * Publishable news, sorted from most to least recent. Draft entries and entries whose
- * `publishedAt` is still in the future (relative to `now`) are excluded — this is the single
- * source of truth for what may ever be reachable at a real URL.
+ * Publishable news, sorted from most to least recent. Unpublished (draft) entries and entries
+ * whose `publishedAt` is still in the future (relative to `now`) are excluded — this is the
+ * single source of truth for what may ever be reachable at a real URL.
  */
 export function selectPublishedNews<T extends PublishableNews>(
 	entries: readonly T[],
@@ -18,7 +18,7 @@ export function selectPublishedNews<T extends PublishableNews>(
 	limit?: number,
 ): T[] {
 	const published = entries
-		.filter(({ data }) => !data.draft && data.publishedAt.getTime() <= now.getTime())
+		.filter(({ data }) => data.published && data.publishedAt.getTime() <= now.getTime())
 		.sort((left, right) => right.data.publishedAt.getTime() - left.data.publishedAt.getTime());
 	return typeof limit === 'number' ? published.slice(0, limit) : published;
 }

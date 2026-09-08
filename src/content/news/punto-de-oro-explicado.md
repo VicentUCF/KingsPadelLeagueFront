@@ -1,6 +1,6 @@
 ---
 title: El punto de oro, la jugada que decide los cruces
-summary: Un solo punto puede cambiar el rumbo de un juego entero, y varias cartas del maletín están pensadas justo para ese momento.
+subtitle: Un solo punto puede cambiar el rumbo de un juego entero, y varias cartas del maletín están pensadas justo para ese momento.
 category: partidos
 publishedAt: 2026-08-25T12:00:00+02:00
 cover:
