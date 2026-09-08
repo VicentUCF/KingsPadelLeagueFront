@@ -1,5 +1,4 @@
 ---
-# Entrada de ejemplo para previsualizar el diseño del mosaico de /noticias. No es una noticia real.
 title: Así funciona Robo saque
 summary: La carta del nivel azul convierte el servicio en un arma de doble filo durante un juego completo.
 category: cartas
