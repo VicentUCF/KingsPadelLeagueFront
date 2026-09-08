@@ -341,7 +341,7 @@
 		position: absolute;
 		inset-block-start: 50%;
 		inset-inline-start: 50%;
-		inline-size: min(19rem, 56%);
+		inline-size: min(24rem, 68%);
 		block-size: auto;
 		translate: -50% -54%;
 		animation: home-trophy-float 5.5s ease-in-out infinite;
@@ -488,7 +488,7 @@
 		}
 
 		.home-hero__trophy {
-			inline-size: 12rem;
+			inline-size: 15rem;
 		}
 	}
 
