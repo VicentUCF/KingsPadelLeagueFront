@@ -12,24 +12,24 @@
 	}
 
 	.team-card,
-	.home-team-card,
 	.player-card--team {
-		border-color: color-mix(in srgb, var(--team-primary) 46%, var(--kpl-color-border-subtle));
+		border: var(--kpl-border-width) solid
+			color-mix(in srgb, var(--team-primary) 46%, var(--kpl-color-border-subtle));
 		background:
-			linear-gradient(180deg, transparent 44%, var(--team-surface) 72%), var(--team-surface);
+			linear-gradient(
+				158deg,
+				color-mix(in srgb, var(--team-primary) 9%, transparent),
+				transparent 43%
+			),
+			linear-gradient(180deg, var(--team-surface), var(--kpl-color-surface));
 
 		&:is(:hover, :focus-visible) {
 			border-color: var(--team-primary);
 			box-shadow: 0 2rem 4rem -1.25rem var(--team-glow);
 		}
-
-		&:focus-visible {
-			translate: 0 -0.3rem;
-		}
 	}
 
 	.team-card__identity-accent,
-	.home-team-card__identity-accent,
 	.player-card__team-accent,
 	.team-profile-hero__identity-accent {
 		position: absolute;
@@ -57,10 +57,6 @@
 	}
 
 	.team-card {
-		& .team-card__halo {
-			opacity: 0;
-		}
-
 		& .team-card__number {
 			z-index: 2;
 			color: color-mix(in srgb, var(--team-accent) 45%, transparent);
@@ -68,35 +64,6 @@
 
 		& :is(.team-card__logo, .team-card__copy) {
 			z-index: 1;
-		}
-
-		& .team-card__logo img {
-			filter: drop-shadow(0 1rem 1rem var(--team-glow));
-		}
-	}
-
-	.home-team-card {
-		& .home-team-card__glow {
-			opacity: 0;
-		}
-
-		& .home-team-card__identity-accent {
-			mask-image: linear-gradient(to bottom, black 68%, transparent);
-
-			&::after {
-				inset-block: 0 16%;
-				inset-inline-end: 1rem;
-				inline-size: 2px;
-			}
-		}
-
-		& > :not(.home-team-card__identity-accent) {
-			position: relative;
-			z-index: 1;
-		}
-
-		& .home-team-card__logo img {
-			filter: drop-shadow(0 0.8rem 0.9rem var(--team-glow));
 		}
 	}
 
@@ -340,7 +307,6 @@
 		}
 
 		.team-card:focus-visible,
-		.home-team-card:focus-visible,
 		.player-card--team:focus-visible {
 			translate: none;
 		}
@@ -350,7 +316,6 @@
 		.team-profile-hero__light-sweep,
 		.team-profile-hero__motion-ribbon,
 		.team-card__identity-accent,
-		.home-team-card__identity-accent,
 		.player-card__team-accent,
 		.team-profile-hero__identity-accent,
 		.team-profile-hero__signature,

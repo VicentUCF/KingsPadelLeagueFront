@@ -92,7 +92,9 @@ try {
 	assert.doesNotMatch(team, /Kings_of_Favar_no_bg\.webp/);
 	assert.match(teams, /team-card__identity-accent/);
 	assert.match(teams, /--team-primary:#69f6d1/);
-	assert.match(home, /home-team-card__identity-accent/);
+	// Home teasers share the team-card mechanics (see docs/css-audit.md P2);
+	// the home-team-card__* classes were unified into team-card__*.
+	assert.match(home, /team-card__identity-accent/);
 	// TeamIdentityBands (and its `team-identity-bands` class) was removed in
 	// the CSS consolidation (see docs/css-audit.md) — MatchCard now renders
 	// team identity through TeamBadge alone, with no direct replacement marker.

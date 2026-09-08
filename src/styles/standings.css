@@ -1,0 +1,136 @@
+/*
+ * Standings table and preseason placeholder.
+ * Extracted from public-pages.css + premium-pages.css (see docs/css-audit.md).
+ */
+@layer app {
+	.standings-table td:first-child,
+	.standings-table th:first-child {
+		inline-size: 4rem;
+	}
+
+	.standings-table .c-team-badge {
+		min-inline-size: 13rem;
+	}
+
+	.standings-table__positive {
+		color: var(--kpl-color-success);
+	}
+
+	.standings-table__negative {
+		color: var(--kpl-color-danger);
+	}
+
+	.standings-preseason {
+		display: grid;
+		grid-template-columns: minmax(20rem, 0.72fr) minmax(0, 1.28fr);
+		overflow: hidden;
+		border: var(--kpl-border-width) solid var(--kpl-color-border-strong);
+		border-radius: 2rem;
+		background: var(--kpl-color-surface);
+		box-shadow: var(--kpl-shadow-lg);
+	}
+
+	.standings-preseason__intro {
+		display: grid;
+		align-content: center;
+		gap: var(--kpl-space-4);
+		padding: clamp(var(--kpl-space-6), 6vw, var(--kpl-space-10));
+		background:
+			radial-gradient(circle at 20% 20%, rgb(201 162 39 / 0.15), transparent 55%),
+			var(--kpl-color-surface-emphasis);
+
+		& h2 {
+			font-size: clamp(2.5rem, 5vw, 5rem);
+			line-height: 0.95;
+			letter-spacing: -0.06em;
+		}
+
+		& > p:last-of-type {
+			color: var(--kpl-color-text-muted);
+			line-height: var(--kpl-line-height-loose);
+		}
+	}
+
+	.standings-preseason__key {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		margin-block-start: var(--kpl-space-4);
+		border-block: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+
+		& > span {
+			display: grid;
+			gap: var(--kpl-space-1);
+			padding: var(--kpl-space-4);
+		}
+
+		& > span + span {
+			border-inline-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		}
+
+		& strong {
+			font-family: var(--kpl-font-family-heading);
+			font-size: var(--kpl-font-size-500);
+		}
+
+		& small {
+			color: var(--kpl-color-text-muted);
+			font-size: 0.65rem;
+		}
+	}
+
+	.standings-preseason__teams {
+		display: grid;
+		align-content: center;
+		margin: 0;
+		padding: clamp(var(--kpl-space-5), 4vw, var(--kpl-space-8));
+		list-style: none;
+
+		& li {
+			display: grid;
+			grid-template-columns: 2rem minmax(0, 1fr) auto;
+			align-items: center;
+			gap: var(--kpl-space-3);
+			min-block-size: 4.5rem;
+			padding-block: var(--kpl-space-3);
+		}
+
+		& li + li {
+			border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		}
+	}
+
+	.standings-preseason__rank {
+		color: var(--kpl-color-text-muted);
+		font-family: var(--kpl-font-family-heading);
+	}
+
+	.standings-table-wrap {
+		box-shadow: var(--kpl-shadow-lg);
+	}
+
+	.standings-table tbody tr:first-child {
+		background: color-mix(in srgb, var(--kpl-color-brand) 9%, transparent);
+	}
+
+	@media (width < 64rem) {
+		.standings-preseason {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.standings-preseason__teams {
+			border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		}
+	}
+
+	@media (width < 36rem) {
+		.standings-preseason__teams .c-chip {
+			display: none;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.standings-preseason {
+			border-color: CanvasText;
+		}
+	}
+}

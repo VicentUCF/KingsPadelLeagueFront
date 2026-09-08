@@ -22,7 +22,10 @@ import type {
 import { loadPublicLeagueView } from '../lib/public-view';
 import { teamThemeStyle } from '../lib/team-identity';
 import '../styles/news.css';
-import '../styles/home.css';
+import '../styles/home-hero.css';
+import '../styles/home-spotlight.css';
+import '../styles/home-panels.css';
+import '../styles/home-teams-social.css';
 
 const buildDate = new Date();
 const [{ seasons, matchdays, playoffs, playoffMatches }, view, newsEntries] = await Promise.all([
@@ -530,13 +533,13 @@ function resolveSpotlightChipTone(
 							return (
 								<li>
 									<a
-										class="home-team-card"
+										class="team-card team-card--compact"
 										href={`/equipos/${team.slug}`}
 										style={teamThemeStyle(team)}
 									>
-										<span class="home-team-card__identity-accent" aria-hidden="true" />
+										<span class="team-card__identity-accent" aria-hidden="true" />
 										<span
-											class="home-team-card__logo"
+											class="team-card__logo"
 											aria-hidden="true"
 											transition:name={`kpl-team-${team.slug}-crest`}
 										>
@@ -553,7 +556,7 @@ function resolveSpotlightChipTone(
 												team.monogram
 											)}
 										</span>
-										<span class="home-team-card__copy">
+										<span class="team-card__copy">
 											<small>
 												{hasStandingsData && standing
 													? `#${standing.rank} · ${standing.points} pts`

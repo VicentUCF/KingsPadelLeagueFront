@@ -1,0 +1,200 @@
+/*
+ * Home teams strip, news teaser hookup, and social footer panel.
+ * Extracted from home.css (see docs/css-audit.md).
+ */
+@layer app {
+	.home-teams {
+		position: relative;
+
+		&::before {
+			position: absolute;
+			z-index: -1;
+			inset-block: 0;
+			inset-inline: -100vw;
+			border-block: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+			background:
+				linear-gradient(90deg, transparent, rgb(255 255 255 / 0.018), transparent), #0c0c0c;
+			content: '';
+		}
+	}
+
+	.home-teams__reel {
+		--kpl-grid-min: 12.5rem;
+		--kpl-grid-gap: var(--kpl-space-4);
+
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.home-news .news-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.home-social {
+		padding-block-start: 0;
+	}
+
+	.home-social__panel {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(30rem, 1.2fr);
+		align-items: center;
+		gap: var(--kpl-space-8);
+		overflow: hidden;
+		padding: clamp(var(--kpl-space-6), 5vw, var(--kpl-space-10));
+		border: var(--kpl-border-width) solid var(--kpl-color-border-strong);
+		border-radius: var(--kpl-radius-xl);
+		background:
+			radial-gradient(circle at 12% 50%, rgb(201 162 39 / 0.18), transparent 34%),
+			linear-gradient(125deg, rgb(255 255 255 / 0.04), transparent 50%),
+			var(--kpl-color-surface-emphasis);
+		box-shadow: var(--kpl-shadow-lg);
+
+		&::after {
+			position: absolute;
+			inset-block-start: 50%;
+			inset-inline-start: 42%;
+			inline-size: 12rem;
+			aspect-ratio: 1;
+			translate: -50% -50%;
+			border: 1px solid rgb(201 162 39 / 0.12);
+			border-radius: 50%;
+			box-shadow:
+				0 0 0 2rem rgb(201 162 39 / 0.035),
+				0 0 0 4rem rgb(201 162 39 / 0.018);
+			content: '';
+			pointer-events: none;
+		}
+	}
+
+	.home-social__copy {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: var(--kpl-space-3);
+
+		& h2 {
+			font-size: clamp(var(--kpl-font-size-600), 4vw, 3.6rem);
+		}
+
+		& p:last-child {
+			color: var(--kpl-color-text-muted);
+			line-height: var(--kpl-line-height-loose);
+		}
+	}
+
+	.home-social__links {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--kpl-space-3);
+	}
+
+	.home-social__link {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--kpl-space-4);
+		min-block-size: 5.5rem;
+		padding: var(--kpl-space-4);
+		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		border-radius: var(--kpl-radius-lg);
+		background: rgb(8 8 8 / 0.45);
+		color: var(--kpl-color-text-strong);
+		text-decoration: none;
+		backdrop-filter: blur(12px);
+		transition:
+			translate var(--kpl-duration-normal) var(--kpl-ease-standard),
+			border-color var(--kpl-duration-normal) var(--kpl-ease-standard),
+			background-color var(--kpl-duration-normal) var(--kpl-ease-standard);
+
+		&:hover {
+			translate: 0 -0.18rem;
+			border-color: var(--kpl-color-brand);
+			background: rgb(255 255 255 / 0.07);
+			color: var(--kpl-color-text-strong);
+		}
+
+		& > svg {
+			inline-size: 2rem;
+			fill: none;
+			stroke: currentcolor;
+			stroke-width: 1.8;
+			color: var(--kpl-color-brand-strong);
+		}
+
+		& :is(.home-social__dot, .home-social__play) {
+			fill: currentcolor;
+			stroke: none;
+		}
+
+		& > span:nth-child(2) {
+			display: grid;
+			gap: var(--kpl-space-1);
+		}
+
+		& small {
+			color: var(--kpl-color-text-muted);
+			font-size: var(--kpl-font-size-50);
+		}
+
+		& strong {
+			font-family: var(--kpl-font-family-heading);
+			font-size: var(--kpl-font-size-300);
+		}
+	}
+
+	@media (width < 64rem) {
+		.home-social__panel {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.home-social__panel::after {
+			inset-inline-start: 88%;
+		}
+	}
+
+	@media (width < 48rem) {
+		.home-news .news-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.home-teams__reel {
+			display: flex;
+			margin-inline: calc(var(--kpl-container-gutter) * -1);
+			padding-inline: var(--kpl-container-gutter);
+			overflow-x: auto;
+			overscroll-behavior-inline: contain;
+			scroll-padding-inline: var(--kpl-container-gutter);
+			scroll-snap-type: inline proximity;
+			scrollbar-width: thin;
+		}
+
+		.home-teams__reel > li {
+			flex: 0 0 min(78vw, 16rem);
+			scroll-snap-align: start;
+		}
+
+		.home-social__links {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.home-social__link {
+			transition: none;
+		}
+
+		.home-teams__reel {
+			scroll-behavior: auto;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.home-social__panel {
+			border-color: CanvasText;
+		}
+	}
+}
