@@ -25,6 +25,7 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
+      - run: npm run lint:css
       - run: npm run typecheck
       - run: npm run knip
       - run: npm run architecture

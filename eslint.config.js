@@ -3,6 +3,7 @@ import js from '@eslint/js';
 import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginAstro from 'eslint-plugin-astro';
+import sonarjs from 'eslint-plugin-sonarjs';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -104,6 +105,19 @@ export default defineConfig(
 			globals: { ...globals.browser, ...globals.node },
 		},
 		rules: aiSlopRules,
+	},
+
+	// Sonar-style code-smell detection (cognitive complexity, duplicated
+	// branches, nested ternaries, etc.) plus a generic "file is too big"
+	// guard — the same class of check SonarQube/SonarCloud applies, running
+	// here without any server/account. See docs/quality.md.
+	{
+		files: ['**/*.ts', '**/*.mts', '**/*.cts', '**/*.astro'],
+		plugins: { sonarjs },
+		rules: {
+			...sonarjs.configs.recommended.rules,
+			'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
+		},
 	},
 
 	// Architecture boundary: UI must go through the stable src/lib/*.ts

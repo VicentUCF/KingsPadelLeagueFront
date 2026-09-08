@@ -17,6 +17,16 @@ const secondaryIdentity = player.alias
 	? `“${player.alias}” · ${player.positionLabel}`
 	: player.positionLabel;
 const rosterSecondaryIdentity = player.alias ? `“${player.alias}”` : null;
+const footerVariant = resolveFooterVariant(rosterRole, preseason);
+
+function resolveFooterVariant(
+	role: Props['rosterRole'],
+	isPreseason: boolean,
+): 'none' | 'preseason' | 'stats' {
+	if (role) return 'none';
+	if (isPreseason) return 'preseason';
+	return 'stats';
+}
 ---
 
 <a
@@ -116,12 +126,15 @@ const rosterSecondaryIdentity = player.alias ? `“${player.alias}”` : null;
 	</span>
 
 	{
-		rosterRole ? null : preseason ? (
+		footerVariant === 'preseason' && (
 			<span class="player-card__preseason-note">
 				<small>Temporada 2</small>
 				<strong>Jugador confirmado</strong>
 			</span>
-		) : (
+		)
+	}
+	{
+		footerVariant === 'stats' && (
 			<span class="player-card__stats" aria-label="Estadísticas de temporada">
 				<span>
 					<strong>{player.totalPoints}</strong>

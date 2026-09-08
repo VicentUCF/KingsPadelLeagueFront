@@ -98,13 +98,12 @@ export function resolveHomeSeasonStatus(
 		.sort(byScheduledAtDesc)[0];
 	const playoffInProgress = seasonPlayoffMatches.find((match) => match.status === 'in_progress');
 	const playoffScheduled = seasonPlayoffMatches.find((match) => match.status === 'scheduled');
-	const focusPlayoff = !focusedInProgress
-		? (playoffInProgress ??
-			(playoffScheduled &&
-			(!focusedScheduled || byScheduledAtAsc(playoffScheduled, focusedScheduled) <= 0)
-				? playoffScheduled
-				: undefined))
-		: undefined;
+	const focusPlayoff = resolveFocusPlayoff(
+		focusedInProgress,
+		playoffInProgress,
+		playoffScheduled,
+		focusedScheduled,
+	);
 	if (focusPlayoff) {
 		const playoff = seasonPlayoffs.find((item) => item.id === focusPlayoff.playoffId);
 		return {
@@ -121,19 +120,37 @@ export function resolveHomeSeasonStatus(
 	return {
 		seasonName: selectedSeason.name,
 		phaseLabel: resolvePhaseLabel(selectedSeason, seasonMatchdays, seasonPlayoffMatches, now),
-		matchdayEyebrow: focusedInProgress
-			? 'Jornada en curso'
-			: focusedScheduled
-				? 'Próxima jornada'
-				: focusedFinished
-					? 'Última jornada'
-					: 'Calendario',
+		matchdayEyebrow: resolveMatchdayEyebrow(focusedInProgress, focusedScheduled, focusedFinished),
 		matchdayLabel: focusMatchday?.name ?? 'Calendario pendiente',
 		dateLabel: focusMatchday
 			? formatMatchdayDate(focusMatchday.scheduledAt)
 			: 'Fechas por confirmar',
 		focusHref: '/calendario',
 	};
+}
+
+function resolveFocusPlayoff(
+	focusedInProgress: Matchday | undefined,
+	playoffInProgress: HomePlayoffMatch | undefined,
+	playoffScheduled: HomePlayoffMatch | undefined,
+	focusedScheduled: Matchday | undefined,
+): HomePlayoffMatch | undefined {
+	if (focusedInProgress) return undefined;
+	if (playoffInProgress) return playoffInProgress;
+	if (!playoffScheduled) return undefined;
+	if (!focusedScheduled) return playoffScheduled;
+	return byScheduledAtAsc(playoffScheduled, focusedScheduled) <= 0 ? playoffScheduled : undefined;
+}
+
+function resolveMatchdayEyebrow(
+	focusedInProgress: Matchday | undefined,
+	focusedScheduled: Matchday | undefined,
+	focusedFinished: Matchday | undefined,
+): HomeSeasonStatus['matchdayEyebrow'] {
+	if (focusedInProgress) return 'Jornada en curso';
+	if (focusedScheduled) return 'Próxima jornada';
+	if (focusedFinished) return 'Última jornada';
+	return 'Calendario';
 }
 
 function resolvePhaseLabel(

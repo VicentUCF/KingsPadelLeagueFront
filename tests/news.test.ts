@@ -34,7 +34,7 @@ describe('selectPublishedNews', () => {
 
 		const result = selectPublishedNews(entries, new Date('2026-08-27T12:00:00Z'));
 
-		expect(result.length).toBe(2);
+		expect(result).toHaveLength(2);
 	});
 });
 
@@ -96,7 +96,7 @@ describe('selectHomeNews', () => {
 
 		const result = selectHomeNews(entries, new Date('2026-08-27T12:00:00Z'), 3);
 
-		expect(result.length).toBe(2);
+		expect(result).toHaveLength(2);
 	});
 });
 
@@ -130,7 +130,7 @@ describe('selectNewsFeed', () => {
 
 		const result = selectNewsFeed(entries, new Date('2026-08-27T12:00:00Z'));
 
-		expect(result.length).toBe(5);
+		expect(result).toHaveLength(5);
 		expect(result[result.length - 1]?.id).toBe('normal');
 	});
 

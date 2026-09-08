@@ -3,5 +3,6 @@
 // pre-push/CI instead — see docs/quality.md.
 export default {
 	'*.{js,mjs,cjs,ts,mts,cts,astro}': ['eslint --fix', 'prettier --write'],
-	'*.{json,css,scss,md,mdx,yml,yaml}': ['prettier --write'],
+	'src/**/*.css': ['stylelint --fix', 'prettier --write'],
+	'*.{json,md,mdx,yml,yaml}': ['prettier --write'],
 };

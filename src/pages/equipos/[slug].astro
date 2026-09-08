@@ -53,6 +53,11 @@ const teamStructuredData = teamUrl
 			},
 		]
 	: undefined;
+
+function presidentsSummary(count: number): string {
+	if (count === 0) return 'Presidencia pendiente';
+	return `${count} ${count === 1 ? 'presidente' : 'presidentes'}`;
+}
 ---
 
 <BaseLayout
@@ -165,11 +170,7 @@ const teamStructuredData = teamUrl
 						<p class="c-eyebrow">{preseason ? 'Plantilla confirmada' : 'Plantilla oficial'}</p>
 						<h2 id="roster-title">Las caras de {team.name}</h2>
 						<p class="team-roster__summary">
-							{
-								presidents.length
-									? `${presidents.length} ${presidents.length === 1 ? 'presidente' : 'presidentes'}`
-									: 'Presidencia pendiente'
-							}
+							{presidentsSummary(presidents.length)}
 							<span aria-hidden="true">·</span>
 							{squadPlayers.length}
 							{squadPlayers.length === 1 ? 'jugador' : 'jugadores'}

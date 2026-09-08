@@ -43,6 +43,11 @@ function capitalize(value: string) {
 	return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function cellLongDate(cell: DayCell): string {
+	const date = new Date(`${cell.key}T00:00:00Z`);
+	return capitalize(longDateFormatter.format(date));
+}
+
 const matchdayByDay = new Map<string, PublicMatchday>();
 for (const matchday of matchdays) {
 	matchdayByDay.set(dayKeyFormatter.format(new Date(matchday.date)), matchday);
@@ -113,7 +118,7 @@ if (firstMonthKey && lastMonthKey) {
 											data-status={cell.matchday.status}
 											href={`#day-${cell.key}`}
 											aria-current={cell.isToday ? 'date' : undefined}
-											title={`${cell.matchday.label} · ${capitalize(longDateFormatter.format(new Date(`${cell.key}T00:00:00Z`)))}`}
+											title={`${cell.matchday.label} · ${cellLongDate(cell)}`}
 										>
 											<span class="season-map__day-number" aria-hidden="true">
 												{cell.day}
@@ -122,8 +127,8 @@ if (firstMonthKey && lastMonthKey) {
 												J{cell.matchday.number}
 											</span>
 											<span class="u-visually-hidden">
-												{capitalize(longDateFormatter.format(new Date(`${cell.key}T00:00:00Z`)))}:{' '}
-												{cell.matchday.label}, {statusLabels[cell.matchday.status]}
+												{cellLongDate(cell)}: {cell.matchday.label},{' '}
+												{statusLabels[cell.matchday.status]}
 											</span>
 										</a>
 									</li>

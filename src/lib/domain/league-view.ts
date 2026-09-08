@@ -124,5 +124,5 @@ function byScheduledAt(left: { scheduledAt: string }, right: { scheduledAt: stri
 }
 
 function matchdayNumber(label: string, fallback: number): number {
-	return Number(label.match(/\d+/)?.[0]) || fallback;
+	return Number(/\d+/.exec(label)?.[0]) || fallback;
 }

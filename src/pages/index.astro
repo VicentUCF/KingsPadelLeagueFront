@@ -11,8 +11,14 @@ import {
 	PUBLIC_SEASON_NAME,
 	SEASON_STARTS_LABEL,
 } from '../lib/league-presentation';
-import { resolveHomeSeasonStatus } from '../lib/league-status';
+import { resolveHomeSeasonStatus, type HomeSeasonStatus } from '../lib/league-status';
 import { selectHomeNews } from '../lib/news';
+import type {
+	PublicEncounter,
+	PublicMatchday,
+	PublicPlayoffMatch,
+	PublicTeam,
+} from '../lib/public-league';
 import { loadPublicLeagueView } from '../lib/public-view';
 import { teamThemeStyle } from '../lib/team-identity';
 import '../styles/news.css';
@@ -32,11 +38,7 @@ const seasonStatus = resolveHomeSeasonStatus(
 	playoffMatches,
 );
 const preseason = isPublicPreseason(buildDate);
-const displayPhase = preseason
-	? 'Pretemporada'
-	: seasonStatus.phaseLabel === 'Playoffs' && !PLAYOFFS_ENABLED
-		? 'Fase regular'
-		: seasonStatus.phaseLabel;
+const displayPhase = resolveDisplayPhase(preseason, seasonStatus.phaseLabel, PLAYOFFS_ENABLED);
 const displaySeasonName = PUBLIC_SEASON_NAME;
 const homeNews = selectHomeNews(newsEntries, buildDate);
 
@@ -50,33 +52,7 @@ const focusEncounter =
 	focusMatchday?.encounters[0] ??
 	null;
 const playoffFocus = displayPhase === 'Playoffs' ? (view.focusPlayoffMatch ?? null) : null;
-const spotlight = preseason
-	? null
-	: playoffFocus
-		? {
-				awayScore: playoffFocus.awayScore,
-				awayTeam: playoffFocus.awayTeam,
-				homeScore: playoffFocus.homeScore,
-				homeTeam: playoffFocus.homeTeam,
-				href: '/playoffs',
-				label: playoffFocus.stageLabel,
-				scheduledAt: playoffFocus.scheduledAt,
-				scheduledAtLabel: playoffFocus.scheduledAtLabel,
-				status: playoffFocus.status,
-			}
-		: focusEncounter
-			? {
-					awayScore: focusEncounter.awayScore,
-					awayTeam: focusEncounter.awayTeam,
-					homeScore: focusEncounter.homeScore,
-					homeTeam: focusEncounter.homeTeam,
-					href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/calendario',
-					label: focusMatchday?.label ?? 'Próximo cruce',
-					scheduledAt: focusEncounter.scheduledAt,
-					scheduledAtLabel: focusEncounter.scheduledAtLabel,
-					status: focusEncounter.status,
-				}
-			: null;
+const spotlight = resolveSpotlight(preseason, playoffFocus, focusEncounter, focusMatchday);
 
 const heroContent = {
 	Pretemporada: {
@@ -125,17 +101,15 @@ const hasStandingsData =
 	view.standings.some((standing) => standing.points > 0 || standing.playedMatches > 0);
 const standingsByTeamId = new Map(view.standings.map((standing) => [standing.team.id, standing]));
 const topStandings = view.standings.slice(0, 6);
-const calendarPathMeta = preseason
-	? `Desde el ${SEASON_STARTS_LABEL}`
-	: currentMatchday
-		? `${currentMatchday.label} en curso`
-		: nextMatchday
-			? `Próxima: ${nextMatchday.dateLabel}`
-			: latestCompletedMatchday
-				? `Última: ${latestCompletedMatchday.label}`
-				: 'Jornadas y resultados';
+const calendarPathMeta = resolveCalendarPathMeta(
+	preseason,
+	currentMatchday,
+	nextMatchday,
+	latestCompletedMatchday,
+);
 const focusEyebrow = preseason ? 'Próximamente' : seasonStatus.matchdayEyebrow;
 const focusLabel = preseason ? displaySeasonName : seasonStatus.matchdayLabel;
+const spotlightChipTone = resolveSpotlightChipTone(preseason, currentMatchday, spotlight);
 const focusDateLabel = preseason
 	? `La competición empieza el ${SEASON_STARTS_LABEL}`
 	: seasonStatus.dateLabel;
@@ -166,6 +140,87 @@ const homeStructuredData = homeUrl
 			},
 		]
 	: undefined;
+
+function resolveDisplayPhase(
+	preseason: boolean,
+	phaseLabel: HomeSeasonStatus['phaseLabel'],
+	playoffsEnabled: boolean,
+): HomeSeasonStatus['phaseLabel'] {
+	if (preseason) return 'Pretemporada';
+	if (phaseLabel === 'Playoffs' && !playoffsEnabled) return 'Fase regular';
+	return phaseLabel;
+}
+
+interface HomeSpotlight {
+	awayScore: number | null;
+	awayTeam: PublicTeam | null;
+	homeScore: number;
+	homeTeam: PublicTeam;
+	href: string;
+	label: string;
+	scheduledAt: string;
+	scheduledAtLabel: string;
+	status: PublicEncounter['status'];
+}
+
+function resolveSpotlight(
+	preseason: boolean,
+	playoffFocus: PublicPlayoffMatch | null,
+	focusEncounter: PublicEncounter | null,
+	focusMatchday: PublicMatchday | null,
+): HomeSpotlight | null {
+	if (preseason) return null;
+	if (playoffFocus) {
+		return {
+			awayScore: playoffFocus.awayScore,
+			awayTeam: playoffFocus.awayTeam,
+			homeScore: playoffFocus.homeScore,
+			homeTeam: playoffFocus.homeTeam,
+			href: '/playoffs',
+			label: playoffFocus.stageLabel,
+			scheduledAt: playoffFocus.scheduledAt,
+			scheduledAtLabel: playoffFocus.scheduledAtLabel,
+			status: playoffFocus.status,
+		};
+	}
+	if (focusEncounter) {
+		return {
+			awayScore: focusEncounter.awayScore,
+			awayTeam: focusEncounter.awayTeam,
+			homeScore: focusEncounter.homeScore,
+			homeTeam: focusEncounter.homeTeam,
+			href: focusMatchday ? `/jornadas/${focusMatchday.id}` : '/calendario',
+			label: focusMatchday?.label ?? 'Próximo cruce',
+			scheduledAt: focusEncounter.scheduledAt,
+			scheduledAtLabel: focusEncounter.scheduledAtLabel,
+			status: focusEncounter.status,
+		};
+	}
+	return null;
+}
+
+function resolveCalendarPathMeta(
+	preseason: boolean,
+	currentMatchday: PublicMatchday | null,
+	nextMatchday: PublicMatchday | null,
+	latestCompletedMatchday: PublicMatchday | null,
+): string {
+	if (preseason) return `Desde el ${SEASON_STARTS_LABEL}`;
+	if (currentMatchday) return `${currentMatchday.label} en curso`;
+	if (nextMatchday) return `Próxima: ${nextMatchday.dateLabel}`;
+	if (latestCompletedMatchday) return `Última: ${latestCompletedMatchday.label}`;
+	return 'Jornadas y resultados';
+}
+
+function resolveSpotlightChipTone(
+	preseason: boolean,
+	currentMatchday: PublicMatchday | null,
+	spotlight: HomeSpotlight | null,
+): string {
+	if (preseason) return 'c-chip--tone-brand';
+	if (currentMatchday || spotlight?.status === 'current') return 'c-chip--tone-warning';
+	return 'c-chip--tone-info';
+}
 ---
 
 <BaseLayout
@@ -266,16 +321,7 @@ const homeStructuredData = homeUrl
 					<article class="home-spotlight">
 						<header class="home-spotlight__header">
 							<div>
-								<span
-									class:list={[
-										'c-chip',
-										preseason
-											? 'c-chip--tone-brand'
-											: currentMatchday || spotlight?.status === 'current'
-												? 'c-chip--tone-warning'
-												: 'c-chip--tone-info',
-									]}
-								>
+								<span class:list={['c-chip', spotlightChipTone]}>
 									{focusEyebrow}
 								</span>
 								<h2>{focusLabel}</h2>

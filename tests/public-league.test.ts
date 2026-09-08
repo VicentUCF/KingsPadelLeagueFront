@@ -185,7 +185,9 @@ describe('createPublicLeagueView', () => {
 
 		const view = createPublicLeagueView(duplicateNames, new Date('2026-08-27T12:00:00Z'));
 
-		expect(view.players.map((player) => player.slug).sort()).toEqual(['ana-uno', 'ana-uno-2']);
+		expect(
+			view.players.map((player) => player.slug).sort((left, right) => left.localeCompare(right)),
+		).toEqual(['ana-uno', 'ana-uno-2']);
 	});
 
 	it('crea rondas de playoffs y admite un rival todavía no decidido', () => {

@@ -29,7 +29,7 @@ describe('includeSupplementalTeams', () => {
 
 		const supplemented = includeSupplementalTeams(data);
 
-		expect(supplemented.teams.length).toBe(1);
+		expect(supplemented.teams).toHaveLength(1);
 		expect(supplemented.teams[0]).toEqual({
 			id: 'team-red',
 			name: 'RedLions',
@@ -38,7 +38,7 @@ describe('includeSupplementalTeams', () => {
 			logo: '',
 			primaryColor: '#d62f35',
 		});
-		expect(data.teams.length).toBe(0);
+		expect(data.teams).toHaveLength(0);
 	});
 
 	it('conserva el registro del backend sin duplicarlo cuando ya existe', () => {

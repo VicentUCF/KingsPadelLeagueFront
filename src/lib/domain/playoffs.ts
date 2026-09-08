@@ -13,6 +13,7 @@ import {
 	groupBy,
 	mapStatus,
 	requireById,
+	resolveWinner,
 } from './shared.ts';
 import type {
 	PairResult,
@@ -143,12 +144,7 @@ function createPlayoffMatch(
 						awayScoreLabel: sets.length
 							? sets.map((set) => `${set.away}/${set.local}`).join(' · ')
 							: 'Pendiente',
-						winnerTeamId:
-							homeSetWins > awaySetWins
-								? homeTeam.id
-								: awaySetWins > homeSetWins
-									? awayTeam.id
-									: null,
+						winnerTeamId: resolveWinner(homeSetWins, awaySetWins, homeTeam.id, awayTeam.id),
 					},
 				},
 			];

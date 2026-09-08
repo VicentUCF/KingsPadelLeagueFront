@@ -30,17 +30,8 @@ const {
 const currentPath = Astro.url.pathname;
 const canonicalUrl = Astro.site ? new URL(currentPath, Astro.site) : null;
 const socialImageUrl = new URL(image, Astro.site ?? Astro.url.origin);
-const jsonLdItems = Array.isArray(structuredData)
-	? structuredData
-	: structuredData
-		? [structuredData]
-		: [];
-const jsonLd = jsonLdItems.length
-	? JSON.stringify(jsonLdItems.length === 1 ? jsonLdItems[0] : jsonLdItems).replaceAll(
-			'<',
-			'\\u003c',
-		)
-	: null;
+const jsonLdItems = structuredData ? [structuredData].flat() : [];
+const jsonLd = toJsonLdScript(jsonLdItems);
 const navigation = [
 	{ href: '/', label: 'Inicio' },
 	{ href: '/noticias', label: 'Noticias' },
@@ -83,6 +74,12 @@ const pageTransition: TransitionDirectionalAnimations = {
 		},
 	},
 };
+
+function toJsonLdScript(items: Record<string, unknown>[]): string | null {
+	if (items.length === 0) return null;
+	const payload = items.length === 1 ? items[0] : items;
+	return JSON.stringify(payload).replaceAll('<', '\\u003c');
+}
 ---
 
 <!doctype html>

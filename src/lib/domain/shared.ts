@@ -37,8 +37,14 @@ export function createPairLineup(
 	};
 }
 
+const STATUS_MAP: Record<MatchdayStatus, PublicStatus> = {
+	finished: 'completed',
+	in_progress: 'current',
+	scheduled: 'upcoming',
+};
+
 export function mapStatus(status: MatchdayStatus): PublicStatus {
-	return status === 'finished' ? 'completed' : status === 'in_progress' ? 'current' : 'upcoming';
+	return STATUS_MAP[status];
 }
 
 export function normalizeSlug(value: string): string {
@@ -70,6 +76,17 @@ export function formatDateTime(value: string): string {
 
 export function byId<T extends { id: string }>(left: T, right: T): number {
 	return left.id.localeCompare(right.id, 'es');
+}
+
+export function resolveWinner(
+	homeSetWins: number,
+	awaySetWins: number,
+	homeTeamId: string,
+	awayTeamId: string,
+): string | null {
+	if (homeSetWins > awaySetWins) return homeTeamId;
+	if (awaySetWins > homeSetWins) return awayTeamId;
+	return null;
 }
 
 function capitalize(value: string): string {

@@ -11,6 +11,8 @@ extenderlo.
 | `npm run format:check`  | Comprueba formato sin escribir cambios (usado en CI).                |
 | `npm run lint`          | ESLint sobre todo el repo (`.ts`, `.astro`, config).                 |
 | `npm run lint:fix`      | Igual que `lint`, aplicando fixes automáticos.                       |
+| `npm run lint:css`      | Stylelint sobre `src/**/*.css`.                                      |
+| `npm run lint:css:fix`  | Igual que `lint:css`, aplicando fixes automáticos.                   |
 | `npm run typecheck`     | `astro check` — tipos de Astro + TypeScript en modo estricto.        |
 | `npm run check`         | Alias histórico de `typecheck` (se mantiene por compatibilidad).     |
 | `npm run test`          | Vitest en modo watch.                                                |
@@ -34,7 +36,7 @@ pre-push (Husky)
   → test:run (Vitest, una pasada)
 
 CI (.github/workflows/ci.yml)
-  → static-checks: format:check, lint, typecheck, knip, architecture
+  → static-checks: format:check, lint, lint:css, typecheck, knip, architecture
   → unit-tests: test:coverage (sube el reporte como artifact)
   → build-check: test:ssg (build real contra la API fixture — ver nota abajo)
   → e2e: Playwright contra dev:fixture
@@ -97,12 +99,41 @@ definida. Para activarlo, configura en el repo de GitHub:
 `node_modules/`, `coverage/`, `playwright-report/`, `test-results/`, `public/admin/`, `design/`,
 `.astro/`) y el reporte de cobertura (`coverage/lcov.info`, generado por `test:coverage`).
 
+Ninguna de las tres cosas anteriores (host, token, project key/organization) está configurada
+todavía — nadie ha creado un proyecto SonarCloud/SonarQube para este repo — así que el job se
+queda en pausa (no falla, simplemente no corre) hasta que existan.
+
+### Reglas "Sonar" que sí corren ya, sin servidor
+
+Levantar un SonarQube real necesita Docker (con el daemon arrancado — requiere `sudo`, no
+disponible para el agente) o una cuenta SonarCloud (credenciales que nadie debe inventar). Mientras
+tanto, dos herramientas aplican el mismo tipo de reglas —sin servidor, sin cuenta— dentro de
+`lint`/`lint:css`:
+
+- **`eslint-plugin-sonarjs`** (`.ts`/`.astro`, ver `eslint.config.js`): complejidad cognitiva,
+  ternarios anidados, template literals anidados, `sort()` sin comparador, `.match()` en vez de
+  `.exec()`, y ~275 reglas más de la config `recommended`. Se probó contra el código real antes de
+  activarla: solo 5 categorías de regla producían hallazgos (14 en total), todos corregidos —
+  varios extrayendo funciones pequeñas (p. ej. `resolveFocusPlayoff`, `resolveSpotlight` en
+  `index.astro`) o partiendo `validateLeagueData` en `validation.ts` (complejidad cognitiva 21→un
+  par de funciones bajo 15).
+- **`kpl/max-file-lines`** (`stylelint-local-rules/max-file-lines.mjs`, regla 1000 líneas): el
+  equivalente de la regla Sonar S104 ("Files should not have too many lines"), que no existe en
+  Stylelint de serie. **Encuentra 3 violaciones reales ahora mismo** —
+  `src/styles/premium-pages.css` (2382 líneas), `home.css` (1329) y `cards.css` (1099) — que
+  `npm run lint:css`/`quality`/CI reportan como error. No se han dividido en esta pasada: partir
+  hojas de estilo de miles de líneas sin tests de regresión visual es un cambio con riesgo real de
+  romper algo visible, y ya existe un plan dedicado para ese trabajo en `docs/css-audit.md`. La
+  regla se deja en `error` a propósito — bajar el umbral para que pase silenciaría exactamente lo
+  que se pidió detectar.
+
 ## Patrones bloqueados/avisados (código generado por IA)
 
 ESLint (`eslint.config.js`) trata como **error**: `@ts-ignore`, `@ts-nocheck`, `any` explícito,
 `console.log` (se permite `console.warn`/`console.error`), `debugger`, promesas sin gestionar
-(`no-floating-promises`), y cualquier `eslint-disable` sin una razón (`-- motivo`) tras `--`. Como
-**warning**: comentarios `TODO`/`FIXME`/`HACK`.
+(`no-floating-promises`), cualquier `eslint-disable` sin una razón (`-- motivo`) tras `--`,
+ternarios/template literals anidados y complejidad cognitiva excesiva (`eslint-plugin-sonarjs`, ver
+más abajo). Como **warning**: comentarios `TODO`/`FIXME`/`HACK`.
 
 ## Deuda técnica conocida (no arreglada en esta pasada)
 
@@ -112,3 +143,9 @@ ESLint (`eslint.config.js`) trata como **error**: `@ts-ignore`, `@ts-nocheck`, `
   generaba ~60 errores en tests existentes por cómo modelan `homePriority?: number`, y arreglarlo
   bien es un cambio de forma de los tipos, no algo para colar en esta pasada. Queda como próximo
   paso si se quiere ese nivel de estrictez.
+- **3 hojas de estilo superan las 1000 líneas** (`premium-pages.css` 2382, `home.css` 1329,
+  `cards.css` 1099) — `npm run lint:css` falla por esto a propósito, ver más arriba. Dividirlas es
+  el siguiente paso lógico y ya tiene su propio plan en `docs/css-audit.md`.
+- `no-descending-specificity` de Stylelint está desactivada (ver `stylelint.config.mjs`): con
+  `stylelint-config-recommended` activo produjo 86 hallazgos, todos sobre orden de selectores en un
+  código con clases BEM ya únicas por componente — ruido, no bugs de especificidad reales.

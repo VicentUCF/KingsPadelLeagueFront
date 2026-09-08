@@ -1,6 +1,41 @@
 import type { PublicLeagueData } from '../api/types';
 
+interface ReferenceIds {
+	seasonIds: ReadonlySet<string>;
+	matchdayIds: ReadonlySet<string>;
+	teamIds: ReadonlySet<string>;
+	playerIds: ReadonlySet<string>;
+	matchIds: ReadonlySet<string>;
+	lineupIds: ReadonlySet<string>;
+	pairIds: ReadonlySet<string>;
+	playoffIds: ReadonlySet<string>;
+	playoffMatchIds: ReadonlySet<string>;
+	playoffLineupIds: ReadonlySet<string>;
+	playoffPairIds: ReadonlySet<string>;
+}
+
 export function validateLeagueData(data: PublicLeagueData): void {
+	assertAllUnique(data);
+
+	const ids: ReferenceIds = {
+		seasonIds: idsOf(data.seasons),
+		matchdayIds: idsOf(data.matchdays),
+		teamIds: idsOf(data.teams),
+		playerIds: idsOf(data.players),
+		matchIds: idsOf(data.matches),
+		lineupIds: idsOf(data.lineups),
+		pairIds: idsOf(data.lineupPairs),
+		playoffIds: idsOf(data.playoffs),
+		playoffMatchIds: idsOf(data.playoffMatches),
+		playoffLineupIds: idsOf(data.playoffLineups),
+		playoffPairIds: idsOf(data.playoffLineupPairs),
+	};
+
+	validateRegularSeasonReferences(data, ids);
+	validatePlayoffReferences(data, ids);
+}
+
+function assertAllUnique(data: PublicLeagueData): void {
 	assertUnique(data.seasons, 'temporadas');
 	assertUnique(data.matchdays, 'jornadas');
 	assertUnique(data.teams, 'equipos');
@@ -14,18 +49,10 @@ export function validateLeagueData(data: PublicLeagueData): void {
 	assertUnique(data.playoffLineups, 'alineaciones de playoffs');
 	assertUnique(data.playoffLineupPairs, 'parejas de alineación de playoffs');
 	assertUnique(data.playoffPairMatches, 'partidos por parejas de playoffs');
+}
 
-	const seasonIds = idsOf(data.seasons);
-	const matchdayIds = idsOf(data.matchdays);
-	const teamIds = idsOf(data.teams);
-	const playerIds = idsOf(data.players);
-	const matchIds = idsOf(data.matches);
-	const lineupIds = idsOf(data.lineups);
-	const pairIds = idsOf(data.lineupPairs);
-	const playoffIds = idsOf(data.playoffs);
-	const playoffMatchIds = idsOf(data.playoffMatches);
-	const playoffLineupIds = idsOf(data.playoffLineups);
-	const playoffPairIds = idsOf(data.playoffLineupPairs);
+function validateRegularSeasonReferences(data: PublicLeagueData, ids: ReferenceIds): void {
+	const { seasonIds, matchdayIds, teamIds, playerIds, matchIds, lineupIds, pairIds } = ids;
 
 	for (const item of data.matchdays) {
 		requireReference(seasonIds, item.seasonId, `La jornada ${item.id}`, 'temporada');
@@ -69,6 +96,18 @@ export function validateLeagueData(data: PublicLeagueData): void {
 		requireReference(playerIds, score.playerId, `La puntuación de ${score.playerId}`, 'jugador');
 	}
 	validateTeamScores(data, seasonIds, teamIds);
+}
+
+function validatePlayoffReferences(data: PublicLeagueData, ids: ReferenceIds): void {
+	const {
+		seasonIds,
+		teamIds,
+		playerIds,
+		playoffIds,
+		playoffMatchIds,
+		playoffLineupIds,
+		playoffPairIds,
+	} = ids;
 
 	for (const playoff of data.playoffs) {
 		requireReference(seasonIds, playoff.seasonId, `El playoff ${playoff.id}`, 'temporada');
@@ -81,16 +120,15 @@ export function validateLeagueData(data: PublicLeagueData): void {
 			`El partido de playoff ${match.id}`,
 			'equipo local',
 		);
-		if (match.awayTeamId) {
-			requireReference(
-				teamIds,
-				match.awayTeamId,
-				`El partido de playoff ${match.id}`,
-				'equipo visitante',
-			);
-			if (match.localTeamId === match.awayTeamId) {
-				throw new Error(`El partido de playoff ${match.id} enfrenta al mismo equipo.`);
-			}
+		if (!match.awayTeamId) continue;
+		requireReference(
+			teamIds,
+			match.awayTeamId,
+			`El partido de playoff ${match.id}`,
+			'equipo visitante',
+		);
+		if (match.localTeamId === match.awayTeamId) {
+			throw new Error(`El partido de playoff ${match.id} enfrenta al mismo equipo.`);
 		}
 	}
 	for (const lineup of data.playoffLineups) {

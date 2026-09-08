@@ -157,7 +157,8 @@ export function createLeagueParticipants(
 		};
 	});
 
-	players.sort(comparePlayers).forEach((player, index) => {
+	players.sort(comparePlayers);
+	players.forEach((player, index) => {
 		player.rank = index + 1;
 	});
 	const playerById = new Map(players.map((player) => [player.id, player]));
@@ -236,8 +237,14 @@ function playerName(player: PlayerHttp): string {
 	return player.alias?.trim() || [player.firstName, player.lastName].filter(Boolean).join(' ');
 }
 
+const POSITION_LABELS: Record<PlayerHttp['preferredPosition'], string> = {
+	left: 'Revés',
+	right: 'Drive',
+	both: 'Ambos lados',
+};
+
 function positionLabel(position: PlayerHttp['preferredPosition']): string {
-	return position === 'left' ? 'Revés' : position === 'right' ? 'Drive' : 'Ambos lados';
+	return POSITION_LABELS[position];
 }
 
 function meaningfulText(value: string): string | null {

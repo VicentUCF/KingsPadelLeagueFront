@@ -14,6 +14,7 @@ import {
 	groupBy,
 	mapStatus,
 	requireById,
+	resolveWinner,
 } from './shared.ts';
 import type {
 	PairResult,
@@ -117,12 +118,7 @@ function createEncounter(
 						awayScoreLabel: sets.length
 							? sets.map((set) => `${set.away}/${set.local}`).join(' · ')
 							: 'Pendiente',
-						winnerTeamId:
-							homeSetWins > awaySetWins
-								? homeTeam.id
-								: awaySetWins > homeSetWins
-									? awayTeam.id
-									: null,
+						winnerTeamId: resolveWinner(homeSetWins, awaySetWins, homeTeam.id, awayTeam.id),
 					},
 				},
 			];
@@ -149,5 +145,5 @@ interface OrderedPairResult {
 }
 
 function matchdayNumber(label: string, fallback: number): number {
-	return Number(label.match(/\d+/)?.[0]) || fallback;
+	return Number(/\d+/.exec(label)?.[0]) || fallback;
 }
