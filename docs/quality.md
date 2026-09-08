@@ -119,13 +119,12 @@ tanto, dos herramientas aplican el mismo tipo de reglas —sin servidor, sin cue
   par de funciones bajo 15).
 - **`kpl/max-file-lines`** (`stylelint-local-rules/max-file-lines.mjs`, regla 1000 líneas): el
   equivalente de la regla Sonar S104 ("Files should not have too many lines"), que no existe en
-  Stylelint de serie. **Encuentra 3 violaciones reales ahora mismo** —
-  `src/styles/premium-pages.css` (2382 líneas), `home.css` (1329) y `cards.css` (1099) — que
-  `npm run lint:css`/`quality`/CI reportan como error. No se han dividido en esta pasada: partir
-  hojas de estilo de miles de líneas sin tests de regresión visual es un cambio con riesgo real de
-  romper algo visible, y ya existe un plan dedicado para ese trabajo en `docs/css-audit.md`. La
-  regla se deja en `error` a propósito — bajar el umbral para que pase silenciaría exactamente lo
-  que se pidió detectar.
+  Stylelint de serie. Encontró 3 violaciones (`premium-pages.css` 2382 líneas, `home.css` 1329,
+  `cards.css` 1099); las tres se resolvieron partiendo cada hoja por dominio/sección (ver
+  `docs/css-audit.md`) en vez de subir el umbral — el objetivo era detectar y arreglar esto, no
+  silenciarlo. Cada extracción se verificó con un diff de AST (`postcss`): cada declaración
+  original aparece exactamente una vez en el destino, sin pérdidas ni duplicados, más capturas de
+  pantalla en 12 rutas.
 
 ## Patrones bloqueados/avisados (código generado por IA)
 
@@ -143,9 +142,6 @@ más abajo). Como **warning**: comentarios `TODO`/`FIXME`/`HACK`.
   generaba ~60 errores en tests existentes por cómo modelan `homePriority?: number`, y arreglarlo
   bien es un cambio de forma de los tipos, no algo para colar en esta pasada. Queda como próximo
   paso si se quiere ese nivel de estrictez.
-- **3 hojas de estilo superan las 1000 líneas** (`premium-pages.css` 2382, `home.css` 1329,
-  `cards.css` 1099) — `npm run lint:css` falla por esto a propósito, ver más arriba. Dividirlas es
-  el siguiente paso lógico y ya tiene su propio plan en `docs/css-audit.md`.
 - `no-descending-specificity` de Stylelint está desactivada (ver `stylelint.config.mjs`): con
   `stylelint-config-recommended` activo produjo 86 hallazgos, todos sobre orden de selectores en un
   código con clases BEM ya únicas por componente — ruido, no bugs de especificidad reales.

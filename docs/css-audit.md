@@ -1,5 +1,31 @@
 # Auditoría de CSS de la app — `KingsPadelLeagueAstro`
 
+> **Actualización 2026-09-08 (misma sesión, pasada posterior):** aplicado el
+> punto 8 de P2 — unificación de `.team-card` / `.team-card--premium` /
+> `.home-team-card` en un único componente con flags `--compact`/`--premium`.
+> Detalle completo, incluida una regresión introducida y corregida en la
+> propia unificación (fila de grid colapsada a 0px por un `align-self: end`
+> perdido en el refactor), en el punto 8 más abajo. P2 queda completo (3/3).
+> Sigue pendiente solo P3 (BEM + nesting, auditoría de radios/tamaños de
+> fuente sueltos).
+>
+> **Actualización 2026-09-08:** `stylelint` (con una regla propia
+> `kpl/max-file-lines`, ver `docs/quality.md`) empezó a fallar sobre
+> `premium-pages.css` (2381 líneas), `home.css` (1328) y `cards.css` (1098).
+> Esto completó la partición por dominio que el punto 5 (P1) dejaba pendiente
+> — `public-pages.css` + `premium-pages.css` se fusionaron y partieron en
+> `page-shell.css`, `team.css`, `player.css`, `calendar.css` y
+> `standings.css` — y además partió `home.css` en `home-hero.css` /
+> `home-spotlight.css` / `home-panels.css` / `home-teams-social.css`, y
+> `cards.css` en `cards-hero.css` / `cards-rules.css` / `cards-grid.css`.
+> Extracción verificada mecánicamente: cada declaración (selector, propiedad,
+> valor) del origen se localizó exactamente una vez en el destino — sin
+> pérdidas ni duplicados — vía un diff de AST con `postcss`, no una
+> comprobación visual únicamente. Confirmado además con capturas de pantalla
+> en 12 rutas y `npm run quality` en verde. Detalle marcado `[APLICADO
+2026-09-08]` más abajo. Sigue pendiente lo mismo que antes: la unificación
+> visual de "team card" (P2) y la migración a BEM + nesting (P3).
+>
 > **Actualización 2026-09-04 (misma sesión):** los puntos P0 completos, la
 > mayor parte de P1 y los ítems mecánicos de P2 de la sección 5 ya se han
 > aplicado (working tree, sin commitear). Cada uno está marcado `[APLICADO]`
@@ -500,11 +526,11 @@ el problema crezca):**
 5. `[APLICADO]` Fusionar los 12 selectores duplicados entre `public-pages.css`
    y `premium-pages.css` (§3) en una única declaración canónica cada uno,
    reproduciendo exactamente la cascada resuelta anterior (verificado
-   selector a selector antes de tocar nada, cero cambio visual). No se hizo
-   la partición completa en 5 ficheros por dominio (`page-shell.css`,
-   `team.css`, etc.) propuesta en §3 — ese resto de la reorganización sigue
-   pendiente y es de menor riesgo/urgencia ahora que la colisión real ya no
-   existe.
+   selector a selector antes de tocar nada, cero cambio visual).
+   `[APLICADO 2026-09-08]` La partición completa en 5 ficheros por dominio
+   (`page-shell.css`, `team.css`, `player.css`, `calendar.css`,
+   `standings.css`) propuesta en §3 también se ejecutó — `public-pages.css` y
+   `premium-pages.css` ya no existen como ficheros separados.
 
 6. `[APLICADO]` Renombrada la colisión `.empty-state` (app) →
    `.results-empty-state`, en `EmptyState.astro`, `public-pages.css` y
@@ -517,12 +543,36 @@ el problema crezca):**
 **P2 — unificación de componentes duplicados (mayor esfuerzo, requiere
 decidir diseño):**
 
-8. `[PENDIENTE — decisión de diseño]` Unificar `.team-card` /
-   `.team-card--premium` / `.home-team-card` en un único bloque con
-   modificadores. No se ejecutó: el tratamiento del "líder"/hover difiere
-   visualmente entre las tres implementaciones y colapsarlas cambia la
-   apariencia de 3 páginas sin aprobación de diseño — se deja fuera
-   deliberadamente en vez de adivinar.
+8. `[APLICADO 2026-09-08]` Unificadas `.team-card` / `.team-card--premium` /
+   `.home-team-card` en un único bloque `.team-card` con modificadores
+   `--compact` (teaser de `/`) y `--premium` (grid de `/equipos`), en
+   `team.css`. `.team-card__copy`, `__logo`, `__number`, `__meta`, `__name`,
+   `__tagline`, `__president`, `__cta` e `__identity-accent` ahora son
+   compartidos; solo estructura/tamaño quedan en cada modificador. El
+   theming por equipo (`border`, `background`, hover `box-shadow`) se
+   consolidó en `team-identity.css` sobre el selector único `.team-card`,
+   eliminando una carrera de cascada real que existía entre `team.css` /
+   `home-teams-social.css` y `team-identity.css` (ambos declaraban las
+   mismas propiedades sobre el mismo layer; qué archivo ganaba dependía del
+   orden de import por página — inconsistente entre `/` y `/equipos`).
+   También se eliminó CSS muerto: `.team-card__halo` (opacity:0 siempre,
+   verificado con Playwright) y `.home-team-card__glow` (elemento nunca
+   presente en el markup). Markup actualizado en `index.astro` (clases
+   `home-team-card*` → `team-card team-card--compact` + `team-card__*`) y
+   `equipos/index.astro` (eliminado el `<span class="team-card__halo">`
+   muerto). Regresión detectada y corregida durante la propia unificación:
+   el bloque base `.team-card__copy` no incluía `align-self: end` (sí
+   presente en el `.team-card__copy` original de `public-pages.css`), lo
+   que forzaba el grid interno (`grid-template-rows: auto auto minmax(0,
+1fr) auto auto`) a estirarse exactamente a la altura de su fila en vez
+   de desbordar hacia el padding inferior como el diseño original permitía
+   — la fila `minmax(0, 1fr)` (el tagline) colapsaba a 0px en `/equipos`.
+   Confirmado con un `git worktree` aislado sobre el HEAD pre-unificación
+   (mismos datos de fixture, mismo viewport) que las alturas de fila
+   coinciden exactamente tras el fix (`13.59px 77.75px 21px 21px 52px` en
+   ambos). Verificado con capturas de pantalla en reposo y hover en `/` y
+   `/equipos`, `npx stylelint`, `npm run check`, `npm run test:run` (28/28),
+   `npm run test:ssg`, Playwright e2e (2/2) y un `astro build` real.
 
 9. `[APLICADO]` `.home-standing__rank` ahora compone `c-rank` en el markup
    (`index.astro`) y solo sobreescribe color/tamaño de fuente — la geometría
@@ -556,13 +606,13 @@ decidir diseño):**
     `0.7rem`...) en `home.css`/`premium-pages.css` frente a
     `--kpl-font-size-50`.
 
-**Resumen de esta pasada:** P0 completo (4/4), P1 completo (3/3), P2
-parcialmente aplicado (2/3 — la unificación de team-card queda pendiente de
-decisión de diseño), P3 sin aplicar (documentado como trabajo futuro
-incremental). Verificación: `npm run build`, `npm test` (28/28), `npm run
-test:ssg` (un fallo preexistente en `HEAD` sobre un enlace a "King", no
-relacionado con CSS — reproducido igual con los cambios en stash), `npm run
-format:check` y `npx astro check` (0 errores) en verde; capturas de pantalla
-sin errores de consola en `/`, `/cartas`, `/noticias`, `/404`, `/equipos`,
-`/equipos/magic-city`, `/jugadores`, `/jugadores/millet`, `/clasificacion` y
-`/calendario`. Nada de esto está commiteado todavía.
+**Resumen de esta pasada:** P0 completo (4/4), P1 completo (3/3), P2 completo
+(3/3 — la unificación de team-card, ítem 8, se aplicó el 2026-09-08), P3 sin
+aplicar (documentado como trabajo futuro incremental). Verificación: `npm run
+build`, `npm test` (28/28), `npm run test:ssg` (un fallo preexistente en
+`HEAD` sobre un enlace a "King", no relacionado con CSS — reproducido igual
+con los cambios en stash), `npm run format:check` y `npx astro check` (0
+errores) en verde; capturas de pantalla sin errores de consola en `/`,
+`/cartas`, `/noticias`, `/404`, `/equipos`, `/equipos/magic-city`,
+`/jugadores`, `/jugadores/millet`, `/clasificacion` y `/calendario`. Nada de
+esto está commiteado todavía.
