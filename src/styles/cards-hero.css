@@ -196,16 +196,17 @@
 		border-radius: var(--kpl-radius-lg);
 		/* Let the dark studio background reveal the hero texture underneath. */
 		-webkit-mask-image:
-			linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%),
-			linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+			linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%),
+			linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
 		-webkit-mask-composite: source-in;
 		mask-image:
-			linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%),
-			linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+			linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%),
+			linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
 		mask-composite: intersect;
 	}
 
-	.cards-hero__case-video {
+	.cards-hero__case-poster,
+	.cards-hero__case-canvas {
 		display: block;
 		inline-size: 100%;
 		max-inline-size: none;
@@ -216,6 +217,16 @@
 		mix-blend-mode: screen;
 		filter: contrast(1.1) saturate(0.92) brightness(1.04);
 		opacity: 1;
+	}
+
+	.cards-hero__case-poster {
+		position: absolute;
+		inset: 0;
+	}
+
+	.cards-hero__case-canvas[hidden],
+	.cards-hero__case-poster[hidden] {
+		display: none;
 	}
 
 	.cards-hero__fan {

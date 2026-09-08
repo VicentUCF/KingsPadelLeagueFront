@@ -37,7 +37,8 @@
 	},
 	"dependencies": {
 		"@kpl/design-system": "git+https://github.com/VicentUCF/KPL-Design-System.git#74871a429cbca165dc3c7070e1d8c4195b8c6b2a",
-		"astro": "^7.2.8"
+		"astro": "^7.2.8",
+		"three": "^0.185.1"
 	},
 	"allowScripts": {
 		"esbuild": true
@@ -48,6 +49,7 @@
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.63.0",
 		"@types/node": "^26.4.0",
+		"@types/three": "^0.185.4",
 		"@vitest/coverage-v8": "^5.0.0",
 		"dependency-cruiser": "^18.2.0",
 		"eslint": "^10.10.0",
