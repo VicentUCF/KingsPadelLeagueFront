@@ -1,0 +1,130 @@
+{
+  "units": "mm",
+  "source_components": 52,
+  "boolean_engine": "manifold3d",
+  "height_mm": 399.9999694824219,
+  "section_planes_mm": [
+    80.0,
+    235.0
+  ],
+  "female_clearance_per_wall_mm": 0.25,
+  "female_extra_depth_mm": 0.5,
+  "key_profiles_mm": [
+    [
+      14,
+      10
+    ],
+    [
+      12,
+      8
+    ]
+  ],
+  "files": [
+    {
+      "file": "kpl-trophy-full-400mm.stl",
+      "kind": "trophy",
+      "size_bytes": 1665484,
+      "dimensions_mm": [
+        171.8321,
+        155.8803,
+        400.0
+      ],
+      "triangles": 33308,
+      "watertight": true,
+      "consistent_winding": true,
+      "connected_components": 1,
+      "volume_mm3": 1764564.2741566913,
+      "assembly_z_mm": 0
+    },
+    {
+      "file": "01-base-with-key.stl",
+      "kind": "trophy",
+      "size_bytes": 1244984,
+      "dimensions_mm": [
+        155.8803,
+        155.8803,
+        90.0
+      ],
+      "triangles": 24898,
+      "watertight": true,
+      "consistent_winding": true,
+      "connected_components": 1,
+      "volume_mm3": 1190096.593686777,
+      "assembly_z_mm": 0
+    },
+    {
+      "file": "02-body-with-key.stl",
+      "kind": "trophy",
+      "size_bytes": 163184,
+      "dimensions_mm": [
+        106.0141,
+        62.5573,
+        165.0
+      ],
+      "triangles": 3262,
+      "watertight": true,
+      "consistent_winding": true,
+      "connected_components": 1,
+      "volume_mm3": 204639.43382164152,
+      "assembly_z_mm": 80.0
+    },
+    {
+      "file": "03-crown-with-socket.stl",
+      "kind": "trophy",
+      "size_bytes": 314684,
+      "dimensions_mm": [
+        171.8321,
+        61.4025,
+        165.0
+      ],
+      "triangles": 6292,
+      "watertight": true,
+      "consistent_winding": true,
+      "connected_components": 1,
+      "volume_mm3": 369474.86715396686,
+      "assembly_z_mm": 235.0
+    },
+    {
+      "file": "fit-test-male.stl",
+      "kind": "calibration",
+      "size_bytes": 1484,
+      "dimensions_mm": [
+        25.0,
+        22.0,
+        13.0
+      ],
+      "triangles": 28,
+      "watertight": true,
+      "consistent_winding": true,
+      "connected_components": 1,
+      "volume_mm3": 3460.0,
+      "assembly_z_mm": 0
+    },
+    {
+      "file": "fit-test-female.stl",
+      "kind": "calibration",
+      "size_bytes": 1484,
+      "dimensions_mm": [
+        25.0,
+        22.0,
+        13.0
+      ],
+      "triangles": 28,
+      "watertight": true,
+      "consistent_winding": true,
+      "connected_components": 1,
+      "volume_mm3": 5627.5,
+      "assembly_z_mm": 0
+    }
+  ],
+  "physical_print_tested": false,
+  "notes": [
+    "Geometric checks establish closed connected volumes, not printer calibration or material strength.",
+    "Print at 100% in mm. Model gold and surface brushing are digital materials; physical parts require finishing.",
+    "Supports are required under the projecting fins and badge. Preview all layers in the intended slicer.",
+    "Nominal main blade stock is 4\u20135 mm; cast edges and pointed ends taper below this.",
+    "Test the included fit coupon before the full trophy. Clearance can depend on printer and material."
+  ],
+  "base_body_assembly_overlap_mm3": 0.0,
+  "body_crown_assembly_overlap_mm3": 0.0
+}

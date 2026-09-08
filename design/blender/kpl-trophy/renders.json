@@ -1,0 +1,62 @@
+[
+  {
+    "view": "hero",
+    "file": "kpl-trophy-hero.png",
+    "size_bytes": 3561377,
+    "resolution": [
+      1600,
+      2000
+    ],
+    "samples": 128
+  },
+  {
+    "view": "front",
+    "file": "kpl-trophy-front.png",
+    "size_bytes": 1982845,
+    "resolution": [
+      1200,
+      1500
+    ],
+    "samples": 80
+  },
+  {
+    "view": "side",
+    "file": "kpl-trophy-side.png",
+    "size_bytes": 1934116,
+    "resolution": [
+      1200,
+      1500
+    ],
+    "samples": 80
+  },
+  {
+    "view": "rear",
+    "file": "kpl-trophy-rear.png",
+    "size_bytes": 2023128,
+    "resolution": [
+      1200,
+      1500
+    ],
+    "samples": 80
+  },
+  {
+    "view": "detail",
+    "file": "kpl-trophy-detail.png",
+    "size_bytes": 2553880,
+    "resolution": [
+      1200,
+      1500
+    ],
+    "samples": 128
+  },
+  {
+    "view": "transparent",
+    "file": "kpl-trophy-transparent.png",
+    "size_bytes": 2055781,
+    "resolution": [
+      1600,
+      2000
+    ],
+    "samples": 128
+  }
+]

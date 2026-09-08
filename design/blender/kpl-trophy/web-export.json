@@ -1,0 +1,16 @@
+{
+  "file": "/home/vicent_ucf/Documents/Personal/KingsPadelLeagueAstro/public/models/kpl/kpl-trophy.glb",
+  "bytes": 3817060,
+  "mesh_count": 7,
+  "triangles": 50138,
+  "materials": 7,
+  "height_m": 0.4,
+  "baked_pbr_maps": [
+    "kpl_4_roughness.png",
+    "kpl_0_normal.png",
+    "kpl_3_roughness.png",
+    "kpl_4_normal.png",
+    "kpl_0_roughness.png",
+    "kpl_3_normal.png"
+  ]
+}

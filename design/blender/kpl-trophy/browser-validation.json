@@ -1,0 +1,73 @@
+{
+  "dimensionsMetres": [
+    0.1718321442604065,
+    0.3999999761581421,
+    0.15588031709194183
+  ],
+  "bounds": [
+    [
+      -0.08591607213020325,
+      0,
+      -0.07794015854597092
+    ],
+    [
+      0.08591607213020325,
+      0.3999999761581421,
+      0.07794015854597092
+    ]
+  ],
+  "meshes": [
+    {
+      "name": "KPL_·_Badge_·_5",
+      "vertices": 1454,
+      "normalMap": false,
+      "roughnessMap": false,
+      "metalness": 0.07999999821186066
+    },
+    {
+      "name": "KPL_·_Gold_·_1",
+      "vertices": 5019,
+      "normalMap": false,
+      "roughnessMap": false,
+      "metalness": 1
+    },
+    {
+      "name": "KPL_·_Gold_·_3",
+      "vertices": 13876,
+      "normalMap": true,
+      "roughnessMap": true,
+      "metalness": 1
+    },
+    {
+      "name": "KPL_·_Gold_·_4",
+      "vertices": 1346,
+      "normalMap": true,
+      "roughnessMap": true,
+      "metalness": 1
+    },
+    {
+      "name": "KPL_·_Lettering_·_6",
+      "vertices": 26062,
+      "normalMap": false,
+      "roughnessMap": false,
+      "metalness": 0.7200000286102295
+    },
+    {
+      "name": "KPL_·_Obsidian_·_0",
+      "vertices": 3260,
+      "normalMap": true,
+      "roughnessMap": true,
+      "metalness": 0.07999999821186066
+    },
+    {
+      "name": "KPL_·_Obsidian_·_2",
+      "vertices": 2434,
+      "normalMap": false,
+      "roughnessMap": false,
+      "metalness": 0.07999999821186066
+    }
+  ],
+  "drawCalls": 7,
+  "triangles": 50138,
+  "pageErrors": []
+}

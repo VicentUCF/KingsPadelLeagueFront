@@ -1,0 +1,11 @@
+{
+  "source": "public/KPL/KPL.svg",
+  "construction": "2D union, then one extrusion",
+  "source_overlap_is_filled": true,
+  "original_KP_overlap_area": 0.0005133232060511159,
+  "silhouette_components": 1,
+  "holes": 2,
+  "width_mm": 53.82,
+  "extrusion_mm": 1.3,
+  "valid_volume": true
+}
