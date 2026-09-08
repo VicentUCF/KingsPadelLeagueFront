@@ -1,0 +1,60 @@
+{
+  "id": "kpl-reveal",
+  "duration_seconds": 12,
+  "fps": 24,
+  "frames": 288,
+  "render": "Blender EEVEE, ray tracing, 64 samples, 1920x1080",
+  "video_url": "/cards/kpl-reveal.mp4",
+  "model_url": "/models/kpl/kpl-reveal.glb",
+  "poster_url": "/images/kpl/kpl-reveal-poster.webp",
+  "final_url": "/images/kpl/kpl-reveal-final.webp",
+  "playback": "Once; retain final frame. Static final image for reduced motion.",
+  "animation": "KPL_Reveal",
+  "model_bytes": 3558892,
+  "model_meshes": 39,
+  "model_animation_channels": 23,
+  "reference": "Approved kpl-briefcase.blend and seven existing card images in public/cards",
+  "rights": "Project-supplied brand/card artwork; model and animation authored in this conversation. No new license claimed for brand artwork.",
+  "verification": {
+    "glb_round_trip_max_matrix_deviation": 5.21540641784668e-07,
+    "video": {
+      "master": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "24/1",
+            "nb_read_frames": "288"
+          }
+        ],
+        "format": {
+          "duration": "12.000000",
+          "size": "5581474"
+        }
+      },
+      "web": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "r_frame_rate": "24/1",
+            "nb_read_frames": "288"
+          }
+        ],
+        "format": {
+          "duration": "12.000000",
+          "size": "1706189"
+        }
+      }
+    },
+    "all_288_frames_in_camera": true,
+    "minimum_screen_margin": 0.0449,
+    "geometry_below_floor": false
+  }
+}

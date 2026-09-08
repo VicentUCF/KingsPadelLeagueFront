@@ -104,16 +104,6 @@ const toneLabels: Record<(typeof levels)[number]['tone'], string> = {
 const cards = levels.flatMap((level) =>
 	level.cards.map((card) => ({ ...card, level: level.name })),
 );
-const fanCards = [
-	cards.find((card) => card.id === 'restas-tu'),
-	cards.find((card) => card.id === 'robo-saque'),
-	cards.find((card) => card.id === '2-vs-1'),
-	cards.find((card) => card.id === 'comodin'),
-	cards.find((card) => card.id === 'robo-carta'),
-	cards.find((card) => card.id === 'solo-un-saque'),
-	cards.find((card) => card.id === 'cambiate'),
-].filter((card): card is (typeof cards)[number] => Boolean(card));
-
 const cardsUrl = Astro.site ? new URL('/cartas', Astro.site).href : null;
 const structuredData = cardsUrl
 	? {
@@ -179,30 +169,12 @@ const structuredData = cardsUrl
 							muted
 							playsinline
 							preload="metadata"
+							poster="/images/kpl/kpl-reveal-final.webp"
 							disablepictureinpicture
 						>
-							<source src="/cards/maletin-cartas-apertura.mp4" type="video/mp4" />
+							<source src="/cards/kpl-reveal.mp4" type="video/mp4" />
 						</video>
 					</div>
-					<div class="cards-hero__fan">
-						{
-							fanCards.map((card) => (
-								<img
-									class="cards-hero__card"
-									src={card.image}
-									alt=""
-									width="447"
-									height="559"
-									loading="eager"
-									decoding="async"
-								/>
-							))
-						}
-					</div>
-					<p class="cards-hero__animation-label">
-						<span></span>
-						El maletín KPL · Siete cartas, una oportunidad
-					</p>
 				</div>
 			</div>
 		</section>
@@ -379,12 +351,10 @@ const structuredData = cardsUrl
 			const video = animation.querySelector('[data-case-video]');
 			if (!(video instanceof HTMLVideoElement)) return;
 
-			const revealCards = () => animation.classList.add('is-revealed');
-			const showOpenCase = () => animation.classList.add('is-open');
 			const showStaticComposition = () => {
 				video.pause();
 				animation.classList.remove('is-playing');
-				animation.classList.add('is-static', 'is-revealed', 'is-open');
+				animation.classList.add('is-static');
 			};
 
 			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -393,18 +363,6 @@ const structuredData = cardsUrl
 			}
 
 			animation.classList.add('is-playing');
-			video.addEventListener('timeupdate', () => {
-				if (video.currentTime >= 3.85) revealCards();
-				if (video.currentTime >= 4.72) showOpenCase();
-			});
-			video.addEventListener(
-				'ended',
-				() => {
-					revealCards();
-					showOpenCase();
-				},
-				{ once: true },
-			);
 			void video.play().catch(showStaticComposition);
 		});
 	};

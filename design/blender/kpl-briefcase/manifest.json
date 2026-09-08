@@ -1,0 +1,84 @@
+{
+  "id": "kpl-briefcase",
+  "purpose": "Visual del maletín de cartas para la web de Kings Padel League",
+  "created": "2026-09-08",
+  "production": "Modelado mediante MCP de Blender; render Cycles; WebP codificado desde PNG",
+  "reference": "public/cards/kpl-reveal.mp4",
+  "brand_source": "public/kpl-logo-wordmark.png",
+  "rights": "Vídeo y logo existentes en el proyecto del usuario; no se declara una licencia adicional. Geometría creada en esta sesión.",
+  "alt": "Maletín metálico negro de Kings Padel League con cierres dorados",
+  "decorative_alt": "",
+  "crop": "Conservar la proporción 4:3; preferir object-fit: contain.",
+  "runtime_note": "GLB con materiales PBR; microtexturas procedurales disponibles en el .blend y en los renders. Requiere iluminación de entorno en un visor.",
+  "verification": [
+    "Inspección visual de renders",
+    "Reimportación GLB en Blender y comprobación de apertura",
+    "Estructura GLB y dimensiones/alpha de WebP verificados"
+  ],
+  "assets": [
+    {
+      "id": "kpl-briefcase-closed",
+      "url": "/images/kpl/kpl-briefcase-closed.webp",
+      "format": "image/webp",
+      "width": 1600,
+      "height": 1200,
+      "bytes": 121642,
+      "alpha": false
+    },
+    {
+      "id": "kpl-briefcase-closed-800",
+      "url": "/images/kpl/kpl-briefcase-closed-800.webp",
+      "format": "image/webp",
+      "width": 800,
+      "height": 600,
+      "bytes": 45046,
+      "alpha": false
+    },
+    {
+      "id": "kpl-briefcase-open",
+      "url": "/images/kpl/kpl-briefcase-open.webp",
+      "format": "image/webp",
+      "width": 1600,
+      "height": 1200,
+      "bytes": 64916,
+      "alpha": false
+    },
+    {
+      "id": "kpl-briefcase-open-800",
+      "url": "/images/kpl/kpl-briefcase-open-800.webp",
+      "format": "image/webp",
+      "width": 800,
+      "height": 600,
+      "bytes": 24496,
+      "alpha": false
+    },
+    {
+      "id": "kpl-briefcase-transparent",
+      "url": "/images/kpl/kpl-briefcase-transparent.webp",
+      "format": "image/webp",
+      "width": 1600,
+      "height": 1200,
+      "bytes": 122924,
+      "alpha": true
+    },
+    {
+      "id": "kpl-briefcase-transparent-800",
+      "url": "/images/kpl/kpl-briefcase-transparent-800.webp",
+      "format": "image/webp",
+      "width": 800,
+      "height": 600,
+      "bytes": 50976,
+      "alpha": true
+    },
+    {
+      "id": "kpl-briefcase-3d",
+      "url": "/models/kpl/kpl-briefcase.glb",
+      "format": "model/gltf-binary",
+      "bytes": 2474532,
+      "meshes": 13,
+      "triangles": 95300,
+      "animation": "KPL_Open",
+      "sha256": "943da50bfd15a385a423a543bf91bd5878b4949754d4765d656ca5ea48119850"
+    }
+  ]
+}

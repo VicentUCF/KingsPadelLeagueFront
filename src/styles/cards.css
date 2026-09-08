@@ -132,7 +132,8 @@
 		position: relative;
 		isolation: isolate;
 		min-inline-size: 0;
-		block-size: clamp(25rem, 37vw, 34rem);
+		aspect-ratio: 7 / 3;
+		block-size: auto;
 		pointer-events: none;
 
 		&::before {
@@ -184,17 +185,18 @@
 	.cards-hero__video-crop {
 		position: absolute;
 		z-index: 1;
-		inset-inline: -4%;
-		inset-block-end: 9%;
-		aspect-ratio: 3.6;
+		inset: 0;
+		aspect-ratio: 7 / 3;
 		overflow: hidden;
+		border-radius: var(--kpl-radius-lg);
+		/* Let the dark studio background reveal the hero texture underneath. */
 		-webkit-mask-image:
-			linear-gradient(transparent, black 32%, black 82%, transparent),
-			linear-gradient(90deg, black, black 68%, transparent 100%);
+			linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%),
+			linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
 		-webkit-mask-composite: source-in;
 		mask-image:
-			linear-gradient(transparent, black 32%, black 82%, transparent),
-			linear-gradient(90deg, black, black 68%, transparent 100%);
+			linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%),
+			linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
 		mask-composite: intersect;
 	}
 
@@ -203,8 +205,11 @@
 		inline-size: 100%;
 		max-inline-size: none;
 		block-size: auto;
-		translate: 0 -18%;
-		filter: contrast(1.08) saturate(0.78);
+		aspect-ratio: 7 / 3;
+		object-fit: cover;
+		translate: none;
+		mix-blend-mode: screen;
+		filter: contrast(1.1) saturate(0.92) brightness(1.04);
 		opacity: 1;
 	}
 
@@ -954,7 +959,7 @@
 
 		.cards-hero__animation {
 			inline-size: min(100%, 49rem);
-			block-size: clamp(23rem, 62vw, 31rem);
+			block-size: auto;
 			justify-self: center;
 		}
 
@@ -998,7 +1003,7 @@
 		}
 
 		.cards-hero__animation {
-			block-size: clamp(18rem, 74vw, 25rem);
+			block-size: auto;
 			margin-block-start: calc(var(--kpl-space-4) * -1);
 		}
 
