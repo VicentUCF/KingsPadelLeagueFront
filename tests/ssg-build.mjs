@@ -4,6 +4,12 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
 
+// El adapter de Vercel (astro.config.mjs, necesario para /tina-island y /noticias/preview bajo
+// demanda) ignora `--outDir` para los assets estáticos: siempre los escribe en la ruta fija que
+// exige el Build Output API de Vercel. `outDir`/`activeOutDir` (mkdtemp) ya no son el resultado
+// real, pero se mantienen como directorio de trabajo de cada build.
+const VERCEL_STATIC_DIR = join(process.cwd(), '.vercel/output/static');
+
 const port = await availablePort();
 const outDir = await mkdtemp(join(process.cwd(), '.astro/ssg-'));
 const activeOutDir = await mkdtemp(join(process.cwd(), '.astro/ssg-active-'));
@@ -17,21 +23,22 @@ try {
 	await runBuild(port, outDir);
 	const [home, standings, matchday, cards, teams, team, players, player, sitemap, robots] =
 		await Promise.all([
-			readFile(join(outDir, 'index.html'), 'utf8'),
-			readFile(join(outDir, 'clasificacion/index.html'), 'utf8'),
-			readFile(join(outDir, 'jornadas/jornada-1/index.html'), 'utf8'),
-			readFile(join(outDir, 'cartas/index.html'), 'utf8'),
-			readFile(join(outDir, 'equipos/index.html'), 'utf8'),
-			readFile(join(outDir, 'equipos/kings-of-favar/index.html'), 'utf8'),
-			readFile(join(outDir, 'jugadores/index.html'), 'utf8'),
-			readFile(join(outDir, 'jugadores/king/index.html'), 'utf8'),
-			readFile(join(outDir, 'sitemap.xml'), 'utf8'),
-			readFile(join(outDir, 'robots.txt'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'clasificacion/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'jornadas/jornada-1/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'cartas/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'equipos/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'equipos/kings-of-favar/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'jugadores/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'jugadores/king/index.html'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'sitemap.xml'), 'utf8'),
+			readFile(join(VERCEL_STATIC_DIR, 'robots.txt'), 'utf8'),
 		]);
+	await rm(join(process.cwd(), '.vercel/output'), { recursive: true, force: true });
 	await runBuild(port, activeOutDir, false);
 	const [calendarPage, activeMatchday] = await Promise.all([
-		readFile(join(activeOutDir, 'calendario/index.html'), 'utf8'),
-		readFile(join(activeOutDir, 'jornadas/jornada-1/index.html'), 'utf8'),
+		readFile(join(VERCEL_STATIC_DIR, 'calendario/index.html'), 'utf8'),
+		readFile(join(VERCEL_STATIC_DIR, 'jornadas/jornada-1/index.html'), 'utf8'),
 	]);
 
 	assert.doesNotMatch(home, /Playoffs/);
@@ -112,6 +119,7 @@ try {
 	await Promise.all([
 		rm(outDir, { recursive: true, force: true }),
 		rm(activeOutDir, { recursive: true, force: true }),
+		rm(join(process.cwd(), '.vercel/output'), { recursive: true, force: true }),
 	]);
 }
 

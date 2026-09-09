@@ -1,7 +1,14 @@
 # build output
 dist/
+.vercel/
 # generated types
 .astro/
+
+# TinaCMS: admin compilado y generados (regenerados por `tinacms dev`/`build`), salvo
+# tina/__generated__/client.ts, que se commitea como placeholder — ver ese archivo.
+public/admin/
+tina/__generated__/*
+!tina/__generated__/client.ts
 
 # dependencies
 node_modules/

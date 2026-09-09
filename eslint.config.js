@@ -61,6 +61,10 @@ export default defineConfig(
 			'playwright-report/**',
 			'test-results/**',
 			'public/admin/**',
+			'.vercel/**',
+			// tina/__generated__/client.ts is a committed placeholder (see that file), overwritten by
+			// `tinacms dev`/`build` with real generated code that this repo doesn't own the style of.
+			'tina/__generated__/**',
 			'design/**',
 		],
 	},

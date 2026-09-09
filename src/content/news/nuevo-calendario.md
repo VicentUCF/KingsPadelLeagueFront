@@ -3,6 +3,7 @@ title: Calendario
 subtitle: La próxima temporada llegará con nuevas jornadas, cruces y fechas para seguir toda la competición desde el primer partido.
 category: calendario
 publishedAt: 2026-08-27T12:00:00+02:00
+published: true
 cover:
   image: /news/covers/padel-court-mariestad.jpg
   alt: Pista de pádel al aire libre vacía, lista para el próximo partido.

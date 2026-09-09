@@ -1,4 +1,4 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
-	"entry": ["tests/fixtures/kpl-api-server.mjs"]
+	"entry": ["tests/fixtures/kpl-api-server.mjs", "tina/config.ts"]
 }

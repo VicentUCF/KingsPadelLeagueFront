@@ -3,6 +3,7 @@ title: El mercado
 subtitle: Los equipos actualizan sus plantillas tras el cierre del mercado, mientras una nueva escuadra, RedLions, se suma a la competición.
 category: equipos
 publishedAt: 2026-08-27T14:00:00+02:00
+published: true
 featured: true
 relatedTeamSlugs:
   - redlions

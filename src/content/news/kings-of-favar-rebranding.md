@@ -3,6 +3,7 @@ title: 'El nuevo logo de Kings of Favar: tres letras y ganas de K.O.'
 subtitle: 'Rosa flúor, lema en inglés y unas siglas, KOF, que en el grupo nadie lee ya sin pensar en el videojuego de lucha de los noventa.'
 category: equipos
 publishedAt: 2026-09-03T10:00:00+02:00
+published: true
 relatedTeamSlugs:
   - kings-of-favar
 cover:

@@ -1,0 +1,73 @@
+---
+import { getEntry, render } from 'astro:content';
+
+import EmptyState from '../../../../components/EmptyState.astro';
+import NewsArticleContent from '../../../../components/NewsArticleContent.astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import '../../../../styles/news.css';
+
+// Ruta bajo demanda (no en el build estático): permite revisar desde Tina una noticia con
+// `published: false` en producción, sin generarle una página pública real. Ver tina/config.ts
+// (`ui.router`), que construye este enlace con el token, y src/pages/robots.txt.ts, que la
+// excluye de indexación.
+//
+// El token va como segmento de ruta (`/preview/<slug>/<token>`), no como `?token=`: el iframe de
+// previsualización que Tina abre desde su propio listado de documentos (a diferencia del enlace
+// "Ver en directo" copiado fuera del admin) construye su `src` a partir de la ruta que devuelve
+// `ui.router` descartando la query string, así que un `?token=` ahí nunca llega a cargarse y la
+// previsualización se ve siempre como "no disponible" dentro del admin.
+//
+// No usa `Astro.rewrite('/404')` para el caso "no encontrado": esta ruta es on-demand
+// (prerender=false) y /404.astro está prerenderizada, y Astro prohíbe reescribir una ruta
+// on-demand a una estática (error ForbiddenRewrite). El "no encontrado" se resuelve en el propio
+// template, más abajo.
+export const prerender = false;
+
+const { slug, token } = Astro.params;
+const expectedToken = import.meta.env.TINA_PUBLIC_PREVIEW_SECRET;
+const isAuthorized = Boolean(expectedToken) && token === expectedToken;
+
+const entry = isAuthorized && slug ? await getEntry('news', slug) : undefined;
+if (!entry) Astro.response.status = 404;
+
+const renderResult = entry ? await render(entry) : undefined;
+---
+
+{
+	entry && renderResult ? (
+		<BaseLayout
+			title={`Vista previa: ${entry.data.title} | Kings Padel League`}
+			description={entry.data.subtitle}
+			image={entry.data.cover?.image}
+			imageAlt={entry.data.cover?.alt}
+			pageType="article"
+			noindex
+		>
+			<main id="main-content" class="public-page public-page--news-detail">
+				<div class="o-container o-container--md public-page__body">
+					<p class="c-chip c-chip--tone-warning" role="status">
+						Vista previa {entry.data.published ? '' : '· Borrador, no publicada'}
+					</p>
+
+					<NewsArticleContent
+						data={entry.data}
+						body={{ kind: 'markdown', Content: renderResult.Content }}
+						slug={entry.id}
+					/>
+				</div>
+			</main>
+		</BaseLayout>
+	) : (
+		<BaseLayout title="Vista previa no encontrada · Kings Padel League" noindex>
+			<main id="main-content" class="public-page public-page--not-found">
+				<div class="o-container o-container--md public-page__body">
+					<EmptyState
+						headingLevel="h1"
+						title="Vista previa no disponible"
+						description="La noticia no existe o el enlace de previsualización no es válido."
+					/>
+				</div>
+			</main>
+		</BaseLayout>
+	)
+}

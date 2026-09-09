@@ -1,0 +1,109 @@
+---
+import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
+import TinaMarkdown, { tinaField } from '@tinacms/astro';
+import type { TinaRichTextContent } from '@tinacms/astro/types';
+
+import { NEWS_CATEGORY_CHIP_TONES, NEWS_CATEGORY_LABELS, NEWS_DATE_FORMATTER } from '../lib/news';
+import type { NewsCategory } from '../lib/news';
+
+// Datos del artículo, en la misma forma tanto si vienen de Astro Content Collections
+// (página pública, prerenderizada) como del cliente GraphQL de Tina (isla de edición en vivo).
+// `_content_source` solo lo añade Tina; sin él, `tinaField()` es inerte (no hay nada que editar).
+interface ArticleData {
+	title: string;
+	category: NewsCategory;
+	publishedAt: Date | string;
+	updatedAt?: Date | string;
+	cover?: { image: string; alt: string; credit?: string };
+	_content_source?: unknown;
+	// tinaField() acepta cualquier objeto de datos; el índice evita que el shape concreto de
+	// ArticleData (más estricto que lo que Tina necesita) rompa esa firma genérica.
+	[key: string]: unknown;
+}
+
+// El cuerpo llega de dos formas distintas según el origen de los datos:
+// - `markdown`: producción, `Content` es el componente ya compilado por Astro (`render(entry)`).
+// - `rich-text`: edición en vivo dentro de Tina, el AST tal cual lo devuelve el campo `body`.
+type ArticleBody =
+	| { kind: 'markdown'; Content: AstroComponentFactory }
+	| { kind: 'rich-text'; content: TinaRichTextContent };
+
+interface Props {
+	data: ArticleData;
+	body: ArticleBody;
+	slug: string;
+}
+
+const { data, body, slug } = Astro.props;
+
+function asDate(value: Date | string): Date {
+	return value instanceof Date ? value : new Date(value);
+}
+
+const publishedAt = asDate(data.publishedAt);
+const updatedAt = data.updatedAt ? asDate(data.updatedAt) : undefined;
+---
+
+<TinaIsland
+	name="article"
+	wrapper={{ tag: 'article', className: 'news-article' }}
+	params={{ relativePath: `${slug}.md` }}
+	primary
+>
+	{
+		data.cover ? (
+			<p class="news-article__cover">
+				<img
+					src={data.cover.image}
+					alt={data.cover.alt}
+					loading="eager"
+					decoding="async"
+					data-tina-field={tinaField(data.cover, 'image')}
+				/>
+				{data.cover.credit && (
+					<span class="news-article__credit" aria-hidden="true">
+						{data.cover.credit}
+					</span>
+				)}
+			</p>
+		) : (
+			<p class="news-article__cover-fallback" aria-hidden="true">
+				<img
+					src="/textures/backgournd_pelota.png"
+					alt=""
+					width="1672"
+					height="941"
+					loading="eager"
+					decoding="async"
+				/>
+			</p>
+		)
+	}
+
+	<header class="news-article__header">
+		<p class="news-article__meta">
+			<span class:list={['c-chip', NEWS_CATEGORY_CHIP_TONES[data.category]]}>
+				{NEWS_CATEGORY_LABELS[data.category]}
+			</span>
+			<time datetime={publishedAt.toISOString()}>{NEWS_DATE_FORMATTER.format(publishedAt)}</time>
+		</p>
+		<h1 class="news-article__title" data-tina-field={tinaField(data, 'title')}>
+			{data.title}
+		</h1>
+		{
+			updatedAt && (
+				<p class="news-article__updated">
+					Actualizado el{' '}
+					<time datetime={updatedAt.toISOString()}>{NEWS_DATE_FORMATTER.format(updatedAt)}</time>
+				</p>
+			)
+		}
+	</header>
+
+	<div class="news-article__body">
+		{body.kind === 'markdown' ? <body.Content /> : <TinaMarkdown content={body.content} />}
+	</div>
+
+	<slot name="after" />
+</TinaIsland>

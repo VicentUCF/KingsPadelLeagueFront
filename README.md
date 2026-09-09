@@ -96,40 +96,58 @@ no sean borradores y cuya fecha no sea futura generan una URL real (`src/lib/new
 entrada con `featured: true` la promociona a la portada, ordenada opcionalmente por
 `homePriority`.
 
-## Gestión de noticias (Pages CMS)
+## Gestión de noticias (TinaCMS)
 
 Para que alguien sin conocimientos técnicos pueda crear y publicar noticias sin tocar
-Markdown/YAML/git, las noticias se editan con [Pages CMS](https://pagescms.org/) a partir de
-`.pages.yml` (raíz del repo). No es un backend nuevo: Pages CMS solo hace commits de Markdown a
-este mismo repo de GitHub — sigue siendo "publicar = crear/editar un archivo y desplegar el
-build". El sitio público sigue siendo 100% estático; no añade SSR ni cambia `astro.config.mjs`.
+Markdown/YAML/git, las noticias se editan en `/admin` con [TinaCMS](https://tina.io/) a partir de
+`tina/config.ts` (raíz del repo). No es un backend nuevo: TinaCloud solo hace commits de Markdown
+a este mismo repo de GitHub — sigue siendo "publicar = crear/editar un archivo y desplegar el
+build". El sitio público sigue siendo 100% estático (`output: 'static'`); el adapter de Vercel
+(`astro.config.mjs`) solo sirve bajo demanda dos rutas puntuales para la edición visual (ver
+abajo), no convierte el resto del sitio en SSR.
+
+Guía paso a paso para quien redacta noticias (sin jerga técnica):
+[`docs/guia-editorial-noticias.md`](docs/guia-editorial-noticias.md). Lo que sigue aquí es la
+referencia técnica de cómo está montada la integración.
 
 - **Dónde están los archivos**: cada noticia es un fichero Markdown en `src/content/news/`
   (Astro Content Collections, `src/content.config.ts`), la misma fuente que consumen
-  `src/pages/noticias/[...page].astro` y `src/pages/noticias/[slug].astro`. Pages CMS no introduce
-  una fuente de datos paralela.
+  `src/pages/noticias/[...page].astro` y `src/pages/noticias/[slug].astro`. Tina edita esos mismos
+  archivos — no introduce una fuente de datos paralela.
 - **Dónde están las imágenes**: la imagen principal (`cover.image`) se sube a
-  `public/news/covers/` y se referencia como `/news/covers/<archivo>`.
+  `public/news/covers/` y se referencia como `/news/covers/<archivo>` (`media.tina` en
+  `tina/config.ts`).
 - **Qué hace `published`**: `published: true` hace visible la noticia en `/noticias` y genera su
   página de detalle; `published: false` la deja como borrador, sin listado ni URL pública
   (`selectPublishedNews` en `src/lib/news.ts` es la única puerta de esta regla).
+- **Previsualizar un borrador**: el botón "Ver en directo" del admin abre
+  `/noticias/preview/<slug>/<token>` (`src/pages/noticias/preview/[slug]/[token].astro`, bajo
+  demanda), que renderiza la noticia real con el mismo componente que la página pública
+  (`NewsArticleContent.astro`) sin pasar por `selectPublishedNews`. El token va como segmento de
+  ruta y no como `?token=`: el iframe de previsualización que el propio admin de Tina abre desde su
+  listado de documentos construye su `src` a partir de la ruta que devuelve `ui.router`
+  descartando la query string, así que con `?token=` la vista previa dentro del admin siempre se
+  veía como "no disponible" (el enlace "Ver en directo" copiado fuera del admin sí cargaba, porque
+  ahí el navegador conserva la URL completa). El token (`TINA_PUBLIC_PREVIEW_SECRET`) evita que la
+  URL sea adivinable o indexable — no es una autenticación real, es una capa adicional a
+  `Disallow: /noticias/preview/` en `robots.txt`.
+- **Edición visual**: el detalle de una noticia (`src/pages/noticias/[slug].astro`) usa
+  `NewsArticleContent.astro`, envuelto en `<TinaIsland>` y con `tinaField()` en título, imagen y
+  cuerpo. Al abrir esa página dentro del editor de `/admin`, el bridge de Tina refresca esa región
+  en vivo contra `src/pages/tina-island/[name].ts` (la única ruta realmente dinámica del sitio);
+  fuera del editor, esos marcadores son inertes y el HTML público no cambia.
 - **`subtitle`**: la entradilla/bajada corta de la noticia. Se muestra en las tarjetas del listado
   y en la cabecera del detalle, y también se usa como `description` para SEO y redes (Open Graph).
 - **`socialTitle`, `socialSubtitle` y `socialTemplate`**: campos opcionales, todavía sin uso en el
   frontend. Preparan el modelo de datos para una fase futura de generación automática de piezas
   para Instagram a partir de la misma noticia — de momento solo se guardan.
 
-La GitHub App de Pages CMS ([app.pagescms.org](https://app.pagescms.org)) ya está instalada en
-`VicentUCF/KingsPadelLeagueFront`, el repositorio real de este sitio. A diferencia de Decap CMS,
-Pages CMS no requiere desplegar ni mantener un proxy OAuth propio: la autenticación la resuelve su
-GitHub App alojada.
-
-Para que un commit de Pages CMS llegue a producción falta configurar, **fuera de este repo**:
-
-- **Rebuild tras cada commit**: este repo no tiene `.github/workflows` ni configuración de ninguna
-  plataforma de despliegue, así que cada commit de Pages CMS necesita un deploy hook configurado en
-  el hosting real (fuera del repo) para que la noticia llegue a producción. Sin eso, el commit se
-  crea en GitHub pero el sitio publicado no se actualiza hasta el siguiente build manual.
+Configuración fuera de este repo, en [app.tina.io](https://app.tina.io/): crear un proyecto
+TinaCloud conectado a `VicentUCF/KingsPadelLeagueFront`, y copiar su Client ID/token a las
+variables de entorno `TINA_CLIENT_ID`/`TINA_TOKEN` (ver `.env.example`) tanto en local como en
+Vercel. `npm run dev` (`tinacms dev -c "astro dev"`) y `npm run build`
+(`tinacms build -c "astro build"`) generan `tina/__generated__/` y `public/admin/` — no se
+versionan (`.gitignore`).
 
 ## Arquitectura de `src/lib`
 

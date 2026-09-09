@@ -5,6 +5,12 @@ node_modules/
 coverage/
 playwright-report/
 test-results/
+.vercel/
+
+# Generado por `tinacms dev`/`build` (tina-lock.json es un lockfile de esquema, se commitea tal
+# cual; __generated__/ son artefactos de build, ver .gitignore).
+tina/tina-lock.json
+tina/__generated__/
 
 # Not web app source: a separate Blender asset project vendored in-repo.
 design/

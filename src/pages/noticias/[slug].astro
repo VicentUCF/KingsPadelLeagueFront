@@ -1,16 +1,11 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
+import NewsArticleContent from '../../components/NewsArticleContent.astro';
 import NewsCard from '../../components/NewsCard.astro';
 import TeamBadge from '../../components/TeamBadge.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import {
-	NEWS_CATEGORY_CHIP_TONES,
-	NEWS_CATEGORY_DESTINATIONS,
-	NEWS_CATEGORY_LABELS,
-	NEWS_DATE_FORMATTER,
-	selectPublishedNews,
-} from '../../lib/news';
+import { NEWS_CATEGORY_DESTINATIONS, selectPublishedNews } from '../../lib/news';
 import { loadPublicLeagueView } from '../../lib/public-view';
 import '../../styles/news.css';
 
@@ -40,7 +35,6 @@ const moreNews = selectPublishedNews(allEntries, new Date())
 
 const hasRelatedContent = relatedTeams.length > 0 || Boolean(data.relatedMatchdayId);
 const destination = NEWS_CATEGORY_DESTINATIONS[data.category];
-const categoryLabel = NEWS_CATEGORY_LABELS[data.category];
 
 const articleUrl = Astro.site ? new URL(`/noticias/${entry.id}`, Astro.site).href : null;
 const articleStructuredData = articleUrl
@@ -86,64 +80,22 @@ const articleStructuredData = articleUrl
 				<a class="c-breadcrumbs__item" href="/noticias">← Todas las noticias</a>
 			</nav>
 
-			<article class="news-article">
-				{
-					data.cover ? (
-						<p class="news-article__cover">
-							<img src={data.cover.image} alt={data.cover.alt} loading="eager" decoding="async" />
-							{data.cover.credit && (
-								<span class="news-article__credit" aria-hidden="true">
-									{data.cover.credit}
-								</span>
-							)}
-						</p>
-					) : (
-						<p class="news-article__cover-fallback" aria-hidden="true">
-							<img
-								src="/textures/backgournd_pelota.png"
-								alt=""
-								width="1672"
-								height="941"
-								loading="eager"
-								decoding="async"
-							/>
-						</p>
-					)
-				}
-
-				<header class="news-article__header">
-					<p class="news-article__meta">
-						<span class:list={['c-chip', NEWS_CATEGORY_CHIP_TONES[data.category]]}>
-							{categoryLabel}
-						</span>
-						<time datetime={data.publishedAt.toISOString()}>
-							{NEWS_DATE_FORMATTER.format(data.publishedAt)}
-						</time>
-					</p>
-					<h1 class="news-article__title">{data.title}</h1>
-					{
-						data.updatedAt && (
-							<p class="news-article__updated">
-								Actualizado el{' '}
-								<time datetime={data.updatedAt.toISOString()}>
-									{NEWS_DATE_FORMATTER.format(data.updatedAt)}
-								</time>
-							</p>
-						)
-					}
-				</header>
-
-				<div class="news-article__body">
-					<Content />
-				</div>
-
-				<a class="c-button c-button--outline news-article__destination" href={destination.href}>
+			<NewsArticleContent data={data} body={{ kind: 'markdown', Content }} slug={entry.id}>
+				<a
+					slot="after"
+					class="c-button c-button--outline news-article__destination"
+					href={destination.href}
+				>
 					{destination.label} →
 				</a>
 
 				{
 					hasRelatedContent && (
-						<section class="news-article__related" aria-labelledby="news-related-title">
+						<section
+							slot="after"
+							class="news-article__related"
+							aria-labelledby="news-related-title"
+						>
 							<h2 id="news-related-title">Contenido relacionado</h2>
 
 							{relatedTeams.length > 0 && (
@@ -168,7 +120,7 @@ const articleStructuredData = articleUrl
 						</section>
 					)
 				}
-			</article>
+			</NewsArticleContent>
 
 			{
 				moreNews.length > 0 && (
