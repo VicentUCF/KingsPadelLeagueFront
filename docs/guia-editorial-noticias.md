@@ -24,7 +24,10 @@ el proyecto en TinaCloud (normalmente tu email o tu cuenta de GitHub).
   listado de noticias y también es lo que se muestra al compartir el enlace en redes sociales.
 - **Imagen principal**: opcional. Sube una foto, añade un **texto alternativo** describiéndola (lo
   usan los lectores de pantalla para personas con discapacidad visual) y, si aplica, el **crédito**
-  de la foto.
+  de la foto. Antes de subirla, renombra el archivo con un nombre simple, sin espacios, tildes ni
+  símbolos (por ejemplo `victoria-jornada-3.jpg` en vez de `Victoria Jornada 3 (final).jpg`): el
+  gestor de imágenes no corrige esto por ti, y un nombre así deja el enlace de la foto más largo y
+  más difícil de compartir.
 - **Contenido**: el cuerpo de la noticia. El editor es visual: puedes poner negrita, cursiva,
   enlaces, listas, etc. sin escribir código.
 - **Fecha de publicación**: mientras esta fecha esté en el futuro, la noticia queda guardada pero

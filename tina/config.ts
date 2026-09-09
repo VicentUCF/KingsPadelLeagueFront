@@ -43,6 +43,9 @@ export default defineConfig({
 		tina: {
 			publicFolder: 'public',
 			mediaRoot: 'news/covers',
+			// Explícito (coincide con el default) para que quede claro que Patrizio puede subir y
+			// borrar fotos desde el admin: con `static: true` el Media Manager pasa a solo lectura.
+			static: false,
 		},
 	},
 
@@ -77,8 +80,8 @@ export default defineConfig({
 					// El token va como segmento de ruta, no como `?token=`: el iframe de previsualización
 					// que Tina abre desde su propio listado de documentos construye su `src` a partir de
 					// esta ruta descartando la query string (ver src/pages/noticias/preview/[slug]/
-					// [[token]].astro), así que con `?token=` la previsualización dentro del admin
-					// siempre se veía como "no disponible".
+					// [token].astro), así que con `?token=` la previsualización dentro del admin siempre
+					// se veía como "no disponible".
 					router: ({ document }) =>
 						`/noticias/preview/${document._sys.filename}${
 							previewToken ? `/${encodeURIComponent(previewToken)}` : ''
