@@ -44,6 +44,44 @@
 		mix-blend-mode: normal;
 	}
 
+	/*
+	 * Astro's ClientRouter fetches the destination page before it can start the
+	 * view transition, so on mobile connections there's a stretch with no visual
+	 * feedback between the tap and the page actually changing. This bar fills in
+	 * that gap; astro:before-preparation/astro:page-load drive it in BaseLayout.
+	 */
+	.kpl-nav-progress {
+		position: fixed;
+		inset-block-start: 0;
+		inset-inline: 0;
+		block-size: 2px;
+		background: var(--kpl-color-accent);
+		transform: scaleX(0);
+		transform-origin: left;
+		opacity: 0;
+		z-index: 9999;
+		pointer-events: none;
+		transition:
+			transform 400ms cubic-bezier(0.2, 0, 0, 1),
+			opacity 150ms linear;
+	}
+
+	.kpl-nav-progress[data-active] {
+		opacity: 1;
+	}
+
+	.kpl-nav-progress[data-state='done'] {
+		transition:
+			transform 150ms ease-out,
+			opacity 300ms linear 100ms;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.kpl-nav-progress {
+			transition: opacity 150ms linear;
+		}
+	}
+
 	.site-shell__brand-image {
 		inline-size: 5.4rem;
 		block-size: 2.5rem;

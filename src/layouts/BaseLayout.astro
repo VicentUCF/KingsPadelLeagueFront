@@ -123,6 +123,7 @@ function toJsonLdScript(items: Record<string, unknown>[]): string | null {
 		<ClientRouter fallback="none" />
 	</head>
 	<body data-kpl-root>
+		<div class="kpl-nav-progress" id="kpl-nav-progress" aria-hidden="true"></div>
 		<a class="c-skip-link u-visually-hidden-focusable" href="#main-content"> Ir al contenido </a>
 		<header
 			class="c-site-header site-shell__header"
@@ -224,6 +225,42 @@ function toJsonLdScript(items: Record<string, unknown>[]): string | null {
 			});
 			document.addEventListener('astro:after-swap', () => prepareMainContent(true));
 			document.addEventListener('astro:page-load', () => prepareMainContent());
+
+			// Astro's ClientRouter fetches the target page before it can start the
+			// view transition. On mobile connections that fetch can take a moment
+			// with no visible feedback, which reads as a stuck/broken tap. Fill that
+			// gap with a thin progress bar, delayed slightly so fast navigations
+			// (cached/local) never see it flash.
+			const navProgress = document.querySelector<HTMLElement>('#kpl-nav-progress');
+			let navProgressShowTimer: ReturnType<typeof setTimeout> | undefined;
+			let navProgressHideTimer: ReturnType<typeof setTimeout> | undefined;
+
+			document.addEventListener('astro:before-preparation', () => {
+				if (!navProgress) return;
+				clearTimeout(navProgressShowTimer);
+				clearTimeout(navProgressHideTimer);
+				navProgress.removeAttribute('data-state');
+				navProgress.style.transform = 'scaleX(0)';
+				navProgressShowTimer = setTimeout(() => {
+					navProgress.setAttribute('data-active', '');
+					requestAnimationFrame(() => {
+						navProgress.style.transform = 'scaleX(0.7)';
+					});
+				}, 120);
+			});
+
+			document.addEventListener('astro:page-load', () => {
+				if (!navProgress) return;
+				clearTimeout(navProgressShowTimer);
+				if (!navProgress.hasAttribute('data-active')) return;
+				navProgress.setAttribute('data-state', 'done');
+				navProgress.style.transform = 'scaleX(1)';
+				navProgressHideTimer = setTimeout(() => {
+					navProgress.removeAttribute('data-active');
+					navProgress.removeAttribute('data-state');
+					navProgress.style.transform = 'scaleX(0)';
+				}, 300);
+			});
 
 			const closeMobileMenu = (menu: HTMLDetailsElement, focusToggle = false) => {
 				menu.removeAttribute('open');
