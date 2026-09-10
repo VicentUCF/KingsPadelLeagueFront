@@ -217,7 +217,14 @@ function toJsonLdScript(items: Record<string, unknown>[]): string | null {
 				const main = document.querySelector<HTMLElement>('#main-content');
 				if (!main) return;
 				if (!main.hasAttribute('tabindex')) main.tabIndex = -1;
-				if (moveFocus) main.focus({ preventScroll: true });
+				// .focus() forces the browser to flush layout synchronously. Called
+				// right after astro:after-swap, that means laying out the entire new
+				// page (which hasn't been rendered yet at all) on the main thread,
+				// right in the middle of the view transition's own paint/composite
+				// work — measured as the single biggest source of jank during
+				// navigation. Deferring one frame lets the browser's normal paint
+				// happen first, so the layout .focus() needs is already done.
+				if (moveFocus) requestAnimationFrame(() => main.focus({ preventScroll: true }));
 			};
 
 			document.addEventListener('astro:before-swap', (event) => {
