@@ -120,7 +120,7 @@ function toJsonLdScript(items: Record<string, unknown>[]): string | null {
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		{jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} />}
-		<ClientRouter fallback="animate" />
+		<ClientRouter fallback="none" />
 	</head>
 	<body data-kpl-root>
 		<a class="c-skip-link u-visually-hidden-focusable" href="#main-content"> Ir al contenido </a>
