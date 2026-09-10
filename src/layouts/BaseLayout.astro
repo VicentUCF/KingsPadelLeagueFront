@@ -226,6 +226,19 @@ function toJsonLdScript(items: Record<string, unknown>[]): string | null {
 			document.addEventListener('astro:after-swap', () => prepareMainContent(true));
 			document.addEventListener('astro:page-load', () => prepareMainContent());
 
+			// If the view transition starts while the page is scrolled down, the
+			// browser captures the "old" snapshot at that scroll offset and then the
+			// swap resets scroll to 0 mid-flight. That mismatch between the two
+			// snapshots produces a dropped/blank compositor frame right as the
+			// transition begins — very visible as a black flash on slower mobile
+			// GPUs. Scrolling to the top before the transition starts capturing
+			// removes the mismatch entirely.
+			document.addEventListener('astro:before-preparation', () => {
+				if (window.scrollY > 0 || window.scrollX > 0) {
+					window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+				}
+			});
+
 			// Astro's ClientRouter fetches the target page before it can start the
 			// view transition. On mobile connections that fetch can take a moment
 			// with no visible feedback, which reads as a stuck/broken tap. Fill that
