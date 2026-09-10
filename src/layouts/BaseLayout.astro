@@ -282,6 +282,41 @@ function toJsonLdScript(items: Record<string, unknown>[]): string | null {
 				}, 300);
 			});
 
+			// <ClientRouter fallback="none" /> means browsers without the native
+			// View Transitions API get a plain browser navigation for every link:
+			// the tab just unloads and requests the next page, so none of the
+			// astro:* lifecycle events above ever fire and the progress bar never
+			// shows. That leaves an instant, feedback-less cut that reads as more
+			// "tosco" than the animated path supported browsers get. Trigger the
+			// same bar straight from the click instead, purely as a "something is
+			// happening" cue — the browser's own navigation takes it from there.
+			if (typeof document.startViewTransition !== 'function' && navProgress) {
+				document.addEventListener(
+					'click',
+					(event) => {
+						if (event.defaultPrevented || event.button !== 0) return;
+						if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+						const target = event.target instanceof Element ? event.target : null;
+						const link = target?.closest('a[href]');
+						if (!(link instanceof HTMLAnchorElement)) return;
+						if (link.target && link.target !== '_self') return;
+						if (link.hasAttribute('download')) return;
+						const url = new URL(link.href, location.href);
+						if (url.origin !== location.origin) return;
+						const sameDocument =
+							url.pathname === location.pathname && url.search === location.search;
+						if (sameDocument && url.hash) return;
+
+						navProgress.setAttribute('data-active', '');
+						navProgress.style.transform = 'scaleX(0)';
+						requestAnimationFrame(() => {
+							navProgress.style.transform = 'scaleX(0.85)';
+						});
+					},
+					{ capture: true },
+				);
+			}
+
 			const closeMobileMenu = (menu: HTMLDetailsElement, focusToggle = false) => {
 				menu.removeAttribute('open');
 				if (focusToggle) menu.querySelector('summary')?.focus();
