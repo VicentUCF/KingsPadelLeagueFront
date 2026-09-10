@@ -343,7 +343,7 @@ const structuredData = cardsUrl
 <script>
 	import * as THREE from 'three';
 	import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-	import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+	import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
 	const MODEL_URL = '/models/kpl/kpl-reveal.glb';
 	const ENVIRONMENT_URL = '/models/kpl/kpl-trophy-studio.hdr';
@@ -401,9 +401,10 @@ const structuredData = cardsUrl
 				canvas.hidden = false;
 			};
 
-			const clock = new THREE.Clock();
-			const tick = () => {
-				const delta = clock.getDelta();
+			const timer = new THREE.Timer();
+			const tick = (timestamp?: number) => {
+				timer.update(timestamp);
+				const delta = timer.getDelta();
 				mixer?.update(delta);
 				renderFrame();
 				if (action && !action.paused) {
@@ -412,7 +413,7 @@ const structuredData = cardsUrl
 			};
 
 			Promise.all([
-				new RGBELoader().loadAsync(ENVIRONMENT_URL),
+				new HDRLoader().loadAsync(ENVIRONMENT_URL),
 				new GLTFLoader().loadAsync(MODEL_URL),
 			])
 				.then(([hdrTexture, gltf]) => {
@@ -458,7 +459,7 @@ const structuredData = cardsUrl
 
 					animation.classList.add('is-playing');
 					action.play();
-					clock.start();
+					timer.reset();
 					tick();
 				})
 				.catch(() => {
