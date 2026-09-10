@@ -23,6 +23,7 @@ extenderlo.
 | `npm run knip`          | Detecta archivos, exports y dependencias sin usar.                   |
 | `npm run architecture`  | dependency-cruiser: ciclos, huérfanos, capas `api`/`domain`.         |
 | `npm run security`      | `npm audit --audit-level=high` (bloquea solo high/critical).         |
+| `npm run generate`      | `astro sync` + `tinacms build --local` (ver nota abajo).             |
 | `npm run quality`       | Encadena todo lo anterior (menos Sonar y E2E) — el gate local/CI.    |
 
 ## Qué corre dónde
@@ -36,9 +37,9 @@ pre-push (Husky)
   → test:run (Vitest, una pasada)
 
 CI (.github/workflows/ci.yml)
-  → static-checks: format:check, lint, lint:css, typecheck, knip, architecture
+  → static-checks: generate, format:check, lint, lint:css, typecheck, knip, architecture
   → unit-tests: test:coverage (sube el reporte como artifact)
-  → build-check: test:ssg (build real contra la API fixture — ver nota abajo)
+  → build-check: generate, test:ssg (build real contra la API fixture — ver nota abajo)
   → e2e: Playwright contra dev:fixture
   → security: npm audit
   → sonar: solo si existe SONAR_PROJECT_KEY (ver más abajo)
@@ -48,6 +49,18 @@ CI (.github/workflows/ci.yml)
 Pre-commit es intencionalmente mínimo: solo toca los archivos que vas a commitear, para que
 nunca sea una razón real para usar `--no-verify`. La autoridad real es CI — los hooks locales
 se pueden saltar y no hay que depender de ellos para garantizar calidad.
+
+### Por qué `static-checks` y `build-check` corren `generate` primero
+
+`src/content.config.ts` usa `astro:content` (tipos que solo existen tras `astro sync`) y
+`src/lib/tina/islands.ts` importa `tina/__generated__/client.ts` → `./types.js`, que no está en
+el repo (solo `client.ts` se commitea como placeholder — ver `.gitignore`). En un checkout limpio
+ninguno de los dos existe todavía: ESLint (type-aware) resuelve esos imports como `any`/error y
+`astro build` falla con `Could not resolve './types.js'`. En local esto queda enmascarado porque
+`npm run dev`/`npm run build` ya generan ambos como efecto secundario antes de que llegues a
+lintar. `npm run generate` (`astro sync` + `tinacms build --local --skip-indexing
+--skip-search-index --skip-cloud-checks`) reproduce ese efecto secundario sin depender de Tina
+Cloud ni de un servidor de indexado.
 
 ### Por qué `build-check` usa `test:ssg` y no `astro build`
 
@@ -63,6 +76,14 @@ lanza como subproceso (`spawn(..., ['tests/fixtures/kpl-api-server.mjs'])`) desd
 `tests/dev-with-fixture.mjs` y `tests/ssg-build.mjs`, no mediante un `import` estático, así que
 Knip no puede verlo por análisis estático sin esa pista. El resto del árbol (páginas, componentes,
 integraciones de Astro) lo detecta el plugin de Astro que trae Knip de serie.
+
+`ignoreFiles` excluye `design/**` (scripts sueltos de las herramientas de diseño, p. ej.
+`validate_glb.cjs`, con rutas absolutas de máquina — no se ejecutan desde npm/CI, no son código
+de la aplicación). `ignoreIssues` silencia `exports`/`duplicates` solo bajo
+`tina/__generated__/**`: la forma exacta de `client.ts` la decide `tinacms build`, no nosotros —
+cada build real sobrescribe el placeholder commiteado con un `export const` y un `export default`,
+y Knip marcaría el `default` como no usado/duplicado en cada pasada aunque el código sea correcto
+(el archivo en sí sí se analiza — solo se ignoran esos dos tipos de hallazgo en él).
 
 ## Arquitectura (dependency-cruiser)
 
@@ -133,6 +154,17 @@ ESLint (`eslint.config.js`) trata como **error**: `@ts-ignore`, `@ts-nocheck`, `
 (`no-floating-promises`), cualquier `eslint-disable` sin una razón (`-- motivo`) tras `--`,
 ternarios/template literals anidados y complejidad cognitiva excesiva (`eslint-plugin-sonarjs`, ver
 más abajo). Como **warning**: comentarios `TODO`/`FIXME`/`HACK`.
+
+## `overrides` en `package.json`
+
+`path-to-regexp` queda fijado a `^6.3.0`: `@vercel/routing-utils` (dependencia transitiva de
+`@astrojs/vercel`) pinza la `6.1.0` exacta, vulnerable a backtracking catastrófico
+([GHSA-9wv6-86v2-598j](https://github.com/advisories/GHSA-9wv6-86v2-598j), high). `6.3.0` ya
+incluye el parche y es la misma major, así que no hace falta bajar `@astrojs/vercel` (que es lo
+que sugiere `npm audit fix --force`, un cambio breaking). Las vulnerabilidades moderadas restantes
+(`qs` vía `express`/TinaCMS local server, `react-router` vía TinaCMS) no cruzan el umbral
+`--audit-level=high` y solo se resuelven subiendo TinaCMS de major — se dejan para cuando toque esa
+migración.
 
 ## Deuda técnica conocida (no arreglada en esta pasada)
 

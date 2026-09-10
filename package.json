@@ -6,6 +6,9 @@
 	"engines": {
 		"node": ">=22.12.0"
 	},
+	"overrides": {
+		"path-to-regexp": "^6.3.0"
+	},
 	"volta": {
 		"node": "24.15.0",
 		"npm": "11.12.1"
@@ -32,7 +35,8 @@
 		"knip": "knip",
 		"architecture": "depcruise src --config .dependency-cruiser.cjs",
 		"security": "npm audit --audit-level=high",
-		"quality": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run knip && npm run architecture && npm run test:run && npm run test:ssg && npm run security",
+		"generate": "astro sync && tinacms build --local --skip-indexing --skip-search-index --skip-cloud-checks --noTelemetry",
+		"quality": "npm run generate && npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run knip && npm run architecture && npm run test:run && npm run test:ssg && npm run security",
 		"prepare": "husky"
 	},
 	"dependencies": {

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
 
@@ -11,6 +11,9 @@ import { join } from 'node:path';
 const VERCEL_STATIC_DIR = join(process.cwd(), '.vercel/output/static');
 
 const port = await availablePort();
+// mkdtemp no crea el directorio padre: en un checkout limpio (CI) `.astro/` todavía no existe
+// porque nada ha invocado a Astro antes de este script.
+await mkdir(join(process.cwd(), '.astro'), { recursive: true });
 const outDir = await mkdtemp(join(process.cwd(), '.astro/ssg-'));
 const activeOutDir = await mkdtemp(join(process.cwd(), '.astro/ssg-active-'));
 const fixture = spawn(process.execPath, ['tests/fixtures/kpl-api-server.mjs'], {
