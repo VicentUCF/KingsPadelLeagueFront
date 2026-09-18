@@ -122,7 +122,7 @@ export function createLeagueParticipants(
 		(player) => player.teamId,
 	);
 	const playerSlugById = createUniqueSlugs(
-		data.players.map((player) => ({ id: player.id, label: playerName(player) })),
+		data.players.map((player) => ({ id: player.id, label: playerSlugLabel(player) })),
 	);
 	const scoreByPlayerId = new Map(
 		data.seasonPlayerScores
@@ -139,7 +139,7 @@ export function createLeagueParticipants(
 		return {
 			id: player.id,
 			slug: requireById(playerSlugById, player.id, 'Slug del jugador'),
-			displayName: playerName(player),
+			displayName: playerFullName(player),
 			firstName: player.firstName,
 			lastName: player.lastName,
 			alias: player.alias,
@@ -233,8 +233,12 @@ function comparePlayers(left: PublicPlayer, right: PublicPlayer): number {
 	);
 }
 
-function playerName(player: PlayerHttp): string {
-	return player.alias?.trim() || [player.firstName, player.lastName].filter(Boolean).join(' ');
+function playerFullName(player: PlayerHttp): string {
+	return [player.firstName, player.lastName].filter(Boolean).join(' ');
+}
+
+function playerSlugLabel(player: PlayerHttp): string {
+	return player.alias?.trim() || playerFullName(player);
 }
 
 const POSITION_LABELS: Record<PlayerHttp['preferredPosition'], string> = {

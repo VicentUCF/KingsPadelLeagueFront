@@ -135,6 +135,7 @@ const playerStructuredData = playerUrl
 						<h1 transition:name={`kpl-player-${player.slug}-name`}>
 							{player.displayName}
 						</h1>
+						{player.alias && <p class="player-profile__alias">“{player.alias}”</p>}
 						<p>
 							<span>{player.teamName}</span>
 							<span aria-hidden="true">·</span>

@@ -170,6 +170,19 @@ describe('createPublicLeagueView', () => {
 		expect(view.players[0]?.totalPoints).toBe(12);
 	});
 
+	it('usa el nombre real como identidad principal y conserva el apodo por separado', () => {
+		const aliased = dataset();
+		overrideAt(aliased.players, 0, { alias: 'La Jefa' });
+
+		const view = createPublicLeagueView(aliased, new Date('2026-08-27T12:00:00Z'));
+		const player = view.players.find(({ id }) => id === 'p1');
+
+		expect(player?.displayName).toBe('Ana Uno');
+		expect(player?.alias).toBe('La Jefa');
+		expect(player?.slug).toBe('la-jefa');
+		expect(view.teams.find(({ id }) => id === 'a')?.presidentLabel).toBe('Ana Uno');
+	});
+
 	it('rechaza relaciones inconsistentes antes de generar páginas', () => {
 		const invalid = dataset();
 		overrideAt(invalid.matches, 0, { awayTeamId: 'missing-team' });

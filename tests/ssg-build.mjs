@@ -111,6 +111,14 @@ try {
 	assert.match(player, /"@type":"Person"/);
 	assert.match(players, /<strong[^>]*>Alex Rey<\/strong>/);
 	assert.match(players, /“King” · Revés · Presidente/);
+	assert.match(team, /<strong[^>]*>Alex Rey<\/strong>/);
+	assert.match(team, /<span>“King”<\/span>/);
+	assert.match(
+		team,
+		/class="player-card__points" aria-label="0 puntos"><strong>0<\/strong> PTS<\/span>/,
+	);
+	assert.match(player, /<h1[^>]*>\s*Alex Rey\s*<\/h1>/);
+	assert.match(player, /player-profile__alias">“King”<\/p>/);
 	assert.match(matchday, /name="robots" content="noindex, follow"/);
 	assert.match(sitemap, /https:\/\/kpl\.example\/equipos\/kings-of-favar/);
 	assert.match(sitemap, /https:\/\/kpl\.example\/cartas/);

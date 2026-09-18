@@ -49,7 +49,15 @@ function resolveFooterVariant(
 	{team && <span class="player-card__team-accent" aria-hidden="true" />}
 	<span class="player-card__topline">
 		<span>{player.isPresident ? 'Presidencia' : player.positionLabel}</span>
-		{!rosterRole && <span>{preseason ? 'T2' : `#${player.rank}`}</span>}
+		{
+			rosterRole ? (
+				<span class="player-card__points" aria-label={`${player.totalPoints} puntos`}>
+					<strong>{player.totalPoints}</strong> PTS
+				</span>
+			) : (
+				<span>{preseason ? 'T2' : `#${player.rank}`}</span>
+			)
+		}
 	</span>
 
 	<span class="player-card__avatar" aria-hidden="true">
