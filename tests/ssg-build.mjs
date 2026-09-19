@@ -39,15 +39,16 @@ try {
 		]);
 	await rm(join(process.cwd(), '.vercel/output'), { recursive: true, force: true });
 	await runBuild(port, activeOutDir, false);
-	const [calendarPage, activeMatchday] = await Promise.all([
+	const [calendarPage, activeMatchday, scheduledMatchday] = await Promise.all([
 		readFile(join(VERCEL_STATIC_DIR, 'calendario/index.html'), 'utf8'),
 		readFile(join(VERCEL_STATIC_DIR, 'jornadas/jornada-1/index.html'), 'utf8'),
+		readFile(join(VERCEL_STATIC_DIR, 'jornadas/jornada-3/index.html'), 'utf8'),
 	]);
 
 	assert.doesNotMatch(home, /Playoffs/);
 	for (const page of [home, standings, matchday, cards, team, player]) {
 		assert.match(page, /name="astro-view-transitions-enabled" content="true"/);
-		assert.match(page, /name="astro-view-transitions-fallback" content="animate"/);
+		assert.match(page, /name="astro-view-transitions-fallback" content="none"/);
 	}
 	for (const [label, page] of [
 		['inicio', home],
@@ -73,10 +74,15 @@ try {
 	assert.match(calendarPage, /Padel Mixto Xeresa/);
 	assert.match(calendarPage, /season-map__day--match/);
 	assert.match(calendarPage, /Ver desglose por parejas/);
-	// MatchCard shows the player's full name with the alias as a secondary
-	// badge (see PlayerCard's "full name + secondary identity" convention,
-	// commit d3495eb) — "King" is player-0-0's alias, not their link text.
+	// MatchCard uses the player's full name without adding the profile alias.
 	assert.match(calendarPage, /<a href="\/jugadores\/king">Alex Rey<\/a>/);
+	assert.match(scheduledMatchday, /Jornada programada/);
+	assert.match(scheduledMatchday, /<a href="\/jugadores\/roar">Iris Rojo<\/a>/);
+	assert.match(scheduledMatchday, /<a href="\/jugadores\/nova">Nora Vega<\/a>/);
+	assert.doesNotMatch(scheduledMatchday, /“Roar”/);
+	assert.doesNotMatch(scheduledMatchday, />Pendiente</);
+	assert.match(scheduledMatchday, /match-card__pair-score">\s*VS\s*<\/strong>/);
+	assert.match(scheduledMatchday, /data-story-export/);
 	assert.match(home, /Pretemporada/);
 	assert.match(home, /Temporada 2/);
 	assert.match(home, /Sigue la Kings Padel League desde el primer partido/);
@@ -115,7 +121,7 @@ try {
 	assert.match(team, /<span>“King”<\/span>/);
 	assert.match(
 		team,
-		/class="player-card__points" aria-label="0 puntos"><strong>0<\/strong> PTS<\/span>/,
+		/class="player-card__points" aria-label="18 puntos">\s*<strong>18<\/strong> PTS\s*<\/span>/,
 	);
 	assert.match(player, /<h1[^>]*>\s*Alex Rey\s*<\/h1>/);
 	assert.match(player, /player-profile__alias">“King”<\/p>/);

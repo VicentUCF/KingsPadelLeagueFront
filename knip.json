@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
-	"entry": ["tests/fixtures/kpl-api-server.mjs", "tina/config.ts"],
+	"entry": ["src/scripts/matchday-story.ts", "tests/fixtures/kpl-api-server.mjs", "tina/config.ts"],
 	"ignoreFiles": ["design/**"],
 	"ignoreIssues": {
 		"tina/__generated__/**": ["exports", "duplicates"]

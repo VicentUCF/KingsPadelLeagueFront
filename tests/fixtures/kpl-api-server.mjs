@@ -146,15 +146,47 @@ const matches = [
 		mvpId: null,
 	},
 ];
-const lineups = teams
-	.slice(0, 2)
-	.map((team) => ({ id: `lineup-${team.id}`, matchId: 'match-1', teamId: team.id }));
-const lineupPairs = teams.slice(0, 2).map((team, teamIndex) => ({
-	id: `pair-${team.id}`,
-	matchTeamLineUpId: `lineup-${team.id}`,
-	player1Id: `player-${teamIndex}-0`,
-	player2Id: `player-${teamIndex}-1`,
-}));
+const lineups = [
+	...teams
+		.slice(0, 2)
+		.map((team) => ({ id: `lineup-${team.id}`, matchId: 'match-1', teamId: team.id })),
+	{ id: 'lineup-match-5-team-red', matchId: 'match-5', teamId: 'team-red' },
+	{ id: 'lineup-match-5-team-kings', matchId: 'match-5', teamId: 'team-kings' },
+	{ id: 'lineup-match-6-team-magic', matchId: 'match-6', teamId: 'team-magic' },
+	{ id: 'lineup-match-6-team-titanics', matchId: 'match-6', teamId: 'team-titanics' },
+];
+const lineupPairs = [
+	...teams.slice(0, 2).map((team, teamIndex) => ({
+		id: `pair-${team.id}`,
+		matchTeamLineUpId: `lineup-${team.id}`,
+		player1Id: `player-${teamIndex}-0`,
+		player2Id: `player-${teamIndex}-1`,
+	})),
+	{
+		id: 'pair-match-5-team-red',
+		matchTeamLineUpId: 'lineup-match-5-team-red',
+		player1Id: 'player-3-0',
+		player2Id: 'player-3-1',
+	},
+	{
+		id: 'pair-match-5-team-kings',
+		matchTeamLineUpId: 'lineup-match-5-team-kings',
+		player1Id: 'player-0-0',
+		player2Id: 'player-0-1',
+	},
+	{
+		id: 'pair-match-6-team-magic',
+		matchTeamLineUpId: 'lineup-match-6-team-magic',
+		player1Id: 'player-2-0',
+		player2Id: 'player-2-1',
+	},
+	{
+		id: 'pair-match-6-team-titanics',
+		matchTeamLineUpId: 'lineup-match-6-team-titanics',
+		player1Id: 'player-1-0',
+		player2Id: 'player-1-1',
+	},
+];
 const pairMatches = [
 	{
 		id: 'pair-match-1',

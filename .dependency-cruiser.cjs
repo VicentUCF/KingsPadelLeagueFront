@@ -34,6 +34,8 @@ module.exports = {
 					// Consumed only from .astro frontmatter, invisible to this tool (see file header).
 					'^src/lib/news\\.ts$',
 					'^src/lib/league-presentation\\.ts$',
+					// Browser entry imported by an Astro component's client-side script.
+					'^src/scripts/matchday-story\\.ts$',
 					'^tests/fixtures/',
 					'^tests/dev-with-fixture\\.mjs$',
 					'^tests/ssg-build\\.mjs$',

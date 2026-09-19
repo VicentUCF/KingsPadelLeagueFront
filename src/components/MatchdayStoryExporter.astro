@@ -1,0 +1,72 @@
+---
+import type { PairLineup, PublicMatchday } from '../lib/public-league';
+
+interface Props {
+	matchday: PublicMatchday;
+	seasonLabel: string;
+}
+
+const { matchday, seasonLabel } = Astro.props;
+
+function fullName(player: PairLineup['players'][number]) {
+	return [player.firstName, player.lastName].filter(Boolean).join(' ');
+}
+
+const payload = {
+	matchdayLabel: matchday.label,
+	dateLabel: matchday.dateLabel,
+	seasonLabel,
+	venue: 'Padel Mixto Xeresa',
+	encounters: matchday.encounters.map((encounter) => ({
+		scheduledAtLabel: encounter.scheduledAtLabel,
+		homeTeam: {
+			name: encounter.homeTeam.name,
+			logoPath: encounter.homeTeam.logoPath,
+			monogram: encounter.homeTeam.monogram,
+			primaryColor: encounter.homeTeam.palette.primary,
+		},
+		awayTeam: {
+			name: encounter.awayTeam.name,
+			logoPath: encounter.awayTeam.logoPath,
+			monogram: encounter.awayTeam.monogram,
+			primaryColor: encounter.awayTeam.palette.primary,
+		},
+		pairs: encounter.pairResults.map((pair) => ({
+			label: pair.label,
+			homePlayers: pair.homePair.players.map(fullName),
+			awayPlayers: pair.awayPair.players.map(fullName),
+		})),
+	})),
+};
+const serializedPayload = JSON.stringify(payload).replaceAll('<', '\\u003c');
+---
+
+<aside class="matchday-story-exporter c-surface" data-story-exporter>
+	<div class="matchday-story-exporter__copy">
+		<p class="c-eyebrow">Comparte la jornada</p>
+		<h2>Publica los cruces en Instagram</h2>
+		<p>
+			Genera una imagen vertical con los equipos, horarios y parejas confirmadas, preparada para
+			Stories.
+		</p>
+	</div>
+	<div class="matchday-story-exporter__action">
+		<button class="c-button c-button--primary" type="button" data-story-export>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"></path>
+			</svg>
+			<span>Descargar Story</span>
+		</button>
+		<p class="matchday-story-exporter__hint">PNG · 1080 × 1920 px</p>
+		<p class="matchday-story-exporter__status" role="status" aria-live="polite" data-story-status>
+		</p>
+	</div>
+	<script is:inline type="application/json" data-story-payload set:html={serializedPayload} />
+</aside>
+
+<script>
+	import { initializeMatchdayStoryExporters } from '../scripts/matchday-story';
+
+	initializeMatchdayStoryExporters();
+	document.addEventListener('astro:page-load', initializeMatchdayStoryExporters);
+</script>

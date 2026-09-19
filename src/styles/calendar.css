@@ -69,6 +69,7 @@
 
 		& .c-team-badge__copy {
 			display: grid;
+			text-align: start;
 		}
 
 		& .c-team-badge__name {
@@ -142,25 +143,19 @@
 
 	.match-card__pairs {
 		display: grid;
-		gap: var(--kpl-space-3);
 		margin-block-start: var(--kpl-space-4);
-	}
-
-	.match-card__pair {
-		display: grid;
-		gap: var(--kpl-space-2);
-		padding: var(--kpl-space-4);
+		overflow: hidden;
+		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
 		border-radius: var(--kpl-radius-md);
 		background: color-mix(in oklch, var(--kpl-color-surface) 88%, black);
 	}
 
-	.match-card__pair-label {
-		margin: 0;
-		color: var(--kpl-color-text-muted);
-		font-size: var(--kpl-font-size-50);
-		font-weight: 800;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
+	.match-card__pair {
+		padding: var(--kpl-space-4);
+	}
+
+	.match-card__pair + .match-card__pair {
+		border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
 	}
 
 	.match-card__pair-row {
@@ -172,11 +167,17 @@
 
 	.match-card__pair-players {
 		display: grid;
-		gap: 0.2rem;
+		justify-items: start;
+		gap: var(--kpl-space-1);
 		margin: 0;
 		padding: var(--kpl-space-2) var(--kpl-space-3);
-		border-radius: var(--kpl-radius-md);
+		border-radius: var(--kpl-radius-sm);
 		list-style: none;
+		text-align: center;
+
+		& li {
+			min-inline-size: 0;
+		}
 
 		&[data-result='win'] {
 			background: linear-gradient(
@@ -194,8 +195,8 @@
 			);
 		}
 
-		&--away {
-			text-align: end;
+		&.match-card__pair-players--away {
+			justify-items: end;
 
 			&[data-result='win'] {
 				background: linear-gradient(
@@ -215,6 +216,7 @@
 		}
 
 		& a {
+			display: block;
 			color: var(--kpl-color-text-strong);
 			font-size: var(--kpl-font-size-200);
 			font-weight: 700;
@@ -233,11 +235,20 @@
 		&[data-result='lose'] a {
 			color: var(--kpl-color-danger);
 		}
+	}
 
-		& small {
-			display: block;
-			color: var(--kpl-color-text-muted);
+	.match-card__pair-versus {
+		display: grid;
+		min-inline-size: 5rem;
+		justify-items: center;
+		gap: 0.1rem;
+
+		& > span {
+			color: var(--kpl-color-brand-strong);
 			font-size: var(--kpl-font-size-50);
+			font-weight: 800;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
 		}
 	}
 
@@ -247,6 +258,16 @@
 		font-size: var(--kpl-font-size-200);
 		font-variant-numeric: tabular-nums;
 		white-space: nowrap;
+	}
+
+	.match-card__lineup-pending {
+		margin: 0;
+		padding-block-start: var(--kpl-space-4);
+		border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-100);
+		font-weight: 700;
+		text-align: center;
 	}
 
 	.playoff-bracket {
@@ -331,45 +352,24 @@
 		}
 
 		.match-card__pair-row {
-			grid-template-columns: 1fr;
-			gap: var(--kpl-space-1);
-			text-align: center;
+			grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+			gap: var(--kpl-space-2);
 		}
 
-		.match-card__pair-players--away {
-			text-align: center;
+		.match-card__pair {
+			padding: var(--kpl-space-3);
 		}
 
-		.match-card__pair-players[data-result='win']:not(.match-card__pair-players--away) {
-			background: linear-gradient(
-				to top,
-				color-mix(in srgb, var(--kpl-color-success) 26%, transparent),
-				transparent
-			);
+		.match-card__pair-players {
+			padding-inline: 0;
+
+			& a {
+				font-size: var(--kpl-font-size-100);
+			}
 		}
 
-		.match-card__pair-players[data-result='lose']:not(.match-card__pair-players--away) {
-			background: linear-gradient(
-				to top,
-				color-mix(in srgb, var(--kpl-color-danger) 20%, transparent),
-				transparent
-			);
-		}
-
-		.match-card__pair-players--away[data-result='win'] {
-			background: linear-gradient(
-				to bottom,
-				color-mix(in srgb, var(--kpl-color-success) 26%, transparent),
-				transparent
-			);
-		}
-
-		.match-card__pair-players--away[data-result='lose'] {
-			background: linear-gradient(
-				to bottom,
-				color-mix(in srgb, var(--kpl-color-danger) 20%, transparent),
-				transparent
-			);
+		.match-card__pair-versus {
+			min-inline-size: 3.75rem;
 		}
 
 		.match-card__pair-score {

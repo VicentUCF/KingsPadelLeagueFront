@@ -1,0 +1,75 @@
+@layer app {
+	.matchday-story-exporter {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--kpl-space-7);
+		padding: clamp(var(--kpl-space-5), 5vw, var(--kpl-space-7));
+		border: var(--kpl-border-width) solid
+			color-mix(in srgb, var(--kpl-color-brand) 35%, transparent);
+		border-radius: var(--kpl-radius-xl);
+		background:
+			radial-gradient(circle at 90% 10%, rgb(201 162 39 / 0.18), transparent 22rem),
+			linear-gradient(135deg, rgb(255 255 255 / 0.04), transparent 48%), var(--kpl-color-surface);
+		box-shadow: var(--kpl-shadow-lg);
+	}
+
+	.matchday-story-exporter__copy {
+		display: grid;
+		gap: var(--kpl-space-2);
+
+		& h2 {
+			font-size: clamp(var(--kpl-font-size-400), 3vw, var(--kpl-font-size-600));
+			letter-spacing: -0.035em;
+		}
+
+		& > p:last-child {
+			max-inline-size: 54ch;
+			color: var(--kpl-color-text-muted);
+			line-height: var(--kpl-line-height-loose);
+		}
+	}
+
+	.matchday-story-exporter__action {
+		display: grid;
+		justify-items: center;
+		gap: var(--kpl-space-2);
+
+		& .c-button {
+			min-inline-size: 12rem;
+		}
+
+		& .c-button svg {
+			inline-size: 1.15rem;
+			block-size: 1.15rem;
+			fill: none;
+			stroke: currentColor;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			stroke-width: 1.8;
+		}
+	}
+
+	.matchday-story-exporter__hint,
+	.matchday-story-exporter__status {
+		margin: 0;
+		color: var(--kpl-color-text-muted);
+		font-size: var(--kpl-font-size-50);
+		text-align: center;
+	}
+
+	.matchday-story-exporter__status:empty {
+		display: none;
+	}
+
+	@media (width < 48rem) {
+		.matchday-story-exporter {
+			grid-template-columns: 1fr;
+		}
+
+		.matchday-story-exporter__action,
+		.matchday-story-exporter__action .c-button {
+			inline-size: 100%;
+		}
+	}
+}
