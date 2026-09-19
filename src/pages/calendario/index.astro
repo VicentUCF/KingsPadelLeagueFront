@@ -169,6 +169,25 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 																	{matchday.label}
 																</h3>
 																<p>{encounterCountLabel(matchday.encounters.length)}</p>
+																{matchday.encounters.length > 0 && (
+																	<ul
+																		class="calendar-matchday__encounters"
+																		aria-label={`Enfrentamientos de ${matchday.label}`}
+																	>
+																		{matchday.encounters.map((encounter) => (
+																			<li>
+																				<span class="calendar-matchday__teams">
+																					<span>{encounter.homeTeam.name}</span>
+																					<span class="calendar-matchday__versus">vs</span>
+																					<span>{encounter.awayTeam.name}</span>
+																				</span>
+																				<time datetime={encounter.scheduledAt}>
+																					{encounter.scheduledAtLabel}
+																				</time>
+																			</li>
+																		))}
+																	</ul>
+																)}
 															</div>
 															<a
 																class="c-button c-button--primary"
@@ -237,3 +256,43 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 		}
 	});
 </script>
+
+<style>
+	@layer app {
+		.calendar-matchday__encounters {
+			display: grid;
+			gap: var(--kpl-space-3);
+			inline-size: 100%;
+			margin: 0;
+			padding: var(--kpl-space-4) 0 0;
+			border-block-start: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
+			list-style: none;
+			font-size: var(--kpl-font-size-100);
+
+			& li {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: var(--kpl-space-2) var(--kpl-space-5);
+			}
+
+			& time {
+				color: var(--kpl-color-text-muted);
+				font-size: var(--kpl-font-size-50);
+			}
+		}
+
+		.calendar-matchday__teams {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--kpl-space-2);
+			font-weight: 700;
+		}
+
+		.calendar-matchday__versus {
+			color: var(--kpl-color-brand-strong);
+			font-weight: 400;
+		}
+	}
+</style>

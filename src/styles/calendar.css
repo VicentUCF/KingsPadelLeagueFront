@@ -350,6 +350,8 @@
 	}
 
 	.calendar-matchday__summary {
+		flex: 1 1 24rem;
+		min-inline-size: 0;
 		display: grid;
 		justify-items: start;
 		gap: var(--kpl-space-3);
