@@ -14,5 +14,5 @@ Antes de cada partido, el maletín se abrirá para que cada presidente robe una 
 Cada carta introduce una regla especial capaz de cambiar el ritmo del encuentro en el momento
 justo, desde ventajas puntuales hasta condiciones excepcionales de juego.
 
-Las siete cartas ya están disponibles para consulta, con su efecto y sus condiciones de uso
+Las diez cartas ya están disponibles para consulta, con su efecto y sus condiciones de uso
 detalladas en la sección de cartas de la liga.

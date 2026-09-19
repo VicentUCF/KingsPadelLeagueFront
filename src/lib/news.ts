@@ -89,7 +89,7 @@ export const NEWS_CATEGORY_CHIP_TONES: Record<NewsCategory, string> = {
 export const NEWS_CATEGORY_DESTINATIONS: Record<NewsCategory, { href: string; label: string }> = {
 	equipos: { href: '/equipos', label: 'Conocer los equipos' },
 	calendario: { href: '/calendario', label: 'Consultar el calendario oficial' },
-	cartas: { href: '/cartas', label: 'Descubrir las siete cartas' },
+	cartas: { href: '/cartas', label: 'Descubrir las cartas' },
 	partidos: { href: '/calendario', label: 'Ver el calendario y los resultados' },
 };
 

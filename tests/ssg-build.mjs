@@ -95,7 +95,7 @@ try {
 	assert.match(cards, /Una carta/);
 	assert.match(cards, /Cada <a href="\/equipos">presidente<\/a> roba una/);
 	assert.match(cards, /40–15/);
-	assert.match(cards, /Las siete cartas/);
+	assert.match(cards, /Las 10 cartas/);
 	// The old skip-button intro (data-card-intro) was replaced by the
 	// video-based reveal (data-cards-animation); this assertion was never
 	// updated when that happened.

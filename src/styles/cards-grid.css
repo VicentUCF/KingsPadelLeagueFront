@@ -5,7 +5,7 @@
 @layer app {
 	.cards-level-nav {
 		display: grid;
-		grid-template-columns: auto repeat(3, minmax(0, 1fr));
+		grid-template-columns: auto repeat(4, minmax(0, 1fr));
 		align-items: stretch;
 		border: var(--kpl-border-width) solid var(--kpl-color-border-subtle);
 		border-radius: var(--kpl-radius-xl);
@@ -89,6 +89,11 @@
 	.cards-level-nav a[data-tone='gold'],
 	.cards-level[data-tone='gold'] {
 		--level-color: var(--cards-gold);
+	}
+
+	.cards-level-nav a[data-tone='red'],
+	.cards-level[data-tone='red'] {
+		--level-color: var(--cards-red);
 	}
 
 	.cards-level {
@@ -214,6 +219,8 @@
 			z-index: 1;
 			inline-size: min(76%, 17rem);
 			block-size: auto;
+			/* Match visible shield sizes across PNGs with different transparent margins. */
+			scale: var(--card-image-scale, 1);
 			filter: drop-shadow(0 1.5rem 1.2rem rgb(0 0 0 / 0.62));
 			transform: rotate(-1deg);
 			transition: transform var(--kpl-duration-slow) var(--kpl-ease-emphasized);
@@ -328,7 +335,7 @@
 
 	@media (width < 74rem) {
 		.cards-level-nav {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 
 		.cards-level-nav__label {

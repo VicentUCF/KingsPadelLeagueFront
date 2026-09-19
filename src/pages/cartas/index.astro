@@ -37,9 +37,9 @@ const levels = [
 		name: 'Nivel azul',
 		number: '02',
 		tone: 'blue',
-		title: 'Presión al servicio',
+		title: 'Cambia el juego',
 		description:
-			'Dos cartas que convierten el saque en una decisión estratégica durante el siguiente juego.',
+			'Cartas para condicionar el saque, disputar un duelo individual o repetir el punto decisivo.',
 		cards: [
 			{
 				id: 'robo-saque',
@@ -56,6 +56,26 @@ const levels = [
 				duration: '1 juego, al resto',
 				activation: 'Entre juegos',
 				effect: 'La pareja rival juega sin segundo servicio durante el siguiente juego.',
+			},
+			{
+				id: '1-vs-1',
+				name: '1 vs 1',
+				image: '/cards/1-vs-1.png',
+				imageScale: 0.79,
+				duration: '1 juego',
+				activation: 'Antes de iniciar un juego',
+				effect:
+					'La pareja que activa la carta escoge qué jugador rival se queda para disputar un 1 vs 1 durante un juego, con toda la pista disponible.',
+			},
+			{
+				id: 'ultima-oportunidad',
+				name: 'Última oportunidad',
+				image: '/cards/ultima-oportunidad.png',
+				imageScale: 0.815,
+				duration: '1 punto',
+				activation: 'Justo después de finalizar un juego',
+				effect:
+					'La pareja que activa la carta puede repetir el último punto del último juego disputado.',
 			},
 		],
 	},
@@ -95,12 +115,32 @@ const levels = [
 			},
 		],
 	},
+	{
+		id: 'rojo',
+		name: 'Nivel rojo',
+		number: '04',
+		tone: 'red',
+		title: 'Dale la vuelta al resultado',
+		description: 'Una carta que puede invertir el resultado si aciertas la cara de la moneda.',
+		cards: [
+			{
+				id: 'inversion',
+				name: 'Inversión',
+				image: '/cards/inversion.png',
+				imageScale: 0.815,
+				duration: 'Todo el partido',
+				activation: 'Antes de empezar un juego',
+				effect: 'Invierte el resultado, pero solo si escoges la cara de la moneda correcta.',
+			},
+		],
+	},
 ] as const;
 
 const toneLabels: Record<(typeof levels)[number]['tone'], string> = {
 	green: 'verde',
 	blue: 'azul',
 	gold: 'oro',
+	red: 'rojo',
 };
 
 const cards = levels.flatMap((level) =>
@@ -112,8 +152,7 @@ const structuredData = cardsUrl
 			'@context': 'https://schema.org',
 			'@type': 'CollectionPage',
 			name: 'Cartas de Kings Padel League',
-			description:
-				'Las siete cartas, sus niveles y las reglas para activarlas durante los partidos de Kings Padel League.',
+			description: `Las ${cards.length} cartas, sus niveles y las reglas para activarlas durante los partidos de Kings Padel League.`,
 			url: cardsUrl,
 			mainEntity: {
 				'@type': 'ItemList',
@@ -131,7 +170,7 @@ const structuredData = cardsUrl
 
 <BaseLayout
 	title="Cartas de Kings Padel League: niveles, reglas y efectos"
-	description="Las 7 cartas de Kings Padel League: niveles verde, azul y oro, su efecto en pista y el momento exacto en que cada presidente puede activarlas."
+	description={`Las ${cards.length} cartas de Kings Padel League: niveles verde, azul, oro y rojo, su efecto en pista y el momento exacto en que cada presidente puede activarlas.`}
 	image="/cards/2-vs-1.png"
 	imageAlt="Carta 2 vs 1 de Kings Padel League"
 	structuredData={structuredData}
@@ -142,14 +181,14 @@ const structuredData = cardsUrl
 			<div class="cards-hero__inner o-container o-container--xl">
 				<div class="cards-hero__copy">
 					<p class="c-eyebrow">El factor sorpresa de Kings Padel League</p>
-					<h1 id="cards-title">Siete cartas.<br /><span>Un giro de partido.</span></h1>
+					<h1 id="cards-title">{cards.length} cartas.<br /><span>Un giro de partido.</span></h1>
 					<p class="cards-hero__lead">
 						Antes de cada partido se abre el maletín y cada presidente roba una carta. Tiene una
 						sola oportunidad para cambiar el guion desde la pista.
 					</p>
 					<div class="cards-hero__actions">
 						<a class="c-button c-button--primary c-button--lg" href="#baraja">
-							Descubrir las 7 cartas
+							Descubrir las {cards.length} cartas
 							<span aria-hidden="true">↓</span>
 						</a>
 						<a class="c-button c-button--outline c-button--lg" href="#como-funciona">
@@ -228,7 +267,8 @@ const structuredData = cardsUrl
 						<h3 id="timing-title">Primero termina el juego. Después, juega tu carta.</h3>
 						<p>
 							Puede activarse justo después de cerrar un juego, también coincidiendo con un cambio
-							de lado. La carta debe anunciarse antes de empezar el siguiente.
+							de lado. La carta debe anunciarse antes de empezar el siguiente. Última oportunidad se
+							activa justo al terminar el juego para repetir su último punto.
 						</p>
 					</div>
 					<div class="cards-timing__examples">
@@ -251,7 +291,9 @@ const structuredData = cardsUrl
 						<a href={`#nivel-${level.id}`} data-tone={level.tone}>
 							<span>{level.number}</span>
 							<strong>{level.name}</strong>
-							<small>{level.cards.length} cartas</small>
+							<small>
+								{level.cards.length} {level.cards.length === 1 ? 'carta' : 'cartas'}
+							</small>
 						</a>
 					))
 				}
@@ -261,7 +303,9 @@ const structuredData = cardsUrl
 				<header class="cards-section-heading cards-section-heading--deck">
 					<div>
 						<p class="c-eyebrow">La baraja completa</p>
-						<h2 id="deck-title">Siete cartas. Siete formas de romper el guion.</h2>
+						<h2 id="deck-title">
+							{cards.length} cartas. {cards.length} formas de romper el guion.
+						</h2>
 					</div>
 					<p>Cada color anticipa el tipo de ventaja. Abre cada nivel y prepara el momento.</p>
 				</header>
@@ -287,16 +331,23 @@ const structuredData = cardsUrl
 							<div class="cards-grid o-grid">
 								{level.cards.map((card) => (
 									<article id={`carta-${card.id}`} class="action-card c-surface-card">
-										<div class="action-card__visual">
-											<img
-												src={card.image}
-												alt={`Carta ${card.name} de Kings Padel League, nivel ${toneLabels[level.tone]}`}
-												width="447"
-												height="559"
-												loading="lazy"
-												decoding="async"
-											/>
-										</div>
+										{card.image && (
+											<div class="action-card__visual">
+												<img
+													src={card.image}
+													style={
+														'imageScale' in card
+															? `--card-image-scale: ${card.imageScale}`
+															: undefined
+													}
+													alt={`Carta ${card.name} de Kings Padel League, nivel ${toneLabels[level.tone]}`}
+													width="447"
+													height="559"
+													loading="lazy"
+													decoding="async"
+												/>
+											</div>
+										)}
 										<div class="action-card__body">
 											<div class="action-card__heading">
 												<span>{level.name}</span>
