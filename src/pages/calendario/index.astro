@@ -1,6 +1,5 @@
 ---
 import EmptyState from '../../components/EmptyState.astro';
-import MatchCard from '../../components/MatchCard.astro';
 import SeasonMap from '../../components/SeasonMap.astro';
 import SeasonReveal from '../../components/SeasonReveal.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -9,23 +8,23 @@ import {
 	PUBLIC_SEASON_NAME,
 	SEASON_STARTS_LABEL,
 } from '../../lib/league-presentation';
-import type { PublicEncounter, PublicMatchday } from '../../lib/public-league';
+import type { PublicMatchday } from '../../lib/public-league';
 import { loadPublicLeagueView } from '../../lib/public-view';
 
 const view = await loadPublicLeagueView();
 const preseason = isPublicPreseason();
-const allEncounters = view.matchdays.flatMap((matchday) =>
-	matchday.encounters.map((encounter) => ({ encounter, matchday })),
-);
-const dateGroups = new Map<
-	string,
-	{ date: Date; items: { encounter: PublicEncounter; matchday: PublicMatchday }[] }
->();
-for (const item of allEncounters) {
-	const date = new Date(item.encounter.scheduledAt);
+const statusLabels = { upcoming: 'Programada', current: 'En juego', completed: 'Finalizada' };
+function encounterCountLabel(count: number): string {
+	if (!count) return 'Enfrentamientos por confirmar';
+	return `${count} ${count === 1 ? 'enfrentamiento' : 'enfrentamientos'}`;
+}
+const statusTones = { upcoming: 'info', current: 'warning', completed: 'success' };
+const dateGroups = new Map<string, { date: Date; items: PublicMatchday[] }>();
+for (const matchday of view.matchdays) {
+	const date = new Date(matchday.date);
 	const key = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(date);
 	const group = dateGroups.get(key) ?? { date, items: [] };
-	group.items.push(item);
+	group.items.push(matchday);
 	dateGroups.set(key, group);
 }
 const groups = [...dateGroups.entries()].sort(([left], [right]) => left.localeCompare(right));
@@ -35,14 +34,6 @@ const formatWeekday = new Intl.DateTimeFormat('es-ES', {
 	weekday: 'short',
 	timeZone: 'Europe/Madrid',
 });
-
-function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefined {
-	const [first, ...rest] = items;
-	if (!first) return undefined;
-	return rest.every((item) => item.matchday.id === first.matchday.id)
-		? first.matchday.id
-		: undefined;
-}
 ---
 
 <BaseLayout
@@ -73,14 +64,14 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 								<p class="c-eyebrow">{PUBLIC_SEASON_NAME} · Calendario oficial</p>
 								<h1>Calendario y resultados de Kings Padel League</h1>
 								<p>
-									Consulta cuándo se juega cada jornada, entra en cualquier partido para ver su
-									marcador y abre el desglose por parejas para seguir a los jugadores.
+									Consulta las fechas de las jornadas y accede a cada una para ver los
+									enfrentamientos, horarios y resultados completos.
 								</p>
 							</div>
 							<SeasonMap matchdays={view.matchdays} />
 						</header>
 
-						{allEncounters.length ? (
+						{view.matchdays.length ? (
 							<>
 								<section
 									class="filters-panel filters-panel--calendar"
@@ -90,10 +81,10 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 									<div class="filters-panel__heading">
 										<div>
 											<p class="c-eyebrow">Tu agenda</p>
-											<h2 id="calendar-filters-title">Encuentra un partido</h2>
+											<h2 id="calendar-filters-title">Encuentra una jornada</h2>
 										</div>
 										<p role="status" aria-live="polite" data-calendar-count>
-											{allEncounters.length} partidos
+											{view.matchdays.length} {view.matchdays.length === 1 ? 'jornada' : 'jornadas'}
 										</p>
 									</div>
 									<div class="filters-panel__grid filters-panel__grid--calendar">
@@ -101,9 +92,9 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 											<span class="c-field__label">Estado</span>
 											<select class="c-select" data-calendar-status>
 												<option value="">Todos los estados</option>
-												<option value="upcoming">Programados</option>
+												<option value="upcoming">Programadas</option>
 												<option value="current">En juego</option>
-												<option value="completed">Finalizados</option>
+												<option value="completed">Finalizadas</option>
 											</select>
 										</label>
 										<label class="c-field">
@@ -131,7 +122,6 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 
 								<div class="calendar-list" data-calendar-list>
 									{groups.map(([key, group]) => {
-										const matchdayId = dayMatchdayId(group.items);
 										return (
 											<section
 												class="calendar-day"
@@ -146,26 +136,48 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 												</div>
 												<div class="match-list">
 													<header class="calendar-day__heading">
-														<p class="c-eyebrow">Agenda del día</p>
-														<h2 transition:name={matchdayId && `kpl-matchday-${matchdayId}-title`}>
+														<p class="c-eyebrow">Jornadas del día</p>
+														<h2>
 															{new Intl.DateTimeFormat('es-ES', {
 																dateStyle: 'long',
 																timeZone: 'Europe/Madrid',
 															}).format(group.date)}
 														</h2>
 													</header>
-													{group.items.map(({ encounter, matchday }) => (
-														<div
-															data-calendar-match
-															data-status={encounter.status}
-															data-home={encounter.homeTeam.id}
-															data-away={encounter.awayTeam.id}
+													{group.items.map((matchday) => (
+														<article
+															class="calendar-matchday"
+															data-calendar-matchday
+															data-status={matchday.status}
+															data-teams={matchday.encounters
+																.flatMap((encounter) => [
+																	encounter.homeTeam.id,
+																	encounter.awayTeam.id,
+																])
+																.join(' ')}
 														>
-															<MatchCard
-																encounter={encounter}
-																matchdayHref={`/jornadas/${matchday.id}`}
-															/>
-														</div>
+															<div class="calendar-matchday__summary">
+																<span
+																	class:list={[
+																		'c-chip',
+																		`c-chip--tone-${statusTones[matchday.status]}`,
+																	]}
+																>
+																	{statusLabels[matchday.status]}
+																</span>
+																<h3 transition:name={`kpl-matchday-${matchday.id}-title`}>
+																	{matchday.label}
+																</h3>
+																<p>{encounterCountLabel(matchday.encounters.length)}</p>
+															</div>
+															<a
+																class="c-button c-button--primary"
+																href={`/jornadas/${matchday.id}`}
+																aria-label={`Ver jornada: ${matchday.label}`}
+															>
+																Ver jornada →
+															</a>
+														</article>
 													))}
 												</div>
 											</section>
@@ -173,7 +185,7 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 									})}
 								</div>
 								<div class="directory-empty" role="status" data-calendar-empty hidden>
-									<strong>No hay partidos con esos filtros.</strong>
+									<strong>No hay jornadas con esos filtros.</strong>
 									<p>Prueba con otro estado o equipo.</p>
 								</div>
 							</>
@@ -199,19 +211,19 @@ function dayMatchdayId(items: { matchday: PublicMatchday }[]): string | undefine
 			const count = filters.querySelector<HTMLElement>('[data-calendar-count]')!;
 			const clear = filters.querySelector<HTMLButtonElement>('[data-calendar-clear]')!;
 			const empty = document.querySelector<HTMLElement>('[data-calendar-empty]')!;
-			const matches = [...document.querySelectorAll<HTMLElement>('[data-calendar-match]')];
+			const matches = [...document.querySelectorAll<HTMLElement>('[data-calendar-matchday]')];
 			const update = () => {
 				let visible = 0;
 				for (const match of matches) {
 					const show =
 						(!status.value || match.dataset.status === status.value) &&
-						(!team.value || match.dataset.home === team.value || match.dataset.away === team.value);
+						(!team.value || match.dataset.teams?.split(' ').includes(team.value));
 					match.hidden = !show;
 					if (show) visible += 1;
 				}
 				for (const day of document.querySelectorAll<HTMLElement>('[data-calendar-day]'))
-					day.hidden = !day.querySelector('[data-calendar-match]:not([hidden])');
-				count.textContent = `${visible} ${visible === 1 ? 'partido' : 'partidos'}`;
+					day.hidden = !day.querySelector('[data-calendar-matchday]:not([hidden])');
+				count.textContent = `${visible} ${visible === 1 ? 'jornada' : 'jornadas'}`;
 				empty.hidden = visible !== 0;
 				clear.hidden = !(status.value || team.value);
 			};

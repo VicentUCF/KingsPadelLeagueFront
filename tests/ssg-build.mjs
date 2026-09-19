@@ -70,12 +70,14 @@ try {
 	for (const page of [calendarPage, activeMatchday]) {
 		assertTransitionNames(page, ['kpl-matchday-jornada-1-title']);
 	}
-	assert.match(calendarPage, /<a class="c-team-badge"[^>]*href="\/equipos\//);
-	assert.match(calendarPage, /Padel Mixto Xeresa/);
+	assert.doesNotMatch(calendarPage, /data-calendar-match(?:\s|>)/);
+	assert.equal((calendarPage.match(/<article\b[^>]*data-calendar-matchday/g) ?? []).length, 3);
+	assert.match(calendarPage, /href="\/jornadas\/jornada-1"[^>]*>\s*Ver jornada/);
+	assert.match(activeMatchday, /Padel Mixto Xeresa/);
 	assert.match(calendarPage, /season-map__day--match/);
-	assert.match(calendarPage, /Ver desglose por parejas/);
+	assert.doesNotMatch(calendarPage, /Ver desglose por parejas/);
 	// MatchCard uses the player's full name without adding the profile alias.
-	assert.match(calendarPage, /<a href="\/jugadores\/king">Alex Rey<\/a>/);
+	assert.match(activeMatchday, /<a href="\/jugadores\/king">Alex Rey<\/a>/);
 	assert.match(scheduledMatchday, /Jornada programada/);
 	assert.match(scheduledMatchday, /<a href="\/jugadores\/roar">Iris Rojo<\/a>/);
 	assert.match(scheduledMatchday, /<a href="\/jugadores\/nova">Nora Vega<\/a>/);
