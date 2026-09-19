@@ -189,6 +189,8 @@
 			max-block-size: 100%;
 			inline-size: min(14rem, 72%);
 			font-size: var(--kpl-font-size-700);
+			justify-self: center;
+			align-self: baseline;
 		}
 
 		& .team-card__logo img {
