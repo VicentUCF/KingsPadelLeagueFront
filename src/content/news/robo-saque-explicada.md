@@ -1,13 +1,13 @@
 ---
 title: Así funciona Robo saque
 subtitle: La carta del nivel azul convierte el servicio en un arma de doble filo durante un juego completo.
-category: cartas
-publishedAt: 2026-08-28T16:00:00+02:00
-published: true
 cover:
-  image: /news/covers/padel-volea-derecha.jpg
+  image: /news/covers/robo_saque.jpeg
   alt: Un jugador de pádel golpea una volea de derecha.
   credit: 'Foto: Calleja10 / Wikimedia Commons (CC BY-SA 4.0)'
+publishedAt: 2026-08-28T14:00:00.000Z
+category: cartas
+published: true
 ---
 
 Dentro del nivel azul del maletín, Robo saque es una de las cartas que más puede condicionar el
