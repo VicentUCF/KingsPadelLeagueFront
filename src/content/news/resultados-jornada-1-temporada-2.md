@@ -1,11 +1,14 @@
 ---
 title: 'Resultados de la Jornada 1: tres victorias por 5-0'
-subtitle: Kings of Favar, RedLions y Magic City firmaron tres 5-0 en una jornada marcada por dos apariciones de la carta Inversión.
+subtitle: 'Kings of Favar, RedLions y Magic City firmaron tres 5-0 en una jornada marcada por dos apariciones de la carta Inversión.'
+cover:
+  image: /news/covers/resultados-jornada-1-temporada-2.webp
+  alt: 'Tres pelotas de pádel iluminadas en primer plano sobre una pista nocturna, con dos jugadores al fondo.'
+  credit: Imagen generada con IA para Kings Padel League.
+publishedAt: 2026-09-22T10:00:00.000Z
 category: partidos
-publishedAt: 2026-09-22T12:00:00+02:00
-published: false
-featured: false
-relatedMatchdayId: 1ec023b4-d593-499f-8951-677714a1d080
+published: true
+featured: true
 relatedTeamSlugs:
   - kings-of-favar
   - titanics
@@ -13,10 +16,7 @@ relatedTeamSlugs:
   - thormentadores
   - magic-city
   - barbaridad-team
-cover:
-  image: /news/covers/resultados-jornada-1-temporada-2.webp
-  alt: Tres pelotas de pádel iluminadas en primer plano sobre una pista nocturna, con dos jugadores al fondo.
-  credit: Imagen generada con IA para Kings Padel League.
+relatedMatchdayId: 1ec023b4-d593-499f-8951-677714a1d080
 ---
 
 La Temporada 2 ha empezado sin espacio para las medias tintas. Kings of Favar, RedLions y
