@@ -5,9 +5,9 @@ category: calendario
 publishedAt: 2026-08-27T12:00:00+02:00
 published: true
 cover:
-  image: /news/covers/padel-court-mariestad.jpg
-  alt: Pista de pádel al aire libre vacía, lista para el próximo partido.
-  credit: 'Foto: Ainali / Wikimedia Commons (CC BY-SA 4.0)'
+  image: /news/covers/calendario-temporada-2.webp
+  alt: Pista de pádel vista desde arriba con una cuadrícula dorada y pelotas marcando distintas casillas.
+  credit: Imagen generada con IA para Kings Padel League.
 ---
 
 El calendario oficial de la nueva temporada ya está cerrado. Cada jornada enfrentará a los equipos

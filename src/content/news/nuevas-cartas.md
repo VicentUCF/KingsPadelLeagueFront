@@ -2,9 +2,9 @@
 title: Cartas Kings Padel League
 subtitle: Antes de cada partido se abrirá el maletín y cada presidente robará una carta de uso único capaz de cambiar el ritmo desde la pista.
 cover:
-  image: '/news/covers/ChatGPT-Image-Sep-2,-2026,-01_01_53-PM.png'
-  alt: Palas y bolas de pádel sobre la pista.
-  credit: 'Foto: Anton Gustafsson / Wikimedia Commons (CC BY 2.0)'
+  image: /news/covers/nuevas-cartas-maletin.webp
+  alt: Maletín negro abierto con diez cartas negras y doradas sobre una pista de pádel.
+  credit: Imagen generada con IA para Kings Padel League.
 publishedAt: 2026-08-27T11:00:00.000Z
 category: cartas
 published: true

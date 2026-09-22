@@ -8,9 +8,9 @@ featured: true
 relatedTeamSlugs:
   - redlions
 cover:
-  image: /news/covers/padel-blue-court-match.jpg
-  alt: Jugadores de pádel disputando un partido en una pista azul al aire libre rodeada de vegetación.
-  credit: 'Foto: Nenad Stojković / Wikimedia Commons (CC BY 2.0)'
+  image: /news/covers/mercado-redlions.webp
+  alt: Camiseta roja de RedLions colgada en un vestuario de pádel junto a una pala.
+  credit: Imagen generada con IA para Kings Padel League.
 ---
 
 El mercado de la próxima temporada ya se ha cerrado, con movimiento en varias plantillas de la

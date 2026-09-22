@@ -2,9 +2,9 @@
 title: Así funciona Robo saque
 subtitle: La carta del nivel azul convierte el servicio en un arma de doble filo durante un juego completo.
 cover:
-  image: /news/covers/robo_saque.jpeg
-  alt: Un jugador de pádel golpea una volea de derecha.
-  credit: 'Foto: Calleja10 / Wikimedia Commons (CC BY-SA 4.0)'
+  image: /news/covers/robo-saque.webp
+  alt: Jugador vestido de azul realiza un saque bajo ante dos rivales en una pista de pádel.
+  credit: Imagen generada con IA para Kings Padel League.
 publishedAt: 2026-08-28T14:00:00.000Z
 category: cartas
 published: true

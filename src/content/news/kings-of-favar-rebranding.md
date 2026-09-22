@@ -1,15 +1,15 @@
 ---
 title: 'El nuevo logo de Kings of Favar: tres letras y ganas de K.O.'
 subtitle: 'Rosa flúor, lema en inglés y unas siglas, KOF, que en el grupo nadie lee ya sin pensar en el videojuego de lucha de los noventa.'
-cover:
-  image: /news/covers/KOF-vector.svg
-  alt: Pista de pádel cubierta en un centro deportivo.
-  credit: 'Foto: Diegodlh / Wikimedia Commons (CC BY 4.0)'
 publishedAt: 2026-09-03T08:00:00.000Z
 category: equipos
 published: true
 relatedTeamSlugs:
   - kings-of-favar
+cover:
+  image: /news/covers/kings-of-favar-rebranding.webp
+  alt: Emblema rosa de KOF iluminado en una pared oscura junto a una pista de pádel.
+  credit: Imagen generada con IA para Kings Padel League.
 ---
 
 Kings of Favar ha presentado el nuevo escudo de cara a la temporada 2, y la pieza central no es
