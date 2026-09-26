@@ -9,6 +9,7 @@ publishedAt: 2026-09-22T10:00:00.000Z
 category: partidos
 published: true
 featured: true
+updatedAt: 2026-09-25T22:00:00.000Z
 relatedTeamSlugs:
   - kings-of-favar
   - titanics
